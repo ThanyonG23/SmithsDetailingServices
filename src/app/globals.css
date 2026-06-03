@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body {
+  background: #070708;
+  color: #ffffff;
+}
+
+body {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Subtle brand glow backdrop reused across pages */
+.brand-backdrop {
+  background-image:
+    radial-gradient(900px 520px at 12% -5%, rgba(255, 230, 0, 0.1), transparent 55%),
+    radial-gradient(820px 460px at 95% 0%, rgba(43, 255, 122, 0.08), transparent 60%);
+}
+
+/* Feature cards: soft outer halo + a border that FADES around the edge
+   (gradient ring via mask) so it never reads as a hard start/stop line. */
+.feature-glow,
+.feature-glow-green {
+  position: relative;
+  border-color: transparent;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+.feature-glow::before,
+.feature-glow-green::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.feature-glow {
+  box-shadow:
+    0 0 16px rgba(255, 230, 0, 0.1),
+    0 0 44px rgba(255, 230, 0, 0.12),
+    0 0 90px rgba(255, 230, 0, 0.07);
+}
+.feature-glow::before {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 230, 0, 0.85),
+    rgba(255, 230, 0, 0) 40%,
+    rgba(255, 230, 0, 0) 60%,
+    rgba(255, 230, 0, 0.55)
+  );
+}
+.feature-glow:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 20px rgba(255, 230, 0, 0.16),
+    0 0 56px rgba(255, 230, 0, 0.18),
+    0 0 110px rgba(255, 230, 0, 0.1);
+}
+
+.feature-glow-green {
+  box-shadow:
+    0 0 16px rgba(43, 255, 122, 0.1),
+    0 0 44px rgba(43, 255, 122, 0.12),
+    0 0 90px rgba(43, 255, 122, 0.07);
+}
+.feature-glow-green::before {
+  background: linear-gradient(
+    135deg,
+    rgba(43, 255, 122, 0.85),
+    rgba(43, 255, 122, 0) 40%,
+    rgba(43, 255, 122, 0) 60%,
+    rgba(43, 255, 122, 0.55)
+  );
+}
+.feature-glow-green:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 20px rgba(43, 255, 122, 0.16),
+    0 0 56px rgba(43, 255, 122, 0.18),
+    0 0 110px rgba(43, 255, 122, 0.1);
+}
+
+/* Date field: force light controls so the calendar button is dark and
+   visible on the white input (the page uses a dark color-scheme by default). */
+input[type="date"] {
+  color-scheme: light;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 1;
+  cursor: pointer;
+}
