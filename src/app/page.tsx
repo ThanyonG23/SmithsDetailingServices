@@ -9,7 +9,7 @@ function BookButton({ className = "" }: { className?: string }) {
       href={TEXT_TO_BOOK_HREF}
       className={`inline-flex items-center justify-center rounded-xl bg-brand-green px-6 py-3.5 font-black text-[#04130a] shadow-glowG transition active:scale-95 ${className}`}
     >
-      Text to Book →
+      Text for a Free Quote →
     </a>
   );
 }
@@ -35,7 +35,7 @@ export default function Home() {
               href={TEXT_TO_BOOK_HREF}
               className="rounded-lg border-2 border-brand-green px-4 py-2 text-sm font-black text-brand-green transition hover:bg-brand-green/10"
             >
-              Text to Book
+              Free Quote
             </a>
           </div>
         </div>
@@ -109,7 +109,7 @@ export default function Home() {
                     href={TEXT_TO_BOOK_HREF}
                     className="mt-6 inline-flex items-center justify-center rounded-xl border-2 border-brand-green bg-black/30 py-3 font-black text-brand-green backdrop-blur transition hover:bg-brand-green/10"
                   >
-                    Text to book
+                    Text for a free quote
                   </a>
                 </div>
               </div>
@@ -236,7 +236,7 @@ export default function Home() {
         href={TEXT_TO_BOOK_HREF}
         className="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full bg-brand-green px-5 py-3.5 text-sm font-black text-[#04130a] shadow-glowG transition active:scale-95"
       >
-        💬 Text to Book
+        💬 Free Quote
       </a>
     </main>
   );
