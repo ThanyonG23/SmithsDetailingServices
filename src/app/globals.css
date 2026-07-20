@@ -10,6 +10,9 @@ html,
 body {
   background: #050506;
   color: #ffffff;
+  /* stop any stray element (glows, wide rows) from causing sideways scroll on mobile */
+  overflow-x: clip;
+  max-width: 100%;
 }
 
 body {

@@ -23,7 +23,7 @@ export const BUSINESS = {
    message they can complete with their vehicle + package. The "?&body=" form
    is the cross-platform trick that works on both iPhone and Android. */
 export const TEXT_TO_BOOK_MESSAGE =
-  "Hey Smiths! Can I please get a free quote.\n\nVehicle: \nPackage: \nDay that suits me: ";
+  "Hey Smiths! I'd like a free quote.\n\nMy vehicle: \nWhat I'm after: ";
 
 export const TEXT_TO_BOOK_HREF =
   "sms:" + BUSINESS.phoneE164 + "?&body=" + encodeURIComponent(TEXT_TO_BOOK_MESSAGE);
