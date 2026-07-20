@@ -35,6 +35,17 @@ export const TEXT_TO_BOOK_HREF =
 export const HERO_IMAGE = "/media/photos/hero.jpg";
 export const CTA_IMAGE = "/media/photos/cta.jpg";
 
+/* Trim-restoration feature video ("Bring Black Back" section) */
+export const TRIM_VIDEO = "/media/videos/trim-restoration.mp4";
+
+/* Touch-up paint before/after slider */
+export const TOUCHUP_BEFORE = "/media/photos/touchup-before.jpg";
+export const TOUCHUP_AFTER = "/media/photos/touchup-after.jpg";
+
+/* Headlight restoration before/after slider */
+export const HEADLIGHT_BEFORE = "/media/photos/headlight-before.jpg";
+export const HEADLIGHT_AFTER = "/media/photos/headlight-after.jpg";
+
 /* ---------------------------------------------------------------- */
 /* VEHICLES                                                          */
 /* ---------------------------------------------------------------- */
@@ -232,11 +243,11 @@ export const SERVICES: ServiceDef[] = [
     name: "Deep Interior Clean",
     headline: "Every surface,",
     accentWord: "brought back to new.",
-    desc: "Not a vacuum and a wipe. We pull the dirt out of the carpets, steam through every vent and crevice, and bring faded plastics back to life. You get in and it smells and feels like a different car.",
+    desc: "Not a vacuum and a wipe. We pull the dirt out of the carpets, steam through the grime and dirt, and bring faded plastics back to life. You get in and it smells and feels like a different car.",
     steps: [
-      "Carpet shampoo & hot-water extraction",
-      "Steam cleaned through vents & crevices",
-      "Plastics and trim rejuvenated",
+      "Carpet shampoo & carpet extraction",
+      "Steam cleaned",
+      "Plastics & trim rejuvenated",
       "Glass left completely streak-free",
     ],
     // ideal upload: services/interior.jpg
@@ -253,7 +264,7 @@ export const SERVICES: ServiceDef[] = [
     steps: [
       "Wheels & arches decontaminated first",
       "Snow-foam pre-soak lifts the grit",
-      "Safe two-bucket hand wash",
+      "Safe contact wash",
       "Hand dried — no water spots",
     ],
     // ideal upload: services/exterior-wash.jpg
@@ -271,7 +282,7 @@ export const SERVICES: ServiceDef[] = [
       "Full decontamination & clay bar",
       "One-step machine cut removes defects",
       "Refined polish for true clarity",
-      "Hand wax sealant locks it in",
+      "Ceramic spray sealant — 3-month protection",
     ],
     // ideal upload: services/cut-polish.jpg
     image: "https://cdn.shopify.com/s/files/1/0933/1055/0325/files/IMG_9226.jpg?v=1769392524",

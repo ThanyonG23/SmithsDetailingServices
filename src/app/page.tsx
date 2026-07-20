@@ -8,10 +8,16 @@ import {
   REVIEW_COUNT,
   HERO_IMAGE,
   CTA_IMAGE,
+  TOUCHUP_BEFORE,
+  TOUCHUP_AFTER,
+  HEADLIGHT_BEFORE,
+  HEADLIGHT_AFTER,
 } from "@/lib/config";
 import Reels from "@/components/Reels";
 import ReviewsSection from "@/components/ReviewsSection";
 import ServiceShowcase from "@/components/ServiceShowcase";
+import BringBlackBack from "@/components/BringBlackBack";
+import BeforeAfter from "@/components/BeforeAfter";
 import Reveal from "@/components/Reveal";
 
 function TextCta({ className = "" }: { className?: string }) {
@@ -172,6 +178,89 @@ export default function Home() {
         </div>
 
         <ServiceShowcase />
+      </section>
+
+      {/* ═══════════════════ BRING BLACK BACK ═══════════════════ */}
+      <BringBlackBack />
+
+      {/* ═══════════════════ TOUCH-UP BEFORE/AFTER ═══════════════════ */}
+      <section className="mx-auto max-w-6xl px-4 py-20 sm:py-28">
+        <div className="flex flex-col items-center gap-10 md:flex-row-reverse md:gap-16">
+          <div className="w-full min-w-0 md:flex-1">
+            <Reveal>
+              <Eyebrow>Touch-up paint</Eyebrow>
+              <h2 className="mt-3 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-6xl">
+                Slide to see
+                <br />
+                <span className="text-brand-yellow">the difference.</span>
+              </h2>
+              <p className="mt-5 max-w-md text-sm leading-relaxed text-white/65 sm:text-base">
+                Stone chips and scratches are the first thing a buyer notices. We colour-match to
+                your factory paint, fill, level and polish until the damage vanishes into the panel.
+                Drag the slider — that&apos;s real work on a real customer&apos;s ute.
+              </p>
+              <a
+                href={TEXT_TO_BOOK_HREF}
+                className="mt-7 inline-flex items-center gap-2 text-sm font-black transition hover:gap-3"
+              >
+                <span className="text-brand-yellow">Text for a free quote</span>
+                <span className="text-brand-yellow">→</span>
+              </a>
+            </Reveal>
+          </div>
+
+          <div className="w-full min-w-0 md:flex-1">
+            <Reveal delay={120}>
+              <div className="relative mx-auto max-w-[340px]">
+                <div className="halo-yellow pointer-events-none absolute -inset-10" aria-hidden />
+                <BeforeAfter before={TOUCHUP_BEFORE} after={TOUCHUP_AFTER} />
+                <p className="mt-3 text-center text-xs font-semibold text-white/40">
+                  ⇆ Drag to reveal
+                </p>
+              </div>
+            </Reveal>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════════════ HEADLIGHT BEFORE/AFTER ═══════════════════ */}
+      <section className="mx-auto max-w-6xl px-4 py-20 sm:py-28">
+        <div className="flex flex-col items-center gap-10 md:flex-row md:gap-16">
+          <div className="w-full min-w-0 md:flex-1">
+            <Reveal>
+              <Eyebrow>Headlight restoration</Eyebrow>
+              <h2 className="mt-3 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-6xl">
+                Cloudy to
+                <br />
+                <span className="text-brand-green">crystal clear.</span>
+              </h2>
+              <p className="mt-5 max-w-md text-sm leading-relaxed text-white/65 sm:text-base">
+                Foggy, yellowed headlights make a good car look tired — and cut how far you can see
+                at night. We sand back the oxidised layer, polish to full clarity, then seal them so
+                they stay clear.
+              </p>
+              <a
+                href={TEXT_TO_BOOK_HREF}
+                className="mt-7 inline-flex items-center gap-2 text-sm font-black transition hover:gap-3"
+              >
+                <span className="text-brand-green">Text for a free quote</span>
+                <span className="text-brand-green">→</span>
+              </a>
+            </Reveal>
+          </div>
+
+          <div className="w-full min-w-0 md:flex-1">
+            <Reveal delay={120}>
+              <div className="relative mx-auto max-w-[340px]">
+                <div className="halo-green pointer-events-none absolute -inset-10" aria-hidden />
+                <BeforeAfter before={HEADLIGHT_BEFORE} after={HEADLIGHT_AFTER} />
+                <p className="mt-3 text-center text-xs font-semibold text-white/40">
+                  ⇆ Drag to reveal
+                </p>
+              </div>
+            </Reveal>
+          </div>
+        </div>
       </section>
 
       {/* ═══════════════════ REVIEWS ═══════════════════ */}
