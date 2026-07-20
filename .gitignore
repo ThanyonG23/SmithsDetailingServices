@@ -30,3 +30,10 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# original camera files — we commit the converted .jpg/.mp4 versions instead,
+# so these large unusable-on-web originals stay local only
+public/media/*.HEIC
+public/media/*.heic
+public/media/*.MOV
+public/media/*.mov

@@ -32,10 +32,8 @@ export const TEXT_TO_BOOK_HREF =
    These are placeholders — for best effect upload your two strongest
    "wow" shots to public/media/photos/ (e.g. hero.jpg + cta.jpg) and
    point these at "/media/photos/hero.jpg" and "/media/photos/cta.jpg". */
-export const HERO_IMAGE =
-  "https://cdn.shopify.com/s/files/1/0933/1055/0325/files/IMG_9226.jpg?v=1769392524";
-export const CTA_IMAGE =
-  "https://cdn.shopify.com/s/files/1/0933/1055/0325/files/IMG_9133.jpg?v=1768791449";
+export const HERO_IMAGE = "/media/photos/hero.jpg";
+export const CTA_IMAGE = "/media/photos/cta.jpg";
 
 /* ---------------------------------------------------------------- */
 /* VEHICLES                                                          */
@@ -326,8 +324,7 @@ export const SERVICES: ServiceDef[] = [
       "Levelled and polished flush",
       "Blended into the surrounding panel",
     ],
-    // ideal upload: services/touch-up.jpg
-    image: "https://cdn.shopify.com/s/files/1/0933/1055/0325/files/IMG_9226.jpg?v=1769392524",
+    image: "/media/photos/services/touch-up.jpg",
     accent: "green",
   },
   {
