@@ -32,7 +32,7 @@ export const TEXT_TO_BOOK_HREF =
    These are placeholders — for best effect upload your two strongest
    "wow" shots to public/media/photos/ (e.g. hero.jpg + cta.jpg) and
    point these at "/media/photos/hero.jpg" and "/media/photos/cta.jpg". */
-export const HERO_IMAGE = "/media/photos/hero.jpg";
+export const HERO_IMAGE = "/media/photos/hero-fpv.jpg";
 export const CTA_IMAGE = "/media/photos/cta.jpg";
 
 /* "Bring Black Back" trim-restoration still (half faded / half restored) */
@@ -42,8 +42,8 @@ export const BRING_BLACK_BACK_IMAGE = "/media/photos/bring-black-back.jpg";
 export const TOUCHUP_BEFORE = "/media/photos/touchup-before.jpg";
 export const TOUCHUP_AFTER = "/media/photos/touchup-after.jpg";
 
-export const TOUCHUP_DOOR_BEFORE = "/media/photos/touchup-door-before.jpg";
-export const TOUCHUP_DOOR_AFTER = "/media/photos/touchup-door-after.jpg";
+export const TOUCHUP_DOOR_BEFORE = "/media/photos/door-damaged.jpg"; // scuffed/scratched door
+export const TOUCHUP_DOOR_AFTER = "/media/photos/door-repaired.jpg"; // glossy, repaired
 
 export const HEADLIGHT_BEFORE = "/media/photos/headlight-before.jpg";
 export const HEADLIGHT_AFTER = "/media/photos/headlight-after.jpg";
@@ -305,7 +305,7 @@ export const SERVICES: ServiceDef[] = [
       "Refining stages for true clarity",
       "Checked under inspection lighting",
     ],
-    image: "/media/photos/paint-correction.jpg",
+    image: "/media/photos/paint-gloss.jpg",
     accent: "green",
   },
   {

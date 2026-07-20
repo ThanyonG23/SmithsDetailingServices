@@ -25,8 +25,17 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: "Smiths Detailing Services",
     type: "website",
+    images: [
+      { url: "/og.jpg", width: 1200, height: 630, alt: "Smiths Detailing Services — Cairns" },
+    ],
   },
-  icons: { icon: "/favicon.ico" },
+  twitter: {
+    card: "summary_large_image",
+    title: "Smiths Detailing Services | Premium Car Detailing in Cairns",
+    description:
+      "Deep interior cleans, cut & polish, paint correction and ceramic coatings in Cairns. Text us for a free quote.",
+    images: ["/og.jpg"],
+  },
 };
 
 export const viewport: Viewport = {
