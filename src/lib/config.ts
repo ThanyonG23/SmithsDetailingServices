@@ -10,10 +10,9 @@ export const BUSINESS = {
   phone: "0456 186 696",
   phoneE164: "+61456186696",
   email: "info@smithsdetailingservices.com.au",
-  suburb: "Smithfield, Cairns",
+  suburb: "Parramatta Park, Cairns",
   // All work is done at our location — customers drop off & pick up.
-  // TODO: replace with the exact street address once confirmed.
-  address: "Smithfield, Cairns QLD 4878",
+  address: "209 Bunda Street, Parramatta Park, Cairns QLD",
   tz: "Australia/Brisbane", // Cairns = QLD = UTC+10, no daylight saving
   reviewLink: "https://g.page/r/CVj0x7-guHPPEBM/review",
   instagram: "https://www.instagram.com/",
@@ -28,6 +27,15 @@ export const TEXT_TO_BOOK_MESSAGE =
 
 export const TEXT_TO_BOOK_HREF =
   "sms:" + BUSINESS.phoneE164 + "?&body=" + encodeURIComponent(TEXT_TO_BOOK_MESSAGE);
+
+/* Big background photos for the hero and the final CTA band.
+   These are placeholders — for best effect upload your two strongest
+   "wow" shots to public/media/photos/ (e.g. hero.jpg + cta.jpg) and
+   point these at "/media/photos/hero.jpg" and "/media/photos/cta.jpg". */
+export const HERO_IMAGE =
+  "https://cdn.shopify.com/s/files/1/0933/1055/0325/files/IMG_9226.jpg?v=1769392524";
+export const CTA_IMAGE =
+  "https://cdn.shopify.com/s/files/1/0933/1055/0325/files/IMG_9133.jpg?v=1768791449";
 
 /* ---------------------------------------------------------------- */
 /* VEHICLES                                                          */
@@ -198,6 +206,148 @@ export function getExtra(key: string): ExtraDef | undefined {
 export function extraPrice(extra: ExtraDef, vehicle: VehicleKey): number {
   return extra.prices[vehicle] ?? 0;
 }
+
+/* ---------------------------------------------------------------- */
+/* SERVICES — the main homepage showcase                            */
+/*                                                                  */
+/* PHOTOS: each service currently uses a placeholder. Drop your own  */
+/* shots into public/media/photos/services/ using the filename in    */
+/* each `image` comment, then change the `image` value to match.     */
+/* See public/media/photos/services/README.md for the full list.     */
+/* ---------------------------------------------------------------- */
+export interface ServiceDef {
+  key: string;
+  eyebrow: string; // small uppercase label above the headline
+  name: string; // plain name (used in pills / alt text)
+  headline: string; // first part of the big headline
+  accentWord: string; // coloured part of the headline
+  desc: string;
+  steps: string[]; // checklist that staggers in
+  image: string;
+  accent: "yellow" | "green";
+}
+
+export const SERVICES: ServiceDef[] = [
+  {
+    key: "interior",
+    eyebrow: "Interior",
+    name: "Deep Interior Clean",
+    headline: "Every surface,",
+    accentWord: "brought back to new.",
+    desc: "Not a vacuum and a wipe. We pull the dirt out of the carpets, steam through every vent and crevice, and bring faded plastics back to life. You get in and it smells and feels like a different car.",
+    steps: [
+      "Carpet shampoo & hot-water extraction",
+      "Steam cleaned through vents & crevices",
+      "Plastics and trim rejuvenated",
+      "Glass left completely streak-free",
+    ],
+    // ideal upload: services/interior.jpg
+    image: "https://cdn.shopify.com/s/files/1/0933/1055/0325/files/IMG_9133.jpg?v=1768791449",
+    accent: "yellow",
+  },
+  {
+    key: "wash",
+    eyebrow: "Exterior",
+    name: "Exterior Wash",
+    headline: "A proper wash.",
+    accentWord: "Not a quick rinse.",
+    desc: "Wheels and arches first, then a snow-foam pre-soak to lift the grit before anything touches your paint. Washed by hand, dried by hand, so you don't trade dirt for swirl marks and water spots.",
+    steps: [
+      "Wheels & arches decontaminated first",
+      "Snow-foam pre-soak lifts the grit",
+      "Safe two-bucket hand wash",
+      "Hand dried — no water spots",
+    ],
+    // ideal upload: services/exterior-wash.jpg
+    image: "https://cdn.shopify.com/s/files/1/0933/1055/0325/files/IMG_9130.jpg?v=1768791441",
+    accent: "green",
+  },
+  {
+    key: "cutpolish",
+    eyebrow: "Paint",
+    name: "Cut & Polish",
+    headline: "Cut back the haze,",
+    accentWord: "bring back the gloss.",
+    desc: "Years of washing leaves paint dull and full of fine scratches. We decontaminate, clay, then machine cut and refine until the colour has depth again — and seal it so it lasts.",
+    steps: [
+      "Full decontamination & clay bar",
+      "One-step machine cut removes defects",
+      "Refined polish for true clarity",
+      "Hand wax sealant locks it in",
+    ],
+    // ideal upload: services/cut-polish.jpg
+    image: "https://cdn.shopify.com/s/files/1/0933/1055/0325/files/IMG_9226.jpg?v=1769392524",
+    accent: "yellow",
+  },
+  {
+    key: "correction",
+    eyebrow: "Paint correction",
+    name: "Multi-Stage Paint Correction",
+    headline: "For paint that",
+    accentWord: "deserves perfect.",
+    desc: "Our most involved paint work. Multiple compounding and refining stages, checked under inspection lighting between each pass, until the finish is as close to flawless as your paint will allow.",
+    steps: [
+      "Paint depth measured & assessed",
+      "Compounding stage for deeper defects",
+      "Refining stages for true clarity",
+      "Checked under inspection lighting",
+    ],
+    // ideal upload: services/paint-correction.jpg
+    image: "https://cdn.shopify.com/s/files/1/0933/1055/0325/files/IMG_9134.jpg?v=1768791452",
+    accent: "green",
+  },
+  {
+    key: "headlights",
+    eyebrow: "Headlights",
+    name: "Headlight Restoration",
+    headline: "Yellowed and foggy?",
+    accentWord: "See clearly again.",
+    desc: "Cloudy headlights make a good car look tired — and they cut how far you can see at night. We sand back the oxidised layer, polish to full clarity, then seal them so they stay clear.",
+    steps: [
+      "Wet-sanded through the grit stages",
+      "Machine polished to full clarity",
+      "UV sealant applied to stop re-fogging",
+      "Night-time visibility restored",
+    ],
+    // ideal upload: services/headlights.jpg
+    image: "/media/photos/plastic-restore.jpg",
+    accent: "yellow",
+  },
+  {
+    key: "touchup",
+    eyebrow: "Touch-ups",
+    name: "Touch Up Paint",
+    headline: "Make the chips",
+    accentWord: "disappear.",
+    desc: "Stone chips and car park scratches are the first thing a buyer notices. We match your factory paint code, fill carefully, then level and polish so the repair blends into the panel.",
+    steps: [
+      "Colour matched to your paint code",
+      "Chips & scratches carefully filled",
+      "Levelled and polished flush",
+      "Blended into the surrounding panel",
+    ],
+    // ideal upload: services/touch-up.jpg
+    image: "https://cdn.shopify.com/s/files/1/0933/1055/0325/files/IMG_9226.jpg?v=1769392524",
+    accent: "green",
+  },
+  {
+    key: "ceramic",
+    eyebrow: "Protection",
+    name: "Ceramic Coatings",
+    headline: "Protection that lasts",
+    accentWord: "years, not weeks.",
+    desc: "A wax lasts a few months. A ceramic coating bonds to your paint and forms a hard, glossy shell that repels water and dirt — so your car stays cleaner, washes easier, and holds its shine for years.",
+    steps: [
+      "Paint corrected & prepped first",
+      "Coating applied panel by panel",
+      "Cured to a hard, glossy shell",
+      "Easier washing, lasting gloss",
+    ],
+    // ideal upload: services/ceramic.jpg
+    image: "/media/photos/hand-wax.jpg",
+    accent: "yellow",
+  },
+];
 
 /* ---------------------------------------------------------------- */
 /* REELS — homepage "Watch real results" videos (self-hosted)       */

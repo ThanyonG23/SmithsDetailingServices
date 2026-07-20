@@ -1,4 +1,5 @@
 import { REVIEWS, REVIEW_RATING, REVIEW_COUNT } from "@/lib/config";
+import Reveal from "./Reveal";
 
 const AVATAR_COLORS = [
   "#1a73e8",
@@ -48,44 +49,50 @@ function Stars({ className = "" }: { className?: string }) {
 
 export default function ReviewsSection() {
   return (
-    <section className="mx-auto max-w-5xl px-4 py-12">
-      {/* header */}
-      <div className="flex items-center gap-4 rounded-3xl border border-white/12 bg-white/[0.03] p-6">
-        <GoogleG className="h-9 w-9" />
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-3xl font-black text-white">{REVIEW_RATING.toFixed(1)}</span>
-            <Stars />
-          </div>
-          <div className="mt-1 text-sm text-white/60">Based on {REVIEW_COUNT}+ Google reviews</div>
+    <section className="mx-auto max-w-6xl px-4 py-20">
+      <Reveal>
+        <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">
+          Don&apos;t take our word for it
         </div>
-      </div>
+        <div className="mt-4 flex flex-wrap items-end gap-x-6 gap-y-3">
+          <h2 className="font-display text-3xl font-extrabold tracking-tight text-white sm:text-5xl">
+            Rated {REVIEW_RATING.toFixed(1)} by Cairns locals
+          </h2>
+          <div className="flex items-center gap-2.5">
+            <GoogleG className="h-6 w-6" />
+            <Stars />
+            <span className="text-sm text-white/55">{REVIEW_COUNT}+ reviews</span>
+          </div>
+        </div>
+      </Reveal>
 
       {/* review cards */}
-      <div className="-mx-4 mt-6 flex snap-x gap-4 overflow-x-auto px-4 pb-3">
-        {REVIEWS.map((r, i) => (
-          <div
-            key={r.name + i}
-            className="flex w-80 flex-none snap-start flex-col rounded-2xl border border-white/12 bg-white/[0.03] p-5"
-          >
-            <div className="flex items-center gap-3">
-              <span
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-black text-white"
-                style={{ background: AVATAR_COLORS[i % AVATAR_COLORS.length] }}
-              >
-                {r.name.charAt(0).toUpperCase()}
-              </span>
-              <div className="min-w-0">
-                <div className="truncate font-bold text-white">{r.name}</div>
-                <div className="text-xs text-white/50">{r.time}</div>
+      <Reveal delay={120}>
+        <div className="-mx-4 mt-8 flex snap-x gap-4 overflow-x-auto px-4 pb-3">
+          {REVIEWS.map((r, i) => (
+            <div
+              key={r.name + i}
+              className="card-edge flex w-80 flex-none snap-start flex-col rounded-2xl bg-white/[0.02] p-5"
+            >
+              <div className="flex items-center gap-3">
+                <span
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-black text-white"
+                  style={{ background: AVATAR_COLORS[i % AVATAR_COLORS.length] }}
+                >
+                  {r.name.charAt(0).toUpperCase()}
+                </span>
+                <div className="min-w-0">
+                  <div className="truncate font-bold text-white">{r.name}</div>
+                  <div className="text-xs text-white/45">{r.time}</div>
+                </div>
+                <GoogleG className="ml-auto h-5 w-5 shrink-0" />
               </div>
-              <GoogleG className="ml-auto h-5 w-5 shrink-0" />
+              <Stars className="mt-3" />
+              <p className="mt-2 text-sm leading-relaxed text-white/75">{r.text}</p>
             </div>
-            <Stars className="mt-3" />
-            <p className="mt-2 text-sm leading-relaxed text-white/80">{r.text}</p>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      </Reveal>
     </section>
   );
 }
