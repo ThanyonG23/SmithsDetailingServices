@@ -20,7 +20,7 @@ export default function BringBlackBack() {
             </h2>
             <p className="mt-5 max-w-md text-sm leading-relaxed text-white/65 sm:text-base">
               Sun-faded bumpers, mirrors and trim make even a clean car look tired. We strip back
-              the oxidation and restore that deep factory black — no greasy dressing that washes off
+              the oxidation and restore that deep factory black, no greasy dressing that washes off
               in a week. One panel, mid-restore:
             </p>
             <a
@@ -43,7 +43,7 @@ export default function BringBlackBack() {
                   className="photo-zoom absolute inset-0 bg-cover bg-center"
                   style={{ backgroundImage: `url(${BRING_BLACK_BACK_IMAGE})` }}
                   role="img"
-                  aria-label="Trim restoration — faded grey on one side, factory black on the other"
+                  aria-label="Trim restoration, faded grey on one side and factory black on the other"
                 />
                 <span className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-black/60 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-white/80 backdrop-blur">
                   Faded → Restored

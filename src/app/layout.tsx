@@ -15,11 +15,11 @@ const SITE_URL =
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: "Smiths Detailing Services | Premium Car Detailing — Cairns",
+  title: "Smiths Detailing Services | Premium Car Detailing in Cairns",
   description:
-    "Premium car detailing in Cairns. Deep interior cleans, cut & polish, multi-stage paint correction, headlight restoration and ceramic coatings. Text us for a free quote — if you're not happy, you don't pay.",
+    "Premium car detailing in Cairns. Deep interior cleans, cut & polish, multi-stage paint correction, headlight restoration and ceramic coatings. Text us for a free quote. If you're not happy, you don't pay.",
   openGraph: {
-    title: "Smiths Detailing Services | Premium Car Detailing — Cairns",
+    title: "Smiths Detailing Services | Premium Car Detailing in Cairns",
     description:
       "Deep interior cleans, cut & polish, paint correction and ceramic coatings in Cairns. Text us for a free quote. If you're not happy, you don't pay.",
     url: SITE_URL,

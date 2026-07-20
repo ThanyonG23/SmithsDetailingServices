@@ -53,7 +53,7 @@ export default function Home() {
       {/* ═══════════════════ NAV ═══════════════════ */}
       <header className="sticky top-0 z-40 border-b border-white/5 bg-black/50 backdrop-blur-md">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <Link href="/" className="flex items-center" aria-label="Smiths Detailing — home">
+          <Link href="/" className="flex items-center" aria-label="Smiths Detailing home">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={BUSINESS.logo} alt={BUSINESS.name} className="h-10 w-auto sm:h-11" />
           </Link>
@@ -109,7 +109,7 @@ export default function Home() {
 
           <Reveal delay={200}>
             <p className="mt-7 max-w-md text-base leading-relaxed text-white/70">
-              From a deep interior reset to full paint correction and ceramic coatings — done
+              From a deep interior reset to full paint correction and ceramic coatings, done
               properly at our {BUSINESS.suburb} workshop.
             </p>
           </Reveal>
@@ -193,7 +193,7 @@ export default function Home() {
             Straight out of the workshop
           </h2>
           <p className="mt-4 max-w-md text-sm text-white/55">
-            Tap a video to play. No filters, no stock footage — these are real customer cars.
+            Tap a video to play. No filters, no stock footage. These are real customer cars.
           </p>
         </Reveal>
         <Reveal delay={120}>
@@ -215,7 +215,7 @@ export default function Home() {
             </p>
             <p className="mx-auto mt-7 max-w-md text-base leading-relaxed text-white/60">
               We don&apos;t stop until your car looks its absolute best. No arguments, no fine
-              print — that&apos;s been our standard since day one.
+              print. That&apos;s been our standard since day one.
             </p>
           </Reveal>
         </div>
@@ -238,7 +238,7 @@ export default function Home() {
             </h2>
             <p className="mx-auto mt-6 max-w-md text-base leading-relaxed text-white/65">
               Send us a text with your car and what it needs. We&apos;ll come back with a price
-              and a time — no pressure, no obligation.
+              and a time. No pressure, no obligation.
             </p>
             <div className="mt-9 flex flex-wrap justify-center gap-3">
               <TextCta />

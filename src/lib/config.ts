@@ -23,7 +23,7 @@ export const BUSINESS = {
    message they can complete with their vehicle + package. The "?&body=" form
    is the cross-platform trick that works on both iPhone and Android. */
 export const TEXT_TO_BOOK_MESSAGE =
-  "Hey Smiths! I'd like a free quote.\n\nMy vehicle: \nWhat I'm after: ";
+  "Hey Smiths! I'd like a free quote.\n\nMy vehicle: \nMy main concerns are: ";
 
 export const TEXT_TO_BOOK_HREF =
   "sms:" + BUSINESS.phoneE164 + "?&body=" + encodeURIComponent(TEXT_TO_BOOK_MESSAGE);
@@ -270,7 +270,7 @@ export const SERVICES: ServiceDef[] = [
       "Wheels & arches decontaminated first",
       "Snow-foam pre-soak lifts the grit",
       "Safe contact wash",
-      "Hand dried — no water spots",
+      "Hand dried, no water spots",
     ],
     image: "/media/photos/exterior-wash.jpg",
     accent: "green",
@@ -281,12 +281,12 @@ export const SERVICES: ServiceDef[] = [
     name: "Cut & Polish",
     headline: "Cut back the haze,",
     accentWord: "bring back the gloss.",
-    desc: "Years of washing leaves paint dull and full of fine scratches. We decontaminate, clay, then machine cut and refine until the colour has depth again — and seal it so it lasts.",
+    desc: "Years of washing leaves paint dull and full of fine scratches. We decontaminate, clay, then machine cut and refine until the colour has depth again, and seal it so it lasts.",
     steps: [
       "Full decontamination & clay bar",
       "One-step machine cut removes defects",
       "Refined polish for true clarity",
-      "Ceramic spray sealant — 3-month protection",
+      "Ceramic spray sealant, 3-month protection",
     ],
     // ideal upload: services/cut-polish.jpg
     image: "https://cdn.shopify.com/s/files/1/0933/1055/0325/files/IMG_9226.jpg?v=1769392524",
@@ -305,8 +305,7 @@ export const SERVICES: ServiceDef[] = [
       "Refining stages for true clarity",
       "Checked under inspection lighting",
     ],
-    // ideal upload: services/paint-correction.jpg
-    image: "https://cdn.shopify.com/s/files/1/0933/1055/0325/files/IMG_9134.jpg?v=1768791452",
+    image: "/media/photos/paint-correction.jpg",
     accent: "green",
   },
   {
@@ -315,7 +314,7 @@ export const SERVICES: ServiceDef[] = [
     name: "Headlight Restoration",
     headline: "Yellowed and foggy?",
     accentWord: "See clearly again.",
-    desc: "Cloudy headlights make a good car look tired — and they cut how far you can see at night. We sand back the oxidised layer, polish to full clarity, then seal them so they stay clear.",
+    desc: "Cloudy headlights make a good car look tired, and they cut how far you can see at night. We sand back the oxidised layer, polish to full clarity, then seal them so they stay clear.",
     steps: [
       "Wet-sanded through the grit stages",
       "Machine polished to full clarity",
@@ -347,7 +346,7 @@ export const SERVICES: ServiceDef[] = [
     name: "Ceramic Coatings",
     headline: "Protection that lasts",
     accentWord: "years, not weeks.",
-    desc: "A wax lasts a few months. A ceramic coating bonds to your paint and forms a hard, glossy shell that repels water and dirt — so your car stays cleaner, washes easier, and holds its shine for years.",
+    desc: "A wax lasts a few months. A ceramic coating bonds to your paint and forms a hard, glossy shell that repels water and dirt, so your car stays cleaner, washes easier, and holds its shine for years.",
     steps: [
       "Paint corrected & prepped first",
       "Coating applied panel by panel",
@@ -395,7 +394,7 @@ export const REVIEWS: Review[] = [
   {
     name: "Cassandra French",
     time: "4 months ago",
-    text: "After 2 years of Husky hair, dirt and general use, my car looks, smells and feels new. Amazing, fantastic work. Punctual, respectful — will definitely use again.",
+    text: "After 2 years of Husky hair, dirt and general use, my car looks, smells and feels new. Amazing, fantastic work. Punctual, respectful, will definitely use again.",
   },
   {
     name: "Thomas Scullion",
@@ -425,7 +424,7 @@ export const REVIEWS: Review[] = [
   {
     name: "Natacha Amora",
     time: "11 months ago",
-    text: "Easy to book in, friendly staff and amazing work — didn't recognise the car after the full detail job! Highly recommend!",
+    text: "Easy to book in, friendly staff and amazing work. Didn't recognise the car after the full detail job! Highly recommend!",
   },
   {
     name: "Daniel Reid",
@@ -440,7 +439,7 @@ export const REVIEWS: Review[] = [
   {
     name: "Katie Carter",
     time: "8 months ago",
-    text: "Absolutely stoked with the job these guys did — car looks mint, was ready ahead of time, price was good and the staff are lovely. Will be using these guys again.",
+    text: "Absolutely stoked with the job these guys did. Car looks mint, was ready ahead of time, price was good and the staff are lovely. Will be using these guys again.",
   },
   {
     name: "Raymond Guy",
@@ -485,7 +484,7 @@ export const REVIEWS: Review[] = [
   {
     name: "Jodi & Tyler",
     time: "1 year ago",
-    text: "Absolutely thrilled with how my car turned out! It was covered in dog hair and definitely due for a good clean. Thanks so much — highly recommend!",
+    text: "Absolutely thrilled with how my car turned out! It was covered in dog hair and definitely due for a good clean. Thanks so much, highly recommend!",
   },
   {
     name: "Sarah Wilkes",
