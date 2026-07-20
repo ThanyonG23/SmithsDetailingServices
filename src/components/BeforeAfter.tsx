@@ -9,10 +9,12 @@ import { useCallback, useRef, useState } from "react";
 export default function BeforeAfter({
   before,
   after,
+  beforeScale = 1,
   className = "",
 }: {
   before: string;
   after: string;
+  beforeScale?: number;
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -56,15 +58,21 @@ export default function BeforeAfter({
         draggable={false}
         className="pointer-events-none absolute inset-0 h-full w-full object-cover"
       />
-      {/* BEFORE — clipped from the right by the divider */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={before}
-        alt="Before"
-        draggable={false}
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover"
+      {/* BEFORE — clipped by a wrapper so the inner image can be zoomed
+          (beforeScale) without shifting the divider edge */}
+      <div
+        className="pointer-events-none absolute inset-0 overflow-hidden"
         style={{ clipPath: `inset(0 ${100 - pos}% 0 0)` }}
-      />
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={before}
+          alt="Before"
+          draggable={false}
+          className="h-full w-full object-cover"
+          style={beforeScale !== 1 ? { transform: `scale(${beforeScale})` } : undefined}
+        />
+      </div>
 
       {/* labels */}
       <span className="pointer-events-none absolute left-3 top-3 rounded-full bg-black/60 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-white backdrop-blur">

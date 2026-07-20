@@ -35,14 +35,16 @@ export const TEXT_TO_BOOK_HREF =
 export const HERO_IMAGE = "/media/photos/hero.jpg";
 export const CTA_IMAGE = "/media/photos/cta.jpg";
 
-/* Trim-restoration feature video ("Bring Black Back" section) */
-export const TRIM_VIDEO = "/media/videos/trim-restoration.mp4";
+/* "Bring Black Back" trim-restoration still (half faded / half restored) */
+export const BRING_BLACK_BACK_IMAGE = "/media/photos/bring-black-back.jpg";
 
-/* Touch-up paint before/after slider */
+/* Gallery before/after sliders */
 export const TOUCHUP_BEFORE = "/media/photos/touchup-before.jpg";
 export const TOUCHUP_AFTER = "/media/photos/touchup-after.jpg";
 
-/* Headlight restoration before/after slider */
+export const TOUCHUP_DOOR_BEFORE = "/media/photos/touchup-door-before.jpg";
+export const TOUCHUP_DOOR_AFTER = "/media/photos/touchup-door-after.jpg";
+
 export const HEADLIGHT_BEFORE = "/media/photos/headlight-before.jpg";
 export const HEADLIGHT_AFTER = "/media/photos/headlight-after.jpg";
 

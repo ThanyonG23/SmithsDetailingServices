@@ -1,24 +1,9 @@
-"use client";
-
-import { useRef, useState } from "react";
-import { TEXT_TO_BOOK_HREF, TRIM_VIDEO } from "@/lib/config";
+import { TEXT_TO_BOOK_HREF, BRING_BLACK_BACK_IMAGE } from "@/lib/config";
 import Reveal from "./Reveal";
 
-/* "Bring Black Back" — trim restoration feature. A vertical clip that
-   autoplays muted + looping (it's a transformation, so motion sells it);
-   tap the video for sound. */
+/* "Bring Black Back" — trim restoration. A single still that captures the
+   whole story: one panel, half sun-faded grey, half restored factory black. */
 export default function BringBlackBack() {
-  const ref = useRef<HTMLVideoElement>(null);
-  const [muted, setMuted] = useState(true);
-
-  function toggleSound() {
-    const v = ref.current;
-    if (!v) return;
-    v.muted = !v.muted;
-    setMuted(v.muted);
-    if (v.paused) v.play().catch(() => {});
-  }
-
   return (
     <section className="mx-auto max-w-6xl px-4 py-20 sm:py-28">
       <div className="flex flex-col items-center gap-10 md:flex-row md:gap-16">
@@ -36,7 +21,7 @@ export default function BringBlackBack() {
             <p className="mt-5 max-w-md text-sm leading-relaxed text-white/65 sm:text-base">
               Sun-faded bumpers, mirrors and trim make even a clean car look tired. We strip back
               the oxidation and restore that deep factory black — no greasy dressing that washes off
-              in a week.
+              in a week. One panel, mid-restore:
             </p>
             <a
               href={TEXT_TO_BOOK_HREF}
@@ -48,32 +33,22 @@ export default function BringBlackBack() {
           </Reveal>
         </div>
 
-        {/* ── Video ── */}
+        {/* ── Photo ── */}
         <div className="w-full min-w-0 md:flex-1">
           <Reveal delay={120}>
-            <div className="relative mx-auto max-w-[300px]">
-              <div className="pointer-events-none absolute -inset-10 halo-green" aria-hidden />
-              <button
-                type="button"
-                onClick={toggleSound}
-                aria-label={muted ? "Tap for sound" : "Mute"}
-                className="card-edge relative block aspect-[9/16] w-full overflow-hidden rounded-3xl bg-black"
-              >
-                <video
-                  ref={ref}
-                  className="h-full w-full object-cover"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  preload="metadata"
-                >
-                  <source src={TRIM_VIDEO} type="video/mp4" />
-                </video>
-                <span className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-black/60 px-2.5 py-1 text-[11px] font-bold text-white backdrop-blur">
-                  {muted ? "🔇 Tap for sound" : "🔊"}
+            <div className="relative mx-auto max-w-[340px]">
+              <div className="halo-green pointer-events-none absolute -inset-10" aria-hidden />
+              <div className="group card-edge shine relative aspect-[3/4] overflow-hidden rounded-3xl bg-black">
+                <div
+                  className="photo-zoom absolute inset-0 bg-cover bg-center"
+                  style={{ backgroundImage: `url(${BRING_BLACK_BACK_IMAGE})` }}
+                  role="img"
+                  aria-label="Trim restoration — faded grey on one side, factory black on the other"
+                />
+                <span className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-black/60 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-white/80 backdrop-blur">
+                  Faded → Restored
                 </span>
-              </button>
+              </div>
             </div>
           </Reveal>
         </div>
