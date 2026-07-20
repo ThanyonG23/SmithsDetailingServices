@@ -36,9 +36,9 @@ export default function BringBlackBack() {
         {/* ── Photo ── */}
         <div className="w-full min-w-0 md:flex-1">
           <Reveal delay={120}>
-            <div className="relative mx-auto max-w-[340px]">
+            <div className="relative">
               <div className="halo-green pointer-events-none absolute -inset-10" aria-hidden />
-              <div className="group card-edge shine relative aspect-[3/4] overflow-hidden rounded-3xl bg-black">
+              <div className="group card-edge shine relative aspect-[4/3] overflow-hidden rounded-3xl bg-black">
                 <div
                   className="photo-zoom absolute inset-0 bg-cover bg-center"
                   style={{ backgroundImage: `url(${BRING_BLACK_BACK_IMAGE})` }}

@@ -7,6 +7,8 @@ import {
   TOUCHUP_DOOR_AFTER,
   HEADLIGHT_BEFORE,
   HEADLIGHT_AFTER,
+  ENGINE_BEFORE,
+  ENGINE_AFTER,
 } from "@/lib/config";
 
 const ITEMS: {
@@ -16,12 +18,13 @@ const ITEMS: {
   beforeScale?: number;
 }[] = [
   { before: TOUCHUP_BEFORE, after: TOUCHUP_AFTER, label: "Touch-up paint" },
-  { before: TOUCHUP_DOOR_BEFORE, after: TOUCHUP_DOOR_AFTER, label: "Kerb-rash repair" },
+  { before: ENGINE_BEFORE, after: ENGINE_AFTER, label: "Engine bay detail" },
+  { before: TOUCHUP_DOOR_BEFORE, after: TOUCHUP_DOOR_AFTER, label: "Door damage" },
   {
     before: HEADLIGHT_BEFORE,
     after: HEADLIGHT_AFTER,
     label: "Headlight restoration",
-    beforeScale: 1.15, // zoom the "before" in to match the after framing
+    beforeScale: 1.35, // zoom the "before" in to match the after framing
   },
 ];
 

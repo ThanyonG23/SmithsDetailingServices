@@ -48,6 +48,9 @@ export const TOUCHUP_DOOR_AFTER = "/media/photos/touchup-door-after.jpg";
 export const HEADLIGHT_BEFORE = "/media/photos/headlight-before.jpg";
 export const HEADLIGHT_AFTER = "/media/photos/headlight-after.jpg";
 
+export const ENGINE_BEFORE = "/media/photos/engine-before.jpg";
+export const ENGINE_AFTER = "/media/photos/engine-after.jpg";
+
 /* ---------------------------------------------------------------- */
 /* VEHICLES                                                          */
 /* ---------------------------------------------------------------- */
@@ -269,8 +272,7 @@ export const SERVICES: ServiceDef[] = [
       "Safe contact wash",
       "Hand dried — no water spots",
     ],
-    // ideal upload: services/exterior-wash.jpg
-    image: "https://cdn.shopify.com/s/files/1/0933/1055/0325/files/IMG_9130.jpg?v=1768791441",
+    image: "/media/photos/exterior-wash.jpg",
     accent: "green",
   },
   {
@@ -320,8 +322,7 @@ export const SERVICES: ServiceDef[] = [
       "UV sealant applied to stop re-fogging",
       "Night-time visibility restored",
     ],
-    // ideal upload: services/headlights.jpg
-    image: "/media/photos/plastic-restore.jpg",
+    image: "/media/photos/headlight-after.jpg",
     accent: "yellow",
   },
   {
@@ -337,7 +338,7 @@ export const SERVICES: ServiceDef[] = [
       "Levelled and polished flush",
       "Blended into the surrounding panel",
     ],
-    image: "/media/photos/services/touch-up.jpg",
+    image: "/media/photos/touchup-after.jpg",
     accent: "green",
   },
   {

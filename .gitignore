@@ -31,9 +31,19 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 
-# original camera files — we commit the converted .jpg/.mp4 versions instead,
-# so these large unusable-on-web originals stay local only
+# original camera files (HEIC / MOV) anywhere under media — we commit only the
+# converted .jpg/.mp4 versions, so these large originals stay local only
+public/media/**/*.HEIC
+public/media/**/*.heic
+public/media/**/*.MOV
+public/media/**/*.mov
 public/media/*.HEIC
 public/media/*.heic
 public/media/*.MOV
 public/media/*.mov
+public/media/*.PNG
+public/media/*.png
+# raw source folders (drop camera dumps here; only converted files get committed)
+public/media/New folder/
+public/media/Red Car/
+public/media/RedCar/
