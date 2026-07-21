@@ -284,9 +284,19 @@ export default function Home() {
             </div>
           </div>
 
-          <p className="mt-12 border-t border-white/5 pt-6 text-xs text-white/30">
-            © {new Date().getFullYear()} {BUSINESS.name}. {BUSINESS.suburb}.
-          </p>
+          <div className="mt-12 flex flex-col gap-2 border-t border-white/5 pt-6 text-xs text-white/30 sm:flex-row sm:items-center sm:justify-between">
+            <p>
+              © {new Date().getFullYear()} {BUSINESS.name}. {BUSINESS.suburb}.
+            </p>
+            <p className="flex gap-4">
+              <Link href="/terms" className="transition hover:text-white/70">
+                Terms &amp; Conditions
+              </Link>
+              <Link href="/privacy" className="transition hover:text-white/70">
+                Privacy Policy
+              </Link>
+            </p>
+          </div>
         </div>
       </footer>
 
