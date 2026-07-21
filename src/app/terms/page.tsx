@@ -102,8 +102,8 @@ export default function TermsPage() {
       <LegalSection heading="7. Your vehicle and personal belongings">
         <LegalList
           items={[
-            "Please remove cash, wallets, phones, sunglasses, tools, paperwork and anything else valuable before you drop your vehicle off.",
-            "We take care with your property, but we are not responsible for loss of or damage to personal items left in the vehicle.",
+            "Please take the time to clear your personal belongings out of the vehicle before you drop it off, especially cash, wallets, phones, sunglasses, tools and paperwork.",
+            "If you do leave things in the vehicle, we'll take them out while we clean and put them back when we're finished. It's not ideal for us though, so a quick clear-out beforehand really helps.",
             "Please make sure the vehicle is registered and roadworthy if it needs to be moved.",
             "Let us know about anything we should be aware of, such as loose trim, aftermarket paint or wrap, existing damage, or parts that need special care.",
           ]}
