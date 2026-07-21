@@ -32,7 +32,7 @@ export const TEXT_TO_BOOK_HREF =
    These are placeholders — for best effect upload your two strongest
    "wow" shots to public/media/photos/ (e.g. hero.jpg + cta.jpg) and
    point these at "/media/photos/hero.jpg" and "/media/photos/cta.jpg". */
-export const HERO_IMAGE = "/media/photos/hero-bright.jpg";
+export const HERO_IMAGE = "/media/photos/hero-mustang.jpg";
 export const CTA_IMAGE = "/media/photos/cta.jpg";
 
 /* "Bring Black Back" trim-restoration still (half faded / half restored) */
