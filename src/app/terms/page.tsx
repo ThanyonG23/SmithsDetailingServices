@@ -12,7 +12,7 @@ export default function TermsPage() {
   return (
     <LegalPage
       title="Terms & Conditions"
-      updated="21 July 2026"
+      updated="22 July 2026"
       intro={`These terms apply when you book or receive detailing services from ${BUSINESS.name}. By booking with us, you agree to them. We've kept them in plain English.`}
     >
       <LegalSection heading="1. Who we are">
@@ -68,14 +68,34 @@ export default function TermsPage() {
       <LegalSection heading="6. Our satisfaction guarantee">
         <p>
           <strong className="text-brand-green">If you&apos;re not happy, you don&apos;t pay.</strong>{" "}
-          We mean it. If you&apos;re not satisfied with the work we&apos;ve done, tell us at
-          collection or as soon as reasonably possible afterwards, and we&apos;ll put it right at no
-          extra cost. If we can&apos;t make it right, you don&apos;t pay for that service.
+          We mean it, and we stand by our work. Two things keep it fair for both of us.
         </p>
+
         <p>
-          To be clear about what this covers: it applies to the quality of the detailing work we
-          performed. It doesn&apos;t cover pre-existing damage, faults unrelated to our work, normal
-          wear and tear, or results we told you upfront couldn&apos;t be achieved on your vehicle.
+          <strong className="text-white">First, give us the chance to put it right.</strong> If
+          something isn&apos;t up to scratch, tell us at collection or as soon as reasonably possible
+          afterwards, and allow us a reasonable amount of time and access to your vehicle to fix it.
+          Most issues are sorted quickly. If we can&apos;t make it right, you don&apos;t pay for that
+          service.
+        </p>
+
+        <p>
+          <strong className="text-white">Second, it covers the work we agreed to do.</strong> The
+          guarantee applies to the work within the scope you booked, and to results that are
+          reasonably achievable within that scope, budget and timeframe. It doesn&apos;t apply to:
+        </p>
+        <LegalList
+          items={[
+            "Issues outside the agreed scope of work.",
+            "Results that aren't reasonably achievable within the work, budget or timeframe agreed (for example, expecting full paint-correction results from a wash and interior clean).",
+            "Pre-existing damage, or faults unrelated to the work we did.",
+            "Normal wear and tear.",
+            "Outcomes we told you upfront couldn't be achieved on your vehicle.",
+          ]}
+        />
+        <p>
+          We&apos;ll always be straight with you before we start about what is and isn&apos;t
+          realistically achievable for your vehicle and budget.
         </p>
       </LegalSection>
 
