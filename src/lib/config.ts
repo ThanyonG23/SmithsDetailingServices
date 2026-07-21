@@ -45,11 +45,14 @@ export const TOUCHUP_AFTER = "/media/photos/touchup-after.jpg";
 export const TOUCHUP_DOOR_BEFORE = "/media/photos/door-damaged.jpg"; // scuffed/scratched door
 export const TOUCHUP_DOOR_AFTER = "/media/photos/door-repaired.jpg"; // glossy, repaired
 
-export const HEADLIGHT_BEFORE = "/media/photos/headlight-before.jpg";
-export const HEADLIGHT_AFTER = "/media/photos/headlight-after.jpg";
+export const HEADLIGHT_BEFORE = "/media/photos/headlight-yellowed.jpg";
+export const HEADLIGHT_AFTER = "/media/photos/headlight-clear.jpg";
 
 export const ENGINE_BEFORE = "/media/photos/engine-before.jpg";
 export const ENGINE_AFTER = "/media/photos/engine-after.jpg";
+
+export const INTERIOR_BEFORE = "/media/photos/interior-before.jpg";
+export const INTERIOR_AFTER = "/media/photos/interior-after.jpg";
 
 /* ---------------------------------------------------------------- */
 /* VEHICLES                                                          */
@@ -255,8 +258,7 @@ export const SERVICES: ServiceDef[] = [
       "Plastics & trim rejuvenated",
       "Glass left completely streak-free",
     ],
-    // ideal upload: services/interior.jpg
-    image: "https://cdn.shopify.com/s/files/1/0933/1055/0325/files/IMG_9133.jpg?v=1768791449",
+    image: "/media/photos/interior-after.jpg",
     accent: "yellow",
   },
   {
@@ -321,7 +323,7 @@ export const SERVICES: ServiceDef[] = [
       "UV sealant applied to stop re-fogging",
       "Night-time visibility restored",
     ],
-    image: "/media/photos/headlight-after.jpg",
+    image: "/media/photos/headlight-clear.jpg",
     accent: "yellow",
   },
   {

@@ -7,6 +7,8 @@ import {
   HEADLIGHT_AFTER,
   ENGINE_BEFORE,
   ENGINE_AFTER,
+  INTERIOR_BEFORE,
+  INTERIOR_AFTER,
 } from "@/lib/config";
 
 const ITEMS: {
@@ -15,14 +17,10 @@ const ITEMS: {
   label: string;
   beforeScale?: number;
 }[] = [
-  { before: TOUCHUP_BEFORE, after: TOUCHUP_AFTER, label: "Touch-up paint" },
+  { before: INTERIOR_BEFORE, after: INTERIOR_AFTER, label: "Interior detail" },
   { before: ENGINE_BEFORE, after: ENGINE_AFTER, label: "Engine bay detail" },
-  {
-    before: HEADLIGHT_BEFORE,
-    after: HEADLIGHT_AFTER,
-    label: "Headlight restoration",
-    beforeScale: 1.35, // zoom the "before" in to match the after framing
-  },
+  { before: HEADLIGHT_BEFORE, after: HEADLIGHT_AFTER, label: "Headlight restoration" },
+  { before: TOUCHUP_BEFORE, after: TOUCHUP_AFTER, label: "Touch-up paint" },
 ];
 
 export default function Gallery() {
