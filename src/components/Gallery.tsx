@@ -3,8 +3,6 @@ import Reveal from "./Reveal";
 import {
   TOUCHUP_BEFORE,
   TOUCHUP_AFTER,
-  TOUCHUP_DOOR_BEFORE,
-  TOUCHUP_DOOR_AFTER,
   HEADLIGHT_BEFORE,
   HEADLIGHT_AFTER,
   ENGINE_BEFORE,
@@ -19,7 +17,6 @@ const ITEMS: {
 }[] = [
   { before: TOUCHUP_BEFORE, after: TOUCHUP_AFTER, label: "Touch-up paint" },
   { before: ENGINE_BEFORE, after: ENGINE_AFTER, label: "Engine bay detail" },
-  { before: TOUCHUP_DOOR_BEFORE, after: TOUCHUP_DOOR_AFTER, label: "Door damage" },
   {
     before: HEADLIGHT_BEFORE,
     after: HEADLIGHT_AFTER,
