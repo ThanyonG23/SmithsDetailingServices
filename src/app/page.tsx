@@ -4,8 +4,6 @@ import {
   REELS,
   SERVICES,
   TEXT_TO_BOOK_HREF,
-  REVIEW_RATING,
-  REVIEW_COUNT,
   HERO_IMAGE,
   CTA_IMAGE,
 } from "@/lib/config";
@@ -129,8 +127,7 @@ export default function Home() {
           <Reveal delay={400}>
             <div className="mt-8 flex items-center gap-2.5 text-sm text-white/60">
               <Stars />
-              <span className="font-bold text-white">{REVIEW_RATING.toFixed(1)}</span>
-              <span>from {REVIEW_COUNT}+ Google reviews</span>
+              <span className="font-bold text-white">100+ 5-Star Google reviews</span>
             </div>
           </Reveal>
         </div>
@@ -140,7 +137,7 @@ export default function Home() {
       <section className="border-y border-white/10 bg-white/[0.02]">
         <div className="mx-auto grid max-w-6xl grid-cols-2 gap-px px-4 md:grid-cols-4">
           {[
-            { big: `${REVIEW_RATING.toFixed(1)}★`, small: `${REVIEW_COUNT}+ Google reviews` },
+            { big: "100+", small: "5-star Google reviews" },
             { big: "7", small: "Detailing services" },
             { big: "100%", small: "Satisfaction guarantee" },
             { big: "Cairns", small: BUSINESS.suburb },

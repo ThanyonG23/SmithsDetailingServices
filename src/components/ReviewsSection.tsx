@@ -1,4 +1,4 @@
-import { REVIEWS, REVIEW_RATING, REVIEW_COUNT } from "@/lib/config";
+import { REVIEWS } from "@/lib/config";
 import Reveal from "./Reveal";
 
 const AVATAR_COLORS = [
@@ -56,12 +56,12 @@ export default function ReviewsSection() {
         </div>
         <div className="mt-4 flex flex-wrap items-end gap-x-6 gap-y-3">
           <h2 className="font-display text-3xl font-extrabold tracking-tight text-white sm:text-5xl">
-            Rated {REVIEW_RATING.toFixed(1)} by Cairns locals
+            100+ 5-star reviews
           </h2>
           <div className="flex items-center gap-2.5">
             <GoogleG className="h-6 w-6" />
             <Stars />
-            <span className="text-sm text-white/55">{REVIEW_COUNT}+ reviews</span>
+            <span className="text-sm text-white/55">on Google</span>
           </div>
         </div>
       </Reveal>
