@@ -81,7 +81,7 @@ export default function Home() {
         />
         {/* legibility layers */}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-[#050506] via-[#050506]/75 to-black/45"
+          className="absolute inset-0 bg-gradient-to-t from-[#050506] via-[#050506]/55 to-black/20"
           aria-hidden
         />
         <div
