@@ -75,13 +75,14 @@ export default function Home() {
       {/* ═══════════════════ HERO ═══════════════════ */}
       <section className="relative flex min-h-[86vh] items-end overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url(${HERO_IMAGE})` }}
+          className="absolute inset-0 bg-cover"
+          // focal point pushed right so mobile crops to the car's front + the shopfront sign
+          style={{ backgroundImage: `url(${HERO_IMAGE})`, backgroundPosition: "80% center" }}
           aria-hidden
         />
         {/* legibility layers */}
         <div
-          className="absolute inset-0 bg-gradient-to-t from-[#050506] via-[#050506]/55 to-black/20"
+          className="absolute inset-0 bg-gradient-to-t from-[#050506] via-[#050506]/45 to-black/10"
           aria-hidden
         />
         <div
