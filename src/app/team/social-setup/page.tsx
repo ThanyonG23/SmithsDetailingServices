@@ -376,6 +376,70 @@ smithsdetailingservices.com.au/r/federica`}
               ]}
             />
           </Station>
+          {/* ── 08 ── */}
+          <Station n="08" title="Every Friday, upload the week's footage">
+            <P>
+              Before you knock off on Friday, drop that week&apos;s clips into your own
+              folder. Same time every week so it doesn&apos;t get away from you.
+            </P>
+
+            <div className="grid gap-3 sm:grid-cols-3">
+              {ACTIVE_TEAM.filter((m) => m.footageUrl).map((m) => (
+                <a
+                  key={m.code}
+                  href={m.footageUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group rounded-2xl border border-white/12 bg-white/[0.03] p-4 transition hover:border-brand-green/50 hover:bg-brand-green/[0.06]"
+                >
+                  <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/35">
+                    Upload folder
+                  </div>
+                  <div className="mt-1.5 font-display text-lg font-extrabold text-white">
+                    {m.name}
+                  </div>
+                  <div className="mt-2 text-xs font-bold text-brand-green">
+                    Open in OneDrive →
+                  </div>
+                </a>
+              ))}
+            </div>
+
+            <Ticks
+              id="upload"
+              items={[
+                <>
+                  <b className="text-white">Only your own folder.</b> Don&apos;t upload to
+                  anyone else&apos;s.
+                </>,
+                <>
+                  <b className="text-white">Raw clips straight off your phone.</b> No edits,
+                  no filters, no captions burnt in &mdash; we need the original file.
+                </>,
+                <>
+                  <b className="text-white">Upload it even if you&apos;ve already posted
+                  it.</b> What&apos;s on your account is a compressed copy and can&apos;t be
+                  used for anything else.
+                </>,
+                <>
+                  <b className="text-white">Everything from the week</b>, not just the ones
+                  you posted. The clips you didn&apos;t use are often the ones we want.
+                </>,
+                <>
+                  <b className="text-white">On your phone:</b> open your folder link once and
+                  tap <b className="text-white">Add to my OneDrive</b>. After that it lives in
+                  your OneDrive app &mdash; Photos → Share → OneDrive → your folder.
+                </>,
+              ]}
+            />
+
+            <Callout tone="warn" heading="Check it actually uploaded">
+              <p>
+                Big videos fail quietly on patchy wifi. Before you leave, open the folder and
+                confirm the files are there &mdash; not stuck at 99%.
+              </p>
+            </Callout>
+          </Station>
         </div>
 
         {/* ═══════════════ AGREEMENT ═══════════════ */}
@@ -425,10 +489,6 @@ smithsdetailingservices.com.au/r/federica`}
             <b className="font-semibold text-white/75">Stuck on any of it?</b> Message the
             group chat rather than guessing &mdash; especially if a handle comes back as
             taken.
-          </p>
-          <p>
-            A shared Drive folder for raw clips is coming shortly. Hang on to your footage
-            until then.
           </p>
         </div>
       </article>

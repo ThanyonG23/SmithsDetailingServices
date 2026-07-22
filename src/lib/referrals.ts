@@ -28,6 +28,10 @@ export interface TeamMember {
   name: string;
   /** Their Instagram/TikTok handle without the @ (optional) */
   handle?: string;
+  /** Their personal OneDrive folder for raw clips. These are edit links —
+      treat them like passwords. Re-share the folder in OneDrive to kill an
+      old link and generate a new one. */
+  footageUrl?: string;
   /** Set true once they've left. Their old links stay alive so posts still
       out in the world keep converting — you just stop paying commission.
       NEVER delete a code and NEVER reassign it to someone else, or your
@@ -38,9 +42,27 @@ export interface TeamMember {
 /* To add a detailer: one line here, push, their link is live.
    Keep codes short, lowercase and obviously theirs. */
 export const TEAM: TeamMember[] = [
-  { code: "federica", name: "Federica", handle: "federica.smithsdetailing" },
-  { code: "yanis", name: "Yanis", handle: "yanis.smithsdetailing" },
-  { code: "laura", name: "Laura", handle: "laura.smithsdetailing" },
+  {
+    code: "federica",
+    name: "Federica",
+    handle: "federica.smithsdetailing",
+    footageUrl:
+      "https://1drv.ms/f/c/9ca96e60befd2607/IgAgbWj9twbgT6Esndx6dh_JAbpZ_BGSoO6h8EA25D0i1Io?e=CCSZ8k",
+  },
+  {
+    code: "yanis",
+    name: "Yanis",
+    handle: "yanis.smithsdetailing",
+    footageUrl:
+      "https://1drv.ms/f/c/9ca96e60befd2607/IgAu1AIC9xeyTJvTY4RKqBu8AVFHKHXNKilTd07rTIMpBH0?e=kZowKK",
+  },
+  {
+    code: "laura",
+    name: "Laura",
+    handle: "laura.smithsdetailing",
+    footageUrl:
+      "https://1drv.ms/f/c/9ca96e60befd2607/IgBEwbh4OErDR5SflSxFONXLAXBl9LExV5pVIDXiNQkq2Rw?e=VhWb0D",
+  },
 ];
 
 /** Everyone currently earning commission. */
