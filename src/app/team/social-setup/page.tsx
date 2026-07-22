@@ -263,6 +263,12 @@ export default function SocialSetupPage() {
                 </>,
               ]}
             />
+            <Callout tone="good" heading="Don't want your face on it?">
+              <p>
+                That&apos;s completely fine &mdash; ask for a copy of our logo and use that
+                as your profile picture instead, on any of the three accounts.
+              </p>
+            </Callout>
           </Station>
 
           {/* ── 03 ── */}
@@ -364,8 +370,8 @@ smithsdetailingservices.com.au/r/federica`}
                   started, the more it gets watched.
                 </>,
                 <>
-                  <b className="text-white">Ask the customer first</b>, and keep number
-                  plates and anything left inside the car out of shot.
+                  <b className="text-white">If a customer asks you to take a post down</b>,
+                  take it down that day.
                 </>,
               ]}
             />

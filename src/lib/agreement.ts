@@ -27,6 +27,7 @@ export const AGREEMENT: Clause[] = [
       "Post your own work, or work you took part in. Don't post someone else's results as your own, and don't repost other detailers' content as if we did it.",
       "Don't quote prices, promise a turnaround time, or guarantee a result on a specific car. Send those enquiries to the shop — it's how we avoid promising something we can't deliver.",
       "Keep it clean. No content that would embarrass a customer, another staff member, or the business.",
+      "You don't have to put your own face on it. If you'd rather not use a personal photo, ask for a copy of our logo and use that as your profile picture instead.",
     ],
   },
   {
@@ -40,8 +41,6 @@ export const AGREEMENT: Clause[] = [
   {
     heading: "Customers and their cars",
     points: [
-      "Always ask the customer before you film their vehicle.",
-      "Keep number plates out of shot, and never film personal belongings left in a car.",
       "Never share a customer's name, address, phone number, or anything about their booking.",
       "If a customer asks you to remove a post, remove it that day.",
     ],
@@ -66,7 +65,6 @@ export const AGREEMENT: Clause[] = [
     points: [
       "You earn 10% of the final invoice on jobs booked through your personal referral link, once the customer has paid in full.",
       "New customers only. It isn't payable on walk-ins, on customers already on our books, or on repeat bookings from someone you didn't originally bring in.",
-      "Minimum $50 per qualifying job, so smaller jobs are still worth tagging.",
       "Nothing is payable on a job that's refunded or not paid for under our satisfaction guarantee.",
       "Paid monthly with your normal wages. It's on top of your usual pay, not instead of it, and superannuation applies to it as normal.",
       "Don't ask walk-in or existing customers to use your link. That's not a referral, and it's the fastest way to end the program for everyone.",
