@@ -1,9 +1,9 @@
-import { TEXT_TO_BOOK_HREF, BRING_BLACK_BACK_IMAGE } from "@/lib/config";
+import { BRING_BLACK_BACK_IMAGE } from "@/lib/config";
 import Reveal from "./Reveal";
 
 /* "Bring Black Back" — trim restoration. A single still that captures the
    whole story: one panel, half sun-faded grey, half restored factory black. */
-export default function BringBlackBack() {
+export default function BringBlackBack({ smsHref }: { smsHref: string }) {
   return (
     <section className="mx-auto max-w-6xl px-4 py-20 sm:py-28">
       <div className="flex flex-col items-center gap-10 md:flex-row md:gap-16">
@@ -24,7 +24,7 @@ export default function BringBlackBack() {
               in a week. One panel, mid-restore:
             </p>
             <a
-              href={TEXT_TO_BOOK_HREF}
+              href={smsHref}
               className="mt-7 inline-flex items-center gap-2 text-sm font-black transition hover:gap-3"
             >
               <span className="text-brand-green">Text for a free quote</span>

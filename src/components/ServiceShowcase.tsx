@@ -1,4 +1,4 @@
-import { SERVICES, TEXT_TO_BOOK_HREF, type ServiceDef } from "@/lib/config";
+import { SERVICES, type ServiceDef } from "@/lib/config";
 import Reveal from "./Reveal";
 
 /* Alternating service sections: eyebrow → big headline with a coloured
@@ -23,17 +23,30 @@ const ACCENT = {
   },
 } as const;
 
-export default function ServiceShowcase() {
+export default function ServiceShowcase({ smsHref }: { smsHref: string }) {
   return (
     <div className="space-y-24 sm:space-y-32">
       {SERVICES.map((service, i) => (
-        <ServiceSection key={service.key} service={service} flip={i % 2 === 1} />
+        <ServiceSection
+          key={service.key}
+          service={service}
+          flip={i % 2 === 1}
+          smsHref={smsHref}
+        />
       ))}
     </div>
   );
 }
 
-function ServiceSection({ service, flip }: { service: ServiceDef; flip: boolean }) {
+function ServiceSection({
+  service,
+  flip,
+  smsHref,
+}: {
+  service: ServiceDef;
+  flip: boolean;
+  smsHref: string;
+}) {
   const a = ACCENT[service.accent];
 
   return (
@@ -58,7 +71,7 @@ function ServiceSection({ service, flip }: { service: ServiceDef; flip: boolean 
               {service.desc}
             </p>
             <a
-              href={TEXT_TO_BOOK_HREF}
+              href={smsHref}
               className="mt-7 inline-flex items-center gap-2 text-sm font-black text-white transition hover:gap-3"
             >
               <span className={a.text}>Text for a free quote</span>

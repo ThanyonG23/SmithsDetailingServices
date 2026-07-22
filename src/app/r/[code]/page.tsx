@@ -1,22 +1,26 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import Home from "@/app/page";
+import HomeContent from "@/components/HomeContent";
 import RefTracker from "@/components/RefTracker";
 import { TEAM, getTeamMember } from "@/lib/referrals";
 import { BUSINESS } from "@/lib/config";
 
-/* Pre-build a page for every detailer in the TEAM list. */
+/* A detailer's link. Deliberately identical to the homepage from the
+   customer's side — no banner, nothing to explain or worry about. The only
+   difference is that the quote button pre-fills their text with the
+   detailer's code, which is rendered into the HTML here on the server so
+   it works the instant the page appears. */
+
 export function generateStaticParams() {
   return TEAM.map((m) => ({ code: m.code }));
 }
 
 export function generateMetadata({ params }: { params: { code: string } }): Metadata {
-  const member = getTeamMember(params.code);
-  if (!member) return {};
+  if (!getTeamMember(params.code)) return {};
   return {
-    title: `${member.name} at ${BUSINESS.name} | Premium Car Detailing in Cairns`,
-    // Their link gets shared around — don't let search engines index
-    // duplicates of the homepage.
+    title: `${BUSINESS.name} | Premium Car Detailing in Cairns`,
+    // Keep these out of search results so they don't compete with the
+    // real homepage.
     robots: { index: false, follow: true },
   };
 }
@@ -27,24 +31,10 @@ export default function ReferralPage({ params }: { params: { code: string } }) {
 
   return (
     <>
+      {/* Remembers the code for 90 days, so it still counts if they come
+          back to the plain homepage later and text from there. */}
       <RefTracker code={member.code} />
-
-      {/* Someone who's left keeps a working link — their old posts still send
-          us customers — but we drop the personal greeting. */}
-      {!member.retired && (
-        <div className="border-b border-brand-green/20 bg-brand-green/[0.07]">
-          <div className="mx-auto flex max-w-6xl items-center justify-center gap-2 px-4 py-2.5 text-center text-xs font-bold text-brand-green sm:text-sm">
-            <span aria-hidden>✅</span>
-            <span>
-              You&apos;re here from {member.name}
-              {member.handle ? ` (@${member.handle})` : ""} — quote us and we&apos;ll look
-              after you.
-            </span>
-          </div>
-        </div>
-      )}
-
-      <Home />
+      <HomeContent refCode={member.code} />
     </>
   );
 }
