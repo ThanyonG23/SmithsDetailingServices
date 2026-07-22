@@ -2,6 +2,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { BUSINESS } from "@/lib/config";
 import { ACTIVE_TEAM } from "@/lib/referrals";
+import { AGREEMENT, AGREEMENT_VERSION } from "@/lib/agreement";
+import AgreementForm from "@/components/AgreementForm";
 
 /* ---------------------------------------------------------------------
    INTERNAL STAFF PAGE — unlisted.
@@ -146,6 +148,22 @@ export default function SocialSetupPage() {
           <span>
             Time: <b className="font-semibold text-white/70">~20 min</b>
           </span>
+        </div>
+
+        <div className="mt-8">
+          <Callout tone="warn" heading="Read this first">
+            <p>
+              There&apos;s a short agreement at the{" "}
+              <a
+                href="#agreement"
+                className="font-semibold text-white underline underline-offset-4 hover:text-brand-yellow"
+              >
+                bottom of this page
+              </a>{" "}
+              covering how the 10% works and what we expect. Accept it before you make the
+              accounts.
+            </p>
+          </Callout>
         </div>
 
         <div className="mt-10 border-t border-white/10">
@@ -354,7 +372,49 @@ smithsdetailingservices.com.au/r/federica`}
           </Station>
         </div>
 
-        <div className="mt-10 flex flex-col gap-2 text-sm text-white/45">
+        {/* ═══════════════ AGREEMENT ═══════════════ */}
+        <section id="agreement" className="mt-16 scroll-mt-6">
+          <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-brand-green">
+            Before you start
+          </div>
+          <h2 className="mt-3 font-display text-3xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-4xl">
+            Content &amp; referral agreement
+          </h2>
+          <p className="mt-3 font-mono text-xs text-white/40">{AGREEMENT_VERSION}</p>
+          <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-white/65">
+            Short version: represent us well, look after our customers, and you get paid
+            for the work you bring in. Read it properly, then accept it at the bottom.
+          </p>
+
+          <ol className="mt-10 flex flex-col gap-9">
+            {AGREEMENT.map((clause, i) => (
+              <li key={clause.heading}>
+                <h3 className="flex gap-3 font-display text-lg font-extrabold tracking-tight text-white">
+                  <span className="font-mono text-sm font-bold text-brand-green">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  {clause.heading}
+                </h3>
+                <ul className="mt-3 flex flex-col gap-2.5 pl-[1.9rem]">
+                  {clause.points.map((point) => (
+                    <li key={point} className="flex gap-2.5">
+                      <span className="mt-px shrink-0 font-black text-brand-green">•</span>
+                      <span className="text-[15px] leading-relaxed text-white/65">
+                        {point}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ol>
+
+          <div className="mt-12">
+            <AgreementForm />
+          </div>
+        </section>
+
+        <div className="mt-14 flex flex-col gap-2 text-sm text-white/45">
           <p>
             <b className="font-semibold text-white/75">Stuck on any of it?</b> Message the
             group chat rather than guessing &mdash; especially if a handle comes back as
