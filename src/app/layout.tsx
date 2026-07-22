@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Sora } from "next/font/google";
 import "./globals.css";
+import RefTracker from "@/components/RefTracker";
 
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 const display = Sora({
@@ -47,7 +48,12 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${sans.variable} ${display.variable}`}>
-      <body>{children}</body>
+      <body>
+        {/* Carries a detailer's referral code onto every "Text for a Free
+            Quote" button, including on repeat visits. */}
+        <RefTracker />
+        {children}
+      </body>
     </html>
   );
 }
