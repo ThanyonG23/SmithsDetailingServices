@@ -16,7 +16,7 @@ export const BUSINESS = {
   tz: "Australia/Brisbane", // Cairns = QLD = UTC+10, no daylight saving
   reviewLink: "https://g.page/r/CVj0x7-guHPPEBM/review",
   instagram: "https://www.instagram.com/",
-  logo: "https://cdn.shopify.com/s/files/1/0933/1055/0325/files/New_Logo_EST_2024.png?v=1768796190",
+  logo: "/media/photos/logo.png",
 } as const;
 
 /* "Text to book" link — opens the visitor's messaging app with a pre-filled
@@ -42,9 +42,6 @@ export const BRING_BLACK_BACK_IMAGE = "/media/photos/bring-black-back.jpg";
 export const TOUCHUP_BEFORE = "/media/photos/touchup-before.jpg";
 export const TOUCHUP_AFTER = "/media/photos/touchup-after.jpg";
 
-export const TOUCHUP_DOOR_BEFORE = "/media/photos/door-damaged.jpg"; // scuffed/scratched door
-export const TOUCHUP_DOOR_AFTER = "/media/photos/door-repaired.jpg"; // glossy, repaired
-
 export const HEADLIGHT_BEFORE = "/media/photos/headlight-yellowed.jpg";
 export const HEADLIGHT_AFTER = "/media/photos/headlight-clear.jpg";
 
@@ -53,176 +50,6 @@ export const ENGINE_AFTER = "/media/photos/engine-after.jpg";
 
 export const INTERIOR_BEFORE = "/media/photos/interior-before.jpg";
 export const INTERIOR_AFTER = "/media/photos/interior-after.jpg";
-
-/* ---------------------------------------------------------------- */
-/* VEHICLES                                                          */
-/* ---------------------------------------------------------------- */
-export type VehicleKey = "Single Cab" | "Sedan/Dual Cab" | "SUV" | "7 Seater";
-
-export interface VehicleDef {
-  key: VehicleKey;
-  label: string;
-  hint: string;
-  image: string;
-}
-
-export const VEHICLES: VehicleDef[] = [
-  {
-    key: "Single Cab",
-    label: "Single Cab",
-    hint: "Single cab ute",
-    image: "/media/photos/single-cab.png",
-  },
-  {
-    key: "Sedan/Dual Cab",
-    label: "Sedan / Dual Cab",
-    hint: "Sedan, hatch, dual cab",
-    image: "/media/photos/dual-cab.png",
-  },
-  {
-    key: "SUV",
-    label: "SUV / Wagon",
-    hint: "SUV, wagon, 5-seat 4WD",
-    image: "/media/photos/suv.png",
-  },
-  {
-    key: "7 Seater",
-    label: "7 Seater / Large 4WD",
-    hint: "7+ seats, van, large 4WD",
-    image: "/media/photos/7-seater.png",
-  },
-];
-
-export const VEHICLE_KEYS = VEHICLES.map((v) => v.key);
-
-/* ---------------------------------------------------------------- */
-/* PACKAGES                                                          */
-/* ---------------------------------------------------------------- */
-export type PackageKey = "premium" | "cutpolish";
-
-export interface PackageDef {
-  key: PackageKey;
-  name: string;
-  tagline: string;
-  durationLabel: string;
-  durationMin: number; // used for calendar availability blocking
-  sevenAmOnly: boolean; // full-day jobs start at 7am only
-  prices: Record<VehicleKey, number>;
-  includes: string[];
-  image: string;
-}
-
-export const PACKAGES: PackageDef[] = [
-  {
-    key: "premium",
-    name: "Premium Interior & Exterior Detail",
-    tagline:
-      "A full interior reset and exterior restoration that makes your car feel new again.",
-    durationLabel: "2–5 hrs",
-    durationMin: 270,
-    sevenAmOnly: false,
-    prices: { "Single Cab": 300, "Sedan/Dual Cab": 350, SUV: 380, "7 Seater": 400 },
-    includes: [
-      "Carpet shampoo & extraction",
-      "Steam cleaning",
-      "Plastic rejuvenation",
-      "Full exterior wash & dry",
-      "Streak-free glass inside & out",
-      "Tyres dressed & shined",
-    ],
-    image:
-      "https://cdn.shopify.com/s/files/1/0933/1055/0325/files/IMG_9133.jpg?v=1768791449",
-  },
-  {
-    key: "cutpolish",
-    name: "Premium Full Detail + Cut & Polish",
-    tagline:
-      "Everything in the Premium detail, plus a full cut & polish to restore deep gloss and clarity.",
-    durationLabel: "Full day",
-    durationMin: 600,
-    sevenAmOnly: true,
-    prices: { "Single Cab": 650, "Sedan/Dual Cab": 700, SUV: 750, "7 Seater": 800 },
-    includes: [
-      "Everything in the Premium Detail",
-      "Decontamination wash",
-      "Clay bar treatment",
-      "1-step cut + 1-step polish",
-      "Hand wax sealant for gloss & protection",
-      "Paint left smooth, glossy & photo-ready",
-    ],
-    image:
-      "https://cdn.shopify.com/s/files/1/0933/1055/0325/files/IMG_9226.jpg?v=1769392524",
-  },
-];
-
-export function getPackage(key: string): PackageDef | undefined {
-  return PACKAGES.find((p) => p.key === key);
-}
-
-/* ---------------------------------------------------------------- */
-/* EXTRAS — priced per vehicle                                      */
-/* ---------------------------------------------------------------- */
-export type ExtraKey = "dog" | "engine" | "plastic" | "leather" | "wax";
-
-export interface ExtraDef {
-  key: ExtraKey;
-  label: string;
-  desc: string;
-  prices: Record<VehicleKey, number>;
-  image: string;
-  // If set, this extra is only offered for these packages (e.g. Hand Wax is
-  // already included in the Cut & Polish package, so it's Premium-only).
-  onlyFor?: PackageKey[];
-}
-
-export const EXTRAS: ExtraDef[] = [
-  {
-    key: "dog",
-    label: "Dog Hair Removal",
-    desc: "Heavy pet-hair removal from carpets, seats and boot.",
-    prices: { "Single Cab": 35, "Sedan/Dual Cab": 55, SUV: 55, "7 Seater": 55 },
-    image: "/media/photos/pet-hair.png",
-  },
-  {
-    key: "engine",
-    label: "Engine Bay Clean",
-    desc: "Deep engine bay clean with plastics dressed and protected.",
-    prices: { "Single Cab": 85, "Sedan/Dual Cab": 85, SUV: 85, "7 Seater": 85 },
-    image:
-      "https://cdn.shopify.com/s/files/1/0933/1055/0325/files/IMG_9134.jpg?v=1768791452",
-  },
-  {
-    key: "plastic",
-    label: "Exterior Plastic Restore",
-    desc: "Bring faded exterior trims back to a deep factory black.",
-    prices: { "Single Cab": 55, "Sedan/Dual Cab": 85, SUV: 85, "7 Seater": 100 },
-    image: "/media/photos/plastic-restore.jpg",
-  },
-  {
-    key: "leather",
-    label: "Leather Conditioner",
-    desc: "Clean, condition and protect your leather surfaces.",
-    prices: { "Single Cab": 55, "Sedan/Dual Cab": 85, SUV: 85, "7 Seater": 100 },
-    image:
-      "https://cdn.shopify.com/s/files/1/0933/1055/0325/files/leather_conditoner.jpg?v=1771811978",
-  },
-  {
-    key: "wax",
-    label: "Hand Wax",
-    desc: "A premium hand wax for a glossy finish and added paint protection.",
-    prices: { "Single Cab": 35, "Sedan/Dual Cab": 55, SUV: 85, "7 Seater": 100 },
-    image: "/media/photos/hand-wax.jpg",
-    onlyFor: ["premium"], // included in the Cut & Polish package, so Premium-only
-  },
-];
-
-export function getExtra(key: string): ExtraDef | undefined {
-  return EXTRAS.find((e) => e.key === key);
-}
-
-export function extraPrice(extra: ExtraDef, vehicle: VehicleKey): number {
-  return extra.prices[vehicle] ?? 0;
-}
 
 /* ---------------------------------------------------------------- */
 /* SERVICES — the main homepage showcase                            */
@@ -291,7 +118,7 @@ export const SERVICES: ServiceDef[] = [
       "Ceramic spray sealant, 3-month protection",
     ],
     // ideal upload: services/cut-polish.jpg
-    image: "https://cdn.shopify.com/s/files/1/0933/1055/0325/files/IMG_9226.jpg?v=1769392524",
+    image: "/media/photos/cutpolish.jpg",
     accent: "yellow",
   },
   {
@@ -383,9 +210,6 @@ export interface Review {
   time: string;
   text: string;
 }
-
-export const REVIEW_RATING = 4.8;
-export const REVIEW_COUNT = 111;
 
 export const REVIEWS: Review[] = [
   {
@@ -499,33 +323,3 @@ export const REVIEWS: Review[] = [
     text: "Amazing job on our car. We were blown away how great our car turned out. Highly recommend and will be telling friends!",
   },
 ];
-
-/* ---------------------------------------------------------------- */
-/* TIME SLOTS                                                        */
-/* ---------------------------------------------------------------- */
-export interface SlotDef {
-  key: "0700" | "1130";
-  label: string;
-  hour: number;
-  minute: number;
-}
-
-export const SLOTS: SlotDef[] = [
-  { key: "0700", label: "7:00 AM", hour: 7, minute: 0 },
-  { key: "1130", label: "11:30 AM", hour: 11, minute: 30 },
-];
-
-export function getSlot(key: string): SlotDef | undefined {
-  return SLOTS.find((s) => s.key === key);
-}
-
-/* ---------------------------------------------------------------- */
-/* HELPERS                                                          */
-/* ---------------------------------------------------------------- */
-export function money(n: number): string {
-  return "$" + Number(n || 0).toLocaleString("en-AU");
-}
-
-export function basePrice(pkg: PackageDef, vehicle: VehicleKey): number {
-  return pkg.prices[vehicle] ?? 0;
-}
