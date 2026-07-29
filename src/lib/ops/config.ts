@@ -3,16 +3,20 @@ import { ACTIVE_TEAM } from "@/lib/referrals";
 /* =====================================================================
    DAILY OPS — targets & roster
    ---------------------------------------------------------------------
-   The break-even and aim come straight off the cost model:
-     - breakEvenRevenue = the daily fixed nut on a 5-day week
-     - aimRevenue       = a healthy day (≈2 corrections + a detail)
+   Straight off the real bank-data cost model (3 detailers + team leader):
+     - breakEvenRevenue = daily break-even (business covered), ~$48k/mo
+     - aimRevenue       = the daily TARGET to beat break-even
+     - weeklyTarget     = the target to run the week toward
+     - monthlyTarget    = the target to run the month toward
      - jobsTarget       = corrections/day we're aiming for
    Update these here if the cost base changes and the whole dashboard
    re-scores itself.
    ===================================================================== */
 export const OPS_TARGETS = {
-  breakEvenRevenue: 2319,
-  aimRevenue: 4000,
+  breakEvenRevenue: 2200,
+  aimRevenue: 2500,
+  weeklyTarget: 12500,
+  monthlyTarget: 50000,
   jobsTarget: 2,
 };
 

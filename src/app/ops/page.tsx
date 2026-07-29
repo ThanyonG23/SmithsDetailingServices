@@ -76,6 +76,45 @@ function NumField({
   );
 }
 
+function PaceCard({
+  label,
+  current,
+  target,
+}: {
+  label: string;
+  current: number;
+  target: number;
+}) {
+  const pct = Math.min(100, Math.round((current / target) * 100));
+  const hit = current >= target;
+  return (
+    <div
+      className={`rounded-2xl border p-5 ${
+        hit ? "border-brand-green/40 bg-brand-green/[0.05]" : "border-white/10 bg-white/[0.02]"
+      }`}
+    >
+      <div className="flex items-baseline justify-between">
+        <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/40">
+          {label}
+        </div>
+        <div className="text-xs font-bold text-white/45">target {money(target)}</div>
+      </div>
+      <div className="mt-1 font-display text-3xl font-extrabold tabular-nums text-white">
+        {money(current)}
+      </div>
+      <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-white/10">
+        <div
+          className={`h-full rounded-full ${hit ? "bg-brand-green" : "bg-brand-yellow"}`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <div className="mt-1.5 text-xs font-semibold text-white/45">
+        {hit ? "Target smashed 🔥" : `${money(target - current)} to go · ${pct}%`}
+      </div>
+    </div>
+  );
+}
+
 function StatTile({
   label,
   value,
@@ -149,9 +188,23 @@ export default async function OpsPage({
 
   const rev = entry?.revenue_collected ?? 0;
   const status = revenueStatus(rev);
-  const { breakEvenRevenue, aimRevenue, jobsTarget } = OPS_TARGETS;
+  const { breakEvenRevenue, aimRevenue, jobsTarget, weeklyTarget, monthlyTarget } = OPS_TARGETS;
   const aimPct = Math.min(100, Math.round((rev / aimRevenue) * 100));
   const bePct = Math.min(100, Math.round((breakEvenRevenue / aimRevenue) * 100));
+
+  // week & month pace (from the loaded history)
+  const monthKey = today.slice(0, 7);
+  const wt = new Date(`${today}T12:00:00+10:00`);
+  const dow = (wt.getUTCDay() + 6) % 7; // 0 = Monday
+  const weekStart = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Australia/Brisbane",
+  }).format(new Date(wt.getTime() - dow * 86400000));
+  const weekRevenue = recent
+    .filter((r) => r.log_date >= weekStart && r.log_date <= today)
+    .reduce((a, r) => a + r.revenue_collected, 0);
+  const monthRevenue = recent
+    .filter((r) => r.log_date.startsWith(monthKey))
+    .reduce((a, r) => a + r.revenue_collected, 0);
 
   return (
     <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
@@ -284,6 +337,17 @@ export default async function OpsPage({
             tone={(entry?.unhappy_customers ?? 0) > 0 ? "yellow" : "neutral"}
           />
         </div>
+      </Reveal>
+
+      {/* ── WEEK & MONTH PACE ────────────────────────────────────── */}
+      <Reveal delay={200}>
+        <section className="mt-8">
+          <SectionTitle eyebrow="The targets" title="Week &amp; month pace" />
+          <div className="grid gap-3 sm:grid-cols-2">
+            <PaceCard label="This week" current={weekRevenue} target={weeklyTarget} />
+            <PaceCard label="This month" current={monthRevenue} target={monthlyTarget} />
+          </div>
+        </section>
       </Reveal>
 
       {/* ── ENTRY FORM ───────────────────────────────────────────── */}
