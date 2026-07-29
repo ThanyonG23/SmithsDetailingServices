@@ -100,8 +100,17 @@ export default async function OpsPage({
   const isToday = date === today;
   const saved = searchParams?.saved === "1";
 
-  const entry = await getDailyLog(date);
-  const recent = await getRecentLogs(30);
+  let entry: DailyLog | null = null;
+  let recent: DailyLog[] = [];
+  let dbError = false;
+  try {
+    entry = await getDailyLog(date);
+    recent = await getRecentLogs(30);
+  } catch {
+    // No database connected yet (or a bad connection string). Don't crash
+    // the whole page — show a notice and let login/UI still render.
+    dbError = true;
+  }
 
   const rev = entry?.revenue_collected ?? 0;
   const status = revenueStatus(rev);
@@ -151,6 +160,15 @@ export default async function OpsPage({
       {saved && (
         <div className="mt-4 rounded-xl border border-brand-green/40 bg-brand-green/[0.08] px-4 py-3 text-sm font-semibold text-brand-green">
           Saved ✓
+        </div>
+      )}
+
+      {dbError && (
+        <div className="mt-4 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
+          <b className="font-bold">Database not connected.</b> Create a Vercel
+          Postgres (Neon) database, connect it to this project, clear any old
+          Supabase <code>POSTGRES_*</code> variables, and redeploy — then saving
+          and history switch on. Your login is working fine.
         </div>
       )}
 
