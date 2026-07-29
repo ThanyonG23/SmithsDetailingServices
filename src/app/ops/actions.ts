@@ -4,8 +4,9 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { checkPassword, sessionCookieValue, OPS_COOKIE } from "@/lib/ops/auth";
-import { upsertDailyLog } from "@/lib/ops/db";
+import { upsertDailyLog, replaceBookings } from "@/lib/ops/db";
 import { OPS_STAFF, hoursBetween } from "@/lib/ops/config";
+import { parseBookingsIcs } from "@/lib/ops/calendar";
 
 export async function login(formData: FormData): Promise<void> {
   const password = String(formData.get("password") || "");
@@ -56,6 +57,7 @@ export async function saveEntry(formData: FormData): Promise<void> {
     bookings: toNum(formData.get("bookings")),
     jobs_completed: toNum(formData.get("jobs_completed")),
     revenue_collected: toNum(formData.get("revenue_collected")),
+    ad_spend: toNum(formData.get("ad_spend")),
     happy_customers: toNum(formData.get("happy_customers")),
     unhappy_customers: toNum(formData.get("unhappy_customers")),
     staff_hours,
@@ -66,4 +68,35 @@ export async function saveEntry(formData: FormData): Promise<void> {
 
   revalidatePath("/ops");
   redirect(`/ops?date=${encodeURIComponent(log_date)}&saved=1`);
+}
+
+/* Upload the Google Calendar export (.zip or .ics) → parse bookings →
+   replace the snapshot. Handles the zip Google gives you (all calendars)
+   by pulling out the "Smiths Bookings" .ics. */
+export async function uploadCalendar(formData: FormData): Promise<void> {
+  const file = formData.get("cal") as File | null;
+  if (!file || file.size === 0) redirect("/ops?calerr=nofile");
+
+  const buf = Buffer.from(await file.arrayBuffer());
+  let ics = "";
+
+  if (file.name.toLowerCase().endsWith(".zip")) {
+    const AdmZip = (await import("adm-zip")).default;
+    const zip = new AdmZip(buf);
+    const entries = zip.getEntries();
+    const entry =
+      entries.find(
+        (e) => /smiths bookings/i.test(e.entryName) && e.entryName.toLowerCase().endsWith(".ics")
+      ) || entries.find((e) => e.entryName.toLowerCase().endsWith(".ics"));
+    if (!entry) redirect("/ops?calerr=noics");
+    ics = entry!.getData().toString("utf8");
+  } else {
+    ics = buf.toString("utf8");
+  }
+
+  const bookings = parseBookingsIcs(ics).filter((b) => b.value > 0);
+  await replaceBookings(bookings);
+
+  revalidatePath("/ops");
+  redirect(`/ops?calok=${bookings.length}`);
 }

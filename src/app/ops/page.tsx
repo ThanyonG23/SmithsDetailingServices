@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { isAuthed } from "@/lib/ops/auth";
-import { getDailyLog, getRecentLogs, type DailyLog } from "@/lib/ops/db";
+import { getDailyLog, getRecentLogs, getRecentBookings, type DailyLog, type Booking } from "@/lib/ops/db";
 import { OPS_STAFF, OPS_TARGETS, cairnsToday } from "@/lib/ops/config";
-import { saveEntry, logout } from "./actions";
+import { saveEntry, logout, uploadCalendar } from "./actions";
 import StaffHours from "@/components/ops/StaffHours";
 import Reveal from "@/components/Reveal";
 
@@ -152,7 +152,7 @@ function StatTile({
 export default async function OpsPage({
   searchParams,
 }: {
-  searchParams: { date?: string; saved?: string };
+  searchParams: { date?: string; saved?: string; calok?: string; calerr?: string };
 }) {
   if (!isAuthed()) redirect("/ops/login");
 
@@ -206,6 +206,38 @@ export default async function OpsPage({
     .filter((r) => r.log_date.startsWith(monthKey))
     .reduce((a, r) => a + r.revenue_collected, 0);
 
+  // ── bookings (from the uploaded calendar) ──
+  const from60 = new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Brisbane" }).format(
+    new Date(Date.now() - 60 * 86400000)
+  );
+  const d14 = new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Brisbane" }).format(
+    new Date(Date.now() - 13 * 86400000)
+  );
+  let bookings: Booking[] = [];
+  try {
+    bookings = await getRecentBookings(from60);
+  } catch {
+    /* dbError already surfaced above */
+  }
+  const last14 = bookings.filter((b) => b.booking_date >= d14 && b.booking_date <= today);
+  const corr14 = last14.filter((b) => b.is_correction).length;
+  const corrPerDay = corr14 / 10; // ~10 working days in 14
+  const weekBookings = bookings.filter((b) => b.booking_date >= weekStart && b.booking_date <= today);
+  const weekBookedValue = weekBookings.reduce((a, b) => a + b.value, 0);
+  const weekBookedCorr = weekBookings.filter((b) => b.is_correction).length;
+  const pipeline = bookings.filter((b) => b.booking_date > today);
+  const pipelineValue = pipeline.reduce((a, b) => a + b.value, 0);
+  const pipelineCorr = pipeline.filter((b) => b.is_correction).length;
+
+  // CAC this week = week ad spend / week bookings
+  const weekAdSpend = recent
+    .filter((r) => r.log_date >= weekStart && r.log_date <= today)
+    .reduce((a, r) => a + (r.ad_spend || 0), 0);
+  const weekCAC = weekBookings.length ? weekAdSpend / weekBookings.length : 0;
+  const hasBookings = bookings.length > 0;
+  const calCount = searchParams?.calok;
+  const calErr = searchParams?.calerr;
+
   return (
     <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
       {/* ── header ───────────────────────────────────────────────── */}
@@ -252,6 +284,19 @@ export default async function OpsPage({
           Postgres (Neon) database, connect it to this project, clear any old
           Supabase <code>POSTGRES_*</code> variables, and redeploy — then saving
           and history switch on. Your login is working fine.
+        </div>
+      )}
+
+      {calCount && (
+        <div className="mt-5 rounded-xl border border-brand-green/40 bg-brand-green/[0.08] px-4 py-3 text-sm font-semibold text-brand-green">
+          Calendar synced ✓ · {calCount} bookings loaded
+        </div>
+      )}
+      {calErr && (
+        <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
+          {calErr === "noics"
+            ? "Couldn't find the Smiths Bookings calendar in that file — upload the calendar .zip Google gives you."
+            : "No file received — pick the calendar .zip and try again."}
         </div>
       )}
 
@@ -350,6 +395,69 @@ export default async function OpsPage({
         </section>
       </Reveal>
 
+      {/* ── BOOKINGS & ADS (from calendar) ───────────────────────── */}
+      <Reveal delay={240}>
+        <section className="mt-8">
+          <SectionTitle eyebrow="From your calendar" title="Bookings &amp; ads" />
+
+          {hasBookings ? (
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              <StatTile
+                label="Corrections/day"
+                value={corrPerDay.toFixed(1)}
+                sub={`aim ${jobsTarget}/day · ${corr14} in 14d`}
+                tone={corrPerDay >= 1 ? "green" : corrPerDay > 0 ? "yellow" : "neutral"}
+              />
+              <StatTile
+                label="Booked this week"
+                value={String(weekBookings.length)}
+                sub={`${money(weekBookedValue)} · ${weekBookedCorr} corr`}
+              />
+              <StatTile
+                label="Pipeline ahead"
+                value={String(pipeline.length)}
+                sub={`${money(pipelineValue)} · ${pipelineCorr} corr`}
+                tone={pipeline.length > 0 ? "green" : "yellow"}
+              />
+              <StatTile
+                label="CAC this week"
+                value={weekCAC ? money(weekCAC) : "—"}
+                sub={`${money(weekAdSpend)} ad spend`}
+              />
+            </div>
+          ) : (
+            <p className="text-sm text-white/45">
+              No bookings loaded yet — upload your calendar below to switch this on.
+            </p>
+          )}
+
+          <form
+            action={uploadCalendar}
+            className={`mt-3 ${CARD} flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between`}
+          >
+            <div>
+              <div className="text-sm font-bold text-white">Sync bookings</div>
+              <div className="mt-0.5 text-xs text-white/45">
+                Drop in the Google Calendar export (.zip or .ics) — refreshes corrections/day &amp;
+                pipeline.
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <input
+                type="file"
+                name="cal"
+                accept=".zip,.ics"
+                required
+                className="max-w-[190px] text-xs text-white/70 file:mr-3 file:rounded-full file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-xs file:font-bold file:text-white hover:file:bg-white/20"
+              />
+              <button className="shrink-0 rounded-full bg-brand-green px-5 py-2.5 text-xs font-black text-[#04130a] transition hover:brightness-110 active:scale-95">
+                Upload
+              </button>
+            </div>
+          </form>
+        </section>
+      </Reveal>
+
       {/* ── ENTRY FORM ───────────────────────────────────────────── */}
       <form action={saveEntry}>
         {/* the numbers */}
@@ -384,6 +492,13 @@ export default async function OpsPage({
               prefix="$"
               step={0.01}
               defaultValue={entry?.revenue_collected ?? ""}
+            />
+            <NumField
+              label="Ad spend today"
+              name="ad_spend"
+              prefix="$"
+              step={0.01}
+              defaultValue={entry?.ad_spend ?? ""}
             />
             <NumField
               label="Happy customers"

@@ -1,15 +1,11 @@
 import postgres from "postgres";
+import type { Booking } from "./calendar";
 
 /* =====================================================================
-   DAILY OPS — data layer (Supabase / any Postgres)
-   ---------------------------------------------------------------------
-   Uses the `postgres` client so it works with the Supabase connection
-   already wired into Vercel (POSTGRES_URL etc.). One row per day
-   (log_date is the primary key); per-staff data is JSON keyed by name:
-     staff_shifts = { "Ashlee": { start, end }, ... }
-     staff_hours  = { "Ashlee": 9.75, ... }   (computed on save)
-     staff_notes  = { "Ashlee": "…", ... }
-   The table + newer columns are created lazily on first use.
+   DAILY OPS — data layer (Supabase / any Postgres via the `postgres` client)
+   - daily_log : one row per day, what Ashlee logs
+   - bookings  : parsed from the uploaded Google Calendar (full snapshot)
+   Tables + newer columns are created lazily on first use.
    ===================================================================== */
 
 export interface DailyLogInput {
@@ -17,6 +13,7 @@ export interface DailyLogInput {
   bookings: number;
   jobs_completed: number;
   revenue_collected: number;
+  ad_spend: number;
   happy_customers: number;
   unhappy_customers: number;
   staff_hours: Record<string, number>;
@@ -29,8 +26,8 @@ export interface DailyLog extends DailyLogInput {
   updated_at: string; // Cairns-local "YYYY-MM-DDTHH:MM"
 }
 
-/* Connection string from the Supabase integration on Vercel. Prefer the
-   pooled URL for serverless; fall back to the others. */
+export type { Booking };
+
 const connectionString =
   process.env.POSTGRES_URL ||
   process.env.POSTGRES_PRISMA_URL ||
@@ -38,9 +35,6 @@ const connectionString =
   process.env.DATABASE_URL ||
   "";
 
-/* `prepare: false` keeps us compatible with Supabase's transaction pooler
-   (pgbouncer); `ssl: require` because Supabase requires TLS; `max: 1`
-   keeps the pool tiny for serverless. */
 const sql = postgres(connectionString, { ssl: "require", prepare: false, max: 1 });
 
 let ensured = false;
@@ -63,8 +57,20 @@ async function ensureTable(): Promise<void> {
   `;
   await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS staff_shifts jsonb NOT NULL DEFAULT '{}'::jsonb;`;
   await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS staff_notes  jsonb NOT NULL DEFAULT '{}'::jsonb;`;
+  await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS ad_spend     numeric(10,2) NOT NULL DEFAULT 0;`;
+  await sql`
+    CREATE TABLE IF NOT EXISTS bookings (
+      id            serial        PRIMARY KEY,
+      booking_date  date          NOT NULL,
+      value         numeric(10,2) NOT NULL DEFAULT 0,
+      is_correction boolean       NOT NULL DEFAULT false,
+      summary       text          NOT NULL DEFAULT ''
+    );
+  `;
   ensured = true;
 }
+
+/* ---- daily_log ------------------------------------------------------ */
 
 export async function getDailyLog(date: string): Promise<DailyLog | null> {
   await ensureTable();
@@ -72,6 +78,7 @@ export async function getDailyLog(date: string): Promise<DailyLog | null> {
     SELECT to_char(log_date, 'YYYY-MM-DD')                       AS log_date,
            bookings, jobs_completed,
            revenue_collected::float8                             AS revenue_collected,
+           ad_spend::float8                                      AS ad_spend,
            happy_customers, unhappy_customers,
            staff_hours, staff_shifts, staff_notes, notes_today,
            to_char(updated_at AT TIME ZONE 'Australia/Brisbane',
@@ -88,6 +95,7 @@ export async function getRecentLogs(limit = 30): Promise<DailyLog[]> {
     SELECT to_char(log_date, 'YYYY-MM-DD')                       AS log_date,
            bookings, jobs_completed,
            revenue_collected::float8                             AS revenue_collected,
+           ad_spend::float8                                      AS ad_spend,
            happy_customers, unhappy_customers,
            staff_hours, staff_shifts, staff_notes, notes_today,
            to_char(updated_at AT TIME ZONE 'Australia/Brisbane',
@@ -103,11 +111,11 @@ export async function upsertDailyLog(e: DailyLogInput): Promise<void> {
   await ensureTable();
   await sql`
     INSERT INTO daily_log
-      (log_date, bookings, jobs_completed, revenue_collected,
+      (log_date, bookings, jobs_completed, revenue_collected, ad_spend,
        happy_customers, unhappy_customers, staff_hours, staff_shifts,
        staff_notes, notes_today, updated_at)
     VALUES
-      (${e.log_date}, ${e.bookings}, ${e.jobs_completed}, ${e.revenue_collected},
+      (${e.log_date}, ${e.bookings}, ${e.jobs_completed}, ${e.revenue_collected}, ${e.ad_spend},
        ${e.happy_customers}, ${e.unhappy_customers},
        ${JSON.stringify(e.staff_hours)}::jsonb,
        ${JSON.stringify(e.staff_shifts)}::jsonb,
@@ -117,6 +125,7 @@ export async function upsertDailyLog(e: DailyLogInput): Promise<void> {
        bookings          = EXCLUDED.bookings,
        jobs_completed    = EXCLUDED.jobs_completed,
        revenue_collected = EXCLUDED.revenue_collected,
+       ad_spend          = EXCLUDED.ad_spend,
        happy_customers   = EXCLUDED.happy_customers,
        unhappy_customers = EXCLUDED.unhappy_customers,
        staff_hours       = EXCLUDED.staff_hours,
@@ -125,4 +134,34 @@ export async function upsertDailyLog(e: DailyLogInput): Promise<void> {
        notes_today       = EXCLUDED.notes_today,
        updated_at        = now();
   `;
+}
+
+/* ---- bookings (from the uploaded calendar) -------------------------- */
+
+/** Replace the whole bookings table with a fresh calendar snapshot. */
+export async function replaceBookings(list: Booking[]): Promise<void> {
+  await ensureTable();
+  await sql`DELETE FROM bookings;`;
+  if (list.length) {
+    await sql`INSERT INTO bookings ${sql(
+      list,
+      "booking_date",
+      "value",
+      "is_correction",
+      "summary"
+    )}`;
+  }
+}
+
+export async function getRecentBookings(fromISO: string): Promise<Booking[]> {
+  await ensureTable();
+  const rows = await sql<Booking[]>`
+    SELECT to_char(booking_date, 'YYYY-MM-DD') AS booking_date,
+           value::float8                       AS value,
+           is_correction, summary
+    FROM bookings
+    WHERE booking_date >= ${fromISO}
+    ORDER BY booking_date;
+  `;
+  return rows as unknown as Booking[];
 }
