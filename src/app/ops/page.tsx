@@ -270,6 +270,7 @@ export default async function OpsPage({
 
   // ── funnel (this week) ──
   const inWeek = (r: DailyLog) => r.log_date >= weekStart && r.log_date <= today;
+  const weekLoggedDays = recent.filter(inWeek).length;
   const weekQuotes = recent.filter(inWeek).reduce((a, r) => a + (r.quotes || 0), 0);
   const weekCompleted = recent.filter(inWeek).reduce((a, r) => a + (r.jobs_completed || 0), 0);
   const weekRedos = recent.filter(inWeek).reduce((a, r) => a + (r.redos || 0), 0);
@@ -319,7 +320,7 @@ export default async function OpsPage({
     });
   if (weekRedos > 4)
     alerts.push({ tone: "red", text: `${weekRedos} re-dos this week — over the target of 4. Check the crew's quality.` });
-  if (daysElapsed >= 3 && weekProfit < 0)
+  if (weekLoggedDays > 0 && daysElapsed >= 3 && weekProfit < 0)
     alerts.push({
       tone: "yellow",
       text: `Behind break-even this week by ${money(-weekProfit)} — get more jobs out the door.`,
@@ -524,14 +525,18 @@ export default async function OpsPage({
               Week profit vs break-even{" "}
               <span className="text-white/30">({daysElapsed}d in)</span>
             </span>
-            <span
-              className={`font-display text-lg font-extrabold tabular-nums ${
-                weekProfit >= 0 ? "text-brand-green" : "text-brand-yellow"
-              }`}
-            >
-              {weekProfit >= 0 ? "+" : ""}
-              {money(weekProfit)}
-            </span>
+            {weekLoggedDays === 0 ? (
+              <span className="text-sm font-semibold text-white/40">— start logging</span>
+            ) : (
+              <span
+                className={`font-display text-lg font-extrabold tabular-nums ${
+                  weekProfit >= 0 ? "text-brand-green" : "text-brand-yellow"
+                }`}
+              >
+                {weekProfit >= 0 ? "+" : ""}
+                {money(weekProfit)}
+              </span>
+            )}
           </div>
           {prevWeekRevenue > 0 && (
             <div className="mt-1 text-xs text-white/35">
@@ -702,8 +707,8 @@ export default async function OpsPage({
             <StatTile
               label="Booked"
               value={String(weekBookings.length)}
-              sub={`${quoteClose}% of quotes`}
-              tone={quoteClose >= 40 ? "green" : quoteClose > 0 ? "yellow" : "neutral"}
+              sub={weekQuotes ? `${quoteClose}% of quotes` : "log quotes to see %"}
+              tone={weekQuotes && quoteClose >= 40 ? "green" : weekQuotes ? "yellow" : "neutral"}
             />
             <StatTile label="Completed" value={String(weekCompleted)} sub="jobs done" />
           </div>
