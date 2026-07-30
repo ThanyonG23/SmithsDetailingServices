@@ -4,9 +4,10 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { checkPassword, sessionCookieValue, OPS_COOKIE } from "@/lib/ops/auth";
-import { upsertDailyLog, replaceBookings } from "@/lib/ops/db";
+import { upsertDailyLog, replaceBookings, replaceAds } from "@/lib/ops/db";
 import { OPS_STAFF, hoursBetween } from "@/lib/ops/config";
 import { parseBookingsIcs } from "@/lib/ops/calendar";
+import { parseAdsCsv } from "@/lib/ops/ads";
 
 export async function login(formData: FormData): Promise<void> {
   const password = String(formData.get("password") || "");
@@ -58,6 +59,8 @@ export async function saveEntry(formData: FormData): Promise<void> {
     revenue_collected: toNum(formData.get("revenue_collected")),
     completed_revenue: toNum(formData.get("completed_revenue")),
     ad_spend: toNum(formData.get("ad_spend")),
+    quotes: toNum(formData.get("quotes")),
+    redos: toNum(formData.get("redos")),
     happy_customers: toNum(formData.get("happy_customers")),
     unhappy_customers: toNum(formData.get("unhappy_customers")),
     staff_hours,
@@ -99,4 +102,18 @@ export async function uploadCalendar(formData: FormData): Promise<void> {
 
   revalidatePath("/ops");
   redirect(`/ops?calok=${bookings.length}`);
+}
+
+/* Upload the Meta ads CSV → parse per-ad stats → replace the snapshot. */
+export async function uploadAds(formData: FormData): Promise<void> {
+  const file = formData.get("ads") as File | null;
+  if (!file || file.size === 0) redirect("/ops?aderr=nofile");
+
+  const text = Buffer.from(await file.arrayBuffer()).toString("utf8");
+  const rows = parseAdsCsv(text);
+  if (!rows.length) redirect("/ops?aderr=noads");
+  await replaceAds(rows);
+
+  revalidatePath("/ops");
+  redirect(`/ops?adok=${rows.length}`);
 }

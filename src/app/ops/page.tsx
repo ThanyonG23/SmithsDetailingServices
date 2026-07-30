@@ -1,9 +1,17 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { isAuthed } from "@/lib/ops/auth";
-import { getDailyLog, getRecentLogs, getRecentBookings, type DailyLog, type Booking } from "@/lib/ops/db";
+import {
+  getDailyLog,
+  getRecentLogs,
+  getRecentBookings,
+  getAds,
+  type DailyLog,
+  type Booking,
+  type AdRow,
+} from "@/lib/ops/db";
 import { OPS_STAFF, OPS_TARGETS, cairnsToday } from "@/lib/ops/config";
-import { saveEntry, logout, uploadCalendar } from "./actions";
+import { saveEntry, logout, uploadCalendar, uploadAds } from "./actions";
 import StaffHours from "@/components/ops/StaffHours";
 import Reveal from "@/components/Reveal";
 
@@ -152,7 +160,14 @@ function StatTile({
 export default async function OpsPage({
   searchParams,
 }: {
-  searchParams: { date?: string; saved?: string; calok?: string; calerr?: string };
+  searchParams: {
+    date?: string;
+    saved?: string;
+    calok?: string;
+    calerr?: string;
+    adok?: string;
+    aderr?: string;
+  };
 }) {
   if (!isAuthed()) redirect("/ops/login");
 
@@ -238,6 +253,80 @@ export default async function OpsPage({
   const calCount = searchParams?.calok;
   const calErr = searchParams?.calerr;
 
+  // ── ads (from the uploaded Meta CSV) ──
+  let ads: AdRow[] = [];
+  try {
+    ads = await getAds();
+  } catch {
+    /* dbError already surfaced */
+  }
+  const adSpend = ads.reduce((a, r) => a + r.spend, 0);
+  const adMessages = ads.reduce((a, r) => a + r.messages, 0);
+  const adPurchases = ads.reduce((a, r) => a + r.purchases, 0);
+  const adCostPerMsg = adMessages ? adSpend / adMessages : 0;
+  const hasAds = ads.length > 0;
+  const adOk = searchParams?.adok;
+  const adErr = searchParams?.aderr;
+
+  // ── funnel (this week) ──
+  const inWeek = (r: DailyLog) => r.log_date >= weekStart && r.log_date <= today;
+  const weekQuotes = recent.filter(inWeek).reduce((a, r) => a + (r.quotes || 0), 0);
+  const weekCompleted = recent.filter(inWeek).reduce((a, r) => a + (r.jobs_completed || 0), 0);
+  const weekRedos = recent.filter(inWeek).reduce((a, r) => a + (r.redos || 0), 0);
+  const quoteClose = weekQuotes ? Math.round((weekBookings.length / weekQuotes) * 100) : 0;
+
+  // ── profit vs break-even ──
+  const daysElapsed = dow + 1; // Mon..today
+  const weekProfit = weekRevenue - breakEvenRevenue * daysElapsed;
+
+  // ── trend: last full week for context ──
+  const prevWeekStart = new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Brisbane" }).format(
+    new Date(wt.getTime() - (dow + 7) * 86400000)
+  );
+  const prevWeekEnd = new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Brisbane" }).format(
+    new Date(wt.getTime() - (dow + 1) * 86400000)
+  );
+  const prevWeekRevenue = recent
+    .filter((r) => r.log_date >= prevWeekStart && r.log_date <= prevWeekEnd)
+    .reduce((a, r) => a + r.revenue_collected, 0);
+
+  // ── did we log today / missing days ──
+  const loggedDates = new Set(recent.map((r) => r.log_date));
+  const loggedToday = loggedDates.has(today);
+  const missingLast7: string[] = [];
+  for (let i = 1; i <= 7; i++) {
+    const d = new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Brisbane" }).format(
+      new Date(wt.getTime() - i * 86400000)
+    );
+    if (!loggedDates.has(d)) missingLast7.push(d);
+  }
+
+  // ── alerts engine ──
+  const alerts: { tone: "red" | "yellow"; text: string }[] = [];
+  if (!loggedToday)
+    alerts.push({ tone: "yellow", text: "Today isn't logged yet — fill in the day before you knock off." });
+  if ((entry?.unhappy_customers ?? 0) > 0)
+    alerts.push({
+      tone: "red",
+      text: `${entry?.unhappy_customers} unhappy customer(s) today — follow up before it becomes a review.`,
+    });
+  if (hasBookings && pipelineCorr === 0)
+    alerts.push({ tone: "red", text: "No corrections booked ahead — push the correction ad or call warm leads." });
+  if (hasBookings && corrPerDay < 1)
+    alerts.push({
+      tone: "yellow",
+      text: `Corrections running ${corrPerDay.toFixed(1)}/day — below the ~1/day break-even line.`,
+    });
+  if (weekRedos > 4)
+    alerts.push({ tone: "red", text: `${weekRedos} re-dos this week — over the target of 4. Check the crew's quality.` });
+  if (daysElapsed >= 3 && weekProfit < 0)
+    alerts.push({
+      tone: "yellow",
+      text: `Behind break-even this week by ${money(-weekProfit)} — get more jobs out the door.`,
+    });
+  if (weekBookings.length > 0 && weekCAC > 300)
+    alerts.push({ tone: "yellow", text: `CAC is ${money(weekCAC)} this week — refresh the ad creative if it keeps climbing.` });
+
   return (
     <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
       {/* ── header ───────────────────────────────────────────────── */}
@@ -298,6 +387,40 @@ export default async function OpsPage({
             ? "Couldn't find the Smiths Bookings calendar in that file — upload the calendar .zip Google gives you."
             : "No file received — pick the calendar .zip and try again."}
         </div>
+      )}
+      {adOk && (
+        <div className="mt-5 rounded-xl border border-brand-green/40 bg-brand-green/[0.08] px-4 py-3 text-sm font-semibold text-brand-green">
+          Ads synced ✓ · {adOk} ads loaded
+        </div>
+      )}
+      {adErr && (
+        <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
+          {adErr === "noads"
+            ? "Couldn't read any ads in that file — upload the Meta Ads CSV export."
+            : "No file received — pick the ads CSV and try again."}
+        </div>
+      )}
+
+      {/* ── ALERTS ───────────────────────────────────────────────── */}
+      {alerts.length > 0 && (
+        <Reveal delay={40}>
+          <section className="mt-6 flex flex-col gap-2">
+            <div className={EYEBROW}>Fix these today</div>
+            {alerts.map((a, i) => (
+              <div
+                key={i}
+                className={`flex items-start gap-2.5 rounded-xl border px-4 py-2.5 text-sm ${
+                  a.tone === "red"
+                    ? "border-red-500/40 bg-red-500/[0.08] text-red-300"
+                    : "border-brand-yellow/40 bg-brand-yellow/[0.07] text-brand-yellow"
+                }`}
+              >
+                <span aria-hidden>{a.tone === "red" ? "🔴" : "🟡"}</span>
+                <span>{a.text}</span>
+              </div>
+            ))}
+          </section>
+        </Reveal>
       )}
 
       {/* ── SCOREBOARD (hero) ────────────────────────────────────── */}
@@ -396,6 +519,25 @@ export default async function OpsPage({
             <PaceCard label="This week" current={weekRevenue} target={weeklyTarget} />
             <PaceCard label="This month" current={monthRevenue} target={monthlyTarget} />
           </div>
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3 text-sm">
+            <span className="text-white/50">
+              Week profit vs break-even{" "}
+              <span className="text-white/30">({daysElapsed}d in)</span>
+            </span>
+            <span
+              className={`font-display text-lg font-extrabold tabular-nums ${
+                weekProfit >= 0 ? "text-brand-green" : "text-brand-yellow"
+              }`}
+            >
+              {weekProfit >= 0 ? "+" : ""}
+              {money(weekProfit)}
+            </span>
+          </div>
+          {prevWeekRevenue > 0 && (
+            <div className="mt-1 text-xs text-white/35">
+              Last full week collected {money(prevWeekRevenue)}.
+            </div>
+          )}
         </section>
       </Reveal>
 
@@ -462,6 +604,116 @@ export default async function OpsPage({
         </section>
       </Reveal>
 
+      {/* ── AD PERFORMANCE (from Meta CSV) ───────────────────────── */}
+      <Reveal delay={260}>
+        <section className="mt-8">
+          <SectionTitle eyebrow="From Meta" title="Ad performance" />
+
+          {hasAds ? (
+            <>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                <StatTile label="Ad spend" value={money(adSpend)} sub="this export" />
+                <StatTile
+                  label="Messages"
+                  value={String(adMessages)}
+                  sub="conversations"
+                  tone={adMessages > 0 ? "green" : "neutral"}
+                />
+                <StatTile
+                  label="Cost / message"
+                  value={adCostPerMsg ? money(adCostPerMsg) : "—"}
+                  sub="lower is better"
+                />
+                <StatTile label="Purchases" value={String(adPurchases)} sub="Meta-attributed" />
+              </div>
+
+              <div className={`mt-3 overflow-x-auto ${CARD}`}>
+                <table className="w-full border-collapse text-sm tabular-nums">
+                  <thead>
+                    <tr className="border-b border-white/10">
+                      {["Ad", "Spend", "Msgs", "$/msg", "Buys"].map((h) => (
+                        <th
+                          key={h}
+                          className="whitespace-nowrap px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-white/40"
+                        >
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ads.map((a, i) => (
+                      <tr key={i} className="border-b border-white/[0.06] last:border-0">
+                        <td className="max-w-[150px] truncate px-3 py-2.5 font-semibold text-white/85">
+                          {a.name}
+                        </td>
+                        <td className="px-3 py-2.5 text-white/70">{money(a.spend)}</td>
+                        <td className="px-3 py-2.5 text-white/70">{a.messages}</td>
+                        <td className="px-3 py-2.5 font-bold text-brand-green">
+                          {a.cost_per_message ? money(a.cost_per_message) : "—"}
+                        </td>
+                        <td className="px-3 py-2.5 text-white/70">{a.purchases}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          ) : (
+            <p className="text-sm text-white/45">
+              No ads loaded yet — upload the Meta Ads CSV below.
+            </p>
+          )}
+
+          <form
+            action={uploadAds}
+            className={`mt-3 ${CARD} flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between`}
+          >
+            <div>
+              <div className="text-sm font-bold text-white">Sync ad stats</div>
+              <div className="mt-0.5 text-xs text-white/45">
+                Drop in the Meta Ads CSV — captures spend, messages, cost-per-message &amp; purchases
+                per ad.
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <input
+                type="file"
+                name="ads"
+                accept=".csv"
+                required
+                className="max-w-[190px] text-xs text-white/70 file:mr-3 file:rounded-full file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-xs file:font-bold file:text-white hover:file:bg-white/20"
+              />
+              <button className="shrink-0 rounded-full bg-brand-green px-5 py-2.5 text-xs font-black text-[#04130a] transition hover:brightness-110 active:scale-95">
+                Upload
+              </button>
+            </div>
+          </form>
+        </section>
+      </Reveal>
+
+      {/* ── FUNNEL (this week) ───────────────────────────────────── */}
+      <Reveal delay={280}>
+        <section className="mt-8">
+          <SectionTitle eyebrow="This week" title="The funnel" />
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <StatTile label="Leads (msgs)" value={String(adMessages)} sub="from Meta" />
+            <StatTile label="Quotes sent" value={String(weekQuotes)} sub="logged this week" />
+            <StatTile
+              label="Booked"
+              value={String(weekBookings.length)}
+              sub={`${quoteClose}% of quotes`}
+              tone={quoteClose >= 40 ? "green" : quoteClose > 0 ? "yellow" : "neutral"}
+            />
+            <StatTile label="Completed" value={String(weekCompleted)} sub="jobs done" />
+          </div>
+          <p className="mt-2 text-xs leading-relaxed text-white/40">
+            Leads → quotes → booked → completed. High leads but low bookings = the leak is your
+            close rate; check response time and the pitch.
+          </p>
+        </section>
+      </Reveal>
+
       {/* ── ENTRY FORM ───────────────────────────────────────────── */}
       <form action={saveEntry}>
         {/* the numbers */}
@@ -511,6 +763,12 @@ export default async function OpsPage({
               defaultValue={entry?.ad_spend ?? ""}
             />
             <NumField
+              label="Quotes sent"
+              name="quotes"
+              defaultValue={entry?.quotes ?? ""}
+            />
+            <NumField label="Re-dos" name="redos" defaultValue={entry?.redos ?? ""} />
+            <NumField
               label="Happy customers"
               name="happy_customers"
               defaultValue={entry?.happy_customers ?? ""}
@@ -552,7 +810,28 @@ export default async function OpsPage({
       {/* ── HISTORY ──────────────────────────────────────────────── */}
       <Reveal>
         <section className="mt-14">
-          <SectionTitle eyebrow="The record" title="Last 30 days" />
+          <div className="mb-4 flex items-end justify-between gap-3">
+            <div>
+              <div className={EYEBROW}>The record</div>
+              <h2 className="mt-2 font-display text-xl font-extrabold tracking-tight text-white">
+                Last 30 days
+              </h2>
+            </div>
+            <a
+              href="/ops/export"
+              className="shrink-0 rounded-full border border-white/15 px-4 py-2 text-xs font-bold text-white/60 transition hover:border-white/35 hover:text-white"
+            >
+              Export CSV ↓
+            </a>
+          </div>
+
+          {missingLast7.length > 0 && (
+            <div className="mb-3 rounded-xl border border-brand-yellow/30 bg-brand-yellow/[0.05] px-4 py-2.5 text-xs text-brand-yellow">
+              Missing logs in the last 7 days: {missingLast7.join(", ")} — fill the gaps so the
+              numbers stay honest.
+            </div>
+          )}
+
           {recent.length === 0 ? (
             <p className="text-sm text-white/45">
               No days logged yet — your first entry will show here.

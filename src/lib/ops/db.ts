@@ -1,5 +1,6 @@
 import postgres from "postgres";
 import type { Booking } from "./calendar";
+import type { AdRow } from "./ads";
 
 /* =====================================================================
    DAILY OPS — data layer (Supabase / any Postgres via the `postgres` client)
@@ -14,6 +15,8 @@ export interface DailyLogInput {
   revenue_collected: number;
   completed_revenue: number;
   ad_spend: number;
+  quotes: number;
+  redos: number;
   happy_customers: number;
   unhappy_customers: number;
   staff_hours: Record<string, number>;
@@ -27,6 +30,7 @@ export interface DailyLog extends DailyLogInput {
 }
 
 export type { Booking };
+export type { AdRow };
 
 const connectionString =
   process.env.POSTGRES_URL ||
@@ -68,6 +72,20 @@ async function ensureTable(): Promise<void> {
       summary       text          NOT NULL DEFAULT ''
     );
   `;
+  await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS quotes integer NOT NULL DEFAULT 0;`;
+  await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS redos  integer NOT NULL DEFAULT 0;`;
+  await sql`
+    CREATE TABLE IF NOT EXISTS ad_stats (
+      id           serial        PRIMARY KEY,
+      name         text          NOT NULL DEFAULT '',
+      spend        numeric(10,2) NOT NULL DEFAULT 0,
+      messages     integer       NOT NULL DEFAULT 0,
+      new_contacts integer       NOT NULL DEFAULT 0,
+      purchases    integer       NOT NULL DEFAULT 0,
+      impressions  integer       NOT NULL DEFAULT 0,
+      reach        integer       NOT NULL DEFAULT 0
+    );
+  `;
   ensured = true;
 }
 
@@ -81,7 +99,7 @@ export async function getDailyLog(date: string): Promise<DailyLog | null> {
            revenue_collected::float8                             AS revenue_collected,
            completed_revenue::float8                             AS completed_revenue,
            ad_spend::float8                                      AS ad_spend,
-           happy_customers, unhappy_customers,
+           quotes, redos, happy_customers, unhappy_customers,
            staff_hours, staff_shifts, staff_notes, notes_today,
            to_char(updated_at AT TIME ZONE 'Australia/Brisbane',
                    'YYYY-MM-DD"T"HH24:MI')                       AS updated_at
@@ -99,7 +117,7 @@ export async function getRecentLogs(limit = 30): Promise<DailyLog[]> {
            revenue_collected::float8                             AS revenue_collected,
            completed_revenue::float8                             AS completed_revenue,
            ad_spend::float8                                      AS ad_spend,
-           happy_customers, unhappy_customers,
+           quotes, redos, happy_customers, unhappy_customers,
            staff_hours, staff_shifts, staff_notes, notes_today,
            to_char(updated_at AT TIME ZONE 'Australia/Brisbane',
                    'YYYY-MM-DD"T"HH24:MI')                       AS updated_at
@@ -115,11 +133,11 @@ export async function upsertDailyLog(e: DailyLogInput): Promise<void> {
   await sql`
     INSERT INTO daily_log
       (log_date, jobs_completed, revenue_collected, completed_revenue, ad_spend,
-       happy_customers, unhappy_customers, staff_hours, staff_shifts,
+       quotes, redos, happy_customers, unhappy_customers, staff_hours, staff_shifts,
        staff_notes, notes_today, updated_at)
     VALUES
       (${e.log_date}, ${e.jobs_completed}, ${e.revenue_collected}, ${e.completed_revenue}, ${e.ad_spend},
-       ${e.happy_customers}, ${e.unhappy_customers},
+       ${e.quotes}, ${e.redos}, ${e.happy_customers}, ${e.unhappy_customers},
        ${JSON.stringify(e.staff_hours)}::jsonb,
        ${JSON.stringify(e.staff_shifts)}::jsonb,
        ${JSON.stringify(e.staff_notes)}::jsonb,
@@ -129,6 +147,8 @@ export async function upsertDailyLog(e: DailyLogInput): Promise<void> {
        revenue_collected = EXCLUDED.revenue_collected,
        completed_revenue = EXCLUDED.completed_revenue,
        ad_spend          = EXCLUDED.ad_spend,
+       quotes            = EXCLUDED.quotes,
+       redos             = EXCLUDED.redos,
        happy_customers   = EXCLUDED.happy_customers,
        unhappy_customers = EXCLUDED.unhappy_customers,
        staff_hours       = EXCLUDED.staff_hours,
@@ -167,4 +187,52 @@ export async function getRecentBookings(fromISO: string): Promise<Booking[]> {
     ORDER BY booking_date;
   `;
   return rows as unknown as Booking[];
+}
+
+/* ---- ad_stats (from the uploaded Meta ads CSV) --------------------- */
+
+export async function replaceAds(list: AdRow[]): Promise<void> {
+  await ensureTable();
+  await sql`DELETE FROM ad_stats;`;
+  if (list.length) {
+    await sql`INSERT INTO ad_stats ${sql(
+      list,
+      "name",
+      "spend",
+      "messages",
+      "new_contacts",
+      "purchases",
+      "impressions",
+      "reach"
+    )}`;
+  }
+}
+
+export async function getAds(): Promise<AdRow[]> {
+  await ensureTable();
+  const rows = await sql<AdRow[]>`
+    SELECT name, spend::float8 AS spend, messages, new_contacts, purchases,
+           impressions, reach,
+           CASE WHEN messages > 0 THEN spend::float8 / messages ELSE 0 END AS cost_per_message
+    FROM ad_stats
+    ORDER BY spend DESC;
+  `;
+  return rows as unknown as AdRow[];
+}
+
+/* ---- export --------------------------------------------------------- */
+
+export async function getAllLogs(): Promise<Record<string, unknown>[]> {
+  await ensureTable();
+  const rows = await sql`
+    SELECT to_char(log_date, 'YYYY-MM-DD') AS log_date,
+           jobs_completed, revenue_collected::float8 AS revenue_collected,
+           completed_revenue::float8 AS completed_revenue, ad_spend::float8 AS ad_spend,
+           quotes, redos, happy_customers, unhappy_customers,
+           staff_hours, staff_notes, notes_today,
+           to_char(updated_at AT TIME ZONE 'Australia/Brisbane', 'YYYY-MM-DD HH24:MI') AS updated_at
+    FROM daily_log
+    ORDER BY log_date DESC;
+  `;
+  return rows as unknown as Record<string, unknown>[];
 }
