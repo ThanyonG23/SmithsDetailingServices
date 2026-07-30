@@ -351,6 +351,21 @@ export default async function OpsPage({
         </div>
       </Reveal>
 
+      {/* ── THE DAILY RULE (motto) ───────────────────────────────── */}
+      <Reveal delay={20}>
+        <div className="mt-6 rounded-2xl border border-brand-green/25 bg-brand-green/[0.05] px-5 py-4">
+          <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-green/70">
+            The daily rule
+          </div>
+          <p className="mt-1.5 font-display text-xl font-extrabold leading-snug tracking-tight text-white">
+            Fill the day first, then cut what&apos;s not needed.
+          </p>
+          <p className="mt-1 text-sm font-bold text-brand-green">
+            Revenue first · cut cost second.
+          </p>
+        </div>
+      </Reveal>
+
       {!isToday && (
         <div className="mt-4">
           <Link
