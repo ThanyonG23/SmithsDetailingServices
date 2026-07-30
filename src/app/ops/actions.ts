@@ -54,9 +54,9 @@ export async function saveEntry(formData: FormData): Promise<void> {
 
   await upsertDailyLog({
     log_date,
-    bookings: toNum(formData.get("bookings")),
     jobs_completed: toNum(formData.get("jobs_completed")),
     revenue_collected: toNum(formData.get("revenue_collected")),
+    completed_revenue: toNum(formData.get("completed_revenue")),
     ad_spend: toNum(formData.get("ad_spend")),
     happy_customers: toNum(formData.get("happy_customers")),
     unhappy_customers: toNum(formData.get("unhappy_customers")),

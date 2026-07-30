@@ -10,9 +10,9 @@ import type { Booking } from "./calendar";
 
 export interface DailyLogInput {
   log_date: string; // YYYY-MM-DD
-  bookings: number;
   jobs_completed: number;
   revenue_collected: number;
+  completed_revenue: number;
   ad_spend: number;
   happy_customers: number;
   unhappy_customers: number;
@@ -58,6 +58,7 @@ async function ensureTable(): Promise<void> {
   await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS staff_shifts jsonb NOT NULL DEFAULT '{}'::jsonb;`;
   await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS staff_notes  jsonb NOT NULL DEFAULT '{}'::jsonb;`;
   await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS ad_spend     numeric(10,2) NOT NULL DEFAULT 0;`;
+  await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS completed_revenue numeric(10,2) NOT NULL DEFAULT 0;`;
   await sql`
     CREATE TABLE IF NOT EXISTS bookings (
       id            serial        PRIMARY KEY,
@@ -76,8 +77,9 @@ export async function getDailyLog(date: string): Promise<DailyLog | null> {
   await ensureTable();
   const rows = await sql<DailyLog[]>`
     SELECT to_char(log_date, 'YYYY-MM-DD')                       AS log_date,
-           bookings, jobs_completed,
+           jobs_completed,
            revenue_collected::float8                             AS revenue_collected,
+           completed_revenue::float8                             AS completed_revenue,
            ad_spend::float8                                      AS ad_spend,
            happy_customers, unhappy_customers,
            staff_hours, staff_shifts, staff_notes, notes_today,
@@ -93,8 +95,9 @@ export async function getRecentLogs(limit = 30): Promise<DailyLog[]> {
   await ensureTable();
   const rows = await sql<DailyLog[]>`
     SELECT to_char(log_date, 'YYYY-MM-DD')                       AS log_date,
-           bookings, jobs_completed,
+           jobs_completed,
            revenue_collected::float8                             AS revenue_collected,
+           completed_revenue::float8                             AS completed_revenue,
            ad_spend::float8                                      AS ad_spend,
            happy_customers, unhappy_customers,
            staff_hours, staff_shifts, staff_notes, notes_today,
@@ -111,20 +114,20 @@ export async function upsertDailyLog(e: DailyLogInput): Promise<void> {
   await ensureTable();
   await sql`
     INSERT INTO daily_log
-      (log_date, bookings, jobs_completed, revenue_collected, ad_spend,
+      (log_date, jobs_completed, revenue_collected, completed_revenue, ad_spend,
        happy_customers, unhappy_customers, staff_hours, staff_shifts,
        staff_notes, notes_today, updated_at)
     VALUES
-      (${e.log_date}, ${e.bookings}, ${e.jobs_completed}, ${e.revenue_collected}, ${e.ad_spend},
+      (${e.log_date}, ${e.jobs_completed}, ${e.revenue_collected}, ${e.completed_revenue}, ${e.ad_spend},
        ${e.happy_customers}, ${e.unhappy_customers},
        ${JSON.stringify(e.staff_hours)}::jsonb,
        ${JSON.stringify(e.staff_shifts)}::jsonb,
        ${JSON.stringify(e.staff_notes)}::jsonb,
        ${e.notes_today}, now())
     ON CONFLICT (log_date) DO UPDATE SET
-       bookings          = EXCLUDED.bookings,
        jobs_completed    = EXCLUDED.jobs_completed,
        revenue_collected = EXCLUDED.revenue_collected,
+       completed_revenue = EXCLUDED.completed_revenue,
        ad_spend          = EXCLUDED.ad_spend,
        happy_customers   = EXCLUDED.happy_customers,
        unhappy_customers = EXCLUDED.unhappy_customers,

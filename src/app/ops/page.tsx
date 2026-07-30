@@ -370,7 +370,11 @@ export default async function OpsPage({
             sub={`aim ${jobsTarget}/day`}
             tone={(entry?.jobs_completed ?? 0) >= jobsTarget ? "green" : "neutral"}
           />
-          <StatTile label="Bookings" value={String(entry?.bookings ?? 0)} sub="taken today" />
+          <StatTile
+            label="Completed"
+            value={money(entry?.completed_revenue ?? 0)}
+            sub="work done today"
+          />
           <StatTile
             label="Happy"
             value={String(entry?.happy_customers ?? 0)}
@@ -480,7 +484,6 @@ export default async function OpsPage({
           </div>
 
           <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-            <NumField label="Bookings taken" name="bookings" defaultValue={entry?.bookings ?? ""} />
             <NumField
               label="Jobs completed"
               name="jobs_completed"
@@ -492,6 +495,13 @@ export default async function OpsPage({
               prefix="$"
               step={0.01}
               defaultValue={entry?.revenue_collected ?? ""}
+            />
+            <NumField
+              label="Completed revenue (est)"
+              name="completed_revenue"
+              prefix="$"
+              step={0.01}
+              defaultValue={entry?.completed_revenue ?? ""}
             />
             <NumField
               label="Ad spend today"
@@ -552,7 +562,7 @@ export default async function OpsPage({
               <table className="w-full border-collapse text-sm tabular-nums">
                 <thead>
                   <tr className="border-b border-white/10">
-                    {["Date", "Revenue", "Book", "Done", "🙂", "🙁", "Hrs"].map((h) => (
+                    {["Date", "Collected", "Compl", "Done", "🙂", "🙁", "Hrs"].map((h) => (
                       <th
                         key={h}
                         className="whitespace-nowrap px-3 py-3 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-white/40"
@@ -585,7 +595,7 @@ export default async function OpsPage({
                         >
                           {money(r.revenue_collected)}
                         </td>
-                        <td className="px-3 py-3 text-white/70">{r.bookings}</td>
+                        <td className="px-3 py-3 text-white/60">{money(r.completed_revenue)}</td>
                         <td className="px-3 py-3 text-white/70">{r.jobs_completed}</td>
                         <td className="px-3 py-3 text-white/70">{r.happy_customers}</td>
                         <td className="px-3 py-3 text-white/70">{r.unhappy_customers}</td>
