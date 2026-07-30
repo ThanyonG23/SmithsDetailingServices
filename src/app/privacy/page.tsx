@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "Privacy Policy | Smiths Detailing Services",
   description:
     "How Smiths Detailing Services collects, uses and protects your personal information.",
+  // Keep the page live (footer link + ad-platform requirement) but out of
+  // Google's index, so it stops showing as a sitelink under the homepage.
+  robots: { index: false, follow: true },
 };
 
 export default function PrivacyPage() {
