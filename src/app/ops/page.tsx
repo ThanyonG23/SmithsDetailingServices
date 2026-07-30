@@ -262,7 +262,7 @@ export default async function OpsPage({
   }
   const adSpend = ads.reduce((a, r) => a + r.spend, 0);
   const adMessages = ads.reduce((a, r) => a + r.messages, 0);
-  const adPurchases = ads.reduce((a, r) => a + r.purchases, 0);
+  const adNewContacts = ads.reduce((a, r) => a + r.new_contacts, 0);
   const adCostPerMsg = adMessages ? adSpend / adMessages : 0;
   const hasAds = ads.length > 0;
   const adOk = searchParams?.adok;
@@ -629,14 +629,18 @@ export default async function OpsPage({
                   value={adCostPerMsg ? money(adCostPerMsg) : "—"}
                   sub="lower is better"
                 />
-                <StatTile label="Purchases" value={String(adPurchases)} sub="Meta-attributed" />
+                <StatTile
+                  label="New contacts"
+                  value={String(adNewContacts)}
+                  sub="new people messaging"
+                />
               </div>
 
               <div className={`mt-3 overflow-x-auto ${CARD}`}>
                 <table className="w-full border-collapse text-sm tabular-nums">
                   <thead>
                     <tr className="border-b border-white/10">
-                      {["Ad", "Spend", "Msgs", "$/msg", "Buys"].map((h) => (
+                      {["Ad", "Spend", "Msgs", "$/msg"].map((h) => (
                         <th
                           key={h}
                           className="whitespace-nowrap px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-white/40"
@@ -657,7 +661,6 @@ export default async function OpsPage({
                         <td className="px-3 py-2.5 font-bold text-brand-green">
                           {a.cost_per_message ? money(a.cost_per_message) : "—"}
                         </td>
-                        <td className="px-3 py-2.5 text-white/70">{a.purchases}</td>
                       </tr>
                     ))}
                   </tbody>
