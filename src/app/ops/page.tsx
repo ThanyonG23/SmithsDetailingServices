@@ -236,24 +236,26 @@ export default async function OpsPage({
   let reorderCount = 0;
   let dbError = false;
   try {
-    // Load sequentially on the single pooled connection — firing all 9 in
-    // parallel deadlocks Supabase's transaction pooler. Region-pinned to
-    // Sydney this is still ~150ms. 9s cap so a stuck DB never hangs the render.
-    const load = (async () => {
-      entry = await getDailyLog(date);
-      recent = await getRecentLogs(30);
-      bookings = await getRecentBookings(from60);
-      ads = await getAds();
-      todaysJobs = await getJobsForDate(today);
-      followups = await getFollowups(fu3, today);
-      rectifyList = await getRectifyList();
-      satisfaction = await getSatisfaction(monthStartISO, today);
-      reorderCount = await getReorderCount();
-    })();
-    await Promise.race([
-      load,
+    // Load sequentially (object properties evaluate in order) on the single
+    // pooled connection — firing all 9 in parallel deadlocks Supabase's
+    // transaction pooler. Region-pinned to Sydney this is still ~150ms. 9s cap
+    // so a stuck DB never hangs the render.
+    const data = await Promise.race([
+      (async () => ({
+        entry: await getDailyLog(date),
+        recent: await getRecentLogs(30),
+        bookings: await getRecentBookings(from60),
+        ads: await getAds(),
+        todaysJobs: await getJobsForDate(today),
+        followups: await getFollowups(fu3, today),
+        rectifyList: await getRectifyList(),
+        satisfaction: await getSatisfaction(monthStartISO, today),
+        reorderCount: await getReorderCount(),
+      }))(),
       new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 9000)),
     ]);
+    ({ entry, recent, bookings, ads, todaysJobs, followups, rectifyList, satisfaction, reorderCount } =
+      data);
   } catch {
     dbError = true;
   }
