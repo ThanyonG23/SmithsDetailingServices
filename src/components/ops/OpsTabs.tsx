@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const TABS = [
@@ -12,15 +13,16 @@ export default function OpsTabs() {
   if (path.endsWith("/login")) return null; // no tabs on the login screen
 
   return (
-    // Plain <a> tags (real navigation, works even before JS hydrates) and
-    // its own stacking layer so the blurred sticky header can't swallow taps.
+    // Client-side navigation (fast, no full reload) + prefetch. Own z-50
+    // layer so the blurred sticky header can't swallow the click.
     <nav className="relative z-50 mx-auto flex max-w-3xl gap-2 px-4 pb-3">
       {TABS.map((t) => {
         const active = t.href === "/ops" ? path === "/ops" : path.startsWith(t.href);
         return (
-          <a
+          <Link
             key={t.href}
             href={t.href}
+            prefetch
             className={`flex-1 rounded-xl px-4 py-2.5 text-center text-sm font-bold transition active:scale-[0.98] ${
               active
                 ? "bg-brand-green text-[#04130a] shadow-[0_6px_20px_rgba(43,255,122,0.25)]"
@@ -28,7 +30,7 @@ export default function OpsTabs() {
             }`}
           >
             {t.label}
-          </a>
+          </Link>
         );
       })}
     </nav>
