@@ -20,8 +20,10 @@ import Reveal from "@/components/Reveal";
 const money = (n: number) => "$" + Math.round(n).toLocaleString("en-AU");
 
 function totalHours(e: DailyLog | null): number {
-  if (!e) return 0;
-  return Object.values(e.staff_hours || {}).reduce((a, b) => a + Number(b || 0), 0);
+  const sh = e?.staff_hours;
+  if (!sh || typeof sh !== "object") return 0;
+  const t = Object.values(sh).reduce((a, b) => a + (Number(b) || 0), 0);
+  return Number.isFinite(t) ? Math.round(t * 100) / 100 : 0;
 }
 
 function revenueStatus(rev: number) {
@@ -291,8 +293,9 @@ export default async function OpsPage({
   const quoteClose = weekQuotes ? Math.round((weekBookings.length / weekQuotes) * 100) : 0;
 
   // ── profit vs break-even ──
-  const daysElapsed = dow + 1; // Mon..today
-  const weekProfit = weekRevenue - breakEvenRevenue * daysElapsed;
+  // profit only charges break-even for days actually logged (not the whole
+  // calendar week) — otherwise unlogged days look like huge losses
+  const weekProfit = weekRevenue - breakEvenRevenue * weekLoggedDays;
 
   // ── trend: last full week for context ──
   const prevWeekStart = new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Brisbane" }).format(
@@ -334,10 +337,10 @@ export default async function OpsPage({
     });
   if (weekRedos > 4)
     alerts.push({ tone: "red", text: `${weekRedos} re-dos this week — over the target of 4. Check the crew's quality.` });
-  if (weekLoggedDays > 0 && daysElapsed >= 3 && weekProfit < 0)
+  if (weekLoggedDays >= 2 && weekProfit < 0)
     alerts.push({
       tone: "yellow",
-      text: `Behind break-even this week by ${money(-weekProfit)} — get more jobs out the door.`,
+      text: `Behind break-even this week by ${money(-weekProfit)} across ${weekLoggedDays} logged days — get more jobs out the door.`,
     });
   if (weekBookings.length > 0 && weekCAC > 300)
     alerts.push({ tone: "yellow", text: `CAC is ${money(weekCAC)} this week — refresh the ad creative if it keeps climbing.` });
@@ -552,7 +555,7 @@ export default async function OpsPage({
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3 text-sm">
             <span className="text-white/50">
               Week profit vs break-even{" "}
-              <span className="text-white/30">({daysElapsed}d in)</span>
+              <span className="text-white/30">({weekLoggedDays}d logged)</span>
             </span>
             {weekLoggedDays === 0 ? (
               <span className="text-sm font-semibold text-white/40">— start logging</span>
