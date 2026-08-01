@@ -66,10 +66,19 @@ async function ensureTable(): Promise<void> {
   await sql`
     CREATE TABLE IF NOT EXISTS bookings (
       id            serial        PRIMARY KEY,
+      uid           text          NOT NULL DEFAULT '',
       booking_date  date          NOT NULL,
       value         numeric(10,2) NOT NULL DEFAULT 0,
       is_correction boolean       NOT NULL DEFAULT false,
       summary       text          NOT NULL DEFAULT ''
+    );
+  `;
+  await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS uid text NOT NULL DEFAULT '';`;
+  await sql`
+    CREATE TABLE IF NOT EXISTS job_hours (
+      uid        text          PRIMARY KEY,
+      hours      numeric(6,2)  NOT NULL DEFAULT 0,
+      updated_at timestamptz   NOT NULL DEFAULT now()
     );
   `;
   await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS quotes integer NOT NULL DEFAULT 0;`;
@@ -168,6 +177,7 @@ export async function replaceBookings(list: Booking[]): Promise<void> {
   if (list.length) {
     await sql`INSERT INTO bookings ${sql(
       list,
+      "uid",
       "booking_date",
       "value",
       "is_correction",
@@ -179,7 +189,7 @@ export async function replaceBookings(list: Booking[]): Promise<void> {
 export async function getRecentBookings(fromISO: string): Promise<Booking[]> {
   await ensureTable();
   const rows = await sql<Booking[]>`
-    SELECT to_char(booking_date, 'YYYY-MM-DD') AS booking_date,
+    SELECT uid, to_char(booking_date, 'YYYY-MM-DD') AS booking_date,
            value::float8                       AS value,
            is_correction, summary
     FROM bookings
@@ -187,6 +197,37 @@ export async function getRecentBookings(fromISO: string): Promise<Booking[]> {
     ORDER BY booking_date;
   `;
   return rows as unknown as Booking[];
+}
+
+/** Today's jobs (from the calendar) with any logged hours joined in. */
+export interface JobWithHours extends Booking {
+  hours: number;
+}
+export async function getJobsForDate(date: string): Promise<JobWithHours[]> {
+  await ensureTable();
+  const rows = await sql`
+    SELECT b.uid, to_char(b.booking_date, 'YYYY-MM-DD') AS booking_date,
+           b.value::float8 AS value, b.is_correction, b.summary,
+           COALESCE(h.hours, 0)::float8 AS hours
+    FROM bookings b
+    LEFT JOIN job_hours h ON h.uid = b.uid
+    WHERE b.booking_date = ${date}
+    ORDER BY b.value DESC;
+  `;
+  return rows as unknown as JobWithHours[];
+}
+
+/** Save hours-per-car, keyed to the calendar UID so it survives re-uploads. */
+export async function saveJobHours(entries: { uid: string; hours: number }[]): Promise<void> {
+  await ensureTable();
+  for (const e of entries) {
+    if (!e.uid) continue;
+    await sql`
+      INSERT INTO job_hours (uid, hours, updated_at)
+      VALUES (${e.uid}, ${e.hours}, now())
+      ON CONFLICT (uid) DO UPDATE SET hours = EXCLUDED.hours, updated_at = now();
+    `;
+  }
 }
 
 /* ---- ad_stats (from the uploaded Meta ads CSV) --------------------- */

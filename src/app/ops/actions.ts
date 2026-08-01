@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { checkPassword, sessionCookieValue, OPS_COOKIE } from "@/lib/ops/auth";
-import { upsertDailyLog, replaceBookings, replaceAds } from "@/lib/ops/db";
+import { upsertDailyLog, replaceBookings, replaceAds, saveJobHours as saveJobHoursDb } from "@/lib/ops/db";
 import { OPS_STAFF, hoursBetween } from "@/lib/ops/config";
 import { parseBookingsIcs } from "@/lib/ops/calendar";
 import { parseAdsCsv } from "@/lib/ops/ads";
@@ -116,4 +116,18 @@ export async function uploadAds(formData: FormData): Promise<void> {
 
   revalidatePath("/ops");
   redirect(`/ops?adok=${rows.length}`);
+}
+
+/* Save the hours each car took today, keyed to the calendar UID. */
+export async function logJobHours(formData: FormData): Promise<void> {
+  const entries: { uid: string; hours: number }[] = [];
+  for (const [key, val] of formData.entries()) {
+    if (key.startsWith("jh::")) {
+      const h = Number(val);
+      entries.push({ uid: key.slice(4), hours: Number.isFinite(h) && h > 0 ? h : 0 });
+    }
+  }
+  await saveJobHoursDb(entries);
+  revalidatePath("/ops");
+  redirect("/ops?jobsok=1");
 }

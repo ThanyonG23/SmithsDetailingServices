@@ -9,6 +9,7 @@
    ===================================================================== */
 
 export interface Booking {
+  uid: string; // stable calendar event id — hours are keyed to this
   booking_date: string; // YYYY-MM-DD
   value: number;
   is_correction: boolean;
@@ -27,6 +28,7 @@ export function parseBookingsIcs(rawInput: string): Booking[] {
   for (const e of events) {
     const dt = (e.match(/DTSTART[^:]*:(\d{8})/) || [])[1];
     if (!dt) continue;
+    const uidRaw = (e.match(/\nUID:([^\n]+)/) || [])[1] || "";
     let summary = (e.match(/\nSUMMARY:([\s\S]*?)(?:\n[A-Z-]+[:;])/) || [])[1] || "";
     let desc = (e.match(/\nDESCRIPTION:([\s\S]*?)(?:\n[A-Z-]+[:;])/) || [])[1] || "";
     summary = clean(summary);
@@ -43,8 +45,10 @@ export function parseBookingsIcs(rawInput: string): Booking[] {
       if (all.length) value = Math.max(...all);
     }
 
+    const booking_date = `${dt.slice(0, 4)}-${dt.slice(4, 6)}-${dt.slice(6, 8)}`;
     out.push({
-      booking_date: `${dt.slice(0, 4)}-${dt.slice(4, 6)}-${dt.slice(6, 8)}`,
+      uid: (uidRaw.trim() || `${booking_date}|${value}|${summary.slice(0, 24)}`).slice(0, 200),
+      booking_date,
       value,
       is_correction: value >= 1500 || /correction|coating|ceramic/i.test(blob),
       summary: summary.slice(0, 200),

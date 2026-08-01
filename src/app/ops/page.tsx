@@ -6,12 +6,14 @@ import {
   getRecentLogs,
   getRecentBookings,
   getAds,
+  getJobsForDate,
   type DailyLog,
   type Booking,
   type AdRow,
+  type JobWithHours,
 } from "@/lib/ops/db";
 import { OPS_STAFF, OPS_TARGETS, cairnsToday } from "@/lib/ops/config";
-import { saveEntry, logout, uploadCalendar, uploadAds } from "./actions";
+import { saveEntry, logout, uploadCalendar, uploadAds, logJobHours } from "./actions";
 import StaffHours from "@/components/ops/StaffHours";
 import Reveal from "@/components/Reveal";
 
@@ -167,6 +169,7 @@ export default async function OpsPage({
     calerr?: string;
     adok?: string;
     aderr?: string;
+    jobsok?: string;
   };
 }) {
   if (!isAuthed()) redirect("/ops/login");
@@ -267,6 +270,17 @@ export default async function OpsPage({
   const hasAds = ads.length > 0;
   const adOk = searchParams?.adok;
   const adErr = searchParams?.aderr;
+
+  // ── today's jobs (from the calendar) + hours logged per car ──
+  let todaysJobs: JobWithHours[] = [];
+  try {
+    todaysJobs = await getJobsForDate(today);
+  } catch {
+    /* dbError already surfaced */
+  }
+  const earnedToday = todaysJobs.reduce((a, j) => a + j.value, 0);
+  const hoursOnCars = todaysJobs.reduce((a, j) => a + (j.hours || 0), 0);
+  const jobsOk = searchParams?.jobsok;
 
   // ── funnel (this week) ──
   const inWeek = (r: DailyLog) => r.log_date >= weekStart && r.log_date <= today;
@@ -621,6 +635,89 @@ export default async function OpsPage({
               </button>
             </div>
           </form>
+        </section>
+      </Reveal>
+
+      {/* ── TODAY'S JOBS (hours per car) ─────────────────────────── */}
+      <Reveal delay={250}>
+        <section className="mt-8">
+          <SectionTitle eyebrow="On the floor today" title="Today's jobs" />
+
+          {jobsOk && (
+            <div className="mb-3 rounded-xl border border-brand-green/40 bg-brand-green/[0.08] px-4 py-2.5 text-sm font-semibold text-brand-green">
+              Hours saved ✓
+            </div>
+          )}
+
+          {todaysJobs.length === 0 ? (
+            <p className="text-sm text-white/45">
+              No jobs on the calendar for today — upload the latest calendar if that looks wrong.
+            </p>
+          ) : (
+            <>
+              <div className="mb-3 grid grid-cols-3 gap-3">
+                <StatTile
+                  label="Earned today"
+                  value={money(earnedToday)}
+                  sub={`${todaysJobs.length} job${todaysJobs.length === 1 ? "" : "s"} on`}
+                />
+                <StatTile
+                  label="Collected"
+                  value={money(rev)}
+                  sub="cash logged"
+                  tone={rev > 0 && rev >= earnedToday ? "green" : "neutral"}
+                />
+                <StatTile
+                  label="Hours on cars"
+                  value={`${hoursOnCars}h`}
+                  sub={hoursOnCars > 0 ? `${money(earnedToday / hoursOnCars)}/hr` : "log hours ↓"}
+                />
+              </div>
+
+              <form action={logJobHours} className={`${CARD} p-4`}>
+                <div className="flex flex-col gap-2">
+                  {todaysJobs.map((j) => (
+                    <div
+                      key={j.uid}
+                      className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-3 py-2.5"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-sm font-semibold text-white/85">
+                          {j.summary || "(no title)"}
+                        </div>
+                        <div className="text-xs text-white/40">
+                          {money(j.value)}
+                          {j.is_correction && (
+                            <span className="ml-1.5 font-bold text-brand-green">· correction</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex shrink-0 items-center gap-1.5">
+                        <input
+                          type="number"
+                          name={`jh::${j.uid}`}
+                          defaultValue={j.hours || ""}
+                          min={0}
+                          step={0.25}
+                          inputMode="decimal"
+                          placeholder="0"
+                          aria-label={`Hours for ${j.summary}`}
+                          className="w-16 rounded-lg border border-white/12 bg-black/50 px-2 py-2 text-right text-sm text-white outline-none focus:border-brand-green"
+                        />
+                        <span className="text-xs font-semibold text-white/40">hrs</span>
+                      </div>
+                      <span className="w-16 shrink-0 text-right text-xs font-bold tabular-nums text-brand-green">
+                        {j.hours > 0 ? `${money(j.value / j.hours)}/hr` : ""}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <button className="mt-3 rounded-full bg-brand-green px-6 py-2.5 text-xs font-black text-[#04130a] transition hover:brightness-110 active:scale-95">
+                  Save hours
+                </button>
+              </form>
+            </>
+          )}
         </section>
       </Reveal>
 
