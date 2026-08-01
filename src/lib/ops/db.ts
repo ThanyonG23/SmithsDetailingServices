@@ -382,6 +382,11 @@ export async function deleteStockItem(id: number): Promise<void> {
   await sql`DELETE FROM stock_items WHERE id = ${id};`;
 }
 
+export async function clearStock(): Promise<void> {
+  await ensureTable();
+  await sql`DELETE FROM stock_items;`;
+}
+
 export async function getReorderCount(): Promise<number> {
   await ensureTable();
   const rows = await sql`SELECT count(*)::int AS n FROM stock_items WHERE current_qty < min_qty;`;

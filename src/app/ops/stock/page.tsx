@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { isAuthed } from "@/lib/ops/auth";
 import { getStock, type StockItem } from "@/lib/ops/db";
-import { addStock, saveStock, deleteStock, seedStock } from "../actions";
+import { addStock, saveStock, deleteStock, seedStock, reseedStock } from "../actions";
 
 export const metadata: Metadata = {
   title: "Stocktake | Smiths Detailing",
@@ -106,7 +106,7 @@ export default async function StockPage({
           <p className="text-sm text-white/45">No stock items yet.</p>
           <form action={seedStock} className="mt-3">
             <button className="rounded-full bg-brand-green px-5 py-2.5 text-xs font-black text-[#04130a] transition hover:brightness-110 active:scale-95">
-              Load Smiths starting list (10 chemicals)
+              Load Smiths master list (20 items)
             </button>
           </form>
           <p className="mt-2 text-xs text-white/35">…or add items one at a time above.</p>
@@ -154,12 +154,26 @@ export default async function StockPage({
                           </td>
                           <td className="whitespace-nowrap px-3 py-2 text-white/50">{it.brand}</td>
                           <td className="px-3 py-2">
-                            <input
-                              name={`web::${it.id}`}
-                              defaultValue={it.website}
-                              placeholder="—"
-                              className={`${CELL} w-24`}
-                            />
+                            <div className="flex items-center gap-1.5">
+                              <input
+                                name={`web::${it.id}`}
+                                defaultValue={it.website}
+                                placeholder="—"
+                                className="w-40 rounded border border-white/10 bg-black/40 px-2 py-1 text-xs text-white outline-none placeholder:text-white/25 focus:border-brand-green"
+                              />
+                              {it.website && (
+                                <a
+                                  href={it.website}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  aria-label={`Open ${it.brand || "supplier"} site`}
+                                  title="Open supplier site to reorder"
+                                  className="shrink-0 text-white/40 transition hover:text-brand-green"
+                                >
+                                  ↗
+                                </a>
+                              )}
+                            </div>
                           </td>
                           <td className="px-3 py-2">
                             <span className="inline-flex items-center rounded-lg border border-white/12 bg-black/40 focus-within:border-brand-green">
@@ -236,6 +250,18 @@ export default async function StockPage({
           >
             Save stocktake →
           </button>
+        </form>
+      )}
+
+      {items.length > 0 && (
+        <form action={reseedStock} className="mt-12 border-t border-white/5 pt-6">
+          <button className="rounded-full border border-white/12 px-4 py-2 text-[11px] font-bold uppercase tracking-wider text-white/40 transition hover:border-red-400/40 hover:text-red-300">
+            ↻ Reset to master list
+          </button>
+          <p className="mt-1.5 text-[11px] text-white/30">
+            Replaces every row with the Smiths master list — use during setup only, it wipes the
+            current counts.
+          </p>
         </form>
       )}
 

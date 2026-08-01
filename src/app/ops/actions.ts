@@ -13,6 +13,7 @@ import {
   addStockItem,
   updateStock,
   deleteStockItem,
+  clearStock,
   getStock,
   type StockItem,
 } from "@/lib/ops/db";
@@ -205,34 +206,64 @@ export async function deleteStock(formData: FormData): Promise<void> {
   redirect("/ops/stock?stockok=deleted");
 }
 
-const STARTER_STOCK: Omit<StockItem, "id" | "updated_at">[] = [
-  ["Mountain Air", "Northern Chemicals", "", "L", 10, 5],
-  ["Truck/Car Wash", "Northern Chemicals", "", "L", 10, 10],
-  ["Koch Chemie Heavy Cut", "Koch Chemie", "", "L", 1, 1],
-  ["Koch Chemie Fine Cut", "Koch Chemie", "", "L", 1, 1],
-  ["Black Trim Restore", "", "", "ml", 350, 350],
-  ["Decontamination Wash / Iron Remover", "Gtech", "", "L", 1, 0],
-  ["Reco Sheen Plastic Rejuvenator", "Reco Sheen", "Paint Shop", "L", 5, 20],
-  ["Bug Remover", "Gtech", "", "L", 1, 0],
-  ["Tar & Glue Remover", "Gtech", "", "ml", 500, 0],
-  ["Citrus All Purpose Cleaner (Backup)", "Gtech", "", "L", 5, 0],
-].map(([item, brand, website, unit, min_qty, current_qty]) => ({
-  category: "Chemicals",
-  item: item as string,
-  brand: brand as string,
-  website: website as string,
-  unit: unit as string,
-  min_qty: min_qty as number,
-  current_qty: current_qty as number,
-  notes: "",
+/* Smiths master stock list — tidied from the real supplier sheet.
+   Tuple: [category, item, brand, website, unit, keep-on-hand (min), have (current), notes?] */
+const NC = "https://northernchemicals.com.au/";
+const GT = "https://gtechniq.com.au/";
+const WAXIT = "https://www.waxit.com.au/";
+const ECON = "https://economypaints.com.au/";
+
+const STARTER_STOCK: Omit<StockItem, "id" | "updated_at">[] = (
+  [
+    // ── Chemicals ──
+    ["Chemicals", "Mountain Air", "Northern Chemicals", NC, "L", 60, 30],
+    ["Chemicals", "Truck Wash", "Northern Chemicals", NC, "L", 60, 0],
+    ["Chemicals", "Reco Sheen", "Economy Paint Supplies", ECON, "L", 20, 6],
+    ["Chemicals", "Iron Remover (Wheel & Paint Cleaner)", "Gtechniq", GT, "L", 2, 10],
+    ["Chemicals", "Bug Remover", "Gtechniq", GT, "L", 5, 3],
+    ["Chemicals", "Tar & Glue Remover", "Gtechniq", GT, "ml", 1000, 500],
+    ["Chemicals", "Koch Chemie Metal Polish", "Koch Chemie (Waxit)", WAXIT, "ml", 75, 30],
+    ["Chemicals", "Koch Chemie M302 Micro Cut", "Koch Chemie (Waxit)", WAXIT, "L", 3, 1],
+    ["Chemicals", "Koch Chemie M902 Heavy Cut", "Koch Chemie (Waxit)", WAXIT, "L", 3, 1],
+    ["Chemicals", "Ceramic Spray Sealant", "Gtechniq", GT, "L", 3, 0],
+    ["Chemicals", "Tyre Sheen", "Supercheap Auto", "", "ea", 1, 0, "Confirm size & qty"],
+    // ── Coatings ──
+    ["Coatings", "Glass Coating Kit", "Gtechniq", GT, "kit", 5, 3],
+    ["Coatings", "Wheel Armour", "Gtechniq", GT, "ea", 5, 3],
+    // ── Consumables ──
+    ["Consumables", "Sandpaper 800 grit (Revcut Blue 75mm)", "Revcut", "", "box", 1, 1],
+    ["Consumables", "Sandpaper 1200 grit (Revcut Blue 75mm)", "Revcut", "", "box", 1, 1],
+    ["Consumables", "Sandpaper 1500 grit (Revcut Blue 75mm)", "Revcut", "", "box", 1, 1],
+    ["Consumables", "Sandpaper 2000 grit (Revcut Blue 75mm)", "Revcut", "", "box", 1, 1],
+    ["Consumables", "Polishing Pads", "", "", "ea", 0, 0, "Add supplier & set levels"],
+    ["Consumables", "Wool Pads", "", "", "ea", 0, 0, "Add supplier & set levels"],
+    ["Consumables", "Suede Applicators", "Gtechniq", GT, "ea", 10, 10],
+  ] as [string, string, string, string, string, number, number, string?][]
+).map(([category, item, brand, website, unit, min_qty, current_qty, notes]) => ({
+  category,
+  item,
+  brand,
+  website,
+  unit,
+  min_qty,
+  current_qty,
+  notes: notes ?? "",
 }));
 
-/* One-time: load the starting stock list (only if the table is empty). */
+/* One-time: load the master stock list (only if the table is empty). */
 export async function seedStock(): Promise<void> {
   const existing = await getStock();
   if (existing.length === 0) {
     for (const it of STARTER_STOCK) await addStockItem(it);
   }
+  revalidatePath("/ops/stock");
+  redirect("/ops/stock?stockok=seeded");
+}
+
+/* Replace the whole table with the master list (wipes current counts). */
+export async function reseedStock(): Promise<void> {
+  await clearStock();
+  for (const it of STARTER_STOCK) await addStockItem(it);
   revalidatePath("/ops/stock");
   redirect("/ops/stock?stockok=seeded");
 }
