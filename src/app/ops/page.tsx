@@ -236,17 +236,22 @@ export default async function OpsPage({
   let reorderCount = 0;
   let dbError = false;
   try {
+    // Hard 9s cap so a slow/stuck DB can never hang the render to the 300s
+    // function limit — the page renders with the DB-error notice instead.
     [entry, recent, bookings, ads, todaysJobs, followups, rectifyList, satisfaction, reorderCount] =
-      await Promise.all([
-        getDailyLog(date),
-        getRecentLogs(30),
-        getRecentBookings(from60),
-        getAds(),
-        getJobsForDate(today),
-        getFollowups(fu3, today),
-        getRectifyList(),
-        getSatisfaction(monthStartISO, today),
-        getReorderCount(),
+      await Promise.race([
+        Promise.all([
+          getDailyLog(date),
+          getRecentLogs(30),
+          getRecentBookings(from60),
+          getAds(),
+          getJobsForDate(today),
+          getFollowups(fu3, today),
+          getRectifyList(),
+          getSatisfaction(monthStartISO, today),
+          getReorderCount(),
+        ]),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 9000)),
       ]);
   } catch {
     dbError = true;

@@ -44,7 +44,7 @@ const sql = postgres(connectionString, {
   prepare: false,
   max: 1,
   idle_timeout: 20, // recycle idle connections (serverless-friendly)
-  connect_timeout: 15, // fail fast instead of hanging on a bad connection
+  connect_timeout: 8, // fail fast (under the 10s function limit) if the DB is unreachable
 });
 
 // Memoise a single in-flight promise so parallel reads on a cold start
@@ -60,6 +60,22 @@ function ensureTable(): Promise<void> {
   return ensurePromise;
 }
 async function runEnsure(): Promise<void> {
+  // Fast path: if the newest column already exists, the schema is current, so
+  // skip all the CREATE/ALTER DDL. This avoids ALTER TABLE lock waits (which
+  // can hang a request to the function timeout). Bump the checked column when
+  // the schema grows.
+  try {
+    const rows = await sql`
+      SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'stock_items' AND column_name = 'ordered'
+      ) AS ready;
+    `;
+    if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
+  } catch {
+    /* fall through and run the full setup */
+  }
+
   await sql`
     CREATE TABLE IF NOT EXISTS daily_log (
       log_date            date          PRIMARY KEY,

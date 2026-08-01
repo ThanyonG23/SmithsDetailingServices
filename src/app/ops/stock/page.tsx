@@ -36,7 +36,11 @@ export default async function StockPage({
   let items: StockItem[] = [];
   let dbError = false;
   try {
-    items = await getStock();
+    // 9s cap so a stuck DB can't hang the render to the function limit.
+    items = await Promise.race([
+      getStock(),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 9000)),
+    ]);
   } catch {
     dbError = true;
   }
