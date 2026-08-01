@@ -112,9 +112,11 @@ async function runEnsure(): Promise<void> {
       min_qty     numeric(10,2) NOT NULL DEFAULT 0,
       current_qty numeric(10,2) NOT NULL DEFAULT 0,
       notes       text          NOT NULL DEFAULT '',
+      ordered     boolean       NOT NULL DEFAULT false,
       updated_at  timestamptz   NOT NULL DEFAULT now()
     );
   `;
+  await sql`ALTER TABLE stock_items ADD COLUMN IF NOT EXISTS ordered boolean NOT NULL DEFAULT false;`;
   await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS quotes integer NOT NULL DEFAULT 0;`;
   await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS redos  integer NOT NULL DEFAULT 0;`;
   await sql`
@@ -331,13 +333,15 @@ export interface StockItem {
   min_qty: number;
   current_qty: number;
   notes: string;
+  ordered: boolean;
   updated_at: string; // "DD/MM/YY" Cairns
 }
 
 export async function getStock(): Promise<StockItem[]> {
+  await ensureTable();
   const rows = await sql`
     SELECT id, category, item, brand, website, unit,
-           min_qty::float8 AS min_qty, current_qty::float8 AS current_qty, notes,
+           min_qty::float8 AS min_qty, current_qty::float8 AS current_qty, notes, ordered,
            to_char(updated_at AT TIME ZONE 'Australia/Brisbane', 'DD/MM/YY') AS updated_at
     FROM stock_items
     ORDER BY category, item;
@@ -345,7 +349,7 @@ export async function getStock(): Promise<StockItem[]> {
   return rows as unknown as StockItem[];
 }
 
-export async function addStockItem(i: Omit<StockItem, "id" | "updated_at">): Promise<void> {
+export async function addStockItem(i: Omit<StockItem, "id" | "updated_at" | "ordered">): Promise<void> {
   await ensureTable();
   await sql`
     INSERT INTO stock_items (category, item, brand, website, unit, min_qty, current_qty, notes)
@@ -363,10 +367,18 @@ export async function updateStock(
     await sql`
       UPDATE stock_items
       SET current_qty = ${e.current_qty}, min_qty = ${e.min_qty},
-          website = ${e.website}, notes = ${e.notes}, updated_at = now()
+          website = ${e.website}, notes = ${e.notes},
+          ordered = CASE WHEN ${e.current_qty} >= ${e.min_qty} THEN false ELSE ordered END,
+          updated_at = now()
       WHERE id = ${e.id};
     `;
   }
+}
+
+/** Tick a low item as ordered (or un-tick it). */
+export async function setOrdered(id: number, ordered: boolean): Promise<void> {
+  await ensureTable();
+  await sql`UPDATE stock_items SET ordered = ${ordered} WHERE id = ${id};`;
 }
 
 export async function deleteStockItem(id: number): Promise<void> {
@@ -380,7 +392,10 @@ export async function clearStock(): Promise<void> {
 }
 
 export async function getReorderCount(): Promise<number> {
-  const rows = await sql`SELECT count(*)::int AS n FROM stock_items WHERE current_qty < min_qty;`;
+  await ensureTable();
+  const rows = await sql`
+    SELECT count(*)::int AS n FROM stock_items WHERE current_qty < min_qty AND ordered = false;
+  `;
   return (rows[0] as { n: number } | undefined)?.n ?? 0;
 }
 

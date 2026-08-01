@@ -14,6 +14,7 @@ import {
   updateStock,
   deleteStockItem,
   clearStock,
+  setOrdered,
   getStock,
   type StockItem,
 } from "@/lib/ops/db";
@@ -206,6 +207,23 @@ export async function deleteStock(formData: FormData): Promise<void> {
   redirect("/ops/stock?stockok=deleted");
 }
 
+/* Tick a low item off the order list (or un-tick it). */
+export async function markOrdered(formData: FormData): Promise<void> {
+  const id = Number(formData.get("id"));
+  if (Number.isFinite(id) && id > 0) await setOrdered(id, true);
+  revalidatePath("/ops/stock");
+  revalidatePath("/ops");
+  redirect("/ops/stock?stockok=ordered");
+}
+
+export async function unmarkOrdered(formData: FormData): Promise<void> {
+  const id = Number(formData.get("id"));
+  if (Number.isFinite(id) && id > 0) await setOrdered(id, false);
+  revalidatePath("/ops/stock");
+  revalidatePath("/ops");
+  redirect("/ops/stock?stockok=saved");
+}
+
 /* Smiths master stock list — tidied from the real supplier sheet.
    Tuple: [category, item, brand, website, unit, keep-on-hand (min), have (current), notes?] */
 const NC = "https://northernchemicals.com.au/";
@@ -213,7 +231,7 @@ const GT = "https://gtechniq.com.au/";
 const WAXIT = "https://www.waxit.com.au/";
 const ECON = "https://economypaints.com.au/";
 
-const STARTER_STOCK: Omit<StockItem, "id" | "updated_at">[] = (
+const STARTER_STOCK: Omit<StockItem, "id" | "updated_at" | "ordered">[] = (
   [
     // ── Chemicals ──
     ["Chemicals", "Mountain Air", "Northern Chemicals", NC, "L", 60, 30],

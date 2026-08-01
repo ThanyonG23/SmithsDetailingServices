@@ -2,7 +2,15 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { isAuthed } from "@/lib/ops/auth";
 import { getStock, type StockItem } from "@/lib/ops/db";
-import { addStock, saveStock, deleteStock, seedStock, reseedStock } from "../actions";
+import {
+  addStock,
+  saveStock,
+  deleteStock,
+  seedStock,
+  reseedStock,
+  markOrdered,
+  unmarkOrdered,
+} from "../actions";
 
 export const metadata: Metadata = {
   title: "Stocktake | Smiths Detailing",
@@ -14,7 +22,9 @@ const CARD = "rounded-2xl border border-white/10 bg-white/[0.02]";
 const INPUT =
   "rounded-lg border border-white/12 bg-black/40 px-2.5 py-2 text-sm text-white outline-none placeholder:text-white/30 focus:border-brand-green";
 const CELL =
-  "w-full min-w-[5rem] rounded border border-white/10 bg-black/40 px-2 py-1 text-xs text-white outline-none placeholder:text-white/25 focus:border-brand-green";
+  "rounded border border-white/10 bg-black/40 px-2 py-1 text-xs text-white outline-none placeholder:text-white/25 focus:border-brand-green";
+const TH =
+  "whitespace-nowrap px-2.5 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-white/40";
 
 export default async function StockPage({
   searchParams,
@@ -38,10 +48,14 @@ export default async function StockPage({
     byCat.set(it.category || "Other", arr);
   }
   const cats = [...byCat.keys()].sort();
-  const reorder = items.filter((i) => i.current_qty < i.min_qty);
+
+  const low = items.filter((i) => i.current_qty < i.min_qty);
+  const toOrder = low.filter((i) => !i.ordered);
+  const onOrder = low.filter((i) => i.ordered);
+  const qty = (n: number, u: string) => `${n}${u}`;
 
   return (
-    <main className="mx-auto max-w-4xl px-4 pb-24 pt-8">
+    <main className="mx-auto max-w-5xl px-4 pb-24 pt-8">
       <div className={EYEBROW}>Smiths Detailing · Cairns</div>
       <h1 className="mt-3 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
         Stock<span className="text-brand-green">take</span>
@@ -62,32 +76,116 @@ export default async function StockPage({
             : searchParams.stockok === "deleted"
             ? "Item removed ✓"
             : searchParams.stockok === "seeded"
-            ? "Starting list loaded ✓"
+            ? "Master list loaded ✓"
+            : searchParams.stockok === "ordered"
+            ? "Ticked as ordered ✓"
             : "Stocktake saved ✓"}
         </div>
       )}
 
-      {/* the order list */}
-      {reorder.length > 0 && (
-        <div className="mt-5 rounded-xl border border-red-500/40 bg-red-500/[0.08] px-4 py-3 text-sm text-red-300">
-          <b className="font-bold">🔴 To order ({reorder.length}):</b>{" "}
-          {reorder
-            .map((r) => `${r.item} (have ${r.current_qty}${r.unit}, need ${r.min_qty}${r.unit})`)
-            .join("  ·  ")}
-        </div>
+      {/* ── ORDER CHECKLIST ─────────────────────────────────────────── */}
+      {low.length > 0 && (
+        <section className="mt-5 rounded-2xl border border-red-500/30 bg-red-500/[0.05] p-4">
+          <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-red-300">
+            🔴 To order ({toOrder.length})
+          </div>
+
+          {toOrder.length === 0 ? (
+            <p className="mt-2 text-sm font-semibold text-brand-green">
+              Everything low is on order ✓
+            </p>
+          ) : (
+            <div className="mt-3 flex flex-col gap-1.5">
+              {toOrder.map((r) => (
+                <form
+                  key={r.id}
+                  action={markOrdered}
+                  className="flex items-center gap-3 rounded-xl border border-red-500/25 bg-black/20 px-3 py-2"
+                >
+                  <input type="hidden" name="id" value={r.id} />
+                  <button
+                    type="submit"
+                    title="Tick when ordered"
+                    aria-label={`Mark ${r.item} ordered`}
+                    className="group flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 border-white/25 transition hover:border-brand-green"
+                  >
+                    <span className="text-sm text-brand-green opacity-0 transition group-hover:opacity-60">
+                      ✓
+                    </span>
+                  </button>
+                  <div className="min-w-0 flex-1">
+                    <span className="text-sm font-semibold text-white/85">{r.item}</span>
+                    <span className="ml-2 whitespace-nowrap text-xs text-white/40">
+                      have {qty(r.current_qty, r.unit)} · need {qty(r.min_qty, r.unit)}
+                    </span>
+                  </div>
+                  {r.website && (
+                    <a
+                      href={r.website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Open supplier to order"
+                      className="shrink-0 text-white/40 transition hover:text-brand-green"
+                    >
+                      ↗
+                    </a>
+                  )}
+                </form>
+              ))}
+            </div>
+          )}
+
+          {onOrder.length > 0 && (
+            <div className="mt-4">
+              <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/40">
+                On order ({onOrder.length})
+              </div>
+              <div className="mt-2 flex flex-col gap-1.5">
+                {onOrder.map((r) => (
+                  <form
+                    key={r.id}
+                    action={unmarkOrdered}
+                    className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/10 px-3 py-2"
+                  >
+                    <input type="hidden" name="id" value={r.id} />
+                    <button
+                      type="submit"
+                      title="Un-tick (not ordered)"
+                      aria-label={`Un-mark ${r.item}`}
+                      className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-2 border-brand-green/50 bg-brand-green/15 text-sm text-brand-green"
+                    >
+                      ✓
+                    </button>
+                    <div className="min-w-0 flex-1">
+                      <span className="text-sm font-semibold text-white/45 line-through">
+                        {r.item}
+                      </span>
+                      <span className="ml-2 whitespace-nowrap text-xs text-white/30">
+                        ordered · have {qty(r.current_qty, r.unit)}/{qty(r.min_qty, r.unit)}
+                      </span>
+                    </div>
+                  </form>
+                ))}
+              </div>
+              <p className="mt-2 text-[11px] text-white/30">
+                These clear on their own once you update the count back above the keep level.
+              </p>
+            </div>
+          )}
+        </section>
       )}
 
-      {/* add item */}
+      {/* ── ADD ITEM ────────────────────────────────────────────────── */}
       <form action={addStock} className={`mt-6 ${CARD} p-4`}>
         <div className="mb-2.5 text-sm font-bold text-white">Add an item</div>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           <input name="item" placeholder="Item *" required className={INPUT} />
-          <input name="brand" placeholder="Brand" className={INPUT} />
+          <input name="brand" placeholder="Brand / supplier" className={INPUT} />
           <input name="category" placeholder="Category" list="stockcats" className={INPUT} />
           <input name="website" placeholder="Website / where to buy" className={INPUT} />
-          <input name="unit" placeholder="Unit (L, ml)" className={INPUT} />
-          <input name="min_qty" type="number" step={0.1} min={0} placeholder="Min stock" className={INPUT} />
-          <input name="current_qty" type="number" step={0.1} min={0} placeholder="Current stock" className={INPUT} />
+          <input name="unit" placeholder="Unit (L, ml, ea)" className={INPUT} />
+          <input name="min_qty" type="number" step={0.1} min={0} placeholder="Keep on hand" className={INPUT} />
+          <input name="current_qty" type="number" step={0.1} min={0} placeholder="Have now" className={INPUT} />
           <input name="notes" placeholder="Notes" className={`${INPUT} col-span-2`} />
         </div>
         <datalist id="stockcats">
@@ -100,7 +198,7 @@ export default async function StockPage({
         </button>
       </form>
 
-      {/* the stock table */}
+      {/* ── THE TABLE ───────────────────────────────────────────────── */}
       {items.length === 0 ? (
         <div className="mt-8">
           <p className="text-sm text-white/45">No stock items yet.</p>
@@ -113,8 +211,7 @@ export default async function StockPage({
         </div>
       ) : (
         <form action={saveStock} className="mt-8">
-          {/* First submit button in the form = the one Enter triggers.
-              Keep it Save (not a row's delete ✕) so hitting Enter in a cell saves. */}
+          {/* First submit = Save, so Enter in a cell saves (not a row delete). */}
           <button type="submit" className="sr-only" tabIndex={-1} aria-hidden="true">
             Save stocktake
           </button>
@@ -123,51 +220,59 @@ export default async function StockPage({
               <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-brand-green">
                 {cat}
               </div>
-              <div className={`overflow-x-auto ${CARD}`}>
+              <div className={CARD}>
                 <table className="w-full border-collapse text-sm">
                   <thead>
                     <tr className="border-b border-white/10">
-                      {["Item", "Brand", "Website", "Min", "Have", "Status", "Date", "Notes", ""].map(
-                        (h) => (
-                          <th
-                            key={h}
-                            className="whitespace-nowrap px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-white/40"
-                          >
-                            {h}
-                          </th>
-                        )
-                      )}
+                      <th className={TH}>Item</th>
+                      <th className={`${TH} hidden md:table-cell`}>Brand</th>
+                      <th className={`${TH} hidden lg:table-cell`}>Website</th>
+                      <th className={`${TH} hidden sm:table-cell`}>Keep</th>
+                      <th className={TH}>Have</th>
+                      <th className={TH}>Status</th>
+                      <th className={`${TH} hidden md:table-cell`}>Notes</th>
+                      <th className={`${TH} hidden xl:table-cell`}>Date</th>
+                      <th className={TH}></th>
                     </tr>
                   </thead>
                   <tbody>
                     {(byCat.get(cat) || []).map((it) => {
-                      const low = it.current_qty < it.min_qty;
+                      const isLow = it.current_qty < it.min_qty;
                       return (
                         <tr
                           key={it.id}
                           className={`border-b border-white/[0.06] last:border-0 ${
-                            low ? "bg-red-500/[0.05]" : ""
+                            isLow && !it.ordered ? "bg-red-500/[0.05]" : ""
                           }`}
                         >
-                          <td className="whitespace-nowrap px-3 py-2 font-semibold text-white/85">
-                            {it.item}
+                          {/* Item (+ brand shown here on mobile where the column is hidden) */}
+                          <td className="px-2.5 py-2 font-semibold text-white/85">
+                            <div className="truncate">{it.item}</div>
+                            {it.brand && (
+                              <div className="mt-0.5 truncate text-[10px] font-normal text-white/35 md:hidden">
+                                {it.brand}
+                              </div>
+                            )}
                           </td>
-                          <td className="whitespace-nowrap px-3 py-2 text-white/50">{it.brand}</td>
-                          <td className="px-3 py-2">
+                          {/* Brand */}
+                          <td className="hidden whitespace-nowrap px-2.5 py-2 text-white/50 md:table-cell">
+                            {it.brand}
+                          </td>
+                          {/* Website (value still saved when hidden) */}
+                          <td className="hidden px-2.5 py-2 lg:table-cell">
                             <div className="flex items-center gap-1.5">
                               <input
                                 name={`web::${it.id}`}
                                 defaultValue={it.website}
                                 placeholder="—"
-                                className="w-40 rounded border border-white/10 bg-black/40 px-2 py-1 text-xs text-white outline-none placeholder:text-white/25 focus:border-brand-green"
+                                className={`${CELL} w-28`}
                               />
                               {it.website && (
                                 <a
                                   href={it.website}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  aria-label={`Open ${it.brand || "supplier"} site`}
-                                  title="Open supplier site to reorder"
+                                  aria-label="Open supplier site"
                                   className="shrink-0 text-white/40 transition hover:text-brand-green"
                                 >
                                   ↗
@@ -175,7 +280,8 @@ export default async function StockPage({
                               )}
                             </div>
                           </td>
-                          <td className="px-3 py-2">
+                          {/* Keep (min) */}
+                          <td className="hidden px-2.5 py-2 sm:table-cell">
                             <span className="inline-flex items-center rounded-lg border border-white/12 bg-black/40 focus-within:border-brand-green">
                               <input
                                 type="number"
@@ -183,12 +289,13 @@ export default async function StockPage({
                                 defaultValue={it.min_qty}
                                 min={0}
                                 step={0.1}
-                                className="w-12 bg-transparent px-1.5 py-1 text-right text-white/70 outline-none"
+                                className="w-11 bg-transparent px-1.5 py-1 text-right text-white/70 outline-none"
                               />
-                              <span className="pr-1.5 text-xs text-white/35">{it.unit}</span>
+                              <span className="pr-1.5 text-[11px] text-white/35">{it.unit}</span>
                             </span>
                           </td>
-                          <td className="px-3 py-2">
+                          {/* Have (current) */}
+                          <td className="px-2.5 py-2">
                             <span className="inline-flex items-center rounded-lg border border-white/12 bg-black/40 focus-within:border-brand-green">
                               <input
                                 type="number"
@@ -197,26 +304,29 @@ export default async function StockPage({
                                 min={0}
                                 step={0.1}
                                 inputMode="decimal"
-                                className="w-12 bg-transparent px-1.5 py-1 text-right text-white outline-none"
+                                className="w-11 bg-transparent px-1.5 py-1 text-right text-white outline-none"
                               />
-                              <span className="pr-1.5 text-xs text-white/40">{it.unit}</span>
+                              <span className="pr-1.5 text-[11px] text-white/40">{it.unit}</span>
                             </span>
                           </td>
-                          <td className="whitespace-nowrap px-3 py-2">
-                            {low ? (
-                              <span className="rounded-full bg-red-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-red-300">
-                                Order
-                              </span>
-                            ) : (
+                          {/* Status */}
+                          <td className="whitespace-nowrap px-2.5 py-2">
+                            {!isLow ? (
                               <span className="text-[10px] font-bold uppercase tracking-wider text-brand-green/70">
                                 OK
                               </span>
+                            ) : it.ordered ? (
+                              <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white/50">
+                                Ordered
+                              </span>
+                            ) : (
+                              <span className="rounded-full bg-red-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-red-300">
+                                Order
+                              </span>
                             )}
                           </td>
-                          <td className="whitespace-nowrap px-3 py-2 text-xs tabular-nums text-white/40">
-                            {it.updated_at}
-                          </td>
-                          <td className="px-3 py-2">
+                          {/* Notes (value still saved when hidden) */}
+                          <td className="hidden px-2.5 py-2 md:table-cell">
                             <input
                               name={`note::${it.id}`}
                               defaultValue={it.notes}
@@ -224,7 +334,12 @@ export default async function StockPage({
                               className={`${CELL} w-28`}
                             />
                           </td>
-                          <td className="px-3 py-2 text-right">
+                          {/* Date */}
+                          <td className="hidden whitespace-nowrap px-2.5 py-2 text-xs tabular-nums text-white/40 xl:table-cell">
+                            {it.updated_at}
+                          </td>
+                          {/* Delete */}
+                          <td className="px-2.5 py-2 text-right">
                             <button
                               formAction={deleteStock}
                               name="id"
