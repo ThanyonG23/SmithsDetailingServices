@@ -19,6 +19,14 @@ import Reveal from "@/components/Reveal";
 
 const money = (n: number) => "$" + Math.round(n).toLocaleString("en-AU");
 
+const dayLabel = (d: string) =>
+  new Date(`${d}T00:00:00+10:00`).toLocaleDateString("en-AU", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    timeZone: "Australia/Brisbane",
+  });
+
 function totalHours(e: DailyLog | null): number {
   const sh = e?.staff_hours;
   if (!sh || typeof sh !== "object") return 0;
@@ -283,6 +291,16 @@ export default async function OpsPage({
   const earnedToday = todaysJobs.reduce((a, j) => a + j.value, 0);
   const hoursOnCars = todaysJobs.reduce((a, j) => a + (j.hours || 0), 0);
   const jobsOk = searchParams?.jobsok;
+
+  // upcoming schedule (today + future), grouped by day
+  const upcoming = bookings.filter((b) => b.booking_date >= today);
+  const scheduleByDay = new Map<string, Booking[]>();
+  for (const b of upcoming) {
+    const arr = scheduleByDay.get(b.booking_date) || [];
+    arr.push(b);
+    scheduleByDay.set(b.booking_date, arr);
+  }
+  const scheduleDays = [...scheduleByDay.keys()].sort().slice(0, 12);
 
   // ── funnel (this week) ──
   const inWeek = (r: DailyLog) => r.log_date >= weekStart && r.log_date <= today;
@@ -638,6 +656,60 @@ export default async function OpsPage({
               </button>
             </div>
           </form>
+        </section>
+      </Reveal>
+
+      {/* ── SCHEDULE (upcoming, from the calendar) ───────────────── */}
+      <Reveal delay={245}>
+        <section className="mt-8">
+          <SectionTitle eyebrow="What's booked" title="Schedule" />
+          {scheduleDays.length === 0 ? (
+            <p className="text-sm text-white/45">
+              Nothing upcoming — upload the latest calendar to see the schedule.
+            </p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {scheduleDays.map((d) => {
+                const jobs = scheduleByDay.get(d) || [];
+                const total = jobs.reduce((a, j) => a + j.value, 0);
+                const corr = jobs.filter((j) => j.is_correction).length;
+                return (
+                  <div key={d} className={`${CARD} p-4`}>
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="font-display text-base font-extrabold tracking-tight text-white">
+                        {dayLabel(d)}
+                        {d === today && (
+                          <span className="ml-2 rounded-full bg-brand-green/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand-green">
+                            Today
+                          </span>
+                        )}
+                      </div>
+                      <div className="shrink-0 text-xs font-semibold text-white/50">
+                        {jobs.length} · {money(total)}
+                        {corr > 0 && <span className="text-brand-green"> · {corr} corr</span>}
+                      </div>
+                    </div>
+                    <div className="mt-2.5 flex flex-col gap-1.5">
+                      {jobs.map((j, i) => (
+                        <div
+                          key={i}
+                          className="flex items-center justify-between gap-3 rounded-lg border border-white/[0.07] bg-black/20 px-3 py-2"
+                        >
+                          <span className="min-w-0 flex-1 truncate text-sm text-white/80">
+                            {j.summary || "(no title)"}
+                          </span>
+                          <span className="shrink-0 text-xs font-bold tabular-nums text-white/55">
+                            {money(j.value)}
+                            {j.is_correction && <span className="ml-1.5 text-brand-green">●</span>}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </section>
       </Reveal>
 
