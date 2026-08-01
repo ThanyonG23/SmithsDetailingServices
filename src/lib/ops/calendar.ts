@@ -69,7 +69,10 @@ export function parseBookingsIcs(rawInput: string): Booking[] {
       uid: (uidRaw.trim() || `${booking_date}|${value}|${summary.slice(0, 24)}`).slice(0, 200),
       booking_date,
       value,
-      is_correction: value >= 1500 || /correction|coating|ceramic/i.test(blob),
+      // Only trust the job TITLE for the package type — descriptions often
+      // mention "coating/correction" in upsell notes and cause false hits.
+      // Value ≥ $1,500 is a safe correction signal for the current pricing.
+      is_correction: value >= 1500 || /correction|coating|ceramic/i.test(summary),
       summary: summary.slice(0, 200),
     });
   }
