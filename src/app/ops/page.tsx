@@ -451,10 +451,11 @@ export default async function OpsPage({
 
       {dbError && (
         <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
-          <b className="font-bold">Database not connected.</b> Create a Vercel
-          Postgres (Neon) database, connect it to this project, clear any old
-          Supabase <code>POSTGRES_*</code> variables, and redeploy — then saving
-          and history switch on. Your login is working fine.
+          <b className="font-bold">Database didn&apos;t respond.</b> It may be
+          waking up or briefly busy — wait a minute and refresh. If it keeps
+          happening, open your Supabase project and check it&apos;s active (free
+          databases pause when idle) and that <code>POSTGRES_URL</code> is set in
+          Vercel. Your login is working fine.
         </div>
       )}
 
