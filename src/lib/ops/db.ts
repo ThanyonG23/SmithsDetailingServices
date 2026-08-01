@@ -441,6 +441,22 @@ export async function dbDiagnostics(): Promise<Record<string, string>> {
     ["job_followups", () => sql`SELECT count(*) FROM job_followups`],
     ["stock_items", () => sql`SELECT count(*) FROM stock_items`],
     ["stock_ordered_col", () => sql`SELECT ordered FROM stock_items LIMIT 1`],
+    // Mimic the dashboard: 9 reads fired in parallel on the single connection.
+    [
+      "parallel9",
+      () =>
+        Promise.all([
+          sql`SELECT 1`,
+          sql`SELECT count(*) FROM daily_log`,
+          sql`SELECT count(*) FROM bookings`,
+          sql`SELECT count(*) FROM ad_stats`,
+          sql`SELECT count(*) FROM bookings`,
+          sql`SELECT count(*) FROM job_followups`,
+          sql`SELECT count(*) FROM job_followups`,
+          sql`SELECT count(*) FROM job_followups`,
+          sql`SELECT count(*) FROM stock_items`,
+        ]),
+    ],
   ];
   const out: Record<string, string> = {};
   for (const [name, fn] of checks) {
