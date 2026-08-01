@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { isAuthed } from "@/lib/ops/auth";
 import { getStock, type StockItem } from "@/lib/ops/db";
-import { addStock, saveStock, deleteStock } from "../actions";
+import { addStock, saveStock, deleteStock, seedStock } from "../actions";
 
 export const metadata: Metadata = {
   title: "Stocktake | Smiths Detailing",
@@ -59,6 +59,8 @@ export default async function StockPage({
             ? "Item added ✓"
             : searchParams.stockok === "deleted"
             ? "Item removed ✓"
+            : searchParams.stockok === "seeded"
+            ? "Starting list loaded ✓"
             : "Stocktake saved ✓"}
         </div>
       )}
@@ -100,7 +102,15 @@ export default async function StockPage({
 
       {/* the stock table */}
       {items.length === 0 ? (
-        <p className="mt-8 text-sm text-white/45">No stock items yet — add your first one above.</p>
+        <div className="mt-8">
+          <p className="text-sm text-white/45">No stock items yet.</p>
+          <form action={seedStock} className="mt-3">
+            <button className="rounded-full bg-brand-green px-5 py-2.5 text-xs font-black text-[#04130a] transition hover:brightness-110 active:scale-95">
+              Load Smiths starting list (10 chemicals)
+            </button>
+          </form>
+          <p className="mt-2 text-xs text-white/35">…or add items one at a time above.</p>
+        </div>
       ) : (
         <form action={saveStock} className="mt-8">
           {cats.map((cat) => (

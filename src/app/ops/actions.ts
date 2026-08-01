@@ -13,6 +13,8 @@ import {
   addStockItem,
   updateStock,
   deleteStockItem,
+  getStock,
+  type StockItem,
 } from "@/lib/ops/db";
 import { OPS_STAFF, hoursBetween } from "@/lib/ops/config";
 import { parseBookingsIcs } from "@/lib/ops/calendar";
@@ -199,4 +201,36 @@ export async function deleteStock(formData: FormData): Promise<void> {
   if (Number.isFinite(id) && id > 0) await deleteStockItem(id);
   revalidatePath("/ops/stock");
   redirect("/ops/stock?stockok=deleted");
+}
+
+const STARTER_STOCK: Omit<StockItem, "id">[] = [
+  ["Mountain Air", "Northern Chemicals", "", "L", 10, 5],
+  ["Truck/Car Wash", "Northern Chemicals", "", "L", 10, 10],
+  ["Koch Chemie Heavy Cut", "Koch Chemie", "", "L", 1, 1],
+  ["Koch Chemie Fine Cut", "Koch Chemie", "", "L", 1, 1],
+  ["Black Trim Restore", "", "", "ml", 350, 350],
+  ["Decontamination Wash / Iron Remover", "Gtech", "", "L", 1, 0],
+  ["Reco Sheen Plastic Rejuvenator", "Reco Sheen", "Paint Shop", "L", 5, 20],
+  ["Bug Remover", "Gtech", "", "L", 1, 0],
+  ["Tar & Glue Remover", "Gtech", "", "ml", 500, 0],
+  ["Citrus All Purpose Cleaner (Backup)", "Gtech", "", "L", 5, 0],
+].map(([item, brand, website, unit, min_qty, current_qty]) => ({
+  category: "Chemicals",
+  item: item as string,
+  brand: brand as string,
+  website: website as string,
+  unit: unit as string,
+  min_qty: min_qty as number,
+  current_qty: current_qty as number,
+  notes: "",
+}));
+
+/* One-time: load the starting stock list (only if the table is empty). */
+export async function seedStock(): Promise<void> {
+  const existing = await getStock();
+  if (existing.length === 0) {
+    for (const it of STARTER_STOCK) await addStockItem(it);
+  }
+  revalidatePath("/ops/stock");
+  redirect("/ops/stock?stockok=seeded");
 }

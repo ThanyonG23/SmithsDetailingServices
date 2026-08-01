@@ -27,7 +27,12 @@ import {
   setCheckin,
 } from "./actions";
 import StaffHours from "@/components/ops/StaffHours";
-import Reveal from "@/components/Reveal";
+
+// Reveal is a no-op on ops — the scroll fade-in was slowing Ashlee down,
+// so render everything instantly.
+function Reveal({ children }: { children: React.ReactNode; delay?: number }) {
+  return <>{children}</>;
+}
 
 const money = (n: number) => "$" + Math.round(n).toLocaleString("en-AU");
 
