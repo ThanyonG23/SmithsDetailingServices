@@ -430,6 +430,33 @@ export async function pingDb(): Promise<boolean> {
   }
 }
 
+/** Per-query diagnostic: which reads work vs hang/error (each capped at 5s). */
+export async function dbDiagnostics(): Promise<Record<string, string>> {
+  const checks: [string, () => Promise<unknown>][] = [
+    ["select1", () => sql`SELECT 1`],
+    ["daily_log", () => sql`SELECT count(*) FROM daily_log`],
+    ["bookings", () => sql`SELECT count(*) FROM bookings`],
+    ["ad_stats", () => sql`SELECT count(*) FROM ad_stats`],
+    ["job_hours", () => sql`SELECT count(*) FROM job_hours`],
+    ["job_followups", () => sql`SELECT count(*) FROM job_followups`],
+    ["stock_items", () => sql`SELECT count(*) FROM stock_items`],
+    ["stock_ordered_col", () => sql`SELECT ordered FROM stock_items LIMIT 1`],
+  ];
+  const out: Record<string, string> = {};
+  for (const [name, fn] of checks) {
+    try {
+      await Promise.race([
+        fn(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("timeout-5s")), 5000)),
+      ]);
+      out[name] = "ok";
+    } catch (e) {
+      out[name] = "ERR " + (e instanceof Error ? e.message : String(e)).slice(0, 160);
+    }
+  }
+  return out;
+}
+
 /* ---- ad_stats (from the uploaded Meta ads CSV) --------------------- */
 
 export async function replaceAds(list: AdRow[]): Promise<void> {
