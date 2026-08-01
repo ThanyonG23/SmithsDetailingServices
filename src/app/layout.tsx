@@ -19,6 +19,20 @@ export const metadata: Metadata = {
   title: "Smiths Detailing Services | Premium Car Detailing in Cairns",
   description:
     "Premium car detailing in Cairns. Deep interior cleans, cut & polish, multi-stage paint correction, headlight restoration and ceramic coatings. Text us for a free quote. If you're not happy, you don't pay.",
+  manifest: "/manifest.webmanifest",
+  applicationName: "Smiths Ops",
+  appleWebApp: {
+    capable: true,
+    title: "Smiths Ops",
+    statusBarStyle: "black-translucent",
+  },
+  icons: {
+    icon: [
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+  },
   openGraph: {
     title: "Smiths Detailing Services | Premium Car Detailing in Cairns",
     description:

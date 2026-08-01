@@ -55,7 +55,7 @@ export default async function StockPage({
   const qty = (n: number, u: string) => `${n}${u}`;
 
   return (
-    <main className="mx-auto max-w-5xl px-4 pb-24 pt-8">
+    <main className="mx-auto max-w-5xl px-4 pb-24 pt-8 xl:max-w-6xl">
       <div className={EYEBROW}>Smiths Detailing · Cairns</div>
       <h1 className="mt-3 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
         Stock<span className="text-brand-green">take</span>
@@ -220,7 +220,7 @@ export default async function StockPage({
               <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-brand-green">
                 {cat}
               </div>
-              <div className={CARD}>
+              <div className={`overflow-x-auto ${CARD}`}>
                 <table className="w-full border-collapse text-sm">
                   <thead>
                     <tr className="border-b border-white/10">
