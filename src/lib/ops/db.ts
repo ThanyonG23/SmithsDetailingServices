@@ -134,7 +134,6 @@ async function runEnsure(): Promise<void> {
 /* ---- daily_log ------------------------------------------------------ */
 
 export async function getDailyLog(date: string): Promise<DailyLog | null> {
-  await ensureTable();
   const rows = await sql<DailyLog[]>`
     SELECT to_char(log_date, 'YYYY-MM-DD')                       AS log_date,
            jobs_completed,
@@ -152,7 +151,6 @@ export async function getDailyLog(date: string): Promise<DailyLog | null> {
 }
 
 export async function getRecentLogs(limit = 30): Promise<DailyLog[]> {
-  await ensureTable();
   const rows = await sql<DailyLog[]>`
     SELECT to_char(log_date, 'YYYY-MM-DD')                       AS log_date,
            jobs_completed,
@@ -220,7 +218,6 @@ export async function replaceBookings(list: Booking[]): Promise<void> {
 }
 
 export async function getRecentBookings(fromISO: string): Promise<Booking[]> {
-  await ensureTable();
   const rows = await sql<Booking[]>`
     SELECT uid, to_char(booking_date, 'YYYY-MM-DD') AS booking_date,
            value::float8                       AS value,
@@ -237,7 +234,6 @@ export interface JobWithHours extends Booking {
   hours: number;
 }
 export async function getJobsForDate(date: string): Promise<JobWithHours[]> {
-  await ensureTable();
   const rows = await sql`
     SELECT b.uid, to_char(b.booking_date, 'YYYY-MM-DD') AS booking_date,
            b.value::float8 AS value, b.is_correction, b.summary,
@@ -271,7 +267,6 @@ export interface JobFollowup extends Booking {
 
 /** Recent jobs with their check-in status (for the "who still needs a check-in" list). */
 export async function getFollowups(fromISO: string, toISO: string): Promise<JobFollowup[]> {
-  await ensureTable();
   const rows = await sql`
     SELECT b.uid, to_char(b.booking_date, 'YYYY-MM-DD') AS booking_date,
            b.value::float8 AS value, b.is_correction, b.summary,
@@ -296,7 +291,6 @@ export async function setFollowupStatus(uid: string, status: string): Promise<vo
 
 /** Unhappy customers still awaiting a rectify job (any date, until sorted). */
 export async function getRectifyList(): Promise<JobFollowup[]> {
-  await ensureTable();
   const rows = await sql`
     SELECT b.uid, to_char(b.booking_date, 'YYYY-MM-DD') AS booking_date,
            b.value::float8 AS value, b.is_correction, b.summary, f.status AS status
@@ -313,7 +307,6 @@ export async function getSatisfaction(
   fromISO: string,
   toISO: string
 ): Promise<{ happy: number; unhappy: number }> {
-  await ensureTable();
   const rows = await sql`
     SELECT
       count(*) FILTER (WHERE f.status = 'happy')::int                     AS happy,
@@ -342,7 +335,6 @@ export interface StockItem {
 }
 
 export async function getStock(): Promise<StockItem[]> {
-  await ensureTable();
   const rows = await sql`
     SELECT id, category, item, brand, website, unit,
            min_qty::float8 AS min_qty, current_qty::float8 AS current_qty, notes,
@@ -388,7 +380,6 @@ export async function clearStock(): Promise<void> {
 }
 
 export async function getReorderCount(): Promise<number> {
-  await ensureTable();
   const rows = await sql`SELECT count(*)::int AS n FROM stock_items WHERE current_qty < min_qty;`;
   return (rows[0] as { n: number } | undefined)?.n ?? 0;
 }
@@ -413,7 +404,6 @@ export async function replaceAds(list: AdRow[]): Promise<void> {
 }
 
 export async function getAds(): Promise<AdRow[]> {
-  await ensureTable();
   const rows = await sql<AdRow[]>`
     SELECT name, spend::float8 AS spend, messages, new_contacts, purchases,
            impressions, reach,
@@ -427,7 +417,6 @@ export async function getAds(): Promise<AdRow[]> {
 /* ---- export --------------------------------------------------------- */
 
 export async function getAllLogs(): Promise<Record<string, unknown>[]> {
-  await ensureTable();
   const rows = await sql`
     SELECT to_char(log_date, 'YYYY-MM-DD') AS log_date,
            jobs_completed, revenue_collected::float8 AS revenue_collected,
