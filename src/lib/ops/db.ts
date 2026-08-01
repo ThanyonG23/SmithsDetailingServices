@@ -419,6 +419,17 @@ export async function getReorderCount(): Promise<number> {
   return (rows[0] as { n: number } | undefined)?.n ?? 0;
 }
 
+/** Trivial DB touch — used by /api/health to keep the connection + the
+    Supabase project awake so it never pauses on idle. */
+export async function pingDb(): Promise<boolean> {
+  try {
+    await sql`SELECT 1 AS ok`;
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 /* ---- ad_stats (from the uploaded Meta ads CSV) --------------------- */
 
 export async function replaceAds(list: AdRow[]): Promise<void> {
