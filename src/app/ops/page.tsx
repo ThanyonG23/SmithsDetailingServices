@@ -673,6 +673,9 @@ export default async function OpsPage({
                 const jobs = scheduleByDay.get(d) || [];
                 const total = jobs.reduce((a, j) => a + j.value, 0);
                 const corr = jobs.filter((j) => j.is_correction).length;
+                const others = jobs.length - corr;
+                const detailers = corr * 2 + others; // correction = 2, other job = 1
+                const overCrew = detailers > 3;
                 return (
                   <div key={d} className={`${CARD} p-4`}>
                     <div className="flex items-center justify-between gap-3">
@@ -689,6 +692,18 @@ export default async function OpsPage({
                         {corr > 0 && <span className="text-brand-green"> · {corr} corr</span>}
                       </div>
                     </div>
+
+                    <div
+                      className={`mt-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold ${
+                        overCrew
+                          ? "bg-brand-yellow/15 text-brand-yellow"
+                          : "bg-brand-green/15 text-brand-green"
+                      }`}
+                    >
+                      👷 ≈ {detailers} detailer{detailers === 1 ? "" : "s"} + Ashlee
+                      {overCrew && " · over your 3 — Ashlee on tools or move a job"}
+                    </div>
+
                     <div className="mt-2.5 flex flex-col gap-1.5">
                       {jobs.map((j, i) => (
                         <div
