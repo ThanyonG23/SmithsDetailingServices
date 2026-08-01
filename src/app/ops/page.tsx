@@ -7,13 +7,22 @@ import {
   getRecentBookings,
   getAds,
   getJobsForDate,
+  getFollowups,
   type DailyLog,
   type Booking,
   type AdRow,
   type JobWithHours,
+  type JobFollowup,
 } from "@/lib/ops/db";
-import { OPS_STAFF, OPS_TARGETS, cairnsToday } from "@/lib/ops/config";
-import { saveEntry, logout, uploadCalendar, uploadAds, logJobHours } from "./actions";
+import { OPS_TARGETS, OPS_STAFF, cairnsToday } from "@/lib/ops/config";
+import {
+  saveEntry,
+  logout,
+  uploadCalendar,
+  uploadAds,
+  logJobHours,
+  logFollowups,
+} from "./actions";
 import StaffHours from "@/components/ops/StaffHours";
 import Reveal from "@/components/Reveal";
 
@@ -180,6 +189,7 @@ export default async function OpsPage({
     adok?: string;
     aderr?: string;
     jobsok?: string;
+    fuok?: string;
   };
 }) {
   if (!isAuthed()) redirect("/ops/login");
@@ -302,6 +312,19 @@ export default async function OpsPage({
   }
   const scheduleDays = [...scheduleByDay.keys()].sort().slice(0, 12);
 
+  // ── customer check-ins (jobs from the last 3 days) ──
+  const fu3 = new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Brisbane" }).format(
+    new Date(Date.now() - 3 * 86400000)
+  );
+  let followups: JobFollowup[] = [];
+  try {
+    followups = await getFollowups(fu3, today);
+  } catch {
+    /* dbError already surfaced */
+  }
+  const pendingFollowups = followups.filter((f) => !f.done).length;
+  const fuOk = searchParams?.fuok;
+
   // ── funnel (this week) ──
   const inWeek = (r: DailyLog) => r.log_date >= weekStart && r.log_date <= today;
   const weekLoggedDays = recent.filter(inWeek).length;
@@ -345,6 +368,11 @@ export default async function OpsPage({
     alerts.push({
       tone: "red",
       text: `${entry?.unhappy_customers} unhappy customer(s) today — follow up before it becomes a review.`,
+    });
+  if (pendingFollowups > 0)
+    alerts.push({
+      tone: "yellow",
+      text: `${pendingFollowups} recent customer(s) not checked in yet — send the day-after "how'd it go?" and tick them off.`,
     });
   if (hasBookings && pipelineCorr === 0)
     alerts.push({ tone: "red", text: "No corrections booked ahead — push the correction ad or call warm leads." });
@@ -828,6 +856,71 @@ export default async function OpsPage({
                 </div>
                 <button className="mt-3 rounded-full bg-brand-green px-6 py-2.5 text-xs font-black text-[#04130a] transition hover:brightness-110 active:scale-95">
                   Save hours
+                </button>
+              </form>
+            </>
+          )}
+        </section>
+      </Reveal>
+
+      {/* ── CUSTOMER CHECK-INS (day-after follow-up) ─────────────── */}
+      <Reveal delay={255}>
+        <section className="mt-8">
+          <SectionTitle eyebrow="Customer care" title="Check-ins" />
+
+          {fuOk && (
+            <div className="mb-3 rounded-xl border border-brand-green/40 bg-brand-green/[0.08] px-4 py-2.5 text-sm font-semibold text-brand-green">
+              Check-ins saved ✓
+            </div>
+          )}
+
+          {followups.length === 0 ? (
+            <p className="text-sm text-white/45">
+              No jobs in the last 3 days — check-ins show here once cars are booked.
+            </p>
+          ) : (
+            <>
+              <p className="mb-3 text-xs leading-relaxed text-white/45">
+                Jobs from the last 3 days. Tick a customer{" "}
+                <b className="text-white/70">only once they&apos;ve confirmed they&apos;re happy</b>.
+                Anything left unticked (red) still needs a follow-up.
+              </p>
+              <form action={logFollowups} className={`${CARD} p-4`}>
+                <div className="flex flex-col gap-2">
+                  {followups.map((f) => (
+                    <label
+                      key={f.uid}
+                      className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 transition ${
+                        f.done
+                          ? "border-brand-green/25 bg-brand-green/[0.05]"
+                          : "border-red-500/25 bg-red-500/[0.06]"
+                      }`}
+                    >
+                      <input type="hidden" name={`fup::${f.uid}`} value="1" />
+                      <input
+                        type="checkbox"
+                        name={`fu::${f.uid}`}
+                        defaultChecked={f.done}
+                        className="h-5 w-5 shrink-0 accent-brand-green"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="truncate text-sm font-semibold text-white/85">
+                          {f.summary || "(no title)"}
+                        </div>
+                        <div className="text-xs text-white/40">
+                          {dayLabel(f.booking_date)} · {money(f.value)}
+                        </div>
+                      </div>
+                      {!f.done && (
+                        <span className="shrink-0 text-[11px] font-bold uppercase tracking-wider text-red-300">
+                          Follow up
+                        </span>
+                      )}
+                    </label>
+                  ))}
+                </div>
+                <button className="mt-3 rounded-full bg-brand-green px-6 py-2.5 text-xs font-black text-[#04130a] transition hover:brightness-110 active:scale-95">
+                  Save check-ins
                 </button>
               </form>
             </>

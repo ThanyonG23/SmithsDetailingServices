@@ -81,6 +81,13 @@ async function ensureTable(): Promise<void> {
       updated_at timestamptz   NOT NULL DEFAULT now()
     );
   `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS job_followups (
+      uid        text         PRIMARY KEY,
+      done       boolean      NOT NULL DEFAULT false,
+      updated_at timestamptz  NOT NULL DEFAULT now()
+    );
+  `;
   await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS quotes integer NOT NULL DEFAULT 0;`;
   await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS redos  integer NOT NULL DEFAULT 0;`;
   await sql`
@@ -226,6 +233,38 @@ export async function saveJobHours(entries: { uid: string; hours: number }[]): P
       INSERT INTO job_hours (uid, hours, updated_at)
       VALUES (${e.uid}, ${e.hours}, now())
       ON CONFLICT (uid) DO UPDATE SET hours = EXCLUDED.hours, updated_at = now();
+    `;
+  }
+}
+
+/* ---- customer check-ins (day-after follow-up) --------------------- */
+
+export interface JobFollowup extends Booking {
+  done: boolean;
+}
+
+export async function getFollowups(fromISO: string, toISO: string): Promise<JobFollowup[]> {
+  await ensureTable();
+  const rows = await sql`
+    SELECT b.uid, to_char(b.booking_date, 'YYYY-MM-DD') AS booking_date,
+           b.value::float8 AS value, b.is_correction, b.summary,
+           COALESCE(f.done, false) AS done
+    FROM bookings b
+    LEFT JOIN job_followups f ON f.uid = b.uid
+    WHERE b.booking_date >= ${fromISO} AND b.booking_date <= ${toISO}
+    ORDER BY b.booking_date DESC;
+  `;
+  return rows as unknown as JobFollowup[];
+}
+
+export async function saveFollowups(entries: { uid: string; done: boolean }[]): Promise<void> {
+  await ensureTable();
+  for (const e of entries) {
+    if (!e.uid) continue;
+    await sql`
+      INSERT INTO job_followups (uid, done, updated_at)
+      VALUES (${e.uid}, ${e.done}, now())
+      ON CONFLICT (uid) DO UPDATE SET done = EXCLUDED.done, updated_at = now();
     `;
   }
 }

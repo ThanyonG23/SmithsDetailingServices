@@ -4,7 +4,13 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { checkPassword, sessionCookieValue, OPS_COOKIE } from "@/lib/ops/auth";
-import { upsertDailyLog, replaceBookings, replaceAds, saveJobHours as saveJobHoursDb } from "@/lib/ops/db";
+import {
+  upsertDailyLog,
+  replaceBookings,
+  replaceAds,
+  saveJobHours as saveJobHoursDb,
+  saveFollowups as saveFollowupsDb,
+} from "@/lib/ops/db";
 import { OPS_STAFF, hoursBetween } from "@/lib/ops/config";
 import { parseBookingsIcs } from "@/lib/ops/calendar";
 import { parseAdsCsv } from "@/lib/ops/ads";
@@ -130,4 +136,16 @@ export async function logJobHours(formData: FormData): Promise<void> {
   await saveJobHoursDb(entries);
   revalidatePath("/ops");
   redirect("/ops?jobsok=1");
+}
+
+/* Save which recent customers have been checked in on (day-after follow-up). */
+export async function logFollowups(formData: FormData): Promise<void> {
+  const uids: string[] = [];
+  for (const [key] of formData.entries()) {
+    if (key.startsWith("fup::")) uids.push(key.slice(5));
+  }
+  const entries = uids.map((uid) => ({ uid, done: formData.has(`fu::${uid}`) }));
+  await saveFollowupsDb(entries);
+  revalidatePath("/ops");
+  redirect("/ops?fuok=1");
 }
