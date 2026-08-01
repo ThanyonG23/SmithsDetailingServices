@@ -676,6 +676,19 @@ export default async function OpsPage({
                 const others = jobs.length - corr;
                 const detailers = corr * 2 + others; // correction = 2, other job = 1
                 const overCrew = detailers > 3;
+                // capacity: a full day ≈ 2 corrections. correction=1, full detail=0.5, premium=0.25
+                const used = jobs.reduce(
+                  (a, j) => a + (j.is_correction ? 1 : j.value >= 700 ? 0.5 : 0.25),
+                  0
+                );
+                const roomUnits = 2 - used;
+                const hasRoom = roomUnits >= 0.25;
+                const roomLabel =
+                  roomUnits >= 1
+                    ? "a correction & coating"
+                    : roomUnits >= 0.5
+                    ? "a full detail"
+                    : "a premium detail";
                 return (
                   <div key={d} className={`${CARD} p-4`}>
                     <div className="flex items-center justify-between gap-3">
@@ -693,15 +706,26 @@ export default async function OpsPage({
                       </div>
                     </div>
 
-                    <div
-                      className={`mt-2 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold ${
-                        overCrew
-                          ? "bg-brand-yellow/15 text-brand-yellow"
-                          : "bg-brand-green/15 text-brand-green"
-                      }`}
-                    >
-                      👷 ≈ {detailers} detailer{detailers === 1 ? "" : "s"} + Ashlee
-                      {overCrew && " · over your 3 — Ashlee on tools or move a job"}
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <span
+                        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold ${
+                          overCrew
+                            ? "bg-brand-yellow/15 text-brand-yellow"
+                            : "bg-brand-green/15 text-brand-green"
+                        }`}
+                      >
+                        👷 ≈ {detailers} detailer{detailers === 1 ? "" : "s"} + Ashlee
+                        {overCrew && " · Ashlee on tools or move a job"}
+                      </span>
+                      {hasRoom ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-red-500/40 bg-red-500/[0.12] px-2.5 py-1 text-[11px] font-bold text-red-300">
+                          🔴 Room to fill · {roomLabel}
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[11px] font-bold text-white/50">
+                          Full ✓
+                        </span>
+                      )}
                     </div>
 
                     <div className="mt-2.5 flex flex-col gap-1.5">
