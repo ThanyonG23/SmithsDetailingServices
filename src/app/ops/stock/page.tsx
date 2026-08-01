@@ -49,7 +49,10 @@ export default async function StockPage({
   }
   const cats = [...byCat.keys()].sort();
 
-  const low = items.filter((i) => i.current_qty < i.min_qty);
+  // group the order list by supplier (across categories) so it's one order per place
+  const low = items
+    .filter((i) => i.current_qty < i.min_qty)
+    .sort((a, b) => (a.brand || "").localeCompare(b.brand || "") || a.item.localeCompare(b.item));
   const toOrder = low.filter((i) => !i.ordered);
   const onOrder = low.filter((i) => i.ordered);
   const qty = (n: number, u: string) => `${n}${u}`;

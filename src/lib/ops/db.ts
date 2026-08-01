@@ -344,7 +344,7 @@ export async function getStock(): Promise<StockItem[]> {
            min_qty::float8 AS min_qty, current_qty::float8 AS current_qty, notes, ordered,
            to_char(updated_at AT TIME ZONE 'Australia/Brisbane', 'DD/MM/YY') AS updated_at
     FROM stock_items
-    ORDER BY category, item;
+    ORDER BY category, brand, item;
   `;
   return rows as unknown as StockItem[];
 }
