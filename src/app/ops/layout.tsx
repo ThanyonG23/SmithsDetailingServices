@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BUSINESS } from "@/lib/config";
+import OpsTabs from "@/components/ops/OpsTabs";
 
 /* Unlisted, like the team page — nothing links here and it's noindex,
    so the only way in is the direct link + the shared password. */
@@ -19,9 +20,10 @@ export default function OpsLayout({ children }: { children: React.ReactNode }) {
             <img src={BUSINESS.logo} alt={BUSINESS.name} className="h-9 w-auto sm:h-10" />
           </Link>
           <span className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/35">
-            Daily Ops
+            Smiths Ops
           </span>
         </div>
+        <OpsTabs />
       </header>
       {children}
     </div>

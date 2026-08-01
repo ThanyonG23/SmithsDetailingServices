@@ -88,6 +88,20 @@ async function ensureTable(): Promise<void> {
       updated_at timestamptz  NOT NULL DEFAULT now()
     );
   `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS stock_items (
+      id          serial        PRIMARY KEY,
+      category    text          NOT NULL DEFAULT '',
+      item        text          NOT NULL DEFAULT '',
+      brand       text          NOT NULL DEFAULT '',
+      website     text          NOT NULL DEFAULT '',
+      unit        text          NOT NULL DEFAULT '',
+      min_qty     numeric(10,2) NOT NULL DEFAULT 0,
+      current_qty numeric(10,2) NOT NULL DEFAULT 0,
+      notes       text          NOT NULL DEFAULT '',
+      updated_at  timestamptz   NOT NULL DEFAULT now()
+    );
+  `;
   await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS quotes integer NOT NULL DEFAULT 0;`;
   await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS redos  integer NOT NULL DEFAULT 0;`;
   await sql`
@@ -267,6 +281,65 @@ export async function saveFollowups(entries: { uid: string; done: boolean }[]): 
       ON CONFLICT (uid) DO UPDATE SET done = EXCLUDED.done, updated_at = now();
     `;
   }
+}
+
+/* ---- stocktake ----------------------------------------------------- */
+
+export interface StockItem {
+  id: number;
+  category: string;
+  item: string;
+  brand: string;
+  website: string;
+  unit: string;
+  min_qty: number;
+  current_qty: number;
+  notes: string;
+}
+
+export async function getStock(): Promise<StockItem[]> {
+  await ensureTable();
+  const rows = await sql`
+    SELECT id, category, item, brand, website, unit,
+           min_qty::float8 AS min_qty, current_qty::float8 AS current_qty, notes
+    FROM stock_items
+    ORDER BY category, item;
+  `;
+  return rows as unknown as StockItem[];
+}
+
+export async function addStockItem(i: Omit<StockItem, "id">): Promise<void> {
+  await ensureTable();
+  await sql`
+    INSERT INTO stock_items (category, item, brand, website, unit, min_qty, current_qty, notes)
+    VALUES (${i.category}, ${i.item}, ${i.brand}, ${i.website}, ${i.unit},
+            ${i.min_qty}, ${i.current_qty}, ${i.notes});
+  `;
+}
+
+export async function updateStock(
+  entries: { id: number; current_qty: number; notes: string }[]
+): Promise<void> {
+  await ensureTable();
+  for (const e of entries) {
+    if (!e.id) continue;
+    await sql`
+      UPDATE stock_items
+      SET current_qty = ${e.current_qty}, notes = ${e.notes}, updated_at = now()
+      WHERE id = ${e.id};
+    `;
+  }
+}
+
+export async function deleteStockItem(id: number): Promise<void> {
+  await ensureTable();
+  await sql`DELETE FROM stock_items WHERE id = ${id};`;
+}
+
+export async function getReorderCount(): Promise<number> {
+  await ensureTable();
+  const rows = await sql`SELECT count(*)::int AS n FROM stock_items WHERE current_qty < min_qty;`;
+  return (rows[0] as { n: number } | undefined)?.n ?? 0;
 }
 
 /* ---- ad_stats (from the uploaded Meta ads CSV) --------------------- */

@@ -8,6 +8,7 @@ import {
   getAds,
   getJobsForDate,
   getFollowups,
+  getReorderCount,
   type DailyLog,
   type Booking,
   type AdRow,
@@ -325,6 +326,13 @@ export default async function OpsPage({
   const pendingFollowups = followups.filter((f) => !f.done).length;
   const fuOk = searchParams?.fuok;
 
+  let reorderCount = 0;
+  try {
+    reorderCount = await getReorderCount();
+  } catch {
+    /* dbError already surfaced */
+  }
+
   // ── funnel (this week) ──
   const inWeek = (r: DailyLog) => r.log_date >= weekStart && r.log_date <= today;
   const weekLoggedDays = recent.filter(inWeek).length;
@@ -373,6 +381,11 @@ export default async function OpsPage({
     alerts.push({
       tone: "yellow",
       text: `${pendingFollowups} recent customer(s) not checked in yet — send the day-after "how'd it go?" and tick them off.`,
+    });
+  if (reorderCount > 0)
+    alerts.push({
+      tone: "yellow",
+      text: `${reorderCount} item(s) low on stock — check the Stock tab and reorder before you run out.`,
     });
   if (hasBookings && pipelineCorr === 0)
     alerts.push({ tone: "red", text: "No corrections booked ahead — push the correction ad or call warm leads." });

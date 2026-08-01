@@ -10,6 +10,9 @@ import {
   replaceAds,
   saveJobHours as saveJobHoursDb,
   saveFollowups as saveFollowupsDb,
+  addStockItem,
+  updateStock,
+  deleteStockItem,
 } from "@/lib/ops/db";
 import { OPS_STAFF, hoursBetween } from "@/lib/ops/config";
 import { parseBookingsIcs } from "@/lib/ops/calendar";
@@ -148,4 +151,52 @@ export async function logFollowups(formData: FormData): Promise<void> {
   await saveFollowupsDb(entries);
   revalidatePath("/ops");
   redirect("/ops?fuok=1");
+}
+
+/* ---- stocktake ---------------------------------------------------- */
+
+export async function addStock(formData: FormData): Promise<void> {
+  const s = (k: string) => String(formData.get(k) || "").trim().slice(0, 300);
+  const n = (k: string) => {
+    const v = Number(formData.get(k));
+    return Number.isFinite(v) && v >= 0 ? v : 0;
+  };
+  const item = s("item");
+  if (!item) redirect("/ops/stock?stockerr=1");
+  await addStockItem({
+    category: s("category") || "Other",
+    item,
+    brand: s("brand"),
+    website: s("website"),
+    unit: s("unit"),
+    min_qty: n("min_qty"),
+    current_qty: n("current_qty"),
+    notes: s("notes"),
+  });
+  revalidatePath("/ops/stock");
+  redirect("/ops/stock?stockok=added");
+}
+
+export async function saveStock(formData: FormData): Promise<void> {
+  const ids: number[] = [];
+  for (const [key] of formData.entries()) {
+    if (key.startsWith("cur::")) ids.push(Number(key.slice(5)));
+  }
+  const entries = ids
+    .filter((id) => Number.isFinite(id) && id > 0)
+    .map((id) => ({
+      id,
+      current_qty: Number(formData.get(`cur::${id}`)) || 0,
+      notes: String(formData.get(`note::${id}`) || "").slice(0, 500),
+    }));
+  await updateStock(entries);
+  revalidatePath("/ops/stock");
+  redirect("/ops/stock?stockok=saved");
+}
+
+export async function deleteStock(formData: FormData): Promise<void> {
+  const id = Number(formData.get("id"));
+  if (Number.isFinite(id) && id > 0) await deleteStockItem(id);
+  revalidatePath("/ops/stock");
+  redirect("/ops/stock?stockok=deleted");
 }
