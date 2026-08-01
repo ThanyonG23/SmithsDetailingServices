@@ -41,9 +41,19 @@ const connectionString =
 
 const sql = postgres(connectionString, { ssl: "require", prepare: false, max: 1 });
 
-let ensured = false;
-async function ensureTable(): Promise<void> {
-  if (ensured) return;
+// Memoise a single in-flight promise so parallel reads on a cold start
+// don't each run the schema DDL. Resets on failure so it can retry.
+let ensurePromise: Promise<void> | null = null;
+function ensureTable(): Promise<void> {
+  if (!ensurePromise) {
+    ensurePromise = runEnsure().catch((e) => {
+      ensurePromise = null;
+      throw e;
+    });
+  }
+  return ensurePromise;
+}
+async function runEnsure(): Promise<void> {
   await sql`
     CREATE TABLE IF NOT EXISTS daily_log (
       log_date            date          PRIMARY KEY,
@@ -119,7 +129,6 @@ async function ensureTable(): Promise<void> {
       reach        integer       NOT NULL DEFAULT 0
     );
   `;
-  ensured = true;
 }
 
 /* ---- daily_log ------------------------------------------------------ */

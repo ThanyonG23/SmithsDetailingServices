@@ -202,6 +202,7 @@ export default async function OpsPage({
 }) {
   if (!isAuthed()) redirect("/ops/login");
 
+  // ── dates (computed up front so all DB reads can run in parallel) ──
   const today = cairnsToday();
   const date = (searchParams?.date || today).slice(0, 10);
   const isToday = date === today;
@@ -212,17 +213,46 @@ export default async function OpsPage({
     month: "long",
     timeZone: "Australia/Brisbane",
   });
+  const monthKey = today.slice(0, 7);
+  const monthStartISO = monthKey + "-01";
+  const wt = new Date(`${today}T12:00:00+10:00`);
+  const dow = (wt.getUTCDay() + 6) % 7; // 0 = Monday
+  const brisDate = (ms: number) =>
+    new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Brisbane" }).format(new Date(ms));
+  const weekStart = brisDate(wt.getTime() - dow * 86400000);
+  const from60 = brisDate(Date.now() - 60 * 86400000);
+  const d14 = brisDate(Date.now() - 13 * 86400000);
+  const fu3 = brisDate(Date.now() - 3 * 86400000);
 
+  // ── all DB reads in one parallel batch (was 9 sequential round trips) ──
   let entry: DailyLog | null = null;
   let recent: DailyLog[] = [];
+  let bookings: Booking[] = [];
+  let ads: AdRow[] = [];
+  let todaysJobs: JobWithHours[] = [];
+  let followups: JobFollowup[] = [];
+  let rectifyList: JobFollowup[] = [];
+  let satisfaction = { happy: 0, unhappy: 0 };
+  let reorderCount = 0;
   let dbError = false;
   try {
-    entry = await getDailyLog(date);
-    recent = await getRecentLogs(30);
+    [entry, recent, bookings, ads, todaysJobs, followups, rectifyList, satisfaction, reorderCount] =
+      await Promise.all([
+        getDailyLog(date),
+        getRecentLogs(30),
+        getRecentBookings(from60),
+        getAds(),
+        getJobsForDate(today),
+        getFollowups(fu3, today),
+        getRectifyList(),
+        getSatisfaction(monthStartISO, today),
+        getReorderCount(),
+      ]);
   } catch {
     dbError = true;
   }
 
+  // ── derived values (no more DB calls below) ──
   const crewInitial: Record<string, { start?: string; end?: string; notes?: string }> = {};
   for (const name of OPS_STAFF) {
     crewInitial[name] = {
@@ -238,13 +268,6 @@ export default async function OpsPage({
   const aimPct = Math.min(100, Math.round((rev / aimRevenue) * 100));
   const bePct = Math.min(100, Math.round((breakEvenRevenue / aimRevenue) * 100));
 
-  // week & month pace (from the loaded history)
-  const monthKey = today.slice(0, 7);
-  const wt = new Date(`${today}T12:00:00+10:00`);
-  const dow = (wt.getUTCDay() + 6) % 7; // 0 = Monday
-  const weekStart = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Australia/Brisbane",
-  }).format(new Date(wt.getTime() - dow * 86400000));
   const weekRevenue = recent
     .filter((r) => r.log_date >= weekStart && r.log_date <= today)
     .reduce((a, r) => a + r.revenue_collected, 0);
@@ -252,19 +275,6 @@ export default async function OpsPage({
     .filter((r) => r.log_date.startsWith(monthKey))
     .reduce((a, r) => a + r.revenue_collected, 0);
 
-  // ── bookings (from the uploaded calendar) ──
-  const from60 = new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Brisbane" }).format(
-    new Date(Date.now() - 60 * 86400000)
-  );
-  const d14 = new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Brisbane" }).format(
-    new Date(Date.now() - 13 * 86400000)
-  );
-  let bookings: Booking[] = [];
-  try {
-    bookings = await getRecentBookings(from60);
-  } catch {
-    /* dbError already surfaced above */
-  }
   const last14 = bookings.filter((b) => b.booking_date >= d14 && b.booking_date <= today);
   const corr14 = last14.filter((b) => b.is_correction).length;
   const corrPerDay = corr14 / 10; // ~10 working days in 14
@@ -275,7 +285,6 @@ export default async function OpsPage({
   const pipelineValue = pipeline.reduce((a, b) => a + b.value, 0);
   const pipelineCorr = pipeline.filter((b) => b.is_correction).length;
 
-  // CAC this week = week ad spend / week bookings
   const weekAdSpend = recent
     .filter((r) => r.log_date >= weekStart && r.log_date <= today)
     .reduce((a, r) => a + (r.ad_spend || 0), 0);
@@ -284,13 +293,6 @@ export default async function OpsPage({
   const calCount = searchParams?.calok;
   const calErr = searchParams?.calerr;
 
-  // ── ads (from the uploaded Meta CSV) ──
-  let ads: AdRow[] = [];
-  try {
-    ads = await getAds();
-  } catch {
-    /* dbError already surfaced */
-  }
   const adSpend = ads.reduce((a, r) => a + r.spend, 0);
   const adMessages = ads.reduce((a, r) => a + r.messages, 0);
   const adNewContacts = ads.reduce((a, r) => a + r.new_contacts, 0);
@@ -299,18 +301,10 @@ export default async function OpsPage({
   const adOk = searchParams?.adok;
   const adErr = searchParams?.aderr;
 
-  // ── today's jobs (from the calendar) + hours logged per car ──
-  let todaysJobs: JobWithHours[] = [];
-  try {
-    todaysJobs = await getJobsForDate(today);
-  } catch {
-    /* dbError already surfaced */
-  }
   const earnedToday = todaysJobs.reduce((a, j) => a + j.value, 0);
   const hoursOnCars = todaysJobs.reduce((a, j) => a + (j.hours || 0), 0);
   const jobsOk = searchParams?.jobsok;
 
-  // upcoming schedule (today + future), grouped by day
   const upcoming = bookings.filter((b) => b.booking_date >= today);
   const scheduleByDay = new Map<string, Booking[]>();
   for (const b of upcoming) {
@@ -320,42 +314,9 @@ export default async function OpsPage({
   }
   const scheduleDays = [...scheduleByDay.keys()].sort().slice(0, 12);
 
-  // ── customer check-ins (jobs from the last 3 days) ──
-  const fu3 = new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Brisbane" }).format(
-    new Date(Date.now() - 3 * 86400000)
-  );
-  let followups: JobFollowup[] = [];
-  try {
-    followups = await getFollowups(fu3, today);
-  } catch {
-    /* dbError already surfaced */
-  }
   const pendingFollowupList = followups.filter((f) => f.status === "pending");
   const pendingFollowups = pendingFollowupList.length;
   const fuOk = searchParams?.fuok;
-
-  // unhappy customers awaiting a rectify job (any date)
-  let rectifyList: JobFollowup[] = [];
-  try {
-    rectifyList = await getRectifyList();
-  } catch {
-    /* dbError already surfaced */
-  }
-  // happy vs unhappy this month (auto-tracked from check-ins)
-  const monthStartISO = today.slice(0, 7) + "-01";
-  let satisfaction = { happy: 0, unhappy: 0 };
-  try {
-    satisfaction = await getSatisfaction(monthStartISO, today);
-  } catch {
-    /* dbError already surfaced */
-  }
-
-  let reorderCount = 0;
-  try {
-    reorderCount = await getReorderCount();
-  } catch {
-    /* dbError already surfaced */
-  }
 
   // ── funnel (this week) ──
   const inWeek = (r: DailyLog) => r.log_date >= weekStart && r.log_date <= today;

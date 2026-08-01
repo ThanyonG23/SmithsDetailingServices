@@ -113,6 +113,11 @@ export default async function StockPage({
         </div>
       ) : (
         <form action={saveStock} className="mt-8">
+          {/* First submit button in the form = the one Enter triggers.
+              Keep it Save (not a row's delete ✕) so hitting Enter in a cell saves. */}
+          <button type="submit" className="sr-only" tabIndex={-1} aria-hidden="true">
+            Save stocktake
+          </button>
           {cats.map((cat) => (
             <section key={cat} className="mt-6 first:mt-0">
               <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-brand-green">
