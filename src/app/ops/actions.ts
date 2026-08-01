@@ -205,7 +205,7 @@ export async function deleteStock(formData: FormData): Promise<void> {
   redirect("/ops/stock?stockok=deleted");
 }
 
-const STARTER_STOCK: Omit<StockItem, "id">[] = [
+const STARTER_STOCK: Omit<StockItem, "id" | "updated_at">[] = [
   ["Mountain Air", "Northern Chemicals", "", "L", 10, 5],
   ["Truck/Car Wash", "Northern Chemicals", "", "L", 10, 10],
   ["Koch Chemie Heavy Cut", "Koch Chemie", "", "L", 1, 1],

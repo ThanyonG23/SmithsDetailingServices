@@ -344,7 +344,7 @@ export async function getStock(): Promise<StockItem[]> {
   return rows as unknown as StockItem[];
 }
 
-export async function addStockItem(i: Omit<StockItem, "id">): Promise<void> {
+export async function addStockItem(i: Omit<StockItem, "id" | "updated_at">): Promise<void> {
   await ensureTable();
   await sql`
     INSERT INTO stock_items (category, item, brand, website, unit, min_qty, current_qty, notes)
