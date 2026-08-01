@@ -420,57 +420,18 @@ export async function getReorderCount(): Promise<number> {
 }
 
 /** Trivial DB touch — used by /api/health to keep the connection + the
-    Supabase project awake so it never pauses on idle. */
+    Supabase project awake so it never pauses on idle. 6s cap so it returns
+    fast (503) instead of hanging when the DB is unreachable. */
 export async function pingDb(): Promise<boolean> {
   try {
-    await sql`SELECT 1 AS ok`;
+    await Promise.race([
+      sql`SELECT 1 AS ok`,
+      new Promise((_, reject) => setTimeout(() => reject(new Error("ping-timeout")), 6000)),
+    ]);
     return true;
   } catch {
     return false;
   }
-}
-
-/** Per-query diagnostic: which reads work vs hang/error (each capped at 5s). */
-export async function dbDiagnostics(): Promise<Record<string, string>> {
-  const checks: [string, () => Promise<unknown>][] = [
-    ["select1", () => sql`SELECT 1`],
-    ["daily_log", () => sql`SELECT count(*) FROM daily_log`],
-    ["bookings", () => sql`SELECT count(*) FROM bookings`],
-    ["ad_stats", () => sql`SELECT count(*) FROM ad_stats`],
-    ["job_hours", () => sql`SELECT count(*) FROM job_hours`],
-    ["job_followups", () => sql`SELECT count(*) FROM job_followups`],
-    ["stock_items", () => sql`SELECT count(*) FROM stock_items`],
-    ["stock_ordered_col", () => sql`SELECT ordered FROM stock_items LIMIT 1`],
-    // Mimic the dashboard: 9 reads fired in parallel on the single connection.
-    [
-      "parallel9",
-      () =>
-        Promise.all([
-          sql`SELECT 1`,
-          sql`SELECT count(*) FROM daily_log`,
-          sql`SELECT count(*) FROM bookings`,
-          sql`SELECT count(*) FROM ad_stats`,
-          sql`SELECT count(*) FROM bookings`,
-          sql`SELECT count(*) FROM job_followups`,
-          sql`SELECT count(*) FROM job_followups`,
-          sql`SELECT count(*) FROM job_followups`,
-          sql`SELECT count(*) FROM stock_items`,
-        ]),
-    ],
-  ];
-  const out: Record<string, string> = {};
-  for (const [name, fn] of checks) {
-    try {
-      await Promise.race([
-        fn(),
-        new Promise((_, reject) => setTimeout(() => reject(new Error("timeout-5s")), 5000)),
-      ]);
-      out[name] = "ok";
-    } catch (e) {
-      out[name] = "ERR " + (e instanceof Error ? e.message : String(e)).slice(0, 160);
-    }
-  }
-  return out;
 }
 
 /* ---- ad_stats (from the uploaded Meta ads CSV) --------------------- */
