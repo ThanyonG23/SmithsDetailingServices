@@ -13,6 +13,8 @@ const EYEBROW = "text-[11px] font-bold uppercase tracking-[0.22em] text-white/40
 const CARD = "rounded-2xl border border-white/10 bg-white/[0.02]";
 const INPUT =
   "rounded-lg border border-white/12 bg-black/40 px-2.5 py-2 text-sm text-white outline-none placeholder:text-white/30 focus:border-brand-green";
+const CELL =
+  "w-full min-w-[5rem] rounded border border-white/10 bg-black/40 px-2 py-1 text-xs text-white outline-none placeholder:text-white/25 focus:border-brand-green";
 
 export default async function StockPage({
   searchParams,
@@ -39,7 +41,7 @@ export default async function StockPage({
   const reorder = items.filter((i) => i.current_qty < i.min_qty);
 
   return (
-    <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
+    <main className="mx-auto max-w-4xl px-4 pb-24 pt-8">
       <div className={EYEBROW}>Smiths Detailing · Cairns</div>
       <h1 className="mt-3 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
         Stock<span className="text-brand-green">take</span>
@@ -65,12 +67,10 @@ export default async function StockPage({
         </div>
       )}
 
-      {/* reorder summary — the order list */}
+      {/* the order list */}
       {reorder.length > 0 && (
         <div className="mt-5 rounded-xl border border-red-500/40 bg-red-500/[0.08] px-4 py-3 text-sm text-red-300">
-          <b className="font-bold">
-            🔴 To order ({reorder.length}):
-          </b>{" "}
+          <b className="font-bold">🔴 To order ({reorder.length}):</b>{" "}
           {reorder
             .map((r) => `${r.item} (have ${r.current_qty}${r.unit}, need ${r.min_qty}${r.unit})`)
             .join("  ·  ")}
@@ -84,11 +84,11 @@ export default async function StockPage({
           <input name="item" placeholder="Item *" required className={INPUT} />
           <input name="brand" placeholder="Brand" className={INPUT} />
           <input name="category" placeholder="Category" list="stockcats" className={INPUT} />
+          <input name="website" placeholder="Website / where to buy" className={INPUT} />
           <input name="unit" placeholder="Unit (L, ml)" className={INPUT} />
-          <input name="min_qty" type="number" step={0.1} min={0} placeholder="Need (min)" className={INPUT} />
-          <input name="current_qty" type="number" step={0.1} min={0} placeholder="Have (current)" className={INPUT} />
-          <input name="website" placeholder="Website (optional)" className={`${INPUT} col-span-2 sm:col-span-3`} />
-          <input name="notes" placeholder="Notes (optional)" className={`${INPUT} col-span-2 sm:col-span-3`} />
+          <input name="min_qty" type="number" step={0.1} min={0} placeholder="Min stock" className={INPUT} />
+          <input name="current_qty" type="number" step={0.1} min={0} placeholder="Current stock" className={INPUT} />
+          <input name="notes" placeholder="Notes" className={`${INPUT} col-span-2`} />
         </div>
         <datalist id="stockcats">
           {cats.map((c) => (
@@ -122,14 +122,16 @@ export default async function StockPage({
                 <table className="w-full border-collapse text-sm">
                   <thead>
                     <tr className="border-b border-white/10">
-                      {["Item", "Brand", "Need", "Have", "Status", "Notes", ""].map((h) => (
-                        <th
-                          key={h}
-                          className="whitespace-nowrap px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-white/40"
-                        >
-                          {h}
-                        </th>
-                      ))}
+                      {["Item", "Brand", "Website", "Min", "Have", "Status", "Date", "Notes", ""].map(
+                        (h) => (
+                          <th
+                            key={h}
+                            className="whitespace-nowrap px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-white/40"
+                          >
+                            {h}
+                          </th>
+                        )
+                      )}
                     </tr>
                   </thead>
                   <tbody>
@@ -146,9 +148,26 @@ export default async function StockPage({
                             {it.item}
                           </td>
                           <td className="whitespace-nowrap px-3 py-2 text-white/50">{it.brand}</td>
-                          <td className="whitespace-nowrap px-3 py-2 text-white/60 tabular-nums">
-                            {it.min_qty}
-                            {it.unit}
+                          <td className="px-3 py-2">
+                            <input
+                              name={`web::${it.id}`}
+                              defaultValue={it.website}
+                              placeholder="—"
+                              className={`${CELL} w-24`}
+                            />
+                          </td>
+                          <td className="px-3 py-2">
+                            <span className="inline-flex items-center rounded-lg border border-white/12 bg-black/40 focus-within:border-brand-green">
+                              <input
+                                type="number"
+                                name={`min::${it.id}`}
+                                defaultValue={it.min_qty}
+                                min={0}
+                                step={0.1}
+                                className="w-12 bg-transparent px-1.5 py-1 text-right text-white/70 outline-none"
+                              />
+                              <span className="pr-1.5 text-xs text-white/35">{it.unit}</span>
+                            </span>
                           </td>
                           <td className="px-3 py-2">
                             <span className="inline-flex items-center rounded-lg border border-white/12 bg-black/40 focus-within:border-brand-green">
@@ -159,7 +178,7 @@ export default async function StockPage({
                                 min={0}
                                 step={0.1}
                                 inputMode="decimal"
-                                className="w-14 bg-transparent px-2 py-1 text-right text-white outline-none"
+                                className="w-12 bg-transparent px-1.5 py-1 text-right text-white outline-none"
                               />
                               <span className="pr-1.5 text-xs text-white/40">{it.unit}</span>
                             </span>
@@ -175,12 +194,15 @@ export default async function StockPage({
                               </span>
                             )}
                           </td>
+                          <td className="whitespace-nowrap px-3 py-2 text-xs tabular-nums text-white/40">
+                            {it.updated_at}
+                          </td>
                           <td className="px-3 py-2">
                             <input
                               name={`note::${it.id}`}
                               defaultValue={it.notes}
                               placeholder="—"
-                              className="w-full min-w-[7rem] rounded border border-white/10 bg-black/40 px-2 py-1 text-xs text-white outline-none placeholder:text-white/25 focus:border-brand-green"
+                              className={`${CELL} w-28`}
                             />
                           </td>
                           <td className="px-3 py-2 text-right">

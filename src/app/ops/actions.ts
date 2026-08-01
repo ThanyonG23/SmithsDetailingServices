@@ -189,6 +189,8 @@ export async function saveStock(formData: FormData): Promise<void> {
     .map((id) => ({
       id,
       current_qty: Number(formData.get(`cur::${id}`)) || 0,
+      min_qty: Number(formData.get(`min::${id}`)) || 0,
+      website: String(formData.get(`web::${id}`) || "").slice(0, 300),
       notes: String(formData.get(`note::${id}`) || "").slice(0, 500),
     }));
   await updateStock(entries);

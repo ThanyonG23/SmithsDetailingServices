@@ -329,13 +329,15 @@ export interface StockItem {
   min_qty: number;
   current_qty: number;
   notes: string;
+  updated_at: string; // "DD/MM/YY" Cairns
 }
 
 export async function getStock(): Promise<StockItem[]> {
   await ensureTable();
   const rows = await sql`
     SELECT id, category, item, brand, website, unit,
-           min_qty::float8 AS min_qty, current_qty::float8 AS current_qty, notes
+           min_qty::float8 AS min_qty, current_qty::float8 AS current_qty, notes,
+           to_char(updated_at AT TIME ZONE 'Australia/Brisbane', 'DD/MM/YY') AS updated_at
     FROM stock_items
     ORDER BY category, item;
   `;
@@ -352,14 +354,15 @@ export async function addStockItem(i: Omit<StockItem, "id">): Promise<void> {
 }
 
 export async function updateStock(
-  entries: { id: number; current_qty: number; notes: string }[]
+  entries: { id: number; current_qty: number; min_qty: number; website: string; notes: string }[]
 ): Promise<void> {
   await ensureTable();
   for (const e of entries) {
     if (!e.id) continue;
     await sql`
       UPDATE stock_items
-      SET current_qty = ${e.current_qty}, notes = ${e.notes}, updated_at = now()
+      SET current_qty = ${e.current_qty}, min_qty = ${e.min_qty},
+          website = ${e.website}, notes = ${e.notes}, updated_at = now()
       WHERE id = ${e.id};
     `;
   }
