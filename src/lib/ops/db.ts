@@ -39,7 +39,13 @@ const connectionString =
   process.env.DATABASE_URL ||
   "";
 
-const sql = postgres(connectionString, { ssl: "require", prepare: false, max: 1 });
+const sql = postgres(connectionString, {
+  ssl: "require",
+  prepare: false,
+  max: 1,
+  idle_timeout: 20, // recycle idle connections (serverless-friendly)
+  connect_timeout: 15, // fail fast instead of hanging on a bad connection
+});
 
 // Memoise a single in-flight promise so parallel reads on a cold start
 // don't each run the schema DDL. Resets on failure so it can retry.
@@ -338,7 +344,6 @@ export interface StockItem {
 }
 
 export async function getStock(): Promise<StockItem[]> {
-  await ensureTable();
   const rows = await sql`
     SELECT id, category, item, brand, website, unit,
            min_qty::float8 AS min_qty, current_qty::float8 AS current_qty, notes, ordered,
@@ -392,7 +397,6 @@ export async function clearStock(): Promise<void> {
 }
 
 export async function getReorderCount(): Promise<number> {
-  await ensureTable();
   const rows = await sql`
     SELECT count(*)::int AS n FROM stock_items WHERE current_qty < min_qty AND ordered = false;
   `;
