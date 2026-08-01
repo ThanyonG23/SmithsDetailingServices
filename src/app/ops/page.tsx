@@ -323,7 +323,8 @@ export default async function OpsPage({
   } catch {
     /* dbError already surfaced */
   }
-  const pendingFollowups = followups.filter((f) => !f.done).length;
+  const pendingFollowupList = followups.filter((f) => !f.done);
+  const pendingFollowups = pendingFollowupList.length;
   const fuOk = searchParams?.fuok;
 
   let reorderCount = 0;
@@ -891,16 +892,20 @@ export default async function OpsPage({
             <p className="text-sm text-white/45">
               No jobs in the last 3 days — check-ins show here once cars are booked.
             </p>
+          ) : pendingFollowupList.length === 0 ? (
+            <p className="text-sm font-semibold text-brand-green">
+              All recent customers checked in ✓ — nice work.
+            </p>
           ) : (
             <>
               <p className="mb-3 text-xs leading-relaxed text-white/45">
-                Jobs from the last 3 days. Tick a customer{" "}
-                <b className="text-white/70">only once they&apos;ve confirmed they&apos;re happy</b>.
-                Anything left unticked (red) still needs a follow-up.
+                These customers need a day-after check-in. Tick each one{" "}
+                <b className="text-white/70">only once they&apos;ve confirmed they&apos;re happy</b> —
+                it drops off the list when you save.
               </p>
               <form action={logFollowups} className={`${CARD} p-4`}>
                 <div className="flex flex-col gap-2">
-                  {followups.map((f) => (
+                  {pendingFollowupList.map((f) => (
                     <label
                       key={f.uid}
                       className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 transition ${
