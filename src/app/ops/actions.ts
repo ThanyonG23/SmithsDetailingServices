@@ -9,7 +9,7 @@ import {
   replaceBookings,
   replaceAds,
   saveJobHours as saveJobHoursDb,
-  saveFollowups as saveFollowupsDb,
+  setFollowupStatus,
   addStockItem,
   updateStock,
   deleteStockItem,
@@ -141,14 +141,14 @@ export async function logJobHours(formData: FormData): Promise<void> {
   redirect("/ops?jobsok=1");
 }
 
-/* Save which recent customers have been checked in on (day-after follow-up). */
-export async function logFollowups(formData: FormData): Promise<void> {
-  const uids: string[] = [];
-  for (const [key] of formData.entries()) {
-    if (key.startsWith("fup::")) uids.push(key.slice(5));
+/* Record a customer check-in outcome: happy (done), unhappy (needs rectify),
+   or rectified (rectify job sorted). Auto-feeds the happy/unhappy tally. */
+export async function setCheckin(formData: FormData): Promise<void> {
+  const uid = String(formData.get("uid") || "");
+  const outcome = String(formData.get("outcome") || "");
+  if (uid && ["happy", "unhappy", "rectified"].includes(outcome)) {
+    await setFollowupStatus(uid, outcome);
   }
-  const entries = uids.map((uid) => ({ uid, done: formData.has(`fu::${uid}`) }));
-  await saveFollowupsDb(entries);
   revalidatePath("/ops");
   redirect("/ops?fuok=1");
 }

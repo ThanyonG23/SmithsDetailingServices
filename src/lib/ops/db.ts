@@ -88,6 +88,9 @@ async function ensureTable(): Promise<void> {
       updated_at timestamptz  NOT NULL DEFAULT now()
     );
   `;
+  // status: 'pending' | 'happy' | 'unhappy' | 'rectified'
+  await sql`ALTER TABLE job_followups ADD COLUMN IF NOT EXISTS status text NOT NULL DEFAULT 'pending';`;
+  await sql`UPDATE job_followups SET status = 'happy' WHERE done = true AND status = 'pending';`;
   await sql`
     CREATE TABLE IF NOT EXISTS stock_items (
       id          serial        PRIMARY KEY,
@@ -254,15 +257,16 @@ export async function saveJobHours(entries: { uid: string; hours: number }[]): P
 /* ---- customer check-ins (day-after follow-up) --------------------- */
 
 export interface JobFollowup extends Booking {
-  done: boolean;
+  status: string; // pending | happy | unhappy | rectified
 }
 
+/** Recent jobs with their check-in status (for the "who still needs a check-in" list). */
 export async function getFollowups(fromISO: string, toISO: string): Promise<JobFollowup[]> {
   await ensureTable();
   const rows = await sql`
     SELECT b.uid, to_char(b.booking_date, 'YYYY-MM-DD') AS booking_date,
            b.value::float8 AS value, b.is_correction, b.summary,
-           COALESCE(f.done, false) AS done
+           COALESCE(f.status, 'pending') AS status
     FROM bookings b
     LEFT JOIN job_followups f ON f.uid = b.uid
     WHERE b.booking_date >= ${fromISO} AND b.booking_date <= ${toISO}
@@ -271,16 +275,46 @@ export async function getFollowups(fromISO: string, toISO: string): Promise<JobF
   return rows as unknown as JobFollowup[];
 }
 
-export async function saveFollowups(entries: { uid: string; done: boolean }[]): Promise<void> {
+/** Set a customer's check-in outcome, keyed to the calendar UID. */
+export async function setFollowupStatus(uid: string, status: string): Promise<void> {
   await ensureTable();
-  for (const e of entries) {
-    if (!e.uid) continue;
-    await sql`
-      INSERT INTO job_followups (uid, done, updated_at)
-      VALUES (${e.uid}, ${e.done}, now())
-      ON CONFLICT (uid) DO UPDATE SET done = EXCLUDED.done, updated_at = now();
-    `;
-  }
+  await sql`
+    INSERT INTO job_followups (uid, status, done, updated_at)
+    VALUES (${uid}, ${status}, ${status === "happy"}, now())
+    ON CONFLICT (uid) DO UPDATE SET status = EXCLUDED.status, done = EXCLUDED.done, updated_at = now();
+  `;
+}
+
+/** Unhappy customers still awaiting a rectify job (any date, until sorted). */
+export async function getRectifyList(): Promise<JobFollowup[]> {
+  await ensureTable();
+  const rows = await sql`
+    SELECT b.uid, to_char(b.booking_date, 'YYYY-MM-DD') AS booking_date,
+           b.value::float8 AS value, b.is_correction, b.summary, f.status AS status
+    FROM job_followups f
+    JOIN bookings b ON b.uid = f.uid
+    WHERE f.status = 'unhappy'
+    ORDER BY b.booking_date DESC;
+  `;
+  return rows as unknown as JobFollowup[];
+}
+
+/** Happy vs unhappy tally over a period (jobs booked in that window). */
+export async function getSatisfaction(
+  fromISO: string,
+  toISO: string
+): Promise<{ happy: number; unhappy: number }> {
+  await ensureTable();
+  const rows = await sql`
+    SELECT
+      count(*) FILTER (WHERE f.status = 'happy')::int                     AS happy,
+      count(*) FILTER (WHERE f.status IN ('unhappy','rectified'))::int    AS unhappy
+    FROM job_followups f
+    JOIN bookings b ON b.uid = f.uid
+    WHERE b.booking_date >= ${fromISO} AND b.booking_date <= ${toISO};
+  `;
+  const r = rows[0] as { happy: number; unhappy: number } | undefined;
+  return { happy: r?.happy ?? 0, unhappy: r?.unhappy ?? 0 };
 }
 
 /* ---- stocktake ----------------------------------------------------- */

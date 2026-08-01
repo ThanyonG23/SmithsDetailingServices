@@ -8,6 +8,8 @@ import {
   getAds,
   getJobsForDate,
   getFollowups,
+  getRectifyList,
+  getSatisfaction,
   getReorderCount,
   type DailyLog,
   type Booking,
@@ -22,7 +24,7 @@ import {
   uploadCalendar,
   uploadAds,
   logJobHours,
-  logFollowups,
+  setCheckin,
 } from "./actions";
 import StaffHours from "@/components/ops/StaffHours";
 import Reveal from "@/components/Reveal";
@@ -323,9 +325,25 @@ export default async function OpsPage({
   } catch {
     /* dbError already surfaced */
   }
-  const pendingFollowupList = followups.filter((f) => !f.done);
+  const pendingFollowupList = followups.filter((f) => f.status === "pending");
   const pendingFollowups = pendingFollowupList.length;
   const fuOk = searchParams?.fuok;
+
+  // unhappy customers awaiting a rectify job (any date)
+  let rectifyList: JobFollowup[] = [];
+  try {
+    rectifyList = await getRectifyList();
+  } catch {
+    /* dbError already surfaced */
+  }
+  // happy vs unhappy this month (auto-tracked from check-ins)
+  const monthStartISO = today.slice(0, 7) + "-01";
+  let satisfaction = { happy: 0, unhappy: 0 };
+  try {
+    satisfaction = await getSatisfaction(monthStartISO, today);
+  } catch {
+    /* dbError already surfaced */
+  }
 
   let reorderCount = 0;
   try {
@@ -373,10 +391,10 @@ export default async function OpsPage({
   const alerts: { tone: "red" | "yellow"; text: string }[] = [];
   if (!loggedToday)
     alerts.push({ tone: "yellow", text: "Today isn't logged yet — fill in the day before you knock off." });
-  if ((entry?.unhappy_customers ?? 0) > 0)
+  if (rectifyList.length > 0)
     alerts.push({
       tone: "red",
-      text: `${entry?.unhappy_customers} unhappy customer(s) today — follow up before it becomes a review.`,
+      text: `${rectifyList.length} unhappy customer(s) need a rectify job booked — sort it before it becomes a review.`,
     });
   if (pendingFollowups > 0)
     alerts.push({
@@ -592,14 +610,16 @@ export default async function OpsPage({
             sub="work done today"
           />
           <StatTile
-            label="Happy"
-            value={String(entry?.happy_customers ?? 0)}
-            tone={(entry?.happy_customers ?? 0) > 0 ? "green" : "neutral"}
+            label="Happy (mo)"
+            value={String(satisfaction.happy)}
+            sub="checked-in ✓"
+            tone={satisfaction.happy > 0 ? "green" : "neutral"}
           />
           <StatTile
-            label="Unhappy"
-            value={String(entry?.unhappy_customers ?? 0)}
-            tone={(entry?.unhappy_customers ?? 0) > 0 ? "yellow" : "neutral"}
+            label="Unhappy (mo)"
+            value={String(satisfaction.unhappy)}
+            sub="this month"
+            tone={satisfaction.unhappy > 0 ? "yellow" : "neutral"}
           />
         </div>
       </Reveal>
@@ -877,17 +897,54 @@ export default async function OpsPage({
         </section>
       </Reveal>
 
-      {/* ── CUSTOMER CHECK-INS (day-after follow-up) ─────────────── */}
+      {/* ── CUSTOMER CHECK-INS (happy → done · unhappy → rectify) ── */}
       <Reveal delay={255}>
         <section className="mt-8">
           <SectionTitle eyebrow="Customer care" title="Check-ins" />
 
           {fuOk && (
             <div className="mb-3 rounded-xl border border-brand-green/40 bg-brand-green/[0.08] px-4 py-2.5 text-sm font-semibold text-brand-green">
-              Check-ins saved ✓
+              Saved ✓
             </div>
           )}
 
+          {/* unhappy → rectify jobs to book */}
+          {rectifyList.length > 0 && (
+            <div className="mb-4">
+              <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-red-300">
+                🔧 Rectify jobs to book
+              </div>
+              <div className="flex flex-col gap-2">
+                {rectifyList.map((f) => (
+                  <div
+                    key={f.uid}
+                    className="flex items-center gap-3 rounded-xl border border-red-500/30 bg-red-500/[0.06] px-3 py-2.5"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-semibold text-white/85">
+                        {f.summary || "(no title)"}
+                      </div>
+                      <div className="text-xs text-white/40">
+                        {dayLabel(f.booking_date)} · {money(f.value)} · unhappy
+                      </div>
+                    </div>
+                    <form action={setCheckin}>
+                      <input type="hidden" name="uid" value={f.uid} />
+                      <button
+                        name="outcome"
+                        value="rectified"
+                        className="shrink-0 rounded-full border border-white/15 px-3 py-1.5 text-[11px] font-bold text-white/70 transition hover:border-brand-green hover:text-brand-green"
+                      >
+                        Rectify sorted ✓
+                      </button>
+                    </form>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* pending check-ins */}
           {followups.length === 0 ? (
             <p className="text-sm text-white/45">
               No jobs in the last 3 days — check-ins show here once cars are booked.
@@ -899,48 +956,45 @@ export default async function OpsPage({
           ) : (
             <>
               <p className="mb-3 text-xs leading-relaxed text-white/45">
-                These customers need a day-after check-in. Tick each one{" "}
-                <b className="text-white/70">only once they&apos;ve confirmed they&apos;re happy</b> —
-                it drops off the list when you save.
+                Message each the day after. When they reply, mark it —{" "}
+                <b className="text-white/70">Happy</b> clears it,{" "}
+                <b className="text-white/70">Not happy</b> books a rectify job. This auto-fills your
+                happy/unhappy numbers.
               </p>
-              <form action={logFollowups} className={`${CARD} p-4`}>
-                <div className="flex flex-col gap-2">
-                  {pendingFollowupList.map((f) => (
-                    <label
-                      key={f.uid}
-                      className={`flex cursor-pointer items-center gap-3 rounded-xl border px-3 py-2.5 transition ${
-                        f.done
-                          ? "border-brand-green/25 bg-brand-green/[0.05]"
-                          : "border-red-500/25 bg-red-500/[0.06]"
-                      }`}
-                    >
-                      <input type="hidden" name={`fup::${f.uid}`} value="1" />
-                      <input
-                        type="checkbox"
-                        name={`fu::${f.uid}`}
-                        defaultChecked={f.done}
-                        className="h-5 w-5 shrink-0 accent-brand-green"
-                      />
-                      <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm font-semibold text-white/85">
-                          {f.summary || "(no title)"}
-                        </div>
-                        <div className="text-xs text-white/40">
-                          {dayLabel(f.booking_date)} · {money(f.value)}
-                        </div>
+              <div className={`${CARD} flex flex-col gap-2 p-4`}>
+                {pendingFollowupList.map((f) => (
+                  <div
+                    key={f.uid}
+                    className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/25 px-3 py-2.5"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-semibold text-white/85">
+                        {f.summary || "(no title)"}
                       </div>
-                      {!f.done && (
-                        <span className="shrink-0 text-[11px] font-bold uppercase tracking-wider text-red-300">
-                          Follow up
-                        </span>
-                      )}
-                    </label>
-                  ))}
-                </div>
-                <button className="mt-3 rounded-full bg-brand-green px-6 py-2.5 text-xs font-black text-[#04130a] transition hover:brightness-110 active:scale-95">
-                  Save check-ins
-                </button>
-              </form>
+                      <div className="text-xs text-white/40">
+                        {dayLabel(f.booking_date)} · {money(f.value)}
+                      </div>
+                    </div>
+                    <form action={setCheckin} className="flex shrink-0 gap-1.5">
+                      <input type="hidden" name="uid" value={f.uid} />
+                      <button
+                        name="outcome"
+                        value="happy"
+                        className="rounded-full bg-brand-green px-3 py-1.5 text-[11px] font-black text-[#04130a] transition hover:brightness-110 active:scale-95"
+                      >
+                        😊 Happy
+                      </button>
+                      <button
+                        name="outcome"
+                        value="unhappy"
+                        className="rounded-full border border-red-500/40 bg-red-500/[0.12] px-3 py-1.5 text-[11px] font-bold text-red-300 transition hover:bg-red-500/20"
+                      >
+                        Not happy
+                      </button>
+                    </form>
+                  </div>
+                ))}
+              </div>
             </>
           )}
         </section>
@@ -1113,17 +1167,10 @@ export default async function OpsPage({
               defaultValue={entry?.quotes ?? ""}
             />
             <NumField label="Re-dos" name="redos" defaultValue={entry?.redos ?? ""} />
-            <NumField
-              label="Happy customers"
-              name="happy_customers"
-              defaultValue={entry?.happy_customers ?? ""}
-            />
-            <NumField
-              label="Unhappy customers"
-              name="unhappy_customers"
-              defaultValue={entry?.unhappy_customers ?? ""}
-            />
           </div>
+          <p className="mt-2 text-xs text-white/35">
+            Happy/unhappy customers are tracked automatically from the check-ins above.
+          </p>
         </section>
 
         {/* the crew */}
@@ -1186,7 +1233,7 @@ export default async function OpsPage({
               <table className="w-full border-collapse text-sm tabular-nums">
                 <thead>
                   <tr className="border-b border-white/10">
-                    {["Date", "Collected", "Compl", "Done", "🙂", "🙁", "Hrs"].map((h) => (
+                    {["Date", "Collected", "Compl", "Done", "Hrs"].map((h) => (
                       <th
                         key={h}
                         className="whitespace-nowrap px-3 py-3 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-white/40"
@@ -1221,8 +1268,6 @@ export default async function OpsPage({
                         </td>
                         <td className="px-3 py-3 text-white/60">{money(r.completed_revenue)}</td>
                         <td className="px-3 py-3 text-white/70">{r.jobs_completed}</td>
-                        <td className="px-3 py-3 text-white/70">{r.happy_customers}</td>
-                        <td className="px-3 py-3 text-white/70">{r.unhappy_customers}</td>
                         <td className="px-3 py-3 text-white/70">{totalHours(r)}</td>
                       </tr>
                     );

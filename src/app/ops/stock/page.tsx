@@ -44,6 +44,9 @@ export default async function StockPage({
       <h1 className="mt-3 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
         Stock<span className="text-brand-green">take</span>
       </h1>
+      <p className="mt-3 text-sm text-white/50">
+        Ashlee keeps the counts current through the week. Anything red needs ordering.
+      </p>
 
       {dbError && (
         <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
@@ -60,13 +63,15 @@ export default async function StockPage({
         </div>
       )}
 
-      {/* reorder summary */}
+      {/* reorder summary — the order list */}
       {reorder.length > 0 && (
         <div className="mt-5 rounded-xl border border-red-500/40 bg-red-500/[0.08] px-4 py-3 text-sm text-red-300">
           <b className="font-bold">
-            🔴 {reorder.length} item{reorder.length === 1 ? "" : "s"} to reorder:
+            🔴 To order ({reorder.length}):
           </b>{" "}
-          {reorder.map((r) => r.item).join(", ")}
+          {reorder
+            .map((r) => `${r.item} (have ${r.current_qty}${r.unit}, need ${r.min_qty}${r.unit})`)
+            .join("  ·  ")}
         </div>
       )}
 
@@ -78,15 +83,8 @@ export default async function StockPage({
           <input name="brand" placeholder="Brand" className={INPUT} />
           <input name="category" placeholder="Category" list="stockcats" className={INPUT} />
           <input name="unit" placeholder="Unit (L, ml)" className={INPUT} />
-          <input name="min_qty" type="number" step={0.1} min={0} placeholder="Min" className={INPUT} />
-          <input
-            name="current_qty"
-            type="number"
-            step={0.1}
-            min={0}
-            placeholder="Current"
-            className={INPUT}
-          />
+          <input name="min_qty" type="number" step={0.1} min={0} placeholder="Need (min)" className={INPUT} />
+          <input name="current_qty" type="number" step={0.1} min={0} placeholder="Have (current)" className={INPUT} />
           <input name="website" placeholder="Website (optional)" className={`${INPUT} col-span-2 sm:col-span-3`} />
           <input name="notes" placeholder="Notes (optional)" className={`${INPUT} col-span-2 sm:col-span-3`} />
         </div>
@@ -100,11 +98,9 @@ export default async function StockPage({
         </button>
       </form>
 
-      {/* the stock list */}
+      {/* the stock table */}
       {items.length === 0 ? (
-        <p className="mt-8 text-sm text-white/45">
-          No stock items yet — add your first one above.
-        </p>
+        <p className="mt-8 text-sm text-white/45">No stock items yet — add your first one above.</p>
       ) : (
         <form action={saveStock} className="mt-8">
           {cats.map((cat) => (
@@ -112,66 +108,87 @@ export default async function StockPage({
               <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-brand-green">
                 {cat}
               </div>
-              <div className="flex flex-col gap-2">
-                {(byCat.get(cat) || []).map((it) => {
-                  const low = it.current_qty < it.min_qty;
-                  return (
-                    <div
-                      key={it.id}
-                      className={`rounded-2xl border p-3.5 ${
-                        low ? "border-red-500/30 bg-red-500/[0.05]" : "border-white/10 bg-white/[0.02]"
-                      }`}
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <div className="font-semibold text-white/90">{it.item}</div>
-                          <div className="truncate text-xs text-white/40">
-                            {it.brand}
-                            {it.website ? ` · ${it.website}` : ""}
-                          </div>
-                        </div>
-                        {low && (
-                          <span className="shrink-0 rounded-full bg-red-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-red-300">
-                            Reorder
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-2 text-sm">
-                        <span className="text-white/40">
-                          Min <b className="text-white/70">{it.min_qty}{it.unit}</b>
-                        </span>
-                        <span className="text-white/40">Now</span>
-                        <span className="inline-flex items-center rounded-lg border border-white/12 bg-black/40 focus-within:border-brand-green">
-                          <input
-                            type="number"
-                            name={`cur::${it.id}`}
-                            defaultValue={it.current_qty}
-                            min={0}
-                            step={0.1}
-                            inputMode="decimal"
-                            className="w-16 bg-transparent px-2 py-1.5 text-right text-white outline-none"
-                          />
-                          <span className="pr-2 text-white/40">{it.unit}</span>
-                        </span>
-                        <input
-                          name={`note::${it.id}`}
-                          defaultValue={it.notes}
-                          placeholder="Notes…"
-                          className="min-w-[8rem] flex-1 rounded-lg border border-white/10 bg-black/40 px-2.5 py-1.5 text-sm text-white outline-none placeholder:text-white/25 focus:border-brand-green"
-                        />
-                        <button
-                          formAction={deleteStock}
-                          name="id"
-                          value={it.id}
-                          className="text-[11px] font-bold text-white/30 transition hover:text-red-400"
+              <div className={`overflow-x-auto ${CARD}`}>
+                <table className="w-full border-collapse text-sm">
+                  <thead>
+                    <tr className="border-b border-white/10">
+                      {["Item", "Brand", "Need", "Have", "Status", "Notes", ""].map((h) => (
+                        <th
+                          key={h}
+                          className="whitespace-nowrap px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-white/40"
                         >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
+                          {h}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {(byCat.get(cat) || []).map((it) => {
+                      const low = it.current_qty < it.min_qty;
+                      return (
+                        <tr
+                          key={it.id}
+                          className={`border-b border-white/[0.06] last:border-0 ${
+                            low ? "bg-red-500/[0.05]" : ""
+                          }`}
+                        >
+                          <td className="whitespace-nowrap px-3 py-2 font-semibold text-white/85">
+                            {it.item}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-2 text-white/50">{it.brand}</td>
+                          <td className="whitespace-nowrap px-3 py-2 text-white/60 tabular-nums">
+                            {it.min_qty}
+                            {it.unit}
+                          </td>
+                          <td className="px-3 py-2">
+                            <span className="inline-flex items-center rounded-lg border border-white/12 bg-black/40 focus-within:border-brand-green">
+                              <input
+                                type="number"
+                                name={`cur::${it.id}`}
+                                defaultValue={it.current_qty}
+                                min={0}
+                                step={0.1}
+                                inputMode="decimal"
+                                className="w-14 bg-transparent px-2 py-1 text-right text-white outline-none"
+                              />
+                              <span className="pr-1.5 text-xs text-white/40">{it.unit}</span>
+                            </span>
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-2">
+                            {low ? (
+                              <span className="rounded-full bg-red-500/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-red-300">
+                                Order
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-green/70">
+                                OK
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-3 py-2">
+                            <input
+                              name={`note::${it.id}`}
+                              defaultValue={it.notes}
+                              placeholder="—"
+                              className="w-full min-w-[7rem] rounded border border-white/10 bg-black/40 px-2 py-1 text-xs text-white outline-none placeholder:text-white/25 focus:border-brand-green"
+                            />
+                          </td>
+                          <td className="px-3 py-2 text-right">
+                            <button
+                              formAction={deleteStock}
+                              name="id"
+                              value={it.id}
+                              aria-label="Delete item"
+                              className="text-sm font-bold text-white/25 transition hover:text-red-400"
+                            >
+                              ✕
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               </div>
             </section>
           ))}
