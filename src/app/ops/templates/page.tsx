@@ -93,16 +93,21 @@ export default async function TemplatesPage({
 
       {/* add template */}
       <form action={saveTemplate} className={`mt-4 ${CARD} p-4`}>
-        <div className="mb-2 text-sm font-bold text-white">Add a template</div>
-        <input name="title" placeholder="Title (e.g. Exterior Correction Package)" className={INPUT} />
+        <div className="mb-1 text-sm font-bold text-white">Add a template</div>
+        <p className="mb-2 text-xs text-white/45">
+          Put the <b className="text-white/60">package name</b> in the title, then paste the whole
+          family in the body. Vehicle sizes separated by a blank gap auto-split into one copyable
+          template each (e.g. &ldquo;Premium Detail — SUV&rdquo;).
+        </p>
+        <input name="title" placeholder="Package name (e.g. Premium Detail)" className={INPUT} />
         <textarea
           name="body"
           rows={6}
-          placeholder="Paste the full package text here…"
+          placeholder="Paste the full package — all vehicle sizes — here…"
           className={`${INPUT} mt-2 resize-y`}
         />
         <button className="mt-3 rounded-full bg-brand-green px-5 py-2 text-xs font-black text-[#04130a] transition hover:brightness-110 active:scale-95">
-          Save template
+          Save template(s)
         </button>
       </form>
 

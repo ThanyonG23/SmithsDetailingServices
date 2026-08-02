@@ -343,16 +343,34 @@ const STARTER_STOCK: Omit<StockItem, "id" | "updated_at" | "ordered">[] = (
 
 /* ---- templates (quote/package library) ----------------------------- */
 
+/** Pull the size label out of a variant block (the 🔶 line, else first line). */
+function variantLabel(block: string): string {
+  const lines = block.split("\n").map((l) => l.trim()).filter(Boolean);
+  const hex = lines.find((l) => l.includes("🔶"));
+  return (hex ? hex.replace(/🔶/g, "").trim() : lines[0] || "").slice(0, 40);
+}
+
 export async function saveTemplate(formData: FormData): Promise<void> {
-  const id = Number(formData.get("id")) || null;
-  const title = String(formData.get("title") || "").trim().slice(0, 120);
-  const body = String(formData.get("body") || "")
-    .replace(/\r\n/g, "\n")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim()
-    .slice(0, 6000);
-  if (!title && !body) redirect("/ops/templates");
-  await upsertTemplate(id, title, body);
+  const family = String(formData.get("title") || "").trim().slice(0, 100);
+  const raw = String(formData.get("body") || "").replace(/\r\n/g, "\n");
+  // Split a multi-variant paste on the big blank-line gaps (4+ newlines);
+  // tidy each block's internal spacing.
+  const blocks = raw
+    .split(/\n[ \t]*(?:\n[ \t]*){3,}/)
+    .map((b) => b.replace(/\n{3,}/g, "\n\n").replace(/[ \t]+\n/g, "\n").trim())
+    .filter((b) => b.length > 25);
+  if (blocks.length === 0) redirect("/ops/templates");
+
+  if (blocks.length === 1) {
+    await upsertTemplate(null, family || variantLabel(blocks[0]) || "Template", blocks[0]);
+  } else {
+    // one copyable template per vehicle-size variant
+    for (const b of blocks) {
+      const size = variantLabel(b);
+      const title = family ? (size ? `${family} — ${size}` : family) : size || "Template";
+      await upsertTemplate(null, title.slice(0, 120), b);
+    }
+  }
   revalidatePath("/ops/templates");
   redirect("/ops/templates?tok=saved");
 }
