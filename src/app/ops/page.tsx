@@ -12,6 +12,7 @@ import {
   getSatisfaction,
   getReorderCount,
   getGrowthSeries,
+  getChecklist,
   type DailyLog,
   type Booking,
   type AdRow,
@@ -29,6 +30,7 @@ import {
   setCheckin,
 } from "./actions";
 import StaffHours from "@/components/ops/StaffHours";
+import RunSheet from "@/components/ops/RunSheet";
 
 // Reveal is a no-op on ops — the scroll fade-in was slowing Ashlee down,
 // so render everything instantly.
@@ -237,6 +239,7 @@ export default async function OpsPage({
   let satisfaction = { happy: 0, unhappy: 0 };
   let reorderCount = 0;
   let growth: GrowthDay[] = [];
+  let checklist: string[] = [];
   let dbError = false;
   try {
     // Load sequentially (object properties evaluate in order) on the single
@@ -255,6 +258,7 @@ export default async function OpsPage({
         satisfaction: await getSatisfaction(monthStartISO, today),
         reorderCount: await getReorderCount(),
         growth: await getGrowthSeries(from60, today),
+        checklist: await getChecklist(today),
       }))(),
       new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 9000)),
     ]);
@@ -269,6 +273,7 @@ export default async function OpsPage({
       satisfaction,
       reorderCount,
       growth,
+      checklist,
     } = data);
   } catch {
     dbError = true;
@@ -532,6 +537,15 @@ export default async function OpsPage({
               </div>
             ))}
           </section>
+        </Reveal>
+      )}
+
+      {/* ── ASHLEE'S RUN SHEET ───────────────────────────────────── */}
+      {isToday && (
+        <Reveal delay={60}>
+          <div className="mt-6">
+            <RunSheet today={today} initial={checklist} />
+          </div>
         </Reveal>
       )}
 

@@ -69,7 +69,7 @@ async function runEnsure(): Promise<void> {
     const rows = await sql`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'daily_log' AND column_name = 'messages_meta'
+        WHERE table_name = 'daily_log' AND column_name = 'checklist'
       ) AS ready;
     `;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
@@ -165,6 +165,7 @@ async function runEnsure(): Promise<void> {
     );
   `;
   await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS messages_meta integer NOT NULL DEFAULT 0;`;
+  await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS checklist jsonb NOT NULL DEFAULT '[]'::jsonb;`;
   await sql`
     CREATE TABLE IF NOT EXISTS ad_stats (
       id           serial        PRIMARY KEY,
@@ -297,6 +298,30 @@ export async function setMetaMessages(date: string, count: number): Promise<void
     INSERT INTO daily_log (log_date, messages_meta, updated_at)
     VALUES (${date}, ${count}, now())
     ON CONFLICT (log_date) DO UPDATE SET messages_meta = ${count}, updated_at = now();
+  `;
+}
+
+/* ---- daily run sheet (Ashlee's checklist) -------------------------- */
+
+/** Checked run-sheet item keys for a day. Crash-safe if the column doesn't
+    exist yet (returns []), so it never breaks the dashboard pre-migration. */
+export async function getChecklist(date: string): Promise<string[]> {
+  try {
+    const rows = await sql`SELECT checklist FROM daily_log WHERE log_date = ${date};`;
+    const c = (rows[0] as { checklist?: unknown } | undefined)?.checklist;
+    return Array.isArray(c) ? (c as string[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export async function setChecklist(date: string, keys: string[]): Promise<void> {
+  await ensureTable();
+  const json = JSON.stringify(keys);
+  await sql`
+    INSERT INTO daily_log (log_date, checklist, updated_at)
+    VALUES (${date}, ${json}::jsonb, now())
+    ON CONFLICT (log_date) DO UPDATE SET checklist = ${json}::jsonb, updated_at = now();
   `;
 }
 

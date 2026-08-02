@@ -17,6 +17,7 @@ import {
   clearStock,
   setOrdered,
   setMetaMessages,
+  setChecklist,
   getStock,
   type StockItem,
 } from "@/lib/ops/db";
@@ -217,6 +218,14 @@ export async function deleteStock(formData: FormData): Promise<void> {
   if (Number.isFinite(id) && id > 0) await deleteStockItem(id);
   revalidatePath("/ops/stock");
   redirect("/ops/stock?stockok=deleted");
+}
+
+/* Save Ashlee's daily run-sheet ticks (called from the client, no reload). */
+export async function saveChecklist(date: string, keys: string[]): Promise<void> {
+  const d = String(date || "").slice(0, 10);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
+  const clean = (Array.isArray(keys) ? keys : []).map((k) => String(k).slice(0, 40)).slice(0, 60);
+  await setChecklist(d, clean);
 }
 
 /* Tick a low item off the order list (or un-tick it). */
