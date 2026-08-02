@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { isAuthed } from "@/lib/ops/auth";
 import { getTemplates, type Template } from "@/lib/ops/db";
-import { saveTemplate, removeTemplate } from "../actions";
+import { saveTemplate, removeTemplate, seedTemplates } from "../actions";
 import CopyButton from "@/components/ops/CopyButton";
 
 export const metadata: Metadata = {
@@ -50,9 +50,27 @@ export default async function TemplatesPage({
       )}
       {searchParams?.tok && (
         <div className="mt-5 rounded-xl border border-brand-green/40 bg-brand-green/[0.08] px-4 py-2.5 text-sm font-semibold text-brand-green">
-          {searchParams.tok === "deleted" ? "Template removed ✓" : "Template saved ✓"}
+          {searchParams.tok === "deleted"
+            ? "Template removed ✓"
+            : searchParams.tok === "seeded"
+            ? "Standard templates loaded ✓"
+            : "Template saved ✓"}
         </div>
       )}
+
+      {/* load the standard Cairns set */}
+      <form action={seedTemplates} className={`mt-5 ${CARD} flex flex-wrap items-center justify-between gap-3 p-4`}>
+        <div>
+          <div className="text-sm font-bold text-white">Load Smiths standard templates (13)</div>
+          <div className="mt-0.5 text-xs text-white/45">
+            Correction · Cut &amp; Polish · Premium Detail — one per vehicle size.{" "}
+            <b className="text-brand-yellow/80">Replaces all current templates.</b>
+          </div>
+        </div>
+        <button className="shrink-0 rounded-full bg-brand-green px-5 py-2.5 text-xs font-black text-[#04130a] transition hover:brightness-110 active:scale-95">
+          Load standard set
+        </button>
+      </form>
 
       {templates.length > 0 ? (
         <div className="mt-6 flex flex-col gap-3">

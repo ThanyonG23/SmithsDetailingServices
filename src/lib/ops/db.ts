@@ -741,6 +741,17 @@ export async function deleteTemplate(id: number): Promise<void> {
   await sql`DELETE FROM templates WHERE id = ${id};`;
 }
 
+/** Replace the whole template library (used by the standard-set loader). */
+export async function replaceTemplates(
+  list: { title: string; body: string; sort: number }[]
+): Promise<void> {
+  await ensureTable();
+  await sql`DELETE FROM templates;`;
+  if (list.length) {
+    await sql`INSERT INTO templates ${sql(list, "title", "body", "sort")}`;
+  }
+}
+
 /* ---- export --------------------------------------------------------- */
 
 export async function getAllLogs(): Promise<Record<string, unknown>[]> {
