@@ -41,6 +41,26 @@ function parseLine(line: string): string[] {
 const num = (s: string | undefined) =>
   parseFloat(String(s || "").replace(/[^0-9.\-]/g, "")) || 0;
 
+/** Reporting date range across the export (min "Reporting starts" / max
+    "Reporting ends"), as YYYY-MM-DD. Used to record daily Meta leads. */
+export function parseAdsPeriod(text: string): { start: string | null; end: string | null } {
+  const lines = text.replace(/^﻿/, "").split(/\r?\n/).filter((l) => l.trim());
+  if (lines.length < 2) return { start: null, end: null };
+  const hdr = parseLine(lines[0]).map((h) => h.toLowerCase().trim());
+  const iStart = hdr.findIndex((h) => h.includes("reporting starts"));
+  const iEnd = hdr.findIndex((h) => h.includes("reporting ends"));
+  let start: string | null = null;
+  let end: string | null = null;
+  for (let i = 1; i < lines.length; i++) {
+    const f = parseLine(lines[i]);
+    const s = iStart >= 0 ? (f[iStart] || "").trim().slice(0, 10) : "";
+    const e = iEnd >= 0 ? (f[iEnd] || "").trim().slice(0, 10) : "";
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s) && (!start || s < start)) start = s;
+    if (/^\d{4}-\d{2}-\d{2}$/.test(e) && (!end || e > end)) end = e;
+  }
+  return { start, end };
+}
+
 export function parseAdsCsv(text: string): AdRow[] {
   const lines = text.replace(/^﻿/, "").split(/\r?\n/).filter((l) => l.trim());
   if (lines.length < 2) return [];

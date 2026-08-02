@@ -16,12 +16,13 @@ import {
   deleteStockItem,
   clearStock,
   setOrdered,
+  setMetaMessages,
   getStock,
   type StockItem,
 } from "@/lib/ops/db";
 import { OPS_STAFF, hoursBetween, cairnsToday } from "@/lib/ops/config";
 import { parseBookingsIcs } from "@/lib/ops/calendar";
-import { parseAdsCsv } from "@/lib/ops/ads";
+import { parseAdsCsv, parseAdsPeriod } from "@/lib/ops/ads";
 
 export async function login(formData: FormData): Promise<void> {
   const password = String(formData.get("password") || "");
@@ -120,18 +121,27 @@ export async function uploadCalendar(formData: FormData): Promise<void> {
   redirect(`/ops?calok=${bookings.length}`);
 }
 
-/* Upload the Meta ads CSV → parse per-ad stats → replace the snapshot. */
+/* Upload the Meta ads CSV → parse per-ad stats → replace the snapshot.
+   If it's a single-day export, also auto-record that day's Meta leads. */
 export async function uploadAds(formData: FormData): Promise<void> {
   const file = formData.get("ads") as File | null;
-  if (!file || file.size === 0) redirect("/ops?aderr=nofile");
+  if (!file || file.size === 0) redirect("/ops/ads?aderr=nofile");
 
   const text = Buffer.from(await file.arrayBuffer()).toString("utf8");
   const rows = parseAdsCsv(text);
-  if (!rows.length) redirect("/ops?aderr=noads");
+  if (!rows.length) redirect("/ops/ads?aderr=noads");
   await replaceAds(rows);
 
+  // Single-day export → record that day's Meta messages into the daily series.
+  const { start, end } = parseAdsPeriod(text);
+  if (start && end && start === end) {
+    const totalMsgs = rows.reduce((a, r) => a + r.messages, 0);
+    await setMetaMessages(end, Math.round(totalMsgs));
+  }
+
   revalidatePath("/ops");
-  redirect(`/ops?adok=${rows.length}`);
+  revalidatePath("/ops/ads");
+  redirect(`/ops/ads?adok=${rows.length}`);
 }
 
 /* Save the hours each car took today, keyed to the calendar UID. */

@@ -69,7 +69,7 @@ async function runEnsure(): Promise<void> {
     const rows = await sql`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'daily_log' AND column_name = 'messages'
+        WHERE table_name = 'daily_log' AND column_name = 'messages_meta'
       ) AS ready;
     `;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
@@ -154,6 +154,17 @@ async function runEnsure(): Promise<void> {
       summary       text          NOT NULL DEFAULT ''
     );
   `;
+  // One-time: clear the baseline that got stamped with today's date on the
+  // first upload (before baseline handling). Runs only on the messages ->
+  // messages_meta upgrade (guard: messages_meta not added yet), never later.
+  await sql`
+    DELETE FROM booking_seen
+    WHERE NOT EXISTS (
+      SELECT 1 FROM information_schema.columns
+      WHERE table_name = 'daily_log' AND column_name = 'messages_meta'
+    );
+  `;
+  await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS messages_meta integer NOT NULL DEFAULT 0;`;
   await sql`
     CREATE TABLE IF NOT EXISTS ad_stats (
       id           serial        PRIMARY KEY,
@@ -259,25 +270,40 @@ export async function replaceBookings(list: Booking[]): Promise<void> {
     ON CONFLICT DO NOTHING keeps the ORIGINAL first-seen date on re-uploads. */
 export async function recordBookingsSeen(list: Booking[], today: string): Promise<void> {
   await ensureTable();
-  const rows = list
-    .filter((b) => b.uid)
-    .map((b) => ({
-      uid: b.uid,
-      first_seen: today,
-      value: b.value,
-      is_correction: b.is_correction,
-      summary: b.summary,
-    }));
-  if (!rows.length) return;
+  const valid = list.filter((b) => b.uid);
+  if (!valid.length) return;
+  // First-ever upload = baseline: everything on the calendar already existed,
+  // so stamp it far in the past ('2000-01-01') to keep it out of the "new per
+  // day" counts. After that, genuinely new bookings get today's date.
+  const cnt = await sql`SELECT count(*)::int AS n FROM booking_seen;`;
+  const seen = ((cnt[0] as { n: number } | undefined)?.n ?? 0) === 0 ? "2000-01-01" : today;
+  const rows = valid.map((b) => ({
+    uid: b.uid,
+    first_seen: seen,
+    value: b.value,
+    is_correction: b.is_correction,
+    summary: b.summary,
+  }));
   await sql`
     INSERT INTO booking_seen ${sql(rows, "uid", "first_seen", "value", "is_correction", "summary")}
     ON CONFLICT (uid) DO NOTHING
   `;
 }
 
+/** Record Meta ad messages for a specific day (from a single-day ads export). */
+export async function setMetaMessages(date: string, count: number): Promise<void> {
+  await ensureTable();
+  await sql`
+    INSERT INTO daily_log (log_date, messages_meta, updated_at)
+    VALUES (${date}, ${count}, now())
+    ON CONFLICT (log_date) DO UPDATE SET messages_meta = ${count}, updated_at = now();
+  `;
+}
+
 export interface GrowthDay {
   date: string;
-  messages: number;
+  messages: number; // manual "other" leads (SMS/web/phone)
+  messages_meta: number; // auto from Meta ads upload
   new_bookings: number;
   new_corrections: number;
   new_value: number;
@@ -301,6 +327,7 @@ export async function getGrowthSeries(fromISO: string, toISO: string): Promise<G
     )
     SELECT to_char(days.d, 'YYYY-MM-DD')          AS date,
            COALESCE(dl.messages, 0)::int          AS messages,
+           COALESCE(dl.messages_meta, 0)::int     AS messages_meta,
            COALESCE(nb.new_bookings, 0)           AS new_bookings,
            COALESCE(nb.new_corrections, 0)        AS new_corrections,
            COALESCE(nb.new_value, 0)::float8      AS new_value,
