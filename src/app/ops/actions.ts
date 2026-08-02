@@ -7,6 +7,7 @@ import { checkPassword, sessionCookieValue, OPS_COOKIE } from "@/lib/ops/auth";
 import {
   upsertDailyLog,
   replaceBookings,
+  recordBookingsSeen,
   replaceAds,
   saveJobHours as saveJobHoursDb,
   setFollowupStatus,
@@ -18,7 +19,7 @@ import {
   getStock,
   type StockItem,
 } from "@/lib/ops/db";
-import { OPS_STAFF, hoursBetween } from "@/lib/ops/config";
+import { OPS_STAFF, hoursBetween, cairnsToday } from "@/lib/ops/config";
 import { parseBookingsIcs } from "@/lib/ops/calendar";
 import { parseAdsCsv } from "@/lib/ops/ads";
 
@@ -74,6 +75,7 @@ export async function saveEntry(formData: FormData): Promise<void> {
     ad_spend: toNum(formData.get("ad_spend")),
     quotes: toNum(formData.get("quotes")),
     redos: toNum(formData.get("redos")),
+    messages: toNum(formData.get("messages")),
     happy_customers: toNum(formData.get("happy_customers")),
     unhappy_customers: toNum(formData.get("unhappy_customers")),
     staff_hours,
@@ -112,6 +114,7 @@ export async function uploadCalendar(formData: FormData): Promise<void> {
 
   const bookings = parseBookingsIcs(ics).filter((b) => b.value > 0);
   await replaceBookings(bookings);
+  await recordBookingsSeen(bookings, cairnsToday());
 
   revalidatePath("/ops");
   redirect(`/ops?calok=${bookings.length}`);

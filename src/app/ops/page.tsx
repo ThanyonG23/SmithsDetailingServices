@@ -11,11 +11,13 @@ import {
   getRectifyList,
   getSatisfaction,
   getReorderCount,
+  getGrowthSeries,
   type DailyLog,
   type Booking,
   type AdRow,
   type JobWithHours,
   type JobFollowup,
+  type GrowthDay,
 } from "@/lib/ops/db";
 import { OPS_TARGETS, OPS_STAFF, cairnsToday } from "@/lib/ops/config";
 import {
@@ -234,6 +236,7 @@ export default async function OpsPage({
   let rectifyList: JobFollowup[] = [];
   let satisfaction = { happy: 0, unhappy: 0 };
   let reorderCount = 0;
+  let growth: GrowthDay[] = [];
   let dbError = false;
   try {
     // Load sequentially (object properties evaluate in order) on the single
@@ -251,11 +254,22 @@ export default async function OpsPage({
         rectifyList: await getRectifyList(),
         satisfaction: await getSatisfaction(monthStartISO, today),
         reorderCount: await getReorderCount(),
+        growth: await getGrowthSeries(from60, today),
       }))(),
       new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 9000)),
     ]);
-    ({ entry, recent, bookings, ads, todaysJobs, followups, rectifyList, satisfaction, reorderCount } =
-      data);
+    ({
+      entry,
+      recent,
+      bookings,
+      ads,
+      todaysJobs,
+      followups,
+      rectifyList,
+      satisfaction,
+      reorderCount,
+      growth,
+    } = data);
   } catch {
     dbError = true;
   }
@@ -325,6 +339,18 @@ export default async function OpsPage({
   const pendingFollowupList = followups.filter((f) => f.status === "pending");
   const pendingFollowups = pendingFollowupList.length;
   const fuOk = searchParams?.fuok;
+
+  // ── growth: leads → bookings over the last 30 days (from the daily series) ──
+  const g30 = growth.slice(0, 30);
+  const gMsgs = g30.reduce((a, g) => a + g.messages, 0);
+  const gNewBookings = g30.reduce((a, g) => a + g.new_bookings, 0);
+  const gNewCorr = g30.reduce((a, g) => a + g.new_corrections, 0);
+  const gSpend = g30.reduce((a, g) => a + g.ad_spend, 0);
+  const gConv = gMsgs ? Math.round((gNewBookings / gMsgs) * 100) : 0;
+  const gCostBooking = gNewBookings ? gSpend / gNewBookings : 0;
+  const gCostMsg = gMsgs ? gSpend / gMsgs : 0;
+  const gRows = growth.slice(0, 14).filter((g) => g.messages || g.new_bookings || g.ad_spend);
+  const gHasData = gMsgs > 0 || gNewBookings > 0;
 
   // ── funnel (this week) ──
   const inWeek = (r: DailyLog) => r.log_date >= weekStart && r.log_date <= today;
@@ -1088,6 +1114,82 @@ export default async function OpsPage({
         </section>
       </Reveal>
 
+      {/* ── LEADS → BOOKINGS (real conversion over time) ─────────────── */}
+      <Reveal delay={285}>
+        <section className="mt-8">
+          <SectionTitle eyebrow="Last 30 days" title="Leads → bookings" />
+
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <StatTile label="Leads (msgs)" value={String(gMsgs)} sub="logged daily" />
+            <StatTile
+              label="New bookings"
+              value={String(gNewBookings)}
+              sub={`${gNewCorr} corrections`}
+              tone={gNewBookings > 0 ? "green" : "neutral"}
+            />
+            <StatTile
+              label="Conversion"
+              value={gHasData && gMsgs ? `${gConv}%` : "—"}
+              sub="leads → booked"
+              tone={gConv >= 15 ? "green" : gConv > 0 ? "yellow" : "neutral"}
+            />
+            <StatTile
+              label="Cost / booking"
+              value={gCostBooking ? money(gCostBooking) : "—"}
+              sub={gCostMsg ? `${money(gCostMsg)}/msg` : "log ad spend"}
+            />
+          </div>
+
+          <p className="mt-2 text-xs leading-relaxed text-white/40">
+            Log new enquiries each day (in the form below) and upload the calendar daily — this
+            tracks how many leads turn into bookings <b className="text-white/60">over time</b>.
+            Corrections book weeks out, so today&apos;s leads land as bookings later — read the{" "}
+            <b className="text-white/60">trend</b>, not a single day.
+          </p>
+
+          {gRows.length > 0 ? (
+            <div className={`mt-3 overflow-x-auto ${CARD}`}>
+              <table className="w-full border-collapse text-sm tabular-nums">
+                <thead>
+                  <tr className="border-b border-white/10">
+                    {["Date", "Leads", "New bookings", "Corr", "Ad spend"].map((h) => (
+                      <th
+                        key={h}
+                        className="whitespace-nowrap px-3 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-white/40"
+                      >
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {gRows.map((g) => (
+                    <tr key={g.date} className="border-b border-white/[0.06] last:border-0">
+                      <td className="whitespace-nowrap px-3 py-2.5 font-semibold text-white/80">
+                        {dayLabel(g.date)}
+                      </td>
+                      <td className="px-3 py-2.5 text-white/70">{g.messages || "—"}</td>
+                      <td className="px-3 py-2.5 font-bold text-brand-green">
+                        {g.new_bookings || "—"}
+                      </td>
+                      <td className="px-3 py-2.5 text-white/60">{g.new_corrections || "—"}</td>
+                      <td className="px-3 py-2.5 text-white/50">
+                        {g.ad_spend ? money(g.ad_spend) : "—"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p className="mt-3 text-sm text-white/45">
+              Start logging <b className="text-white/70">new leads</b> each day and uploading the
+              calendar daily — the conversion trend builds from there.
+            </p>
+          )}
+        </section>
+      </Reveal>
+
       {/* ── ENTRY FORM ───────────────────────────────────────────── */}
       <form action={saveEntry}>
         {/* the numbers */}
@@ -1135,6 +1237,11 @@ export default async function OpsPage({
               prefix="$"
               step={0.01}
               defaultValue={entry?.ad_spend ?? ""}
+            />
+            <NumField
+              label="New leads (msgs)"
+              name="messages"
+              defaultValue={entry?.messages ?? ""}
             />
             <NumField
               label="Quotes sent"

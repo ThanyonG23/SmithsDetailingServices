@@ -17,6 +17,7 @@ export interface DailyLogInput {
   ad_spend: number;
   quotes: number;
   redos: number;
+  messages: number; // new leads/enquiries received that day
   happy_customers: number;
   unhappy_customers: number;
   staff_hours: Record<string, number>;
@@ -68,7 +69,7 @@ async function runEnsure(): Promise<void> {
     const rows = await sql`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'stock_items' AND column_name = 'ordered'
+        WHERE table_name = 'daily_log' AND column_name = 'messages'
       ) AS ready;
     `;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
@@ -141,6 +142,18 @@ async function runEnsure(): Promise<void> {
   await sql`ALTER TABLE stock_items ADD COLUMN IF NOT EXISTS ordered boolean NOT NULL DEFAULT false;`;
   await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS quotes integer NOT NULL DEFAULT 0;`;
   await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS redos  integer NOT NULL DEFAULT 0;`;
+  await sql`ALTER TABLE daily_log ADD COLUMN IF NOT EXISTS messages integer NOT NULL DEFAULT 0;`;
+  // records the first day each booking (by UID) shows up in an upload, so we
+  // can count genuinely NEW bookings per day for the leads→bookings funnel.
+  await sql`
+    CREATE TABLE IF NOT EXISTS booking_seen (
+      uid           text          PRIMARY KEY,
+      first_seen    date          NOT NULL,
+      value         numeric(10,2) NOT NULL DEFAULT 0,
+      is_correction boolean       NOT NULL DEFAULT false,
+      summary       text          NOT NULL DEFAULT ''
+    );
+  `;
   await sql`
     CREATE TABLE IF NOT EXISTS ad_stats (
       id           serial        PRIMARY KEY,
@@ -164,7 +177,7 @@ export async function getDailyLog(date: string): Promise<DailyLog | null> {
            revenue_collected::float8                             AS revenue_collected,
            completed_revenue::float8                             AS completed_revenue,
            ad_spend::float8                                      AS ad_spend,
-           quotes, redos, happy_customers, unhappy_customers,
+           quotes, redos, messages, happy_customers, unhappy_customers,
            staff_hours, staff_shifts, staff_notes, notes_today,
            to_char(updated_at AT TIME ZONE 'Australia/Brisbane',
                    'YYYY-MM-DD"T"HH24:MI')                       AS updated_at
@@ -181,7 +194,7 @@ export async function getRecentLogs(limit = 30): Promise<DailyLog[]> {
            revenue_collected::float8                             AS revenue_collected,
            completed_revenue::float8                             AS completed_revenue,
            ad_spend::float8                                      AS ad_spend,
-           quotes, redos, happy_customers, unhappy_customers,
+           quotes, redos, messages, happy_customers, unhappy_customers,
            staff_hours, staff_shifts, staff_notes, notes_today,
            to_char(updated_at AT TIME ZONE 'Australia/Brisbane',
                    'YYYY-MM-DD"T"HH24:MI')                       AS updated_at
@@ -197,11 +210,11 @@ export async function upsertDailyLog(e: DailyLogInput): Promise<void> {
   await sql`
     INSERT INTO daily_log
       (log_date, jobs_completed, revenue_collected, completed_revenue, ad_spend,
-       quotes, redos, happy_customers, unhappy_customers, staff_hours, staff_shifts,
+       quotes, redos, messages, happy_customers, unhappy_customers, staff_hours, staff_shifts,
        staff_notes, notes_today, updated_at)
     VALUES
       (${e.log_date}, ${e.jobs_completed}, ${e.revenue_collected}, ${e.completed_revenue}, ${e.ad_spend},
-       ${e.quotes}, ${e.redos}, ${e.happy_customers}, ${e.unhappy_customers},
+       ${e.quotes}, ${e.redos}, ${e.messages}, ${e.happy_customers}, ${e.unhappy_customers},
        ${JSON.stringify(e.staff_hours)}::jsonb,
        ${JSON.stringify(e.staff_shifts)}::jsonb,
        ${JSON.stringify(e.staff_notes)}::jsonb,
@@ -213,6 +226,7 @@ export async function upsertDailyLog(e: DailyLogInput): Promise<void> {
        ad_spend          = EXCLUDED.ad_spend,
        quotes            = EXCLUDED.quotes,
        redos             = EXCLUDED.redos,
+       messages          = EXCLUDED.messages,
        happy_customers   = EXCLUDED.happy_customers,
        unhappy_customers = EXCLUDED.unhappy_customers,
        staff_hours       = EXCLUDED.staff_hours,
@@ -239,6 +253,65 @@ export async function replaceBookings(list: Booking[]): Promise<void> {
       "summary"
     )}`;
   }
+}
+
+/** Record the first day each booking (UID) appears — for new-bookings/day.
+    ON CONFLICT DO NOTHING keeps the ORIGINAL first-seen date on re-uploads. */
+export async function recordBookingsSeen(list: Booking[], today: string): Promise<void> {
+  await ensureTable();
+  const rows = list
+    .filter((b) => b.uid)
+    .map((b) => ({
+      uid: b.uid,
+      first_seen: today,
+      value: b.value,
+      is_correction: b.is_correction,
+      summary: b.summary,
+    }));
+  if (!rows.length) return;
+  await sql`
+    INSERT INTO booking_seen ${sql(rows, "uid", "first_seen", "value", "is_correction", "summary")}
+    ON CONFLICT (uid) DO NOTHING
+  `;
+}
+
+export interface GrowthDay {
+  date: string;
+  messages: number;
+  new_bookings: number;
+  new_corrections: number;
+  new_value: number;
+  ad_spend: number;
+  revenue: number;
+}
+
+/** Per-day leads→bookings series: logged messages vs newly-appeared bookings. */
+export async function getGrowthSeries(fromISO: string, toISO: string): Promise<GrowthDay[]> {
+  const rows = await sql`
+    WITH days AS (
+      SELECT generate_series(${fromISO}::date, ${toISO}::date, interval '1 day')::date AS d
+    ),
+    nb AS (
+      SELECT first_seen AS d,
+             count(*)::int                                  AS new_bookings,
+             count(*) FILTER (WHERE is_correction)::int     AS new_corrections,
+             COALESCE(sum(value), 0)::float8                AS new_value
+      FROM booking_seen
+      GROUP BY first_seen
+    )
+    SELECT to_char(days.d, 'YYYY-MM-DD')          AS date,
+           COALESCE(dl.messages, 0)::int          AS messages,
+           COALESCE(nb.new_bookings, 0)           AS new_bookings,
+           COALESCE(nb.new_corrections, 0)        AS new_corrections,
+           COALESCE(nb.new_value, 0)::float8      AS new_value,
+           COALESCE(dl.ad_spend, 0)::float8       AS ad_spend,
+           COALESCE(dl.revenue_collected, 0)::float8 AS revenue
+    FROM days
+    LEFT JOIN nb        ON nb.d = days.d
+    LEFT JOIN daily_log dl ON dl.log_date = days.d
+    ORDER BY days.d DESC;
+  `;
+  return rows as unknown as GrowthDay[];
 }
 
 export async function getRecentBookings(fromISO: string): Promise<Booking[]> {
@@ -471,7 +544,7 @@ export async function getAllLogs(): Promise<Record<string, unknown>[]> {
     SELECT to_char(log_date, 'YYYY-MM-DD') AS log_date,
            jobs_completed, revenue_collected::float8 AS revenue_collected,
            completed_revenue::float8 AS completed_revenue, ad_spend::float8 AS ad_spend,
-           quotes, redos, happy_customers, unhappy_customers,
+           quotes, redos, messages, happy_customers, unhappy_customers,
            staff_hours, staff_notes, notes_today,
            to_char(updated_at AT TIME ZONE 'Australia/Brisbane', 'YYYY-MM-DD HH24:MI') AS updated_at
     FROM daily_log
