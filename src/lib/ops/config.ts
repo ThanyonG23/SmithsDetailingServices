@@ -20,6 +20,9 @@ export const OPS_TARGETS = {
   jobsTarget: 2,
 };
 
+/** Hourly labour rate used to cost the day's crew hours. */
+export const LABOUR_RATE = 32;
+
 /** Whose hours get logged each day: the team leader + every active
     detailer. Add or retire a detailer in referrals.ts and this stays
     in sync automatically. */

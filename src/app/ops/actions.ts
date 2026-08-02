@@ -18,11 +18,14 @@ import {
   setOrdered,
   setMetaMessages,
   setChecklist,
+  upsertCustomers,
+  upsertTemplate,
+  deleteTemplate,
   getStock,
   type StockItem,
 } from "@/lib/ops/db";
 import { OPS_STAFF, hoursBetween, cairnsToday } from "@/lib/ops/config";
-import { parseBookingsIcs } from "@/lib/ops/calendar";
+import { parseBookingsIcs, parseCustomersIcs } from "@/lib/ops/calendar";
 import { parseAdsCsv, parseAdsDailyMessages } from "@/lib/ops/ads";
 
 export async function login(formData: FormData): Promise<void> {
@@ -117,6 +120,49 @@ export async function uploadCalendar(formData: FormData): Promise<void> {
   const bookings = parseBookingsIcs(ics).filter((b) => b.value > 0);
   await replaceBookings(bookings);
   await recordBookingsSeen(bookings, cairnsToday());
+
+  // Build/refresh the CRM from the calendar — deduped by phone/email, so it
+  // never doubles up across uploads. Sorted by date so latest details win.
+  const custs = parseCustomersIcs(ics).sort((a, b) => a.date.localeCompare(b.date));
+  const byKey = new Map<
+    string,
+    {
+      key: string;
+      name: string;
+      phone: string;
+      email: string;
+      car: string;
+      bookings: number;
+      total_value: number;
+      first_seen: string;
+      last_seen: string;
+    }
+  >();
+  for (const r of custs) {
+    const e =
+      byKey.get(r.key) ||
+      {
+        key: r.key,
+        name: "",
+        phone: "",
+        email: "",
+        car: "",
+        bookings: 0,
+        total_value: 0,
+        first_seen: r.date,
+        last_seen: r.date,
+      };
+    if (r.name) e.name = r.name;
+    if (r.phone) e.phone = r.phone;
+    if (r.email) e.email = r.email;
+    if (r.car) e.car = r.car;
+    e.bookings += 1;
+    e.total_value += r.value;
+    if (r.date < e.first_seen) e.first_seen = r.date;
+    if (r.date > e.last_seen) e.last_seen = r.date;
+    byKey.set(r.key, e);
+  }
+  if (byKey.size) await upsertCustomers([...byKey.values()]);
 
   revalidatePath("/ops");
   redirect(`/ops?calok=${bookings.length}`);
@@ -288,6 +334,25 @@ const STARTER_STOCK: Omit<StockItem, "id" | "updated_at" | "ordered">[] = (
   current_qty,
   notes: notes ?? "",
 }));
+
+/* ---- templates (quote/package library) ----------------------------- */
+
+export async function saveTemplate(formData: FormData): Promise<void> {
+  const id = Number(formData.get("id")) || null;
+  const title = String(formData.get("title") || "").trim().slice(0, 120);
+  const body = String(formData.get("body") || "").slice(0, 6000);
+  if (!title && !body) redirect("/ops/crm");
+  await upsertTemplate(id, title, body);
+  revalidatePath("/ops/crm");
+  redirect("/ops/crm?tok=saved");
+}
+
+export async function removeTemplate(formData: FormData): Promise<void> {
+  const id = Number(formData.get("id"));
+  if (Number.isFinite(id) && id > 0) await deleteTemplate(id);
+  revalidatePath("/ops/crm");
+  redirect("/ops/crm?tok=deleted");
+}
 
 /* One-time: load the master stock list (only if the table is empty). */
 export async function seedStock(): Promise<void> {

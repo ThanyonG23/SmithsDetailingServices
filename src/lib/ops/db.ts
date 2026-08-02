@@ -68,8 +68,7 @@ async function runEnsure(): Promise<void> {
   try {
     const rows = await sql`
       SELECT EXISTS (
-        SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'daily_log' AND column_name = 'checklist'
+        SELECT 1 FROM information_schema.tables WHERE table_name = 'customers'
       ) AS ready;
     `;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
@@ -176,6 +175,29 @@ async function runEnsure(): Promise<void> {
       purchases    integer       NOT NULL DEFAULT 0,
       impressions  integer       NOT NULL DEFAULT 0,
       reach        integer       NOT NULL DEFAULT 0
+    );
+  `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS customers (
+      dedupe_key  text          PRIMARY KEY,
+      name        text          NOT NULL DEFAULT '',
+      phone       text          NOT NULL DEFAULT '',
+      email       text          NOT NULL DEFAULT '',
+      car         text          NOT NULL DEFAULT '',
+      bookings    integer       NOT NULL DEFAULT 0,
+      total_value numeric(10,2) NOT NULL DEFAULT 0,
+      first_seen  date,
+      last_seen   date,
+      updated_at  timestamptz   NOT NULL DEFAULT now()
+    );
+  `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS templates (
+      id         serial       PRIMARY KEY,
+      title      text         NOT NULL DEFAULT '',
+      body       text         NOT NULL DEFAULT '',
+      sort       integer      NOT NULL DEFAULT 0,
+      updated_at timestamptz  NOT NULL DEFAULT now()
     );
   `;
 }
@@ -587,6 +609,131 @@ export async function getAds(): Promise<AdRow[]> {
     ORDER BY spend DESC;
   `;
   return rows as unknown as AdRow[];
+}
+
+/* ---- customers (CRM, auto-built from the calendar) ----------------- */
+
+export interface Customer {
+  dedupe_key: string;
+  name: string;
+  phone: string;
+  email: string;
+  car: string;
+  bookings: number;
+  total_value: number;
+  last_seen: string | null;
+}
+
+export async function upsertCustomers(
+  list: {
+    key: string;
+    name: string;
+    phone: string;
+    email: string;
+    car: string;
+    bookings: number;
+    total_value: number;
+    first_seen: string;
+    last_seen: string;
+  }[]
+): Promise<void> {
+  await ensureTable();
+  if (!list.length) return;
+  const rows = list.map((c) => ({
+    dedupe_key: c.key,
+    name: c.name,
+    phone: c.phone,
+    email: c.email,
+    car: c.car,
+    bookings: c.bookings,
+    total_value: c.total_value,
+    first_seen: c.first_seen,
+    last_seen: c.last_seen,
+  }));
+  await sql`
+    INSERT INTO customers ${sql(
+      rows,
+      "dedupe_key",
+      "name",
+      "phone",
+      "email",
+      "car",
+      "bookings",
+      "total_value",
+      "first_seen",
+      "last_seen"
+    )}
+    ON CONFLICT (dedupe_key) DO UPDATE SET
+      name        = CASE WHEN EXCLUDED.name  <> '' THEN EXCLUDED.name  ELSE customers.name  END,
+      phone       = CASE WHEN EXCLUDED.phone <> '' THEN EXCLUDED.phone ELSE customers.phone END,
+      email       = CASE WHEN EXCLUDED.email <> '' THEN EXCLUDED.email ELSE customers.email END,
+      car         = CASE WHEN EXCLUDED.car   <> '' THEN EXCLUDED.car   ELSE customers.car   END,
+      bookings    = EXCLUDED.bookings,
+      total_value = EXCLUDED.total_value,
+      first_seen  = LEAST(customers.first_seen, EXCLUDED.first_seen),
+      last_seen   = GREATEST(customers.last_seen, EXCLUDED.last_seen),
+      updated_at  = now();
+  `;
+}
+
+export async function getCustomers(search = "", limit = 300): Promise<Customer[]> {
+  try {
+    const s = search.trim();
+    const q = `%${s}%`;
+    const rows = s
+      ? await sql`
+          SELECT dedupe_key, name, phone, email, car, bookings,
+                 total_value::float8 AS total_value,
+                 to_char(last_seen, 'YYYY-MM-DD') AS last_seen
+          FROM customers
+          WHERE name ILIKE ${q} OR phone ILIKE ${q} OR email ILIKE ${q} OR car ILIKE ${q}
+          ORDER BY last_seen DESC NULLS LAST
+          LIMIT ${limit};
+        `
+      : await sql`
+          SELECT dedupe_key, name, phone, email, car, bookings,
+                 total_value::float8 AS total_value,
+                 to_char(last_seen, 'YYYY-MM-DD') AS last_seen
+          FROM customers
+          ORDER BY last_seen DESC NULLS LAST
+          LIMIT ${limit};
+        `;
+    return rows as unknown as Customer[];
+  } catch {
+    return [];
+  }
+}
+
+/* ---- templates (quote/package library) ----------------------------- */
+
+export interface Template {
+  id: number;
+  title: string;
+  body: string;
+  sort: number;
+}
+
+export async function getTemplates(): Promise<Template[]> {
+  try {
+    const rows = await sql`SELECT id, title, body, sort FROM templates ORDER BY sort, id;`;
+    return rows as unknown as Template[];
+  } catch {
+    return [];
+  }
+}
+
+export async function upsertTemplate(id: number | null, title: string, body: string): Promise<void> {
+  await ensureTable();
+  if (id && id > 0) {
+    await sql`UPDATE templates SET title = ${title}, body = ${body}, updated_at = now() WHERE id = ${id};`;
+  } else {
+    await sql`INSERT INTO templates (title, body) VALUES (${title}, ${body});`;
+  }
+}
+
+export async function deleteTemplate(id: number): Promise<void> {
+  await ensureTable();
+  await sql`DELETE FROM templates WHERE id = ${id};`;
 }
 
 /* ---- export --------------------------------------------------------- */

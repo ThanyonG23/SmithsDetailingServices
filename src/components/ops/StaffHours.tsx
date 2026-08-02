@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { hoursBetween } from "@/lib/ops/config";
+import { hoursBetween, LABOUR_RATE } from "@/lib/ops/config";
 
 type Seed = { start?: string; end?: string; notes?: string };
 
@@ -108,12 +108,22 @@ export default function StaffHours({
       })}
 
       <div className="flex items-center justify-between rounded-xl border border-white/10 bg-black/20 px-4 py-3">
-        <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">
-          Total hours today
-        </span>
-        <span className="font-display text-lg font-extrabold tabular-nums text-brand-green">
-          {total}h
-        </span>
+        <div>
+          <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">
+            Total hours today
+          </span>
+          <div className="mt-0.5 text-[11px] font-semibold text-white/45">
+            Labour cost @ ${LABOUR_RATE}/hr
+          </div>
+        </div>
+        <div className="text-right">
+          <span className="font-display text-lg font-extrabold tabular-nums text-brand-green">
+            {total}h
+          </span>
+          <div className="mt-0.5 font-display text-sm font-extrabold tabular-nums text-white/80">
+            ${Math.round(total * LABOUR_RATE).toLocaleString("en-AU")}
+          </div>
+        </div>
       </div>
     </div>
   );

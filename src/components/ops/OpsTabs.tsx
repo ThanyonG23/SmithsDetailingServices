@@ -7,6 +7,7 @@ const TABS = [
   { href: "/ops", label: "Dashboard" },
   { href: "/ops/ads", label: "Ads" },
   { href: "/ops/stock", label: "Stock" },
+  { href: "/ops/crm", label: "CRM" },
   { href: "/ops/history", label: "History" },
 ];
 
@@ -17,7 +18,7 @@ export default function OpsTabs() {
   return (
     // Client-side navigation (fast, no full reload) + prefetch. Own z-50
     // layer so the blurred sticky header can't swallow the click.
-    <nav className="relative z-50 mx-auto flex max-w-3xl gap-2 px-4 pb-3">
+    <nav className="relative z-50 mx-auto flex max-w-3xl gap-2 overflow-x-auto px-4 pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       {TABS.map((t) => {
         const active = t.href === "/ops" ? path === "/ops" : path.startsWith(t.href);
         return (
@@ -25,7 +26,7 @@ export default function OpsTabs() {
             key={t.href}
             href={t.href}
             prefetch
-            className={`flex-1 rounded-xl px-4 py-2.5 text-center text-sm font-bold transition active:scale-[0.98] ${
+            className={`shrink-0 rounded-xl px-4 py-2.5 text-center text-sm font-bold transition active:scale-[0.98] ${
               active
                 ? "bg-brand-green text-[#04130a] shadow-[0_6px_20px_rgba(43,255,122,0.25)]"
                 : "border border-white/15 bg-white/[0.03] text-white/70 hover:border-white/30 hover:text-white"

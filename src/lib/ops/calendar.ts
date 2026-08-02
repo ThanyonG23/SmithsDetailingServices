@@ -41,6 +41,59 @@ function brisbaneDate(e: string): string | null {
   return `${y}-${mo}-${d}`;
 }
 
+/* ---- customers (for the CRM) --------------------------------------- */
+
+export interface CustomerRecord {
+  key: string; // dedupe key: normalised phone, else email
+  name: string;
+  phone: string;
+  email: string;
+  car: string;
+  value: number;
+  date: string; // YYYY-MM-DD
+}
+
+const FIELD_LABELS =
+  "Phone|Mobile|Mob|Ph|Email|E-mail|Car|Vehicle|Make|Model|Quote|Total|Price|Extras|Reg|Rego|Registration|Address|Name|Colour|Color|Notes";
+function fieldFrom(blob: string, labelAlt: string): string {
+  const re = new RegExp(
+    "(?:" + labelAlt + ")\\s*:\\s*(.+?)\\s*(?:(?:" + FIELD_LABELS + ")\\s*:|$)",
+    "i"
+  );
+  const m = blob.match(re);
+  return m ? m[1].trim() : "";
+}
+
+/** Pull customer contact details out of the calendar. Only events that carry
+    a phone or email (i.e. real customer bookings, not internal notes). */
+export function parseCustomersIcs(rawInput: string): CustomerRecord[] {
+  const raw = rawInput.replace(/\r\n[ \t]/g, "").replace(/\n[ \t]/g, "");
+  const events = raw.split("BEGIN:VEVENT").slice(1);
+  const out: CustomerRecord[] = [];
+  for (const e of events) {
+    const date = brisbaneDate(e);
+    if (!date) continue;
+    let summary = (e.match(/\nSUMMARY:([\s\S]*?)(?:\n[A-Z-]+[:;])/) || [])[1] || "";
+    let desc = (e.match(/\nDESCRIPTION:([\s\S]*?)(?:\n[A-Z-]+[:;])/) || [])[1] || "";
+    summary = clean(summary);
+    desc = clean(desc);
+    const blob = summary + " " + desc;
+
+    const emailM = blob.match(/[\w.+-]+@[\w-]+\.[\w.-]{2,}/);
+    const email = emailM ? emailM[0].toLowerCase() : "";
+    const phoneDigits = (fieldFrom(blob, "Phone|Mobile|Mob|Ph").match(/\d/g) || []).join("");
+    const phone = phoneDigits.length >= 8 ? phoneDigits.slice(0, 15) : "";
+    if (!phone && !email) continue; // real customers only
+
+    const name = (summary.split(":")[0] || "").trim().slice(0, 80);
+    const car = fieldFrom(blob, "Car|Vehicle|Make").slice(0, 80);
+    const value = num((blob.match(/(?:Total|Quote):\s*\$?\s*([0-9,]+(?:\.[0-9]{1,2})?)/i) || [])[1]);
+
+    out.push({ key: phone || email, name, phone, email, car, value, date });
+  }
+  return out;
+}
+
 export function parseBookingsIcs(rawInput: string): Booking[] {
   const raw = rawInput.replace(/\r\n[ \t]/g, "").replace(/\n[ \t]/g, ""); // unfold
   const events = raw.split("BEGIN:VEVENT").slice(1);
