@@ -347,17 +347,17 @@ export async function saveTemplate(formData: FormData): Promise<void> {
   const id = Number(formData.get("id")) || null;
   const title = String(formData.get("title") || "").trim().slice(0, 120);
   const body = String(formData.get("body") || "").slice(0, 6000);
-  if (!title && !body) redirect("/ops/crm");
+  if (!title && !body) redirect("/ops/templates");
   await upsertTemplate(id, title, body);
-  revalidatePath("/ops/crm");
-  redirect("/ops/crm?tok=saved");
+  revalidatePath("/ops/templates");
+  redirect("/ops/templates?tok=saved");
 }
 
 export async function removeTemplate(formData: FormData): Promise<void> {
   const id = Number(formData.get("id"));
   if (Number.isFinite(id) && id > 0) await deleteTemplate(id);
-  revalidatePath("/ops/crm");
-  redirect("/ops/crm?tok=deleted");
+  revalidatePath("/ops/templates");
+  redirect("/ops/templates?tok=deleted");
 }
 
 /* One-time: load the master stock list (only if the table is empty). */
