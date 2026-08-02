@@ -56,31 +56,34 @@ export default async function TemplatesPage({
 
       {templates.length > 0 ? (
         <div className="mt-6 flex flex-col gap-3">
-          {templates.map((t) => (
-            <div key={t.id} className={`${CARD} p-4`}>
-              <div className="flex items-start justify-between gap-3">
-                <div className="font-display text-base font-extrabold tracking-tight text-white">
-                  {t.title || "Untitled"}
+          {templates.map((t) => {
+            const body = t.body.replace(/\r\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
+            return (
+              <div key={t.id} className={`${CARD} p-4`}>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="font-display text-base font-extrabold tracking-tight text-white">
+                    {t.title || "Untitled"}
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <CopyButton text={body} />
+                    <form action={removeTemplate}>
+                      <button
+                        name="id"
+                        value={t.id}
+                        aria-label="Delete template"
+                        className="text-sm font-bold text-white/25 transition hover:text-red-400"
+                      >
+                        ✕
+                      </button>
+                    </form>
+                  </div>
                 </div>
-                <div className="flex shrink-0 items-center gap-2">
-                  <CopyButton text={t.body} />
-                  <form action={removeTemplate}>
-                    <button
-                      name="id"
-                      value={t.id}
-                      aria-label="Delete template"
-                      className="text-sm font-bold text-white/25 transition hover:text-red-400"
-                    >
-                      ✕
-                    </button>
-                  </form>
-                </div>
+                <pre className="mt-2 max-h-56 overflow-y-auto whitespace-pre-wrap break-words font-sans text-sm leading-relaxed text-white/70">
+                  {body}
+                </pre>
               </div>
-              <pre className="mt-2 max-h-48 overflow-y-auto whitespace-pre-wrap break-words font-sans text-sm leading-relaxed text-white/70">
-                {t.body}
-              </pre>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <p className="mt-6 text-sm text-white/45">

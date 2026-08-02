@@ -346,7 +346,11 @@ const STARTER_STOCK: Omit<StockItem, "id" | "updated_at" | "ordered">[] = (
 export async function saveTemplate(formData: FormData): Promise<void> {
   const id = Number(formData.get("id")) || null;
   const title = String(formData.get("title") || "").trim().slice(0, 120);
-  const body = String(formData.get("body") || "").slice(0, 6000);
+  const body = String(formData.get("body") || "")
+    .replace(/\r\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim()
+    .slice(0, 6000);
   if (!title && !body) redirect("/ops/templates");
   await upsertTemplate(id, title, body);
   revalidatePath("/ops/templates");
