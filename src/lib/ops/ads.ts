@@ -61,6 +61,31 @@ export function parseAdsPeriod(text: string): { start: string | null; end: strin
   return { start, end };
 }
 
+/** Per-day Meta messages, from rows that cover a single day (start == end).
+    Works for a "today only" export AND a Day-breakdown export (one row per ad
+    per day) — so one upload can backfill every day. Range summaries are
+    skipped (their rows span the whole period and can't be attributed daily). */
+export function parseAdsDailyMessages(text: string): { date: string; messages: number }[] {
+  const lines = text.replace(/^﻿/, "").split(/\r?\n/).filter((l) => l.trim());
+  if (lines.length < 2) return [];
+  const hdr = parseLine(lines[0]).map((h) => h.toLowerCase().trim());
+  const iStart = hdr.findIndex((h) => h.includes("reporting starts"));
+  const iEnd = hdr.findIndex((h) => h.includes("reporting ends"));
+  const iMsg =
+    hdr.findIndex((h) => h.includes("messaging conversations started")) >= 0
+      ? hdr.findIndex((h) => h.includes("messaging conversations started"))
+      : hdr.findIndex((h) => h.includes("total messaging contacts"));
+  const byDay: Record<string, number> = {};
+  for (let i = 1; i < lines.length; i++) {
+    const f = parseLine(lines[i]);
+    const s = iStart >= 0 ? (f[iStart] || "").trim().slice(0, 10) : "";
+    const e = iEnd >= 0 ? (f[iEnd] || "").trim().slice(0, 10) : "";
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(s) || s !== e) continue; // per-day rows only
+    byDay[s] = (byDay[s] || 0) + (iMsg >= 0 ? num(f[iMsg]) : 0);
+  }
+  return Object.entries(byDay).map(([date, m]) => ({ date, messages: Math.round(m) }));
+}
+
 export function parseAdsCsv(text: string): AdRow[] {
   const lines = text.replace(/^﻿/, "").split(/\r?\n/).filter((l) => l.trim());
   if (lines.length < 2) return [];

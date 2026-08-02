@@ -185,9 +185,10 @@ export default async function AdsPage({
           />
         </div>
         <p className="mt-2 text-xs leading-relaxed text-white/40">
-          Meta leads pull in automatically from a <b className="text-white/60">single-day</b> ads
-          export; other leads (SMS, website, phone) go in the daily log. Corrections book weeks out,
-          so read the <b className="text-white/60">trend</b>, not one day.
+          Meta leads pull in automatically from a Meta export with a{" "}
+          <b className="text-white/60">Day breakdown</b>; other leads (SMS, website, phone) go in the
+          daily log. Corrections book weeks out, so read the{" "}
+          <b className="text-white/60">trend</b>, not one day.
         </p>
 
         {gRows.length > 0 ? (
@@ -311,9 +312,9 @@ export default async function AdsPage({
           <div>
             <div className="text-sm font-bold text-white">Sync ad stats</div>
             <div className="mt-0.5 text-xs text-white/45">
-              Drop in the Meta Ads CSV. For daily lead tracking, export it as{" "}
-              <b className="text-white/60">today only</b> — that day&apos;s messages auto-fill the
-              funnel above.
+              Drop in the Meta Ads CSV. For daily lead tracking, add a{" "}
+              <b className="text-white/60">Day breakdown</b> in Meta (Breakdown → By Day) — every
+              day&apos;s messages auto-fill the funnel above in one upload.
             </div>
           </div>
           <div className="flex items-center gap-3">

@@ -22,7 +22,7 @@ import {
 } from "@/lib/ops/db";
 import { OPS_STAFF, hoursBetween, cairnsToday } from "@/lib/ops/config";
 import { parseBookingsIcs } from "@/lib/ops/calendar";
-import { parseAdsCsv, parseAdsPeriod } from "@/lib/ops/ads";
+import { parseAdsCsv, parseAdsDailyMessages } from "@/lib/ops/ads";
 
 export async function login(formData: FormData): Promise<void> {
   const password = String(formData.get("password") || "");
@@ -132,11 +132,10 @@ export async function uploadAds(formData: FormData): Promise<void> {
   if (!rows.length) redirect("/ops/ads?aderr=noads");
   await replaceAds(rows);
 
-  // Single-day export → record that day's Meta messages into the daily series.
-  const { start, end } = parseAdsPeriod(text);
-  if (start && end && start === end) {
-    const totalMsgs = rows.reduce((a, r) => a + r.messages, 0);
-    await setMetaMessages(end, Math.round(totalMsgs));
+  // Auto-record daily Meta leads. Works for a single-day export or a
+  // Day-breakdown export (one row per ad per day → backfills every day).
+  for (const d of parseAdsDailyMessages(text)) {
+    await setMetaMessages(d.date, d.messages);
   }
 
   revalidatePath("/ops");
