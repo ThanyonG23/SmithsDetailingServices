@@ -79,16 +79,40 @@ export function parseCustomersIcs(rawInput: string): CustomerRecord[] {
     desc = clean(desc);
     const blob = summary + " " + desc;
 
-    const emailM = blob.match(/[\w.+-]+@[\w-]+\.[\w.-]{2,}/);
+    const emailM = blob.match(/[\w.+-]+@[\w-]+\.[a-z]{2,}(?:\.[a-z]{2,})?/i);
     const email = emailM ? emailM[0].toLowerCase() : "";
-    const phoneDigits = (fieldFrom(blob, "Phone|Mobile|Mob|Ph").match(/\d/g) || []).join("");
-    const phone = phoneDigits.length >= 8 ? phoneDigits.slice(0, 15) : "";
+
+    let digits = (fieldFrom(blob, "Phone|Mobile|Mob|Ph").match(/\d/g) || []).join("");
+    if (digits.startsWith("61") && digits.length >= 11) digits = "0" + digits.slice(2);
+    if (digits.startsWith("0") && digits.length > 10) digits = digits.slice(0, 10); // strip junk tail
+    const phone = digits.length >= 8 && digits.length <= 11 ? digits : "";
+
     if (!phone && !email) continue; // real customers only
+    if (email === "info@smithsdetailingservices.com.au" || /lillyhuskisson/i.test(email)) continue;
 
-    const name = (summary.split(":")[0] || "").trim().slice(0, 80);
-    const car = fieldFrom(blob, "Car|Vehicle|Make").slice(0, 80);
+    // name — also handle the "SMITHS BOOKING — service — Name" export style
+    let name: string;
+    if (/^\s*smiths\s+(booking|detailing)/i.test(summary)) {
+      const parts = summary.split(/\s*[—–]\s*|\s+-\s+/);
+      name = (parts[parts.length - 1] || "").trim();
+    } else {
+      name = (summary.split(":")[0] || "").trim();
+    }
+    name = name.replace(/<[^>]+>/g, "").trim();
+    if (name.includes("@")) name = "";
+    if (/thanyon|griffiths.?smith/i.test(name)) continue; // internal bookings
+    name = name.slice(0, 60);
+
+    // car — strip HTML tags + booking-confirmation boilerplate
+    const car = fieldFrom(blob, "Car|Vehicle|Make")
+      .replace(/<[^>]+>/g, " ")
+      .split(/📍|BOOKING CONFIRMATION|Location:|Pre[- ]?Paid|PRE-?PAID|Thanks so much|Duration:|-::~|\bKey\b/i)[0]
+      .replace(/[•·|]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 45);
+
     const value = num((blob.match(/(?:Total|Quote):\s*\$?\s*([0-9,]+(?:\.[0-9]{1,2})?)/i) || [])[1]);
-
     out.push({ key: phone || email, name, phone, email, car, value, date });
   }
   return out;

@@ -704,6 +704,11 @@ export async function getCustomers(search = "", limit = 300): Promise<Customer[]
   }
 }
 
+export async function clearCustomers(): Promise<void> {
+  await ensureTable();
+  await sql`DELETE FROM customers;`;
+}
+
 /* ---- templates (quote/package library) ----------------------------- */
 
 export interface Template {

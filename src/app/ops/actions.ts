@@ -19,6 +19,7 @@ import {
   setMetaMessages,
   setChecklist,
   upsertCustomers,
+  clearCustomers,
   upsertTemplate,
   deleteTemplate,
   getStock,
@@ -162,7 +163,12 @@ export async function uploadCalendar(formData: FormData): Promise<void> {
     if (r.date > e.last_seen) e.last_seen = r.date;
     byKey.set(r.key, e);
   }
-  if (byKey.size) await upsertCustomers([...byKey.values()]);
+  // Rebuild the CRM fresh from the full calendar each upload — self-cleaning,
+  // never doubles up, and clears out any old junk records.
+  if (byKey.size) {
+    await clearCustomers();
+    await upsertCustomers([...byKey.values()]);
+  }
 
   revalidatePath("/ops");
   redirect(`/ops?calok=${bookings.length}`);
