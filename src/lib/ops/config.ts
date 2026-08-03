@@ -33,8 +33,6 @@ export const OPS_STAFF: string[] = ["Ashlee", ...ACTIVE_TEAM.map((m) => m.name)]
 export const RUN_SHEET: { key: string; label: string; phase: "Open" | "During" | "Close" }[] = [
   { key: "open", label: "Open up", phase: "Open" },
   { key: "setup", label: "Set up detailers — assign cars & brief", phase: "Open" },
-  { key: "cal", label: "Upload Google calendar", phase: "Open" },
-  { key: "ads", label: "Upload ad data (Ads tab)", phase: "Open" },
   { key: "board", label: "Check the board — sort anything red first", phase: "Open" },
   { key: "detail", label: "Help detail / run the floor", phase: "During" },
   { key: "lead_answer", label: "Answer leads fast (minutes, not hours)", phase: "During" },
@@ -43,6 +41,8 @@ export const RUN_SHEET: { key: string; label: string; phase: "Open" | "During" |
   { key: "payment", label: "Take payment + record it", phase: "During" },
   { key: "checkins", label: "Customer check-ins (Happy / Not happy)", phase: "Close" },
   { key: "log", label: "Log the day on the board", phase: "Close" },
+  { key: "cal", label: "Upload Google calendar (end of day)", phase: "Close" },
+  { key: "ads", label: "Upload ad data — Ads tab (end of day)", phase: "Close" },
   { key: "stock", label: "Update stocktake — order anything low", phase: "Close" },
   { key: "tomorrow", label: "Fill tomorrow, then set the crew", phase: "Close" },
   { key: "lockup", label: "Lock up", phase: "Close" },

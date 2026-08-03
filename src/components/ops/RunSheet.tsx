@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { RUN_SHEET } from "@/lib/ops/config";
 import { saveChecklist } from "@/app/ops/actions";
 
@@ -12,16 +12,20 @@ const PHASES: { key: "Open" | "During" | "Close"; label: string }[] = [
 
 export default function RunSheet({ today, initial }: { today: string; initial: string[] }) {
   const [checked, setChecked] = useState<Set<string>>(() => new Set(initial));
-  const [, startTransition] = useTransition();
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">("idle");
 
   const toggle = (key: string) => {
     const next = new Set(checked);
     if (next.has(key)) next.delete(key);
     else next.add(key);
     setChecked(next);
-    startTransition(() => {
-      saveChecklist(today, [...next]);
-    });
+    setSaveState("saving");
+    saveChecklist(today, [...next])
+      .then(() => {
+        setSaveState("saved");
+        setTimeout(() => setSaveState((s) => (s === "saved" ? "idle" : s)), 1500);
+      })
+      .catch(() => setSaveState("idle"));
   };
 
   const done = RUN_SHEET.filter((i) => checked.has(i.key)).length;
@@ -35,12 +39,23 @@ export default function RunSheet({ today, initial }: { today: string; initial: s
         <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">
           Ashlee&apos;s run sheet
         </div>
-        <div
-          className={`text-xs font-black tabular-nums ${
-            allDone ? "text-brand-green" : "text-white/50"
-          }`}
-        >
-          {allDone ? "All done 🔥" : `${done}/${total}`}
+        <div className="flex items-center gap-2">
+          {saveState !== "idle" && (
+            <span
+              className={`text-[11px] font-semibold ${
+                saveState === "saved" ? "text-brand-green" : "text-white/40"
+              }`}
+            >
+              {saveState === "saving" ? "Saving…" : "Saved ✓"}
+            </span>
+          )}
+          <span
+            className={`text-xs font-black tabular-nums ${
+              allDone ? "text-brand-green" : "text-white/50"
+            }`}
+          >
+            {allDone ? "All done 🔥" : `${done}/${total}`}
+          </span>
         </div>
       </div>
 
