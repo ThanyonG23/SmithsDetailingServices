@@ -216,24 +216,26 @@ async function runEnsure(): Promise<void> {
 /** Self-test the checklist read/write path — used by /api/health?deep=checklist. */
 export async function checklistSelfTest(): Promise<Record<string, string>> {
   const out: Record<string, string> = {};
+  const D = "2000-01-02";
   try {
-    const col = await sql`
-      SELECT EXISTS (
-        SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'daily_log' AND column_name = 'checklist'
-      ) AS e;
+    await sql`DELETE FROM daily_log WHERE log_date = ${D};`;
+    await setChecklist(D, ["_selftest"]);
+    const rows = await sql`
+      SELECT to_char(log_date, 'YYYY-MM-DD') AS d, checklist,
+             pg_typeof(checklist)::text AS ty
+      FROM daily_log WHERE log_date = ${D};
     `;
-    out.column = (col[0] as { e: boolean } | undefined)?.e ? "exists" : "MISSING";
+    out.rowsFound = String(rows.length);
+    if (rows[0]) {
+      const r = rows[0] as { checklist: unknown; ty: string };
+      out.type = r.ty;
+      out.rawIsArray = String(Array.isArray(r.checklist));
+      out.raw = JSON.stringify(r.checklist).slice(0, 80);
+    }
+    out.getChecklist = JSON.stringify(await getChecklist(D)).slice(0, 80);
+    await sql`DELETE FROM daily_log WHERE log_date = ${D};`;
   } catch (e) {
-    out.column = "ERR " + (e instanceof Error ? e.message : String(e)).slice(0, 140);
-  }
-  try {
-    await setChecklist("2000-01-02", ["_selftest"]);
-    const back = await getChecklist("2000-01-02");
-    out.roundtrip = back.includes("_selftest") ? "ok" : "wrote, read back " + JSON.stringify(back).slice(0, 60);
-    await sql`DELETE FROM daily_log WHERE log_date = '2000-01-02';`;
-  } catch (e) {
-    out.roundtrip = "ERR " + (e instanceof Error ? e.message : String(e)).slice(0, 160);
+    out.error = (e instanceof Error ? e.message : String(e)).slice(0, 200);
   }
   return out;
 }
