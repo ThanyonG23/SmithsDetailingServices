@@ -32,6 +32,24 @@ function weekdayIdx(dateStr: string): number {
 const pct = (now: number, prev: number) =>
   prev > 0 ? Math.round(((now - prev) / prev) * 100) : now > 0 ? 100 : 0;
 
+function dayHours(sh: Record<string, number> | undefined): number {
+  if (!sh || typeof sh !== "object") return 0;
+  return Math.round(Object.values(sh).reduce((a, b) => a + (Number(b) || 0), 0) * 100) / 100;
+}
+function isDayLogged(r: DailyLog): boolean {
+  return (
+    (r.completed_revenue || 0) > 0 ||
+    (r.revenue_collected || 0) > 0 ||
+    (r.jobs_completed || 0) > 0 ||
+    (r.ad_spend || 0) > 0 ||
+    (r.quotes || 0) > 0 ||
+    (r.messages || 0) > 0 ||
+    (r.redos || 0) > 0 ||
+    (r.notes_today || "").trim().length > 0 ||
+    Object.keys(r.staff_hours || {}).length > 0
+  );
+}
+
 type Week = {
   week: string;
   rev: number;
@@ -83,7 +101,7 @@ export default async function HistoryPage() {
   for (const r of recent) {
     const w = mondayOf(r.log_date);
     const e = wk.get(w) || blank(w);
-    e.rev += r.revenue_collected;
+    e.rev += r.completed_revenue || 0; // earned — matches the dashboard's profitability gauge
     e.redos += r.redos || 0;
     e.jobs += r.jobs_completed || 0;
     e.days += 1;
@@ -106,7 +124,7 @@ export default async function HistoryPage() {
   const monthAgg = (key: string) => {
     const days = recent.filter((r) => r.log_date.startsWith(key));
     const gs = growth.filter((g) => g.date.startsWith(key));
-    const rev = days.reduce((a, r) => a + r.revenue_collected, 0);
+    const rev = days.reduce((a, r) => a + (r.completed_revenue || 0), 0);
     const redos = days.reduce((a, r) => a + (r.redos || 0), 0);
     const leads = gs.reduce((a, g) => a + g.messages + g.messages_meta, 0);
     const bookings = gs.reduce((a, g) => a + g.new_bookings, 0);
@@ -121,7 +139,7 @@ export default async function HistoryPage() {
   const wd = names.map(() => ({ rev: 0, n: 0 }));
   for (const r of recent) {
     const i = weekdayIdx(r.log_date);
-    wd[i].rev += r.revenue_collected;
+    wd[i].rev += r.completed_revenue || 0;
     wd[i].n += 1;
   }
   const wdRows = names.map((name, i) => ({ name, avg: wd[i].n ? wd[i].rev / wd[i].n : 0, n: wd[i].n }));
@@ -161,6 +179,7 @@ export default async function HistoryPage() {
   }
 
   const thin = recent.length < 3;
+  const loggedDays = recent.filter(isDayLogged).slice(0, 60);
 
   return (
     <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
@@ -282,6 +301,53 @@ export default async function HistoryPage() {
                 })}
               </tbody>
             </table>
+          </div>
+        )}
+      </section>
+
+      {/* ── DAY BY DAY (click to open a full day report) ───────────── */}
+      <section className="mt-8">
+        <div className={EYEBROW}>Day by day</div>
+        <p className="mt-2 text-xs text-white/40">Tap any day to read every number and note for it.</p>
+        {loggedDays.length === 0 ? (
+          <p className="mt-3 text-sm text-white/45">No days logged yet.</p>
+        ) : (
+          <div className={`mt-3 overflow-hidden ${CARD}`}>
+            {loggedDays.map((r) => {
+              const earned = r.completed_revenue || 0;
+              const hrs = dayHours(r.staff_hours);
+              const ok = earned >= 2200;
+              const snippet = (r.notes_today || "").trim().replace(/\s+/g, " ").slice(0, 60);
+              return (
+                <a
+                  key={r.log_date}
+                  href={`/ops/history/${r.log_date}`}
+                  className="flex items-center gap-3 border-b border-white/[0.06] px-4 py-3 transition last:border-0 hover:bg-white/[0.03]"
+                >
+                  <div className="w-24 shrink-0">
+                    <div className="text-sm font-bold text-white/85">
+                      {new Date(`${r.log_date}T00:00:00+10:00`).toLocaleDateString("en-AU", {
+                        weekday: "short",
+                        day: "numeric",
+                        month: "short",
+                        timeZone: "Australia/Brisbane",
+                      })}
+                    </div>
+                    <div className="text-[11px] text-white/35">{r.jobs_completed || 0} done · {hrs}h</div>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className={`text-sm font-black tabular-nums ${ok ? "text-brand-green" : "text-brand-yellow"}`}>
+                      {money(earned)} <span className="font-semibold text-white/35">earned</span>
+                      <span className="ml-2 text-xs font-semibold text-white/45">{money(r.revenue_collected || 0)} cash</span>
+                    </div>
+                    {snippet && (
+                      <div className="mt-0.5 truncate text-xs text-white/40">{snippet}{(r.notes_today || "").trim().length > 60 ? "…" : ""}</div>
+                    )}
+                  </div>
+                  <span className="shrink-0 text-white/25">›</span>
+                </a>
+              );
+            })}
           </div>
         )}
       </section>

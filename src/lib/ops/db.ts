@@ -553,6 +553,30 @@ export async function setJobDayHours(
   }
 }
 
+/** Cars that had hours logged on a specific day — for the day report. */
+export async function getJobHoursForDate(
+  date: string
+): Promise<{ uid: string; summary: string; value: number; is_correction: boolean; hours: number }[]> {
+  const rows = await sql`
+    SELECT d.uid,
+           COALESCE(b.summary, '')      AS summary,
+           COALESCE(b.value, 0)::float8 AS value,
+           COALESCE(b.is_correction, false) AS is_correction,
+           d.hours::float8              AS hours
+    FROM job_day_hours d
+    LEFT JOIN bookings b ON b.uid = d.uid
+    WHERE d.work_date = ${date} AND d.hours > 0
+    ORDER BY d.hours DESC;
+  `;
+  return rows as unknown as {
+    uid: string;
+    summary: string;
+    value: number;
+    is_correction: boolean;
+    hours: number;
+  }[];
+}
+
 /** Mark a (multi-day) job done / not done so it stops carrying over. */
 export async function setJobFinished(uid: string, finished: boolean): Promise<void> {
   await ensureTable();
