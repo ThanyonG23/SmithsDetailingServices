@@ -287,9 +287,9 @@ export async function upsertDailyLog(e: DailyLogInput): Promise<void> {
     VALUES
       (${e.log_date}, ${e.jobs_completed}, ${e.revenue_collected}, ${e.completed_revenue}, ${e.ad_spend},
        ${e.quotes}, ${e.redos}, ${e.messages}, ${e.happy_customers}, ${e.unhappy_customers},
-       ${JSON.stringify(e.staff_hours)}::jsonb,
-       ${JSON.stringify(e.staff_shifts)}::jsonb,
-       ${JSON.stringify(e.staff_notes)}::jsonb,
+       ${sql.json(e.staff_hours)},
+       ${sql.json(e.staff_shifts)},
+       ${sql.json(e.staff_notes)},
        ${e.notes_today}, now())
     ON CONFLICT (log_date) DO UPDATE SET
        jobs_completed    = EXCLUDED.jobs_completed,
@@ -377,11 +377,10 @@ export async function getChecklist(date: string): Promise<string[]> {
 
 export async function setChecklist(date: string, keys: string[]): Promise<void> {
   await ensureTable();
-  const json = JSON.stringify(keys);
   await sql`
     INSERT INTO daily_log (log_date, checklist, updated_at)
-    VALUES (${date}, ${json}::jsonb, now())
-    ON CONFLICT (log_date) DO UPDATE SET checklist = ${json}::jsonb, updated_at = now();
+    VALUES (${date}, ${sql.json(keys)}, now())
+    ON CONFLICT (log_date) DO UPDATE SET checklist = ${sql.json(keys)}, updated_at = now();
   `;
 }
 
