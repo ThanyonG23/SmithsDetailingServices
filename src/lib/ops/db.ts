@@ -688,12 +688,14 @@ export interface TeamJob {
   is_correction: boolean;
   extras: string;
   carried: boolean;
-  hours_today: number;
+  hours_today: number; // completed clock hours today
+  hours_total: number; // running total across every day worked
   active: TeamActive[];
 }
 
-/** Today's floor for the detailers: today's cars + unfinished carried jobs,
-    each with hours logged today and who's currently clocked on. */
+/** Today's floor for the detailers: today's cars + any car still open from an
+    earlier day, EXCLUDING anything Ashlee has marked done. A car stays here —
+    and keeps accumulating time — until it's finished. */
 export async function getTeamDay(date: string, sinceISO: string): Promise<TeamJob[]> {
   const jobs = await sql`
     SELECT b.uid, b.summary, b.value::float8 AS value, b.is_correction,
@@ -702,12 +704,15 @@ export async function getTeamDay(date: string, sinceISO: string): Promise<TeamJo
            COALESCE((
              SELECT sum(EXTRACT(EPOCH FROM (end_ts - start_ts)) / 3600.0)
              FROM job_clock c WHERE c.uid = b.uid AND c.work_date = ${date} AND c.end_ts IS NOT NULL
-           ), 0)::float8 AS hours_today
+           ), 0)::float8 AS hours_today,
+           COALESCE((
+             SELECT sum(hours) FROM job_day_hours d WHERE d.uid = b.uid
+           ), 0)::float8 AS hours_total
     FROM bookings b
     LEFT JOIN job_progress p ON p.uid = b.uid
-    WHERE b.booking_date = ${date}
-       OR (b.booking_date < ${date} AND b.booking_date >= ${sinceISO}
-           AND COALESCE(p.finished, false) = false)
+    WHERE COALESCE(p.finished, false) = false
+      AND (b.booking_date = ${date}
+           OR (b.booking_date < ${date} AND b.booking_date >= ${sinceISO}))
     ORDER BY b.booking_date DESC, b.value DESC;
   `;
   const open = await sql`
@@ -722,6 +727,7 @@ export async function getTeamDay(date: string, sinceISO: string): Promise<TeamJo
     ...j,
     value: Number(j.value),
     hours_today: Number(j.hours_today),
+    hours_total: Number(j.hours_total),
     active: byUid[j.uid] || [],
   }));
 }

@@ -96,7 +96,8 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
             const mine = j.active.find((a) => a.detailer === me);
             const others = j.active.filter((a) => a.detailer !== me);
             const runningMs = j.active.reduce((a, x) => a + (now - x.start_ms), 0);
-            const liveHours = j.hours_today + runningMs / 3600000;
+            const liveTotal = j.hours_total + runningMs / 3600000;
+            const liveToday = j.hours_today + runningMs / 3600000;
             const busy = busyUid === j.uid;
             return (
               <div
@@ -129,9 +130,11 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
                   </div>
                   <div className="shrink-0 text-right">
                     <div className="font-display text-xl font-extrabold tabular-nums text-white">
-                      {Math.round(liveHours * 100) / 100}h
+                      {Math.round(liveTotal * 100) / 100}h
                     </div>
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-white/35">on this car</div>
+                    <div className="text-[10px] font-bold uppercase tracking-wider text-white/35">
+                      {j.carried ? `${Math.round(liveToday * 100) / 100}h today` : "on this car"}
+                    </div>
                   </div>
                 </div>
 
