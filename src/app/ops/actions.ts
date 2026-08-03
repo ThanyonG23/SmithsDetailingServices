@@ -279,6 +279,7 @@ export async function saveChecklist(date: string, keys: string[]): Promise<void>
   if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return;
   const clean = (Array.isArray(keys) ? keys : []).map((k) => String(k).slice(0, 40)).slice(0, 60);
   await setChecklist(d, clean);
+  revalidatePath("/ops"); // so the saved ticks show after reload/navigation
 }
 
 /* Tick a low item off the order list (or un-tick it). */
