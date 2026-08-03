@@ -36,7 +36,13 @@ export default function AutoSaveForm({
   };
 
   return (
-    <form ref={formRef} action={action} onChange={onChange} onInput={onChange}>
+    <form
+      ref={formRef}
+      action={action}
+      onChange={onChange}
+      onInput={onChange}
+      autoComplete="off"
+    >
       {children}
       <div className="mt-3 h-4 text-right text-[11px] font-semibold">
         {state === "saving" && <span className="text-white/40">Saving…</span>}

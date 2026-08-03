@@ -604,7 +604,7 @@ export default async function OpsPage({
       {isToday && (
         <Reveal delay={60}>
           <div className="mt-6">
-            <RunSheet today={today} initial={checklist} />
+            <RunSheet key={today} today={today} initial={checklist} />
           </div>
         </Reveal>
       )}
@@ -984,16 +984,22 @@ export default async function OpsPage({
                         <span className="w-14 shrink-0 text-right text-xs font-bold tabular-nums text-brand-green">
                           {total > 0 ? `${money(j.value / total)}/hr` : ""}
                         </span>
-                        {carried && (
-                          <label className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-white/12 px-2.5 py-2 text-xs font-bold text-white/60 transition hover:border-brand-green hover:text-brand-green">
-                            <input
-                              type="checkbox"
-                              name={`fin::${j.uid}`}
-                              className="h-3.5 w-3.5 accent-brand-green"
-                            />
-                            Done
-                          </label>
-                        )}
+                        <input type="hidden" name={`job::${j.uid}`} value="1" />
+                        <label
+                          className={`flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-2 text-xs font-bold transition ${
+                            j.finished
+                              ? "border-brand-green/50 bg-brand-green/10 text-brand-green"
+                              : "border-white/12 text-white/60 hover:border-brand-green hover:text-brand-green"
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            name={`fin::${j.uid}`}
+                            defaultChecked={j.finished}
+                            className="h-3.5 w-3.5 accent-brand-green"
+                          />
+                          Done
+                        </label>
                       </div>
                     );
                   })}
@@ -1111,7 +1117,10 @@ export default async function OpsPage({
       </Reveal>
 
       {/* ── ENTRY FORM (auto-saves as you go) ────────────────────── */}
-      <AutoSaveForm action={saveEntry} autoSave={autoSaveDay}>
+      {/* key by date so a new day (or viewing another date) fully remounts the
+          form and re-seeds from that day's data — otherwise yesterday's typed
+          values stay stuck in the inputs even though the server sent fresh. */}
+      <AutoSaveForm key={date} action={saveEntry} autoSave={autoSaveDay}>
         {/* the numbers */}
         <section className={`mt-10 ${CARD} p-6`}>
           <SectionTitle

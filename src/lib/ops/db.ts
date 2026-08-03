@@ -521,9 +521,9 @@ export async function getJobsForDate(date: string): Promise<JobWithHours[]> {
   return rows as unknown as JobWithHours[];
 }
 
-/** Jobs that started on an earlier day and still have unfinished work — so a
-    multi-day job stays on the floor list until it's marked done. Bounded to a
-    recent window so nothing ancient lingers. */
+/** Every job from an earlier day that hasn't been ticked done — so nothing
+    leaves the floor on its own; only marking it done removes it. Bounded to a
+    recent window so a forgotten job can't linger forever. */
 export async function getCarryoverJobs(today: string, sinceISO: string): Promise<JobWithHours[]> {
   const rows = await sql`
     ${JOB_HOURS_SELECT(today)}
@@ -532,8 +532,6 @@ export async function getCarryoverJobs(today: string, sinceISO: string): Promise
     WHERE b.booking_date < ${today}
       AND b.booking_date >= ${sinceISO}
       AND COALESCE(p.finished, false) = false
-      AND (b.is_correction OR b.value >= 800)  -- only genuine multi-day jobs carry over
-      AND EXISTS (SELECT 1 FROM job_day_hours d WHERE d.uid = b.uid)
     ORDER BY b.booking_date DESC;
   `;
   return rows as unknown as JobWithHours[];

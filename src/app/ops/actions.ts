@@ -217,17 +217,22 @@ export async function uploadAds(formData: FormData): Promise<void> {
 export async function logJobHours(formData: FormData): Promise<void> {
   const today = cairnsToday();
   const entries: { uid: string; date: string; hours: number }[] = [];
-  const finish: string[] = [];
-  for (const [key, val] of formData.entries()) {
+  const onFloor: string[] = []; // every job shown (hidden job:: marker)
+  const done = new Set<string>(); // the ones with "Done" ticked
+  for (const [key] of formData.entries()) {
     if (key.startsWith("jh::")) {
-      const h = Number(val);
+      const h = Number(formData.get(key));
       entries.push({ uid: key.slice(4), date: today, hours: Number.isFinite(h) && h > 0 ? h : 0 });
+    } else if (key.startsWith("job::")) {
+      onFloor.push(key.slice(5));
     } else if (key.startsWith("fin::")) {
-      finish.push(key.slice(5)); // "Done" ticked on a carried-over job
+      done.add(key.slice(5));
     }
   }
   await setJobDayHours(entries);
-  for (const uid of finish) await setJobFinished(uid, true);
+  // A job leaves the floor ONLY when its Done box is ticked; unticking puts it
+  // back. Toggle every job on the floor so it reflects the boxes exactly.
+  for (const uid of onFloor) await setJobFinished(uid, done.has(uid));
   revalidatePath("/ops");
   redirect("/ops?jobsok=1");
 }
