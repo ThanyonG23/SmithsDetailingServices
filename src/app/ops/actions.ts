@@ -453,7 +453,61 @@ ${GUARANTEE}
 ${BOOK}`;
 }
 
+const askDetailsBody = `Great! I just need the following please:
+
+Email:
+Phone:
+
+Thanks!`;
+
+const confirmedBody = `Thank you, that's all booked in!
+
+You should have received a Google Calendar invitation with the booking information and location.
+
+I'll message the day before as a friendly reminder.
+
+Any questions, feel free to reach out.
+
+Have a great day and talk soon :)`;
+
+const calendarBody = `Car:
+Quote:
+Phone:
+Email:
+Extras:
+Referral:
+
+📍 BOOKING CONFIRMATION
+
+Thanks so much: Your booking is confirmed and locked in!
+
+We'll also send you a friendly reminder the day before your booking.
+
+A few quick things to note:
+
+• Reschedule or cancel? Please give us more than 48 hours' notice — this really hurts our business if you don't.
+
+• Extra dirty vehicles: if your car is extra dirty and takes longer than usual, our team will let you know before starting and there may be a surcharge.
+
+• Pet hair: standing up you might not see much, but our team facedown vacuuming see everything. If your car has pet hair we charge a $55 pet hair fee (unless it's bad — we'll let you know beforehand).
+
+• Seat covers: if you'd like your seats cleaned, please remove any seat covers beforehand — we won't remove them ourselves.
+
+• Personal belongings: we'll safely remove and return anything left in the car, but it's faster and smoother if the vehicle is emptied beforehand.
+
+• Timing (we aim to get your car back ASAP):
+Standard: 3-4 hours
+Premium: 4-5 hours
+Premium + Polish: 1 day
+Premium + Cut & Polish: 1-2 days
+Correction + Coat: 1-2 days
+
+Any questions at all, feel free to reach out. Thanks again — we look forward to seeing you!`;
+
 const STANDARD_TEMPLATES: { title: string; body: string; sort: number }[] = [
+  { title: "Booking — Ask for details", body: askDetailsBody, sort: 30 },
+  { title: "Booking — Confirmed message", body: confirmedBody, sort: 31 },
+  { title: "Booking — Calendar event (paste into GCal)", body: calendarBody, sort: 32 },
   { title: "Correction — Single Cab ($1,500)", body: correctionBody(230, 400, "1,500"), sort: 0 },
   { title: "Correction — Sedan/Dual Cab ($2,100)", body: correctionBody(280, 450, "2,100"), sort: 1 },
   { title: "Correction — SUV ($2,200)", body: correctionBody(330, 500, "2,200"), sort: 2 },
