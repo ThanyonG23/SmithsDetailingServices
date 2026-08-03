@@ -143,6 +143,9 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
                     <div className="font-display text-lg font-extrabold leading-tight text-white">
                       {name?.trim() || "(no name)"}
                     </div>
+                    {j.car && (
+                      <div className="mt-0.5 text-sm font-bold text-white/85">🚗 {j.car}</div>
+                    )}
                     {pkg && <div className="mt-0.5 text-sm font-semibold text-brand-green">{pkg}</div>}
                     {(j.is_correction || j.carried) && (
                       <div className="mt-1 flex flex-wrap gap-x-2 text-xs">

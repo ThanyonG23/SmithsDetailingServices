@@ -70,7 +70,7 @@ async function runEnsure(): Promise<void> {
     const rows = await sql`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'job_progress' AND column_name = 'notes'
+        WHERE table_name = 'bookings' AND column_name = 'car'
       ) AS ready;`;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
   } catch {
@@ -108,6 +108,7 @@ async function runEnsure(): Promise<void> {
   `;
   await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS uid text NOT NULL DEFAULT '';`;
   await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS extras text NOT NULL DEFAULT '';`;
+  await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS car text NOT NULL DEFAULT '';`;
   await sql`
     CREATE TABLE IF NOT EXISTS job_hours (
       uid        text          PRIMARY KEY,
@@ -431,7 +432,8 @@ export async function replaceBookings(list: Booking[]): Promise<void> {
       "value",
       "is_correction",
       "summary",
-      "extras"
+      "extras",
+      "car"
     )}`;
   }
 }
@@ -707,6 +709,7 @@ export interface TeamJob {
   value: number;
   is_correction: boolean;
   extras: string;
+  car: string; // vehicle make/model
   carried: boolean;
   hours_today: number; // completed clock hours today
   hours_total: number; // running total across every day worked
@@ -721,6 +724,7 @@ export async function getTeamDay(date: string, sinceISO: string): Promise<TeamJo
   const jobs = await sql`
     SELECT b.uid, b.summary, b.value::float8 AS value, b.is_correction,
            COALESCE(b.extras, '') AS extras,
+           COALESCE(b.car, '') AS car,
            (b.booking_date < ${date}) AS carried,
            COALESCE((
              SELECT sum(EXTRACT(EPOCH FROM (end_ts - start_ts)) / 3600.0)

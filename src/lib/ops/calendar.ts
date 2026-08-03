@@ -15,6 +15,7 @@ export interface Booking {
   is_correction: boolean;
   summary: string;
   extras: string; // any "Extras:" the customer added (for the team board)
+  car: string; // vehicle make/model (for the team board)
 }
 
 const BS = String.fromCharCode(92); // backslash
@@ -65,6 +66,23 @@ function fieldFrom(blob: string, labelAlt: string): string {
   return m ? m[1].trim() : "";
 }
 
+/** The vehicle make/model from a booking's "Car:/Vehicle:/Make:" field, cleaned
+    of the booking-confirmation boilerplate. Blank for the old service-format
+    bookings (their description is the service, not a car). */
+function carFrom(blob: string, summary: string): string {
+  if (/^\s*smiths\s+(booking|detailing)/i.test(summary)) return "";
+  let car = fieldFrom(blob, "Car|Vehicle|Make")
+    .replace(/<[^>]+>/g, " ")
+    .split(
+      /📍|BOOKING CONFIRMATION|Location\s*:|Pre[- ]?Paid|PRE-?PAID|Thanks so much|Duration\s*:|SERVICE\s*:|Package\s*:|Extras|Need done|-::~|\bKey\b|But it'?s|faster and smoother|emptied beforehand|Phone\s*:|Email\s*:|Notes\s*:/i
+    )[0]
+    .replace(/[•·|]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (/@/.test(car) || /^(phone|email|http|but it)/i.test(car)) car = "";
+  return car.slice(0, 45);
+}
+
 /** Pull customer contact details out of the calendar. Only events that carry
     a phone or email (i.e. real customer bookings, not internal notes). */
 export function parseCustomersIcs(rawInput: string): CustomerRecord[] {
@@ -109,21 +127,7 @@ export function parseCustomersIcs(rawInput: string): CustomerRecord[] {
     if (/thanyon|griffiths.?smith/i.test(name) || /^test$/i.test(name)) continue; // internal
     name = name.slice(0, 60);
 
-    // car — real "Car:/Vehicle:" only, cleaned. Blank for the old service-
-    // format bookings (their description is the service, not a car).
-    let car = "";
-    if (!/^\s*smiths\s+(booking|detailing)/i.test(summary)) {
-      car = fieldFrom(blob, "Car|Vehicle|Make")
-        .replace(/<[^>]+>/g, " ")
-        .split(
-          /📍|BOOKING CONFIRMATION|Location\s*:|Pre[- ]?Paid|PRE-?PAID|Thanks so much|Duration\s*:|SERVICE\s*:|Package\s*:|Extras|Need done|-::~|\bKey\b|But it'?s|faster and smoother|emptied beforehand|Phone\s*:|Email\s*:|Notes\s*:/i
-        )[0]
-        .replace(/[•·|]+/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
-      if (/@/.test(car) || /^(phone|email|http|but it)/i.test(car)) car = "";
-      car = car.slice(0, 45);
-    }
+    const car = carFrom(blob, summary);
 
     const value = num((blob.match(/(?:Total|Quote):\s*\$?\s*([0-9,]+(?:\.[0-9]{1,2})?)/i) || [])[1]);
     out.push({ key: phone || email, name, phone, email, car, value, date });
@@ -176,6 +180,7 @@ export function parseBookingsIcs(rawInput: string): Booking[] {
       is_correction: value >= 1500 || /correction|coating|ceramic/i.test(summary),
       summary: summary.slice(0, 200),
       extras,
+      car: carFrom(blob, summary),
     });
   }
   return out;
