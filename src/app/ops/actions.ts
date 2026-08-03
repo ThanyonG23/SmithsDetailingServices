@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { checkPassword, sessionCookieValue, OPS_COOKIE } from "@/lib/ops/auth";
+import { passwordRole, sessionCookieValue, OPS_COOKIE } from "@/lib/ops/auth";
 import {
   upsertDailyLog,
   replaceBookings,
@@ -35,16 +35,18 @@ import { parseAdsCsv, parseAdsDailyMessages } from "@/lib/ops/ads";
 
 export async function login(formData: FormData): Promise<void> {
   const password = String(formData.get("password") || "");
-  if (!checkPassword(password)) redirect("/ops/login?error=1");
+  const role = passwordRole(password);
+  if (!role) redirect("/ops/login?error=1");
 
-  cookies().set(OPS_COOKIE, sessionCookieValue(), {
+  cookies().set(OPS_COOKIE, sessionCookieValue(role), {
     httpOnly: true,
     secure: true,
     sameSite: "lax",
     path: "/",
     maxAge: 60 * 60 * 24 * 30, // 30 days
   });
-  redirect("/ops");
+  // crew only get the Team board; owner lands on the full dashboard
+  redirect(role === "crew" ? "/ops/team" : "/ops");
 }
 
 export async function logout(): Promise<void> {

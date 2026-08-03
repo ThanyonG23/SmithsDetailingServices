@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect, notFound } from "next/navigation";
-import { isAuthed } from "@/lib/ops/auth";
+import { notFound } from "next/navigation";
+import { requireOwner } from "@/lib/ops/auth";
 import { getDailyLog, getJobHoursForDate, type DailyLog } from "@/lib/ops/db";
 import { OPS_TARGETS, OPS_STAFF, LABOUR_RATE } from "@/lib/ops/config";
 
@@ -40,7 +40,7 @@ function Stat({ label, value, sub, tone }: { label: string; value: string; sub?:
 }
 
 export default async function DayReportPage({ params }: { params: { date: string } }) {
-  if (!isAuthed()) redirect("/ops/login");
+  requireOwner();
 
   const date = decodeURIComponent(params.date || "").slice(0, 10);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) notFound();

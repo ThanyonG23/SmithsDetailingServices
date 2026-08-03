@@ -1,6 +1,5 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import { isAuthed } from "@/lib/ops/auth";
+import { requireOwner } from "@/lib/ops/auth";
 import {
   getDailyLog,
   getRecentLogs,
@@ -232,7 +231,7 @@ export default async function OpsPage({
     fuok?: string;
   };
 }) {
-  if (!isAuthed()) redirect("/ops/login");
+  requireOwner();
 
   // ── dates (computed up front so all DB reads can run in parallel) ──
   const today = cairnsToday();

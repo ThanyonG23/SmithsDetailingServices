@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
-import { isAuthed } from "@/lib/ops/auth";
+import { requireOwner } from "@/lib/ops/auth";
 import {
   getRecentLogs,
   getGrowthSeries,
@@ -65,7 +64,7 @@ export const maxDuration = 30;
 export const dynamic = "force-dynamic";
 
 export default async function HistoryPage() {
-  if (!isAuthed()) redirect("/ops/login");
+  requireOwner();
 
   const today = cairnsToday();
   const from = brisFmt(Date.now() - 120 * 86400000);

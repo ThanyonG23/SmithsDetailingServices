@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { isAuthed } from "@/lib/ops/auth";
+import { getRole } from "@/lib/ops/auth";
 import { login } from "../actions";
 
 export default function OpsLoginPage({
@@ -7,7 +7,9 @@ export default function OpsLoginPage({
 }: {
   searchParams: { error?: string };
 }) {
-  if (isAuthed()) redirect("/ops");
+  const role = getRole();
+  if (role === "owner") redirect("/ops");
+  if (role === "crew") redirect("/ops/team");
   const failed = searchParams?.error === "1";
 
   return (

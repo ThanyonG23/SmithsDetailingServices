@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
-import { isAuthed } from "@/lib/ops/auth";
+import { requireOwner } from "@/lib/ops/auth";
 import {
   getAds,
   getGrowthSeries,
@@ -78,7 +77,7 @@ export default async function AdsPage({
 }: {
   searchParams: { adok?: string; aderr?: string };
 }) {
-  if (!isAuthed()) redirect("/ops/login");
+  requireOwner();
 
   const today = cairnsToday();
   const from60 = brisDate(Date.now() - 60 * 86400000);

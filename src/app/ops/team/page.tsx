@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
-import { isAuthed } from "@/lib/ops/auth";
+import { requireAuth } from "@/lib/ops/auth";
 import { getTeamDay, type TeamJob } from "@/lib/ops/db";
 import { OPS_STAFF, cairnsToday } from "@/lib/ops/config";
 import TeamBoard from "@/components/ops/TeamBoard";
@@ -16,7 +15,7 @@ export const dynamic = "force-dynamic";
 const EYEBROW = "text-[11px] font-bold uppercase tracking-[0.22em] text-white/40";
 
 export default async function TeamPage() {
-  if (!isAuthed()) redirect("/ops/login");
+  requireAuth();
 
   const today = cairnsToday();
   const since = new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Brisbane" }).format(

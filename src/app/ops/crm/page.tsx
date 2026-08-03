@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
-import { isAuthed } from "@/lib/ops/auth";
+import { requireOwner } from "@/lib/ops/auth";
 import { getCustomers, type Customer } from "@/lib/ops/db";
 
 export const metadata: Metadata = {
@@ -18,7 +17,7 @@ export const maxDuration = 30;
 export const dynamic = "force-dynamic";
 
 export default async function CrmPage({ searchParams }: { searchParams: { q?: string } }) {
-  if (!isAuthed()) redirect("/ops/login");
+  requireOwner();
 
   const q = (searchParams?.q || "").slice(0, 60);
   let customers: Customer[] = [];

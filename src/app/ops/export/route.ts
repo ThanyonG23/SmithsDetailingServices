@@ -1,4 +1,4 @@
-import { isAuthed } from "@/lib/ops/auth";
+import { isOwner } from "@/lib/ops/auth";
 import { getAllLogs } from "@/lib/ops/db";
 
 export const dynamic = "force-dynamic";
@@ -23,7 +23,7 @@ function esc(v: unknown): string {
 }
 
 export async function GET() {
-  if (!isAuthed()) return new Response("Unauthorized", { status: 401 });
+  if (!isOwner()) return new Response("Unauthorized", { status: 401 });
 
   const rows = await getAllLogs();
   const header = COLS.join(",");

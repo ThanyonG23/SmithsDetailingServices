@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BUSINESS } from "@/lib/config";
+import { getRole } from "@/lib/ops/auth";
 import OpsTabs from "@/components/ops/OpsTabs";
 
 /* Unlisted, like the team page — nothing links here and it's noindex,
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
 };
 
 export default function OpsLayout({ children }: { children: React.ReactNode }) {
+  const role = getRole();
   return (
     <div className="brand-backdrop min-h-screen bg-[#050506] text-white">
       <header className="sticky top-0 z-40 border-b border-white/5 bg-black/50 backdrop-blur-md">
@@ -23,7 +25,7 @@ export default function OpsLayout({ children }: { children: React.ReactNode }) {
             Smiths Ops
           </span>
         </div>
-        <OpsTabs />
+        <OpsTabs role={role} />
       </header>
       {children}
     </div>

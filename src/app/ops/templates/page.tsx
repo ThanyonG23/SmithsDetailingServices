@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
-import { isAuthed } from "@/lib/ops/auth";
+import { requireOwner } from "@/lib/ops/auth";
 import { getTemplates, type Template } from "@/lib/ops/db";
 import { saveTemplate, removeTemplate, seedTemplates } from "../actions";
 import CopyButton from "@/components/ops/CopyButton";
@@ -23,7 +22,7 @@ export default async function TemplatesPage({
 }: {
   searchParams: { tok?: string };
 }) {
-  if (!isAuthed()) redirect("/ops/login");
+  requireOwner();
 
   let templates: Template[] = [];
   let dbError = false;

@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
-import { isAuthed } from "@/lib/ops/auth";
+import { requireOwner } from "@/lib/ops/auth";
 import { getStock, type StockItem } from "@/lib/ops/db";
 import {
   addStock,
@@ -34,7 +33,7 @@ export default async function StockPage({
 }: {
   searchParams: { stockok?: string; stockerr?: string };
 }) {
-  if (!isAuthed()) redirect("/ops/login");
+  requireOwner();
 
   let items: StockItem[] = [];
   let dbError = false;

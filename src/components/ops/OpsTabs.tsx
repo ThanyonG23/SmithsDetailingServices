@@ -13,15 +13,18 @@ const TABS = [
   { href: "/ops/history", label: "History" },
 ];
 
-export default function OpsTabs() {
+export default function OpsTabs({ role }: { role?: "owner" | "crew" | null }) {
   const path = usePathname() || "";
   if (path.endsWith("/login")) return null; // no tabs on the login screen
+
+  // Detailers (crew) only get their Team board — never the rest of ops.
+  const tabs = role === "crew" ? TABS.filter((t) => t.href === "/ops/team") : TABS;
 
   return (
     // Client-side navigation (fast, no full reload) + prefetch. Own z-50
     // layer so the blurred sticky header can't swallow the click.
     <nav className="relative z-50 mx-auto flex max-w-3xl gap-2 overflow-x-auto px-4 pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      {TABS.map((t) => {
+      {tabs.map((t) => {
         const active = t.href === "/ops" ? path === "/ops" : path.startsWith(t.href);
         return (
           <Link
