@@ -190,6 +190,12 @@ function StatTile({
 
 /* --------------------------------------------------------------------- */
 
+// Give the page real headroom. The default ~10s function budget meant a
+// cold or waking database blew the internal cap and showed "didn't respond".
+// Fluid Compute allows up to 60s; 30s is plenty for a cold start to complete.
+export const maxDuration = 30;
+export const dynamic = "force-dynamic";
+
 export default async function OpsPage({
   searchParams,
 }: {
@@ -241,11 +247,27 @@ export default async function OpsPage({
   let growth: GrowthDay[] = [];
   let checklist: string[] = [];
   let dbError = false;
+
+  // Ashlee's run-sheet ticks are the one thing she touches all day, so load
+  // them FIRST and on their own budget. This also warms the pooled connection.
+  // If the heavy aggregate below times out, her ticks still render correctly
+  // (they were never lost — they're saved the instant she taps) instead of the
+  // whole run sheet flashing back to empty and looking like nothing saved.
+  try {
+    checklist = await Promise.race([
+      getChecklist(today),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 15000)),
+    ]);
+  } catch {
+    /* leave [] — the toggle still saves regardless of this read */
+  }
+
   try {
     // Load sequentially (object properties evaluate in order) on the single
     // pooled connection — firing all 9 in parallel deadlocks Supabase's
-    // transaction pooler. Region-pinned to Sydney this is still ~150ms. 9s cap
-    // so a stuck DB never hangs the render.
+    // transaction pooler. Warm it's ~80ms; the generous cap (well under the
+    // 30s function budget) lets a cold/waking DB finish instead of showing
+    // "didn't respond".
     const data = await Promise.race([
       (async () => ({
         entry: await getDailyLog(date),
@@ -258,9 +280,8 @@ export default async function OpsPage({
         satisfaction: await getSatisfaction(monthStartISO, today),
         reorderCount: await getReorderCount(),
         growth: await getGrowthSeries(from60, today),
-        checklist: await getChecklist(today),
       }))(),
-      new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 9000)),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 20000)),
     ]);
     ({
       entry,
@@ -273,7 +294,6 @@ export default async function OpsPage({
       satisfaction,
       reorderCount,
       growth,
-      checklist,
     } = data);
   } catch {
     dbError = true;

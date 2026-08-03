@@ -45,7 +45,7 @@ const sql = postgres(connectionString, {
   prepare: false,
   max: 1,
   idle_timeout: 20, // recycle idle connections (serverless-friendly)
-  connect_timeout: 8, // fail fast (under the 10s function limit) if the DB is unreachable
+  connect_timeout: 15, // allow a cold/waking Supabase pooler time to answer (pages cap the overall wait)
 });
 
 // Memoise a single in-flight promise so parallel reads on a cold start

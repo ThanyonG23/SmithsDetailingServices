@@ -26,6 +26,9 @@ const CELL =
 const TH =
   "whitespace-nowrap px-2.5 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-white/40";
 
+export const maxDuration = 30;
+export const dynamic = "force-dynamic";
+
 export default async function StockPage({
   searchParams,
 }: {
@@ -39,7 +42,7 @@ export default async function StockPage({
     // 9s cap so a stuck DB can't hang the render to the function limit.
     items = await Promise.race([
       getStock(),
-      new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 9000)),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 20000)),
     ]);
   } catch {
     dbError = true;

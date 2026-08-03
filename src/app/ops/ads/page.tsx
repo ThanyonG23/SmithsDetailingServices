@@ -70,6 +70,9 @@ function StatTile({
   );
 }
 
+export const maxDuration = 30;
+export const dynamic = "force-dynamic";
+
 export default async function AdsPage({
   searchParams,
 }: {
@@ -96,7 +99,7 @@ export default async function AdsPage({
         recent: await getRecentLogs(30),
         bookings: await getRecentBookings(from60),
       }))(),
-      new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 9000)),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 20000)),
     ]);
     ({ ads, growth, recent, bookings } = data);
   } catch {

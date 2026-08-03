@@ -43,6 +43,9 @@ type Week = {
   corr: number;
 };
 
+export const maxDuration = 30;
+export const dynamic = "force-dynamic";
+
 export default async function HistoryPage() {
   if (!isAuthed()) redirect("/ops/login");
 
@@ -58,7 +61,7 @@ export default async function HistoryPage() {
         recent: await getRecentLogs(120),
         growth: await getGrowthSeries(from, today),
       }))(),
-      new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 9000)),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 20000)),
     ]);
     ({ recent, growth } = data);
   } catch {

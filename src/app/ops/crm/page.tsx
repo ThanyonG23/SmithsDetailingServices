@@ -14,6 +14,9 @@ const CARD = "rounded-2xl border border-white/10 bg-white/[0.02]";
 const INPUT =
   "w-full rounded-lg border border-white/12 bg-black/40 px-3 py-2 text-sm text-white outline-none placeholder:text-white/30 focus:border-brand-green";
 
+export const maxDuration = 30;
+export const dynamic = "force-dynamic";
+
 export default async function CrmPage({ searchParams }: { searchParams: { q?: string } }) {
   if (!isAuthed()) redirect("/ops/login");
 
@@ -23,7 +26,7 @@ export default async function CrmPage({ searchParams }: { searchParams: { q?: st
   try {
     customers = await Promise.race([
       getCustomers(q),
-      new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 9000)),
+      new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 20000)),
     ]);
   } catch {
     dbError = true;
