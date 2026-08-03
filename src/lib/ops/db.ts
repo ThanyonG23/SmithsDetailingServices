@@ -200,13 +200,42 @@ async function runEnsure(): Promise<void> {
       updated_at timestamptz  NOT NULL DEFAULT now()
     );
   `;
-  // Indexes — keep queries fast as the tables grow (avoids full scans that
-  // trip the timeout on the small DB).
-  await sql`CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings(booking_date);`;
-  await sql`CREATE INDEX IF NOT EXISTS idx_bookings_uid ON bookings(uid);`;
-  await sql`CREATE INDEX IF NOT EXISTS idx_booking_seen_first ON booking_seen(first_seen);`;
-  await sql`CREATE INDEX IF NOT EXISTS idx_followups_status ON job_followups(status);`;
-  await sql`CREATE INDEX IF NOT EXISTS idx_customers_last ON customers(last_seen DESC);`;
+  // Indexes — keep queries fast as the tables grow. Wrapped so a failed
+  // index can NEVER block a write (they're an optimisation, not required).
+  try {
+    await sql`CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings(booking_date);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_bookings_uid ON bookings(uid);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_booking_seen_first ON booking_seen(first_seen);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_followups_status ON job_followups(status);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_customers_last ON customers(last_seen DESC);`;
+  } catch {
+    /* indexes are an optimisation — never let them break a write */
+  }
+}
+
+/** Self-test the checklist read/write path — used by /api/health?deep=checklist. */
+export async function checklistSelfTest(): Promise<Record<string, string>> {
+  const out: Record<string, string> = {};
+  try {
+    const col = await sql`
+      SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'daily_log' AND column_name = 'checklist'
+      ) AS e;
+    `;
+    out.column = (col[0] as { e: boolean } | undefined)?.e ? "exists" : "MISSING";
+  } catch (e) {
+    out.column = "ERR " + (e instanceof Error ? e.message : String(e)).slice(0, 140);
+  }
+  try {
+    await setChecklist("2000-01-02", ["_selftest"]);
+    const back = await getChecklist("2000-01-02");
+    out.roundtrip = back.includes("_selftest") ? "ok" : "wrote, read back " + JSON.stringify(back).slice(0, 60);
+    await sql`DELETE FROM daily_log WHERE log_date = '2000-01-02';`;
+  } catch (e) {
+    out.roundtrip = "ERR " + (e instanceof Error ? e.message : String(e)).slice(0, 160);
+  }
+  return out;
 }
 
 /* ---- daily_log ------------------------------------------------------ */
