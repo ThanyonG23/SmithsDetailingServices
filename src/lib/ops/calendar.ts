@@ -155,13 +155,16 @@ export function parseBookingsIcs(rawInput: string): Booking[] {
       if (all.length) value = Math.max(...all);
     }
 
+    // Keep each extra as its own item (newline-separated) so the team board can
+    // render them as dot points. Split on bullets/pipes/commas/semicolons.
     const extras = fieldFrom(blob, "Extras")
       .split(/📍|BOOKING CONFIRMATION|Referral\s*:|Thanks so much|Phone\s*:|Email\s*:/i)[0]
       .replace(/<[^>]+>/g, " ")
-      .replace(/[•·|]+/g, " ")
-      .replace(/\s+/g, " ")
-      .trim()
-      .slice(0, 120);
+      .split(/[•·|,;]+/)
+      .map((s) => s.replace(/\s+/g, " ").trim())
+      .filter((s) => s.length > 1)
+      .join("\n")
+      .slice(0, 300);
 
     out.push({
       uid: (uidRaw.trim() || `${booking_date}|${value}|${summary.slice(0, 24)}`).slice(0, 200),

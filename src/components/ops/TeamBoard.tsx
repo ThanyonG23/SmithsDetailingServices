@@ -5,8 +5,6 @@ import { useRouter } from "next/navigation";
 import { clockOn, clockOff, saveJobNote } from "@/app/ops/actions";
 import type { TeamJob } from "@/lib/ops/db";
 
-const money = (n: number) => "$" + Math.round(n).toLocaleString("en-AU");
-
 function fmtDur(ms: number): string {
   const s = Math.max(0, Math.floor(ms / 1000));
   const h = Math.floor(s / 3600);
@@ -117,6 +115,10 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
             const liveTotal = j.hours_total + runningMs / 3600000;
             const liveToday = j.hours_today + runningMs / 3600000;
             const busy = busyUid === j.uid;
+            const extraItems = (j.extras || "")
+              .split(/\n|,|;|·|•|\||\/(?=\s)/)
+              .map((s) => s.trim())
+              .filter((s) => s.length > 0);
             return (
               <div
                 key={j.uid}
@@ -134,15 +136,22 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
                       {name?.trim() || "(no name)"}
                     </div>
                     {pkg && <div className="mt-0.5 text-sm font-semibold text-brand-green">{pkg}</div>}
-                    <div className="mt-1 text-xs text-white/40">
-                      {money(j.value)}
-                      {j.is_correction && <span className="ml-1.5 font-bold text-brand-green">· correction</span>}
-                      {j.carried && <span className="ml-1.5 font-semibold text-brand-yellow">· carried over</span>}
-                    </div>
-                    {j.extras && (
-                      <div className="mt-2 rounded-lg border border-white/10 bg-black/30 px-2.5 py-1.5 text-xs text-white/70">
-                        <span className="font-bold text-white/45">Extras: </span>
-                        {j.extras}
+                    {(j.is_correction || j.carried) && (
+                      <div className="mt-1 flex flex-wrap gap-x-2 text-xs">
+                        {j.is_correction && <span className="font-bold text-brand-green">Correction</span>}
+                        {j.carried && <span className="font-semibold text-brand-yellow">Carried over</span>}
+                      </div>
+                    )}
+                    {extraItems.length > 0 && (
+                      <div className="mt-2 rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-xs text-white/75">
+                        <div className="mb-1 text-[10px] font-bold uppercase tracking-wider text-white/45">
+                          Extras
+                        </div>
+                        <ul className="list-disc space-y-0.5 pl-4 marker:text-brand-green">
+                          {extraItems.map((x, i) => (
+                            <li key={i}>{x}</li>
+                          ))}
+                        </ul>
                       </div>
                     )}
                   </div>
