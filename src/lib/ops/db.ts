@@ -18,8 +18,6 @@ export interface DailyLogInput {
   quotes: number;
   redos: number;
   messages: number; // new leads/enquiries received that day
-  happy_customers: number;
-  unhappy_customers: number;
   staff_hours: Record<string, number>;
   staff_shifts: Record<string, { start: string; end: string }>;
   staff_notes: Record<string, string>;
@@ -281,7 +279,7 @@ export async function getDailyLog(date: string): Promise<DailyLog | null> {
            revenue_collected::float8                             AS revenue_collected,
            completed_revenue::float8                             AS completed_revenue,
            ad_spend::float8                                      AS ad_spend,
-           quotes, redos, messages, happy_customers, unhappy_customers,
+           quotes, redos, messages,
            staff_hours, staff_shifts, staff_notes, notes_today,
            to_char(updated_at AT TIME ZONE 'Australia/Brisbane',
                    'YYYY-MM-DD"T"HH24:MI')                       AS updated_at
@@ -298,7 +296,7 @@ export async function getRecentLogs(limit = 30): Promise<DailyLog[]> {
            revenue_collected::float8                             AS revenue_collected,
            completed_revenue::float8                             AS completed_revenue,
            ad_spend::float8                                      AS ad_spend,
-           quotes, redos, messages, happy_customers, unhappy_customers,
+           quotes, redos, messages,
            staff_hours, staff_shifts, staff_notes, notes_today,
            to_char(updated_at AT TIME ZONE 'Australia/Brisbane',
                    'YYYY-MM-DD"T"HH24:MI')                       AS updated_at
@@ -314,11 +312,11 @@ export async function upsertDailyLog(e: DailyLogInput): Promise<void> {
   await sql`
     INSERT INTO daily_log
       (log_date, jobs_completed, revenue_collected, completed_revenue, ad_spend,
-       quotes, redos, messages, happy_customers, unhappy_customers, staff_hours, staff_shifts,
+       quotes, redos, messages, staff_hours, staff_shifts,
        staff_notes, notes_today, updated_at)
     VALUES
       (${e.log_date}, ${e.jobs_completed}, ${e.revenue_collected}, ${e.completed_revenue}, ${e.ad_spend},
-       ${e.quotes}, ${e.redos}, ${e.messages}, ${e.happy_customers}, ${e.unhappy_customers},
+       ${e.quotes}, ${e.redos}, ${e.messages},
        ${sql.json(e.staff_hours)},
        ${sql.json(e.staff_shifts)},
        ${sql.json(e.staff_notes)},
@@ -331,8 +329,6 @@ export async function upsertDailyLog(e: DailyLogInput): Promise<void> {
        quotes            = EXCLUDED.quotes,
        redos             = EXCLUDED.redos,
        messages          = EXCLUDED.messages,
-       happy_customers   = EXCLUDED.happy_customers,
-       unhappy_customers = EXCLUDED.unhappy_customers,
        staff_hours       = EXCLUDED.staff_hours,
        staff_shifts      = EXCLUDED.staff_shifts,
        staff_notes       = EXCLUDED.staff_notes,

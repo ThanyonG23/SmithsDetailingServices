@@ -55,6 +55,25 @@ function totalHours(e: DailyLog | null): number {
   return Number.isFinite(t) ? Math.round(t * 100) / 100 : 0;
 }
 
+// A day counts as "logged" only when real numbers were actually entered — not
+// when a row merely exists. Ticking a run-sheet item auto-creates today's row
+// (with $0 everything), so without this the day looks logged the moment Ashlee
+// ticks her first box: the "log the day" reminder vanishes and a phantom $0 row
+// shows up in history. Any genuine field being non-empty makes it real.
+function isDayLogged(r: DailyLog): boolean {
+  return (
+    (r.revenue_collected ?? 0) > 0 ||
+    (r.completed_revenue ?? 0) > 0 ||
+    (r.jobs_completed ?? 0) > 0 ||
+    (r.ad_spend ?? 0) > 0 ||
+    (r.quotes ?? 0) > 0 ||
+    (r.messages ?? 0) > 0 ||
+    (r.redos ?? 0) > 0 ||
+    (r.notes_today ?? "").trim().length > 0 ||
+    Object.keys(r.staff_hours ?? {}).length > 0
+  );
+}
+
 function revenueStatus(rev: number) {
   const { breakEvenRevenue, aimRevenue } = OPS_TARGETS;
   if (rev <= 0) return { label: "Nothing logged yet", tone: "neutral" as const };
@@ -379,7 +398,7 @@ export default async function OpsPage({
 
   // ── funnel (this week) ──
   const inWeek = (r: DailyLog) => r.log_date >= weekStart && r.log_date <= today;
-  const weekLoggedDays = recent.filter(inWeek).length;
+  const weekLoggedDays = recent.filter((r) => inWeek(r) && isDayLogged(r)).length;
   const weekQuotes = recent.filter(inWeek).reduce((a, r) => a + (r.quotes || 0), 0);
   const weekCompleted = recent.filter(inWeek).reduce((a, r) => a + (r.jobs_completed || 0), 0);
   const weekRedos = recent.filter(inWeek).reduce((a, r) => a + (r.redos || 0), 0);
@@ -402,7 +421,8 @@ export default async function OpsPage({
     .reduce((a, r) => a + r.revenue_collected, 0);
 
   // ── did we log today / missing days ──
-  const loggedDates = new Set(recent.map((r) => r.log_date));
+  const loggedRecent = recent.filter(isDayLogged);
+  const loggedDates = new Set(loggedRecent.map((r) => r.log_date));
   const loggedToday = loggedDates.has(today);
   const missingLast7: string[] = [];
   for (let i = 1; i <= 7; i++) {
@@ -1133,7 +1153,7 @@ export default async function OpsPage({
             <div>
               <div className={EYEBROW}>The record</div>
               <h2 className="mt-2 font-display text-xl font-extrabold tracking-tight text-white">
-                Last 30 days
+                Recent logged days
               </h2>
             </div>
             <a
@@ -1151,7 +1171,7 @@ export default async function OpsPage({
             </div>
           )}
 
-          {recent.length === 0 ? (
+          {loggedRecent.length === 0 ? (
             <p className="text-sm text-white/45">
               No days logged yet — your first entry will show here.
             </p>
@@ -1171,7 +1191,7 @@ export default async function OpsPage({
                   </tr>
                 </thead>
                 <tbody>
-                  {recent.map((r) => {
+                  {loggedRecent.map((r) => {
                     const ok = r.revenue_collected >= breakEvenRevenue;
                     return (
                       <tr

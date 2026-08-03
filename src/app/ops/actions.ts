@@ -83,8 +83,6 @@ export async function saveEntry(formData: FormData): Promise<void> {
     quotes: toNum(formData.get("quotes")),
     redos: toNum(formData.get("redos")),
     messages: toNum(formData.get("messages")),
-    happy_customers: toNum(formData.get("happy_customers")),
-    unhappy_customers: toNum(formData.get("unhappy_customers")),
     staff_hours,
     staff_shifts,
     staff_notes,
