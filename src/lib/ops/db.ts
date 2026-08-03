@@ -64,11 +64,10 @@ async function runEnsure(): Promise<void> {
   // can hang a request to the function timeout). Bump the checked column when
   // the schema grows.
   try {
-    const rows = await sql`
-      SELECT EXISTS (
-        SELECT 1 FROM pg_indexes WHERE indexname = 'idx_bookings_date'
-      ) AS ready;
-    `;
+    // Sentinel = the newest TABLE existing (reliably created, unlike an index
+    // whose creation is wrapped in a swallowed try). Bump this to the newest
+    // table whenever the schema grows so the one-time DDL runs exactly once.
+    const rows = await sql`SELECT to_regclass('public.job_day_hours') IS NOT NULL AS ready;`;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
   } catch {
     /* fall through and run the full setup */
@@ -198,6 +197,36 @@ async function runEnsure(): Promise<void> {
       updated_at timestamptz  NOT NULL DEFAULT now()
     );
   `;
+  // Per-day job hours so a job spanning several days keeps each day's hours
+  // and a running total; job_progress.finished lets an in-progress job carry
+  // over to the next day's floor list until it's marked done.
+  await sql`
+    CREATE TABLE IF NOT EXISTS job_day_hours (
+      uid        text          NOT NULL,
+      work_date  date          NOT NULL,
+      hours      numeric(6,2)  NOT NULL DEFAULT 0,
+      PRIMARY KEY (uid, work_date)
+    );
+  `;
+  await sql`
+    CREATE TABLE IF NOT EXISTS job_progress (
+      uid        text         PRIMARY KEY,
+      finished   boolean      NOT NULL DEFAULT false,
+      updated_at timestamptz  NOT NULL DEFAULT now()
+    );
+  `;
+  // One-time backfill: fold the old single-value job_hours into the per-day
+  // table, stamped to each job's calendar date. Guarded so it runs only while
+  // job_day_hours is still empty (i.e. this first migration pass).
+  await sql`
+    INSERT INTO job_day_hours (uid, work_date, hours)
+    SELECT h.uid, b.booking_date, h.hours
+    FROM job_hours h
+    JOIN bookings b ON b.uid = h.uid
+    WHERE h.hours > 0
+      AND NOT EXISTS (SELECT 1 FROM job_day_hours)
+    ON CONFLICT (uid, work_date) DO NOTHING;
+  `;
   // Indexes — keep queries fast as the tables grow. Wrapped so a failed
   // index can NEVER block a write (they're an optimisation, not required).
   try {
@@ -206,6 +235,7 @@ async function runEnsure(): Promise<void> {
     await sql`CREATE INDEX IF NOT EXISTS idx_booking_seen_first ON booking_seen(first_seen);`;
     await sql`CREATE INDEX IF NOT EXISTS idx_followups_status ON job_followups(status);`;
     await sql`CREATE INDEX IF NOT EXISTS idx_customers_last ON customers(last_seen DESC);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_job_day_hours_uid ON job_day_hours(uid);`;
   } catch {
     /* indexes are an optimisation — never let them break a write */
   }
@@ -465,34 +495,74 @@ export async function getRecentBookings(fromISO: string): Promise<Booking[]> {
   return rows as unknown as Booking[];
 }
 
-/** Today's jobs (from the calendar) with any logged hours joined in. */
+/** Today's jobs (from the calendar) with per-day + running-total hours. */
 export interface JobWithHours extends Booking {
-  hours: number;
+  hours: number; // running total across every day worked
+  hours_today: number; // hours logged for the day being viewed
+  finished: boolean; // marked done (so it stops carrying over)
 }
+
+const JOB_HOURS_SELECT = (date: string) => sql`
+  SELECT b.uid, to_char(b.booking_date, 'YYYY-MM-DD') AS booking_date,
+         b.value::float8 AS value, b.is_correction, b.summary,
+         COALESCE((SELECT sum(hours) FROM job_day_hours d WHERE d.uid = b.uid), 0)::float8 AS hours,
+         COALESCE((SELECT hours FROM job_day_hours d WHERE d.uid = b.uid AND d.work_date = ${date}), 0)::float8 AS hours_today,
+         COALESCE(p.finished, false) AS finished
+`;
+
 export async function getJobsForDate(date: string): Promise<JobWithHours[]> {
   const rows = await sql`
-    SELECT b.uid, to_char(b.booking_date, 'YYYY-MM-DD') AS booking_date,
-           b.value::float8 AS value, b.is_correction, b.summary,
-           COALESCE(h.hours, 0)::float8 AS hours
+    ${JOB_HOURS_SELECT(date)}
     FROM bookings b
-    LEFT JOIN job_hours h ON h.uid = b.uid
+    LEFT JOIN job_progress p ON p.uid = b.uid
     WHERE b.booking_date = ${date}
     ORDER BY b.value DESC;
   `;
   return rows as unknown as JobWithHours[];
 }
 
-/** Save hours-per-car, keyed to the calendar UID so it survives re-uploads. */
-export async function saveJobHours(entries: { uid: string; hours: number }[]): Promise<void> {
+/** Jobs that started on an earlier day and still have unfinished work — so a
+    multi-day job stays on the floor list until it's marked done. Bounded to a
+    recent window so nothing ancient lingers. */
+export async function getCarryoverJobs(today: string, sinceISO: string): Promise<JobWithHours[]> {
+  const rows = await sql`
+    ${JOB_HOURS_SELECT(today)}
+    FROM bookings b
+    LEFT JOIN job_progress p ON p.uid = b.uid
+    WHERE b.booking_date < ${today}
+      AND b.booking_date >= ${sinceISO}
+      AND COALESCE(p.finished, false) = false
+      AND EXISTS (SELECT 1 FROM job_day_hours d WHERE d.uid = b.uid)
+    ORDER BY b.booking_date DESC;
+  `;
+  return rows as unknown as JobWithHours[];
+}
+
+/** Save the hours worked on a car for ONE day (keyed to calendar UID + date),
+    so multi-day jobs accumulate a running total instead of overwriting. */
+export async function setJobDayHours(
+  entries: { uid: string; date: string; hours: number }[]
+): Promise<void> {
   await ensureTable();
   for (const e of entries) {
-    if (!e.uid) continue;
+    if (!e.uid || !/^\d{4}-\d{2}-\d{2}$/.test(e.date)) continue;
     await sql`
-      INSERT INTO job_hours (uid, hours, updated_at)
-      VALUES (${e.uid}, ${e.hours}, now())
-      ON CONFLICT (uid) DO UPDATE SET hours = EXCLUDED.hours, updated_at = now();
+      INSERT INTO job_day_hours (uid, work_date, hours)
+      VALUES (${e.uid}, ${e.date}, ${e.hours})
+      ON CONFLICT (uid, work_date) DO UPDATE SET hours = EXCLUDED.hours;
     `;
   }
+}
+
+/** Mark a (multi-day) job done / not done so it stops carrying over. */
+export async function setJobFinished(uid: string, finished: boolean): Promise<void> {
+  await ensureTable();
+  if (!uid) return;
+  await sql`
+    INSERT INTO job_progress (uid, finished, updated_at)
+    VALUES (${uid}, ${finished}, now())
+    ON CONFLICT (uid) DO UPDATE SET finished = EXCLUDED.finished, updated_at = now();
+  `;
 }
 
 /* ---- customer check-ins (day-after follow-up) --------------------- */

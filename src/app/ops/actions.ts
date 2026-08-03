@@ -9,7 +9,8 @@ import {
   replaceBookings,
   recordBookingsSeen,
   replaceAds,
-  saveJobHours as saveJobHoursDb,
+  setJobDayHours,
+  setJobFinished,
   setFollowupStatus,
   addStockItem,
   updateStock,
@@ -54,7 +55,9 @@ function toNum(v: FormDataEntryValue | null): number {
   return Number.isFinite(n) && n > 0 ? n : 0;
 }
 
-export async function saveEntry(formData: FormData): Promise<void> {
+/** Read the whole day-log form into a record — shared by the explicit save
+    and the as-you-go auto-save so they can never drift apart. */
+function parseDayForm(formData: FormData) {
   const staff_hours: Record<string, number> = {};
   const staff_shifts: Record<string, { start: string; end: string }> = {};
   const staff_notes: Record<string, string> = {};
@@ -72,10 +75,8 @@ export async function saveEntry(formData: FormData): Promise<void> {
     if (note.trim()) staff_notes[name] = note;
   }
 
-  const log_date = String(formData.get("log_date") || "").slice(0, 10);
-
-  await upsertDailyLog({
-    log_date,
+  return {
+    log_date: String(formData.get("log_date") || "").slice(0, 10),
     jobs_completed: toNum(formData.get("jobs_completed")),
     revenue_collected: toNum(formData.get("revenue_collected")),
     completed_revenue: toNum(formData.get("completed_revenue")),
@@ -87,10 +88,26 @@ export async function saveEntry(formData: FormData): Promise<void> {
     staff_shifts,
     staff_notes,
     notes_today: String(formData.get("notes_today") || "").slice(0, 4000),
-  });
+  };
+}
 
+export async function saveEntry(formData: FormData): Promise<void> {
+  const entry = parseDayForm(formData);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(entry.log_date)) redirect("/ops");
+  await upsertDailyLog(entry);
   revalidatePath("/ops");
-  redirect(`/ops?date=${encodeURIComponent(log_date)}&saved=1`);
+  redirect(`/ops?date=${encodeURIComponent(entry.log_date)}&saved=1`);
+}
+
+/** Auto-save the day's log as Ashlee fills it in — the SAME write as "Save the
+    day" but with no redirect, so it fires quietly (debounced) on every change.
+    revalidate keeps the router cache fresh so the numbers are still there when
+    she switches tabs and comes back. */
+export async function autoSaveDay(formData: FormData): Promise<void> {
+  const entry = parseDayForm(formData);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(entry.log_date)) return;
+  await upsertDailyLog(entry);
+  revalidatePath("/ops");
 }
 
 /* Upload the Google Calendar export (.zip or .ics) → parse bookings →
@@ -195,16 +212,22 @@ export async function uploadAds(formData: FormData): Promise<void> {
   redirect(`/ops/ads?adok=${rows.length}`);
 }
 
-/* Save the hours each car took today, keyed to the calendar UID. */
+/* Save the hours each car took TODAY, keyed to the calendar UID + today's
+   date — so a job worked over several days accumulates a running total. */
 export async function logJobHours(formData: FormData): Promise<void> {
-  const entries: { uid: string; hours: number }[] = [];
+  const today = cairnsToday();
+  const entries: { uid: string; date: string; hours: number }[] = [];
+  const finish: string[] = [];
   for (const [key, val] of formData.entries()) {
     if (key.startsWith("jh::")) {
       const h = Number(val);
-      entries.push({ uid: key.slice(4), hours: Number.isFinite(h) && h > 0 ? h : 0 });
+      entries.push({ uid: key.slice(4), date: today, hours: Number.isFinite(h) && h > 0 ? h : 0 });
+    } else if (key.startsWith("fin::")) {
+      finish.push(key.slice(5)); // "Done" ticked on a carried-over job
     }
   }
-  await saveJobHoursDb(entries);
+  await setJobDayHours(entries);
+  for (const uid of finish) await setJobFinished(uid, true);
   revalidatePath("/ops");
   redirect("/ops?jobsok=1");
 }
@@ -216,6 +239,7 @@ export async function setCheckin(formData: FormData): Promise<void> {
   const outcome = String(formData.get("outcome") || "");
   if (uid && ["happy", "unhappy", "rectified"].includes(outcome)) {
     await setFollowupStatus(uid, outcome);
+    await setJobFinished(uid, true); // a check-in means the job's done — stop carry-over
   }
   revalidatePath("/ops");
   redirect("/ops?fuok=1");

@@ -7,6 +7,7 @@ import {
   getRecentBookings,
   getAds,
   getJobsForDate,
+  getCarryoverJobs,
   getFollowups,
   getRectifyList,
   getSatisfaction,
@@ -23,6 +24,7 @@ import {
 import { OPS_TARGETS, OPS_STAFF, cairnsToday } from "@/lib/ops/config";
 import {
   saveEntry,
+  autoSaveDay,
   logout,
   uploadCalendar,
   uploadAds,
@@ -31,6 +33,7 @@ import {
 } from "./actions";
 import StaffHours from "@/components/ops/StaffHours";
 import RunSheet from "@/components/ops/RunSheet";
+import AutoSaveForm from "@/components/ops/AutoSaveForm";
 
 // Reveal is a no-op on ops — the scroll fade-in was slowing Ashlee down,
 // so render everything instantly.
@@ -259,6 +262,7 @@ export default async function OpsPage({
   let bookings: Booking[] = [];
   let ads: AdRow[] = [];
   let todaysJobs: JobWithHours[] = [];
+  let carryover: JobWithHours[] = [];
   let followups: JobFollowup[] = [];
   let rectifyList: JobFollowup[] = [];
   let satisfaction = { happy: 0, unhappy: 0 };
@@ -294,6 +298,7 @@ export default async function OpsPage({
         bookings: await getRecentBookings(from60),
         ads: await getAds(),
         todaysJobs: await getJobsForDate(today),
+        carryover: await getCarryoverJobs(today, d14),
         followups: await getFollowups(fu3, today),
         rectifyList: await getRectifyList(),
         satisfaction: await getSatisfaction(monthStartISO, today),
@@ -308,6 +313,7 @@ export default async function OpsPage({
       bookings,
       ads,
       todaysJobs,
+      carryover,
       followups,
       rectifyList,
       satisfaction,
@@ -367,8 +373,14 @@ export default async function OpsPage({
   const adOk = searchParams?.adok;
   const adErr = searchParams?.aderr;
 
+  // The floor = today's booked cars + any multi-day job carried over from an
+  // earlier day (deduped). Each row logs TODAY's hours and shows the total.
+  const floorJobs = [
+    ...todaysJobs,
+    ...carryover.filter((c) => !todaysJobs.some((t) => t.uid === c.uid)),
+  ];
   const earnedToday = todaysJobs.reduce((a, j) => a + j.value, 0);
-  const hoursOnCars = todaysJobs.reduce((a, j) => a + (j.hours || 0), 0);
+  const hoursToday = floorJobs.reduce((a, j) => a + (j.hours_today || 0), 0);
   const jobsOk = searchParams?.jobsok;
 
   const upcoming = bookings.filter((b) => b.booking_date >= today);
@@ -380,7 +392,10 @@ export default async function OpsPage({
   }
   const scheduleDays = [...scheduleByDay.keys()].sort().slice(0, 12);
 
-  const pendingFollowupList = followups.filter((f) => f.status === "pending");
+  // Check-ins are a day-AFTER job: only cars from a previous day are due, never
+  // a car still being worked today. (fu3 already caps it to the last few days.)
+  const dueFollowups = followups.filter((f) => f.booking_date < today);
+  const pendingFollowupList = dueFollowups.filter((f) => f.status === "pending");
   const pendingFollowups = pendingFollowupList.length;
   const fuOk = searchParams?.fuok;
 
@@ -880,7 +895,7 @@ export default async function OpsPage({
             </div>
           )}
 
-          {todaysJobs.length === 0 ? (
+          {floorJobs.length === 0 ? (
             <p className="text-sm text-white/45">
               No jobs on the calendar for today — upload the latest calendar if that looks wrong.
             </p>
@@ -899,49 +914,79 @@ export default async function OpsPage({
                   tone={rev > 0 && rev >= earnedToday ? "green" : "neutral"}
                 />
                 <StatTile
-                  label="Hours on cars"
-                  value={`${hoursOnCars}h`}
-                  sub={hoursOnCars > 0 ? `${money(earnedToday / hoursOnCars)}/hr` : "log hours ↓"}
+                  label="Hours today"
+                  value={`${Math.round(hoursToday * 100) / 100}h`}
+                  sub={hoursToday > 0 ? `${money(earnedToday / hoursToday)}/hr` : "log hours ↓"}
                 />
               </div>
 
+              <p className="mb-2 text-xs leading-relaxed text-white/45">
+                Log <b className="text-white/70">today&apos;s</b> hours on each car. A job worked over
+                several days keeps a running total and stays here until you tick{" "}
+                <b className="text-white/70">Done</b>.
+              </p>
+
               <form action={logJobHours} className={`${CARD} p-4`}>
                 <div className="flex flex-col gap-2">
-                  {todaysJobs.map((j) => (
-                    <div
-                      key={j.uid}
-                      className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/30 px-3 py-2.5"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm font-semibold text-white/85">
-                          {j.summary || "(no title)"}
+                  {floorJobs.map((j) => {
+                    const carried = j.booking_date < today;
+                    const total = Math.round((j.hours || 0) * 100) / 100;
+                    return (
+                      <div
+                        key={j.uid}
+                        className={`flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border bg-black/30 px-3 py-2.5 ${
+                          carried ? "border-brand-yellow/30" : "border-white/10"
+                        }`}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-sm font-semibold text-white/85">
+                            {j.summary || "(no title)"}
+                          </div>
+                          <div className="text-xs text-white/40">
+                            {money(j.value)}
+                            {j.is_correction && (
+                              <span className="ml-1.5 font-bold text-brand-green">· correction</span>
+                            )}
+                            {carried && (
+                              <span className="ml-1.5 font-semibold text-brand-yellow">
+                                · carried from {dayLabel(j.booking_date)}
+                              </span>
+                            )}
+                            {total > 0 && (
+                              <span className="ml-1.5 text-white/55">· {total}h total</span>
+                            )}
+                          </div>
                         </div>
-                        <div className="text-xs text-white/40">
-                          {money(j.value)}
-                          {j.is_correction && (
-                            <span className="ml-1.5 font-bold text-brand-green">· correction</span>
-                          )}
+                        <div className="flex shrink-0 items-center gap-1.5">
+                          <input
+                            type="number"
+                            name={`jh::${j.uid}`}
+                            defaultValue={j.hours_today || ""}
+                            min={0}
+                            step={0.25}
+                            inputMode="decimal"
+                            placeholder="0"
+                            aria-label={`Hours today for ${j.summary}`}
+                            className="w-16 rounded-lg border border-white/12 bg-black/50 px-2 py-2 text-right text-sm text-white outline-none focus:border-brand-green"
+                          />
+                          <span className="text-xs font-semibold text-white/40">hrs today</span>
                         </div>
+                        <span className="w-14 shrink-0 text-right text-xs font-bold tabular-nums text-brand-green">
+                          {total > 0 ? `${money(j.value / total)}/hr` : ""}
+                        </span>
+                        {carried && (
+                          <label className="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-white/12 px-2.5 py-2 text-xs font-bold text-white/60 transition hover:border-brand-green hover:text-brand-green">
+                            <input
+                              type="checkbox"
+                              name={`fin::${j.uid}`}
+                              className="h-3.5 w-3.5 accent-brand-green"
+                            />
+                            Done
+                          </label>
+                        )}
                       </div>
-                      <div className="flex shrink-0 items-center gap-1.5">
-                        <input
-                          type="number"
-                          name={`jh::${j.uid}`}
-                          defaultValue={j.hours || ""}
-                          min={0}
-                          step={0.25}
-                          inputMode="decimal"
-                          placeholder="0"
-                          aria-label={`Hours for ${j.summary}`}
-                          className="w-16 rounded-lg border border-white/12 bg-black/50 px-2 py-2 text-right text-sm text-white outline-none focus:border-brand-green"
-                        />
-                        <span className="text-xs font-semibold text-white/40">hrs</span>
-                      </div>
-                      <span className="w-16 shrink-0 text-right text-xs font-bold tabular-nums text-brand-green">
-                        {j.hours > 0 ? `${money(j.value / j.hours)}/hr` : ""}
-                      </span>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 <button className="mt-3 rounded-full bg-brand-green px-6 py-2.5 text-xs font-black text-[#04130a] transition hover:brightness-110 active:scale-95">
                   Save hours
@@ -1000,9 +1045,9 @@ export default async function OpsPage({
           )}
 
           {/* pending check-ins */}
-          {followups.length === 0 ? (
+          {dueFollowups.length === 0 ? (
             <p className="text-sm text-white/45">
-              No jobs in the last 3 days — check-ins show here once cars are booked.
+              Nothing due — check-ins show here the day after a car is done.
             </p>
           ) : pendingFollowupList.length === 0 ? (
             <p className="text-sm font-semibold text-brand-green">
@@ -1055,8 +1100,8 @@ export default async function OpsPage({
         </section>
       </Reveal>
 
-      {/* ── ENTRY FORM ───────────────────────────────────────────── */}
-      <form action={saveEntry}>
+      {/* ── ENTRY FORM (auto-saves as you go) ────────────────────── */}
+      <AutoSaveForm action={saveEntry} autoSave={autoSaveDay}>
         {/* the numbers */}
         <section className={`mt-10 ${CARD} p-6`}>
           <SectionTitle
@@ -1144,7 +1189,7 @@ export default async function OpsPage({
             Save the day →
           </button>
         </section>
-      </form>
+      </AutoSaveForm>
 
       {/* ── HISTORY ──────────────────────────────────────────────── */}
       <Reveal>
