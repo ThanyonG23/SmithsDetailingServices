@@ -11,6 +11,8 @@ import {
   replaceAds,
   setJobDayHours,
   setJobFinished,
+  clockStart,
+  clockStop,
   setFollowupStatus,
   addStockItem,
   updateStock,
@@ -235,6 +237,26 @@ export async function logJobHours(formData: FormData): Promise<void> {
   for (const uid of onFloor) await setJobFinished(uid, done.has(uid));
   revalidatePath("/ops");
   redirect("/ops?jobsok=1");
+}
+
+/* ---- detailer time-clock (team board) ----------------------------- */
+
+export async function clockOn(uid: string, detailer: string): Promise<void> {
+  const u = String(uid || "").slice(0, 200);
+  const d = String(detailer || "").slice(0, 40);
+  if (!u || !d) return;
+  await clockStart(u, d, cairnsToday());
+  revalidatePath("/ops/team");
+  revalidatePath("/ops");
+}
+
+export async function clockOff(uid: string, detailer: string): Promise<void> {
+  const u = String(uid || "").slice(0, 200);
+  const d = String(detailer || "").slice(0, 40);
+  if (!u || !d) return;
+  await clockStop(u, d, cairnsToday());
+  revalidatePath("/ops/team");
+  revalidatePath("/ops");
 }
 
 /* Record a customer check-in outcome: happy (done), unhappy (needs rectify),

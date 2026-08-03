@@ -14,6 +14,7 @@ export interface Booking {
   value: number;
   is_correction: boolean;
   summary: string;
+  extras: string; // any "Extras:" the customer added (for the team board)
 }
 
 const BS = String.fromCharCode(92); // backslash
@@ -154,6 +155,14 @@ export function parseBookingsIcs(rawInput: string): Booking[] {
       if (all.length) value = Math.max(...all);
     }
 
+    const extras = fieldFrom(blob, "Extras")
+      .split(/📍|BOOKING CONFIRMATION|Referral\s*:|Thanks so much|Phone\s*:|Email\s*:/i)[0]
+      .replace(/<[^>]+>/g, " ")
+      .replace(/[•·|]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .slice(0, 120);
+
     out.push({
       uid: (uidRaw.trim() || `${booking_date}|${value}|${summary.slice(0, 24)}`).slice(0, 200),
       booking_date,
@@ -163,6 +172,7 @@ export function parseBookingsIcs(rawInput: string): Booking[] {
       // Value ≥ $1,500 is a safe correction signal for the current pricing.
       is_correction: value >= 1500 || /correction|coating|ceramic/i.test(summary),
       summary: summary.slice(0, 200),
+      extras,
     });
   }
   return out;

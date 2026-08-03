@@ -67,7 +67,7 @@ async function runEnsure(): Promise<void> {
     // Sentinel = the newest TABLE existing (reliably created, unlike an index
     // whose creation is wrapped in a swallowed try). Bump this to the newest
     // table whenever the schema grows so the one-time DDL runs exactly once.
-    const rows = await sql`SELECT to_regclass('public.job_day_hours') IS NOT NULL AS ready;`;
+    const rows = await sql`SELECT to_regclass('public.job_clock') IS NOT NULL AS ready;`;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
   } catch {
     /* fall through and run the full setup */
@@ -103,6 +103,7 @@ async function runEnsure(): Promise<void> {
     );
   `;
   await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS uid text NOT NULL DEFAULT '';`;
+  await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS extras text NOT NULL DEFAULT '';`;
   await sql`
     CREATE TABLE IF NOT EXISTS job_hours (
       uid        text          PRIMARY KEY,
@@ -215,6 +216,19 @@ async function runEnsure(): Promise<void> {
       updated_at timestamptz  NOT NULL DEFAULT now()
     );
   `;
+  // Detailer time-clock: one row per detailer's start→stop on a car. Hours on a
+  // car for a day = sum of these durations, rolled into job_day_hours.
+  await sql`
+    CREATE TABLE IF NOT EXISTS job_clock (
+      id         serial       PRIMARY KEY,
+      uid        text         NOT NULL,
+      detailer   text         NOT NULL,
+      work_date  date         NOT NULL,
+      start_ts   timestamptz  NOT NULL DEFAULT now(),
+      end_ts     timestamptz,
+      updated_at timestamptz  NOT NULL DEFAULT now()
+    );
+  `;
   // One-time backfill: fold the old single-value job_hours into the per-day
   // table, stamped to each job's calendar date. Guarded so it runs only while
   // job_day_hours is still empty (i.e. this first migration pass).
@@ -236,6 +250,8 @@ async function runEnsure(): Promise<void> {
     await sql`CREATE INDEX IF NOT EXISTS idx_followups_status ON job_followups(status);`;
     await sql`CREATE INDEX IF NOT EXISTS idx_customers_last ON customers(last_seen DESC);`;
     await sql`CREATE INDEX IF NOT EXISTS idx_job_day_hours_uid ON job_day_hours(uid);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_job_clock_open ON job_clock(detailer) WHERE end_ts IS NULL;`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_job_clock_uid ON job_clock(uid, work_date);`;
   } catch {
     /* indexes are an optimisation — never let them break a write */
   }
@@ -380,7 +396,8 @@ export async function replaceBookings(list: Booking[]): Promise<void> {
       "booking_date",
       "value",
       "is_correction",
-      "summary"
+      "summary",
+      "extras"
     )}`;
   }
 }
@@ -586,6 +603,100 @@ export async function setJobFinished(uid: string, finished: boolean): Promise<vo
     VALUES (${uid}, ${finished}, now())
     ON CONFLICT (uid) DO UPDATE SET finished = EXCLUDED.finished, updated_at = now();
   `;
+}
+
+/* ---- detailer time-clock (the team board) ------------------------- */
+
+/** Recompute a car's hours for a day = sum of every finished clock that day. */
+async function recomputeJobDayHours(uid: string, date: string): Promise<void> {
+  await sql`
+    INSERT INTO job_day_hours (uid, work_date, hours)
+    VALUES (${uid}, ${date}, COALESCE((
+      SELECT sum(EXTRACT(EPOCH FROM (end_ts - start_ts)) / 3600.0)
+      FROM job_clock
+      WHERE uid = ${uid} AND work_date = ${date} AND end_ts IS NOT NULL
+    ), 0))
+    ON CONFLICT (uid, work_date) DO UPDATE SET hours = EXCLUDED.hours;
+  `;
+}
+
+/** A detailer starts on a car. Closes any car they were already on (one car at
+    a time), then opens a fresh clock. Recomputes any car that got closed. */
+export async function clockStart(uid: string, detailer: string, date: string): Promise<void> {
+  await ensureTable();
+  if (!uid || !detailer || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+  const closed = await sql`
+    UPDATE job_clock SET end_ts = now(), updated_at = now()
+    WHERE detailer = ${detailer} AND end_ts IS NULL
+    RETURNING uid, to_char(work_date, 'YYYY-MM-DD') AS d;
+  `;
+  await sql`
+    INSERT INTO job_clock (uid, detailer, work_date, start_ts)
+    VALUES (${uid}, ${detailer}, ${date}, now());
+  `;
+  for (const r of closed as unknown as { uid: string; d: string }[]) {
+    await recomputeJobDayHours(r.uid, r.d);
+  }
+}
+
+/** A detailer stops on a car. Closes their open clock for it and recomputes. */
+export async function clockStop(uid: string, detailer: string, date: string): Promise<void> {
+  await ensureTable();
+  if (!uid || !detailer) return;
+  await sql`
+    UPDATE job_clock SET end_ts = now(), updated_at = now()
+    WHERE detailer = ${detailer} AND uid = ${uid} AND end_ts IS NULL;
+  `;
+  await recomputeJobDayHours(uid, date);
+}
+
+export interface TeamActive {
+  detailer: string;
+  start_ms: number;
+}
+export interface TeamJob {
+  uid: string;
+  summary: string;
+  value: number;
+  is_correction: boolean;
+  extras: string;
+  carried: boolean;
+  hours_today: number;
+  active: TeamActive[];
+}
+
+/** Today's floor for the detailers: today's cars + unfinished carried jobs,
+    each with hours logged today and who's currently clocked on. */
+export async function getTeamDay(date: string, sinceISO: string): Promise<TeamJob[]> {
+  const jobs = await sql`
+    SELECT b.uid, b.summary, b.value::float8 AS value, b.is_correction,
+           COALESCE(b.extras, '') AS extras,
+           (b.booking_date < ${date}) AS carried,
+           COALESCE((
+             SELECT sum(EXTRACT(EPOCH FROM (end_ts - start_ts)) / 3600.0)
+             FROM job_clock c WHERE c.uid = b.uid AND c.work_date = ${date} AND c.end_ts IS NOT NULL
+           ), 0)::float8 AS hours_today
+    FROM bookings b
+    LEFT JOIN job_progress p ON p.uid = b.uid
+    WHERE b.booking_date = ${date}
+       OR (b.booking_date < ${date} AND b.booking_date >= ${sinceISO}
+           AND COALESCE(p.finished, false) = false)
+    ORDER BY b.booking_date DESC, b.value DESC;
+  `;
+  const open = await sql`
+    SELECT uid, detailer, (EXTRACT(EPOCH FROM start_ts) * 1000)::float8 AS start_ms
+    FROM job_clock WHERE work_date = ${date} AND end_ts IS NULL;
+  `;
+  const byUid: Record<string, TeamActive[]> = {};
+  for (const o of open as unknown as { uid: string; detailer: string; start_ms: number }[]) {
+    (byUid[o.uid] ||= []).push({ detailer: o.detailer, start_ms: Number(o.start_ms) });
+  }
+  return (jobs as unknown as TeamJob[]).map((j) => ({
+    ...j,
+    value: Number(j.value),
+    hours_today: Number(j.hours_today),
+    active: byUid[j.uid] || [],
+  }));
 }
 
 /* ---- customer check-ins (day-after follow-up) --------------------- */
