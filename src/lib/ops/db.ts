@@ -532,6 +532,7 @@ export async function getCarryoverJobs(today: string, sinceISO: string): Promise
     WHERE b.booking_date < ${today}
       AND b.booking_date >= ${sinceISO}
       AND COALESCE(p.finished, false) = false
+      AND (b.is_correction OR b.value >= 800)  -- only genuine multi-day jobs carry over
       AND EXISTS (SELECT 1 FROM job_day_hours d WHERE d.uid = b.uid)
     ORDER BY b.booking_date DESC;
   `;
