@@ -55,45 +55,33 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
     });
   };
 
-  // ── name picker ──
-  if (!me) {
-    return (
-      <div className="mt-8">
-        <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">
-          Who are you?
+  return (
+    <div className="mt-6">
+      {/* name selector — always visible so the cars are never hidden behind it */}
+      <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-3">
+        <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">
+          You are
         </div>
-        <p className="mt-2 text-sm text-white/50">Tap your name — it&apos;s remembered on this device.</p>
-        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <div className="mt-2 flex flex-wrap gap-2">
           {staff.map((name) => (
             <button
               key={name}
               onClick={() => pick(name)}
-              className="rounded-2xl border border-white/12 bg-white/[0.03] px-4 py-6 font-display text-lg font-extrabold text-white transition hover:border-brand-green hover:bg-brand-green/10 active:scale-95"
+              className={`rounded-full px-4 py-2 text-sm font-extrabold transition active:scale-95 ${
+                me === name
+                  ? "bg-brand-green text-[#04130a]"
+                  : "border border-white/15 bg-white/[0.03] text-white/70 hover:border-brand-green hover:text-white"
+              }`}
             >
               {name}
             </button>
           ))}
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="mt-6">
-      <div className="flex items-center justify-between gap-3 rounded-2xl border border-brand-green/25 bg-brand-green/[0.05] px-4 py-3">
-        <div>
-          <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-brand-green/70">You are</div>
-          <div className="font-display text-xl font-extrabold text-white">{me}</div>
-        </div>
-        <button
-          onClick={() => {
-            localStorage.removeItem("smiths_detailer");
-            setMe(null);
-          }}
-          className="rounded-full border border-white/15 px-3 py-1.5 text-xs font-bold text-white/60 transition hover:text-white"
-        >
-          Not you?
-        </button>
+        {!me && (
+          <p className="mt-2 text-xs font-semibold text-brand-yellow">
+            👆 Tap your name to start clocking cars (remembered on this device).
+          </p>
+        )}
       </div>
 
       {jobs.length === 0 ? (
@@ -168,14 +156,22 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
 
                 <button
                   onClick={() => toggle(j.uid, !!mine)}
-                  disabled={busy}
+                  disabled={busy || !me}
                   className={`mt-3 w-full rounded-xl px-4 py-3.5 text-sm font-black transition active:scale-[0.98] disabled:opacity-50 ${
-                    mine
+                    !me
+                      ? "border border-white/15 bg-white/[0.03] text-white/50"
+                      : mine
                       ? "bg-red-500/90 text-white hover:brightness-110"
                       : "bg-brand-green text-[#04130a] hover:brightness-110"
                   }`}
                 >
-                  {busy ? "…" : mine ? `■ Stop — ${fmtDur(now - mine.start_ms)}` : "▶ Start on this car"}
+                  {!me
+                    ? "Tap your name above first"
+                    : busy
+                    ? "…"
+                    : mine
+                    ? `■ Stop — ${fmtDur(now - mine.start_ms)}`
+                    : "▶ Start on this car"}
                 </button>
                 {others.length > 0 && !mine && (
                   <p className="mt-1.5 text-center text-[11px] text-white/35">
