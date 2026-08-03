@@ -289,6 +289,33 @@ export async function dashDiagnostics(): Promise<Record<string, string>> {
   return out;
 }
 
+/** Why is the team board empty? ?deep=team */
+export async function teamDiagnostics(): Promise<Record<string, string>> {
+  const fmt = (ms: number) =>
+    new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Brisbane" }).format(new Date(ms));
+  const today = fmt(Date.now());
+  const since = fmt(Date.now() - 13 * 86400000);
+  const out: Record<string, string> = { today, since };
+  try {
+    const b = await sql`SELECT count(*)::int AS n FROM bookings WHERE booking_date = ${today};`;
+    out.bookingsToday = String((b[0] as { n: number }).n);
+    const all = await sql`
+      SELECT count(*)::int AS n,
+             to_char(min(booking_date), 'YYYY-MM-DD') AS mn,
+             to_char(max(booking_date), 'YYYY-MM-DD') AS mx
+      FROM bookings;`;
+    const a = all[0] as { n: number; mn: string; mx: string };
+    out.bookingsTotal = String(a.n);
+    out.bookingRange = `${a.mn}..${a.mx}`;
+    const t = await getTeamDay(today, since);
+    out.teamJobs = String(t.length);
+    out.sample = t.slice(0, 4).map((j) => j.summary).join(" | ").slice(0, 160);
+  } catch (e) {
+    out.error = (e instanceof Error ? e.message : String(e)).slice(0, 200);
+  }
+  return out;
+}
+
 /** Self-test the checklist read/write path — used by /api/health?deep=checklist. */
 export async function checklistSelfTest(): Promise<Record<string, string>> {
   const out: Record<string, string> = {};
