@@ -68,7 +68,7 @@ async function runEnsure(): Promise<void> {
   try {
     const rows = await sql`
       SELECT EXISTS (
-        SELECT 1 FROM information_schema.tables WHERE table_name = 'customers'
+        SELECT 1 FROM pg_indexes WHERE indexname = 'idx_bookings_date'
       ) AS ready;
     `;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
@@ -200,6 +200,13 @@ async function runEnsure(): Promise<void> {
       updated_at timestamptz  NOT NULL DEFAULT now()
     );
   `;
+  // Indexes — keep queries fast as the tables grow (avoids full scans that
+  // trip the timeout on the small DB).
+  await sql`CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings(booking_date);`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_bookings_uid ON bookings(uid);`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_booking_seen_first ON booking_seen(first_seen);`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_followups_status ON job_followups(status);`;
+  await sql`CREATE INDEX IF NOT EXISTS idx_customers_last ON customers(last_seen DESC);`;
 }
 
 /* ---- daily_log ------------------------------------------------------ */
