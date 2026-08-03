@@ -213,6 +213,38 @@ async function runEnsure(): Promise<void> {
   }
 }
 
+/** Time each dashboard read to find the slow/failing one. ?deep=dash */
+export async function dashDiagnostics(): Promise<Record<string, string>> {
+  const fmt = (ms: number) =>
+    new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Brisbane" }).format(new Date(ms));
+  const today = fmt(Date.now());
+  const from60 = fmt(Date.now() - 60 * 86400000);
+  const checks: [string, () => Promise<unknown>][] = [
+    ["getDailyLog", () => getDailyLog(today)],
+    ["getRecentLogs", () => getRecentLogs(30)],
+    ["getRecentBookings", () => getRecentBookings(from60)],
+    ["getAds", () => getAds()],
+    ["getJobsForDate", () => getJobsForDate(today)],
+    ["getFollowups", () => getFollowups(from60, today)],
+    ["getRectifyList", () => getRectifyList()],
+    ["getSatisfaction", () => getSatisfaction(from60, today)],
+    ["getReorderCount", () => getReorderCount()],
+    ["getGrowthSeries", () => getGrowthSeries(from60, today)],
+    ["getChecklist", () => getChecklist(today)],
+  ];
+  const out: Record<string, string> = {};
+  for (const [name, fn] of checks) {
+    const t0 = Date.now();
+    try {
+      await fn();
+      out[name] = Date.now() - t0 + "ms";
+    } catch (e) {
+      out[name] = "ERR " + (Date.now() - t0) + "ms " + (e instanceof Error ? e.message : String(e)).slice(0, 90);
+    }
+  }
+  return out;
+}
+
 /** Self-test the checklist read/write path — used by /api/health?deep=checklist. */
 export async function checklistSelfTest(): Promise<Record<string, string>> {
   const out: Record<string, string> = {};

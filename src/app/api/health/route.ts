@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { pingDb, checklistSelfTest } from "@/lib/ops/db";
+import { pingDb, checklistSelfTest, dashDiagnostics } from "@/lib/ops/db";
 
 /* Keep-warm health check. A free external pinger hits this every few minutes
    so the serverless function stays warm AND the Supabase database never
@@ -12,8 +12,9 @@ export async function GET(req: Request) {
   const deep = new URL(req.url).searchParams.get("deep");
   const ok = await pingDb();
   const checklist = deep === "checklist" ? await checklistSelfTest() : undefined;
+  const dash = deep === "dash" ? await dashDiagnostics() : undefined;
   return NextResponse.json(
-    { ok, checklist, service: "smiths-ops", ts: new Date().toISOString() },
+    { ok, checklist, dash, service: "smiths-ops", ts: new Date().toISOString() },
     { status: ok ? 200 : 503, headers: { "Cache-Control": "no-store" } }
   );
 }
