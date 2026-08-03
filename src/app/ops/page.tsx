@@ -334,18 +334,23 @@ export default async function OpsPage({
     };
   }
 
-  const rev = entry?.revenue_collected ?? 0;
-  const status = revenueStatus(rev);
+  // The scoreboard runs on revenue EARNED (work completed), not cash collected.
+  // Collected lags — deposits, payment timing — so it understates how much the
+  // team actually produced. Earned is the real "did we do enough to be
+  // profitable today" gauge; collected is shown alongside as the cash figure.
+  const earned = entry?.completed_revenue ?? 0;
+  const collected = entry?.revenue_collected ?? 0;
+  const status = revenueStatus(earned);
   const { breakEvenRevenue, aimRevenue, jobsTarget, weeklyTarget, monthlyTarget } = OPS_TARGETS;
-  const aimPct = Math.min(100, Math.round((rev / aimRevenue) * 100));
+  const aimPct = Math.min(100, Math.round((earned / aimRevenue) * 100));
   const bePct = Math.min(100, Math.round((breakEvenRevenue / aimRevenue) * 100));
 
   const weekRevenue = recent
     .filter((r) => r.log_date >= weekStart && r.log_date <= today)
-    .reduce((a, r) => a + r.revenue_collected, 0);
+    .reduce((a, r) => a + (r.completed_revenue || 0), 0);
   const monthRevenue = recent
     .filter((r) => r.log_date.startsWith(monthKey))
-    .reduce((a, r) => a + r.revenue_collected, 0);
+    .reduce((a, r) => a + (r.completed_revenue || 0), 0);
 
   const last14 = bookings.filter((b) => b.booking_date >= d14 && b.booking_date <= today);
   const corr14 = last14.filter((b) => b.is_correction).length;
@@ -433,7 +438,7 @@ export default async function OpsPage({
   );
   const prevWeekRevenue = recent
     .filter((r) => r.log_date >= prevWeekStart && r.log_date <= prevWeekEnd)
-    .reduce((a, r) => a + r.revenue_collected, 0);
+    .reduce((a, r) => a + (r.completed_revenue || 0), 0);
 
   // ── did we log today / missing days ──
   const loggedRecent = recent.filter(isDayLogged);
@@ -626,7 +631,7 @@ export default async function OpsPage({
             }`}
           >
             <div className="flex items-center justify-between">
-              <div className={EYEBROW}>Today&apos;s takings</div>
+              <div className={EYEBROW}>Revenue earned today</div>
               <div
                 className={`rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-wider ${
                   status.tone === "yellow"
@@ -641,14 +646,18 @@ export default async function OpsPage({
             </div>
 
             <div className="mt-3 font-display text-6xl font-extrabold leading-none tabular-nums text-white sm:text-7xl">
-              {money(rev)}
+              {money(earned)}
+            </div>
+            <div className="mt-1.5 text-sm font-semibold text-white/45">
+              Work completed today · <span className="text-white/70">{money(collected)}</span> cash
+              collected so far
             </div>
 
             {/* progress toward the aim, with the break-even marker */}
             <div className="relative mt-6 h-3.5 overflow-hidden rounded-full bg-white/10">
               <div
                 className={`h-full rounded-full transition-all ${
-                  rev >= breakEvenRevenue ? "bg-brand-green" : "bg-brand-yellow"
+                  earned >= breakEvenRevenue ? "bg-brand-green" : "bg-brand-yellow"
                 }`}
                 style={{ width: `${aimPct}%` }}
               />
@@ -675,9 +684,10 @@ export default async function OpsPage({
             tone={(entry?.jobs_completed ?? 0) >= jobsTarget ? "green" : "neutral"}
           />
           <StatTile
-            label="Completed"
-            value={money(entry?.completed_revenue ?? 0)}
-            sub="work done today"
+            label="Cash collected"
+            value={money(collected)}
+            sub="banked today"
+            tone={collected > 0 ? "green" : "neutral"}
           />
           <StatTile
             label="Happy (mo)"
@@ -722,7 +732,7 @@ export default async function OpsPage({
           </div>
           {prevWeekRevenue > 0 && (
             <div className="mt-1 text-xs text-white/35">
-              Last full week collected {money(prevWeekRevenue)}.
+              Last full week earned {money(prevWeekRevenue)}.
             </div>
           )}
         </section>
@@ -909,9 +919,9 @@ export default async function OpsPage({
                 />
                 <StatTile
                   label="Collected"
-                  value={money(rev)}
+                  value={money(collected)}
                   sub="cash logged"
-                  tone={rev > 0 && rev >= earnedToday ? "green" : "neutral"}
+                  tone={collected > 0 && collected >= earnedToday ? "green" : "neutral"}
                 />
                 <StatTile
                   label="Hours today"
@@ -1128,18 +1138,18 @@ export default async function OpsPage({
               defaultValue={entry?.jobs_completed ?? ""}
             />
             <NumField
-              label="Revenue collected"
-              name="revenue_collected"
-              prefix="$"
-              step={0.01}
-              defaultValue={entry?.revenue_collected ?? ""}
-            />
-            <NumField
-              label="Completed revenue (est)"
+              label="Revenue earned (est) — drives the board"
               name="completed_revenue"
               prefix="$"
               step={0.01}
               defaultValue={entry?.completed_revenue ?? ""}
+            />
+            <NumField
+              label="Cash collected today"
+              name="revenue_collected"
+              prefix="$"
+              step={0.01}
+              defaultValue={entry?.revenue_collected ?? ""}
             />
             <NumField
               label="Ad spend today"
