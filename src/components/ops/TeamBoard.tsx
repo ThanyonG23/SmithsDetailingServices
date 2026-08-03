@@ -115,10 +115,18 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
             const liveTotal = j.hours_total + runningMs / 3600000;
             const liveToday = j.hours_today + runningMs / 3600000;
             const busy = busyUid === j.uid;
+            // Split into items on delimiters OR on a price (e.g. "…: $100 …: +$85"),
+            // then strip any leftover dollar amounts — no pricing on the crew board.
             const extraItems = (j.extras || "")
-              .split(/\n|,|;|·|•|\||\/(?=\s)/)
-              .map((s) => s.trim())
-              .filter((s) => s.length > 0);
+              .split(/(?::?\s*\+?\$\s*[\d,]+(?:\.\d{1,2})?)|[\n,;·•|]+/)
+              .map((s) =>
+                s
+                  .replace(/\+?\$\s*[\d,]+(?:\.\d{1,2})?/g, "")
+                  .replace(/^[\s:+\-–]+|[\s:+\-–]+$/g, "")
+                  .replace(/\s+/g, " ")
+                  .trim()
+              )
+              .filter((s) => s.length > 1);
             return (
               <div
                 key={j.uid}
