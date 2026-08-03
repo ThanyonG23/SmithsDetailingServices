@@ -999,12 +999,19 @@ export default async function OpsPage({
                           />
                           Done
                         </label>
+                        <textarea
+                          name={`note::${j.uid}`}
+                          defaultValue={j.note}
+                          rows={1}
+                          placeholder="Notes for the crew — what's left, anything to rectify…"
+                          className="mt-1 w-full resize-y rounded-lg border border-white/10 bg-black/30 px-2.5 py-2 text-xs text-white/80 outline-none placeholder:text-white/25 focus:border-brand-green"
+                        />
                       </div>
                     );
                   })}
                 </div>
                 <button className="mt-3 rounded-full bg-brand-green px-6 py-2.5 text-xs font-black text-[#04130a] transition hover:brightness-110 active:scale-95">
-                  Save hours
+                  Save hours &amp; notes
                 </button>
               </form>
             </>

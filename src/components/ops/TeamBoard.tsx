@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { clockOn, clockOff } from "@/app/ops/actions";
+import { clockOn, clockOff, saveJobNote } from "@/app/ops/actions";
 import type { TeamJob } from "@/lib/ops/db";
 
 const money = (n: number) => "$" + Math.round(n).toLocaleString("en-AU");
@@ -22,6 +22,9 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
   const [me, setMe] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const [busyUid, setBusyUid] = useState<string | null>(null);
+  const [noteOpen, setNoteOpen] = useState<string | null>(null);
+  const [noteText, setNoteText] = useState<Record<string, string>>({});
+  const [noteBusy, setNoteBusy] = useState<string | null>(null);
   const [, startTransition] = useTransition();
   const tick = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -52,6 +55,21 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
       else await clockOn(uid, me);
       router.refresh();
       setBusyUid(null);
+    });
+  };
+
+  const openNote = (uid: string, current: string) => {
+    setNoteText((t) => ({ ...t, [uid]: t[uid] ?? current }));
+    setNoteOpen(uid);
+  };
+  const saveNote = (uid: string) => {
+    setNoteBusy(uid);
+    const text = noteText[uid] ?? "";
+    startTransition(async () => {
+      await saveJobNote(uid, text);
+      router.refresh();
+      setNoteBusy(null);
+      setNoteOpen(null);
     });
   };
 
@@ -155,6 +173,52 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
                       </span>
                     ))}
                   </div>
+                )}
+
+                {/* running note — what still needs doing / to rectify */}
+                {noteOpen === j.uid ? (
+                  <div className="mt-3">
+                    <textarea
+                      value={noteText[j.uid] ?? j.note}
+                      onChange={(e) => setNoteText((t) => ({ ...t, [j.uid]: e.target.value }))}
+                      rows={3}
+                      autoFocus
+                      placeholder="What still needs doing, anything missed to rectify…"
+                      className="w-full resize-y rounded-lg border border-white/12 bg-black/40 px-3 py-2 text-sm text-white outline-none placeholder:text-white/30 focus:border-brand-green"
+                    />
+                    <div className="mt-1.5 flex gap-2">
+                      <button
+                        onClick={() => saveNote(j.uid)}
+                        disabled={noteBusy === j.uid}
+                        className="rounded-full bg-brand-green px-4 py-1.5 text-xs font-black text-[#04130a] transition active:scale-95 disabled:opacity-50"
+                      >
+                        {noteBusy === j.uid ? "…" : "Save note"}
+                      </button>
+                      <button
+                        onClick={() => setNoteOpen(null)}
+                        className="rounded-full border border-white/15 px-4 py-1.5 text-xs font-bold text-white/60"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : j.note ? (
+                  <button
+                    onClick={() => openNote(j.uid, j.note)}
+                    className="mt-3 block w-full rounded-lg border border-brand-yellow/30 bg-brand-yellow/[0.06] px-3 py-2 text-left"
+                  >
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-brand-yellow/80">
+                      📝 Notes · tap to edit
+                    </span>
+                    <span className="mt-0.5 block whitespace-pre-wrap text-sm text-white/85">{j.note}</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => openNote(j.uid, "")}
+                    className="mt-3 text-xs font-bold text-white/45 transition hover:text-brand-green"
+                  >
+                    ＋ Add a note
+                  </button>
                 )}
 
                 <button

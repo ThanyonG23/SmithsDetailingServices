@@ -11,6 +11,7 @@ import {
   replaceAds,
   setJobDayHours,
   setJobFinished,
+  setJobNote,
   clockStart,
   clockStop,
   setFollowupStatus,
@@ -223,6 +224,7 @@ export async function logJobHours(formData: FormData): Promise<void> {
   const entries: { uid: string; date: string; hours: number }[] = [];
   const onFloor: string[] = []; // every job shown (hidden job:: marker)
   const done = new Set<string>(); // the ones with "Done" ticked
+  const notes: { uid: string; note: string }[] = [];
   for (const [key] of formData.entries()) {
     if (key.startsWith("jh::")) {
       const h = Number(formData.get(key));
@@ -231,17 +233,29 @@ export async function logJobHours(formData: FormData): Promise<void> {
       onFloor.push(key.slice(5));
     } else if (key.startsWith("fin::")) {
       done.add(key.slice(5));
+    } else if (key.startsWith("note::")) {
+      notes.push({ uid: key.slice(6), note: String(formData.get(key) || "").slice(0, 1000) });
     }
   }
   await setJobDayHours(entries);
   // A job leaves the floor ONLY when its Done box is ticked; unticking puts it
   // back. Toggle every job on the floor so it reflects the boxes exactly.
   for (const uid of onFloor) await setJobFinished(uid, done.has(uid));
+  for (const n of notes) await setJobNote(n.uid, n.note);
   revalidatePath("/ops");
   redirect("/ops?jobsok=1");
 }
 
 /* ---- detailer time-clock (team board) ----------------------------- */
+
+/** Save a car's running note (from the team board). */
+export async function saveJobNote(uid: string, note: string): Promise<void> {
+  const u = String(uid || "").slice(0, 200);
+  if (!u) return;
+  await setJobNote(u, String(note || "").slice(0, 1000));
+  revalidatePath("/ops/team");
+  revalidatePath("/ops");
+}
 
 export async function clockOn(uid: string, detailer: string): Promise<void> {
   const u = String(uid || "").slice(0, 200);

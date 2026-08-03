@@ -67,7 +67,11 @@ async function runEnsure(): Promise<void> {
     // Sentinel = the newest TABLE existing (reliably created, unlike an index
     // whose creation is wrapped in a swallowed try). Bump this to the newest
     // table whenever the schema grows so the one-time DDL runs exactly once.
-    const rows = await sql`SELECT to_regclass('public.job_clock') IS NOT NULL AS ready;`;
+    const rows = await sql`
+      SELECT EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'job_progress' AND column_name = 'notes'
+      ) AS ready;`;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
   } catch {
     /* fall through and run the full setup */
@@ -216,6 +220,9 @@ async function runEnsure(): Promise<void> {
       updated_at timestamptz  NOT NULL DEFAULT now()
     );
   `;
+  // A running note per car (what still needs doing, rectify items) that travels
+  // with the job across days.
+  await sql`ALTER TABLE job_progress ADD COLUMN IF NOT EXISTS notes text NOT NULL DEFAULT '';`;
   // Detailer time-clock: one row per detailer's start→stop on a car. Hours on a
   // car for a day = sum of these durations, rolled into job_day_hours.
   await sql`
@@ -544,6 +551,7 @@ export interface JobWithHours extends Booking {
   hours: number; // running total across every day worked
   hours_today: number; // hours logged for the day being viewed
   finished: boolean; // marked done (so it stops carrying over)
+  note: string; // running per-car note
 }
 
 const JOB_HOURS_SELECT = (date: string) => sql`
@@ -551,7 +559,8 @@ const JOB_HOURS_SELECT = (date: string) => sql`
          b.value::float8 AS value, b.is_correction, b.summary,
          COALESCE((SELECT sum(hours) FROM job_day_hours d WHERE d.uid = b.uid), 0)::float8 AS hours,
          COALESCE((SELECT hours FROM job_day_hours d WHERE d.uid = b.uid AND d.work_date = ${date}), 0)::float8 AS hours_today,
-         COALESCE(p.finished, false) AS finished
+         COALESCE(p.finished, false) AS finished,
+         COALESCE(p.notes, '') AS note
 `;
 
 export async function getJobsForDate(date: string): Promise<JobWithHours[]> {
@@ -632,6 +641,17 @@ export async function setJobFinished(uid: string, finished: boolean): Promise<vo
   `;
 }
 
+/** Set the running per-car note (what still needs doing / rectify items). */
+export async function setJobNote(uid: string, note: string): Promise<void> {
+  await ensureTable();
+  if (!uid) return;
+  await sql`
+    INSERT INTO job_progress (uid, notes, updated_at)
+    VALUES (${uid}, ${note}, now())
+    ON CONFLICT (uid) DO UPDATE SET notes = EXCLUDED.notes, updated_at = now();
+  `;
+}
+
 /* ---- detailer time-clock (the team board) ------------------------- */
 
 /** Recompute a car's hours for a day = sum of every finished clock that day. */
@@ -690,6 +710,7 @@ export interface TeamJob {
   carried: boolean;
   hours_today: number; // completed clock hours today
   hours_total: number; // running total across every day worked
+  note: string; // running per-car note (what still needs doing)
   active: TeamActive[];
 }
 
@@ -707,7 +728,8 @@ export async function getTeamDay(date: string, sinceISO: string): Promise<TeamJo
            ), 0)::float8 AS hours_today,
            COALESCE((
              SELECT sum(hours) FROM job_day_hours d WHERE d.uid = b.uid
-           ), 0)::float8 AS hours_total
+           ), 0)::float8 AS hours_total,
+           COALESCE(p.notes, '') AS note
     FROM bookings b
     LEFT JOIN job_progress p ON p.uid = b.uid
     WHERE COALESCE(p.finished, false) = false
