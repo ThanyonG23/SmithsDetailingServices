@@ -420,22 +420,26 @@ export async function upsertDailyLog(e: DailyLogInput): Promise<void> {
 
 /* ---- bookings (from the uploaded calendar) -------------------------- */
 
-/** Replace the whole bookings table with a fresh calendar snapshot. */
+/** Replace the whole bookings table with a fresh calendar snapshot. Atomic:
+    the delete + insert run in one transaction so a mid-way timeout can never
+    leave the table empty (it rolls back and the old snapshot survives). */
 export async function replaceBookings(list: Booking[]): Promise<void> {
   await ensureTable();
-  await sql`DELETE FROM bookings;`;
-  if (list.length) {
-    await sql`INSERT INTO bookings ${sql(
-      list,
-      "uid",
-      "booking_date",
-      "value",
-      "is_correction",
-      "summary",
-      "extras",
-      "car"
-    )}`;
-  }
+  await sql.begin(async (tx) => {
+    await tx`DELETE FROM bookings;`;
+    if (list.length) {
+      await tx`INSERT INTO bookings ${tx(
+        list,
+        "uid",
+        "booking_date",
+        "value",
+        "is_correction",
+        "summary",
+        "extras",
+        "car"
+      )}`;
+    }
+  });
 }
 
 /** Record the first day each booking (UID) appears — for new-bookings/day.
