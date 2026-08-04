@@ -456,26 +456,25 @@ const BOOK = "Would you like to book this in?";
 
 function correctionBody(interior: number, bonus: number, total: string): string {
   return `Hey! We can definitely take care of your vehicle with our Exterior Correction Package
-
 Our Exterior Correction Package Also Includes:
+
 ✅ Contact Wash
 ✅ Decontamination Wash
 ✅ Clay Bar Treatment
 ✅ Multi Stage Paint Correction
 ✅ 3 Year Ceramic Coating
 
-🎁 BONUS #1: FREE Premium Interior Detail (Valued at $${interior})
+🎁 BONUS #1: FREE Premium Interior Detail (Valued At $${interior})
 🎁 BONUS #2: LIMITED TIME FREE UPGRADES
 ✅ Engine Bay Detail
 ✅ Exterior Plastic Restore
 
 Bonus Free Inclusions: $${bonus}
 Total Price Today: $${total}
-
 ⏱️ 1-2 days turnaround
 ${LOC}
-${GUARANTEE}
 
+${GUARANTEE}
 ${BOOK}`;
 }
 
