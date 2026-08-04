@@ -215,6 +215,25 @@ function StatTile({
 
 /* --------------------------------------------------------------------- */
 
+// Pre-filled daily reflection template for "How the day went" — same GM
+// checklist every day so it imprints the habit. Detailer lines come from the
+// roster (OPS_STAFF minus the leader) so they stay in sync if the crew changes.
+const DAY_NOTES_TEMPLATE = [
+  "Good:",
+  "",
+  "Bad:",
+  "",
+  ...OPS_STAFF.slice(1).flatMap((name) => [`${name}:`, ""]),
+  "Room for improvement:",
+  "",
+  "What went really well:",
+  "",
+  "How do you maximise revenue:",
+  "",
+  "How did you cut costs:",
+  "",
+].join("\n");
+
 // Give the page real headroom. The default ~10s function budget meant a
 // cold or waking database blew the internal cap and showed "didn't respond".
 // Fluid Compute allows up to 60s; 30s is plenty for a cold start to complete.
@@ -1258,10 +1277,10 @@ export default async function OpsPage({
           <SectionTitle eyebrow="The story" title="How the day went" />
           <textarea
             name="notes_today"
-            rows={4}
-            defaultValue={entry?.notes_today ?? ""}
-            placeholder="Wins, hold-ups, anything you want me to see — the good and the bad."
-            className={`${FIELD} px-3 py-3`}
+            rows={16}
+            defaultValue={entry?.notes_today || DAY_NOTES_TEMPLATE}
+            placeholder="Fill in each line, the good and the bad."
+            className={`${FIELD} resize-y px-3 py-3 leading-relaxed`}
           />
 
           <button
