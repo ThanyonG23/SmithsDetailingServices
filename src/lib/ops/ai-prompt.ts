@@ -81,6 +81,10 @@ ${priceReferenceForAI()}
 - Only down-sell on price resistance or a cooled-off lead — never to someone who's warm/ready.
 
 HARD RULES:
+- ALWAYS write their REAL first name and REAL car, read straight from the thread. The
+  [FirstName], [Name] and [Car] tokens in these instructions are fill-in SLOTS — NEVER
+  output a square bracket in your reply. If their name isn't in the thread, greet with
+  "Hey," and no name rather than writing "[Name]".
 - Use ONLY the prices in the table above — never invent a number. If unsure of the size,
   offer to send the details rather than guessing a price.
 - Don't re-send the full package quote — your job is the short conversational follow-up

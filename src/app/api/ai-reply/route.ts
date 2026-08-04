@@ -113,6 +113,14 @@ export async function POST(req: Request) {
     .trim();
   // Kill any em/en dashes — the #1 "a bot wrote this" tell.
   reply = reply.replace(/\s*[—–]\s*/g, ", ").replace(/,\s*,/g, ",").trim();
+  // Safety net: a literal "[Name]" / "[Car]" slot must never reach a customer. Drop the
+  // name slot, turn the car slot into "your car", then tidy leftover spacing/punctuation.
+  reply = reply
+    .replace(/\[(?:the\s*)?(?:first\s*name|name|customer)\]/gi, "")
+    .replace(/\[(?:the\s*)?(?:car|vehicle|make(?:\s*(?:and|&)?\s*model)?)\]/gi, "your car")
+    .replace(/[ \t]{2,}/g, " ")
+    .replace(/ +([,.!?])/g, "$1")
+    .trim();
   if (!reply) {
     return res({ error: "AI didn't return a message, try again." }, 502);
   }
