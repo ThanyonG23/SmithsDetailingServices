@@ -43,7 +43,15 @@ export default async function TemplatesPage({
     { key: "interior", title: "Interior", emoji: "🧽", match: /^interior/i },
     { key: "booking", title: "Booking messages", emoji: "💬", match: /^booking/i },
   ];
-  const groups: TemplateGroup[] = defs.map((d) => ({ ...d, items: [] as Template[] }));
+  // NOTE: only serializable fields go into the group objects — the `match`
+  // RegExp must NOT be spread in, or passing groups to the client component
+  // throws "server-side exception" (RegExp can't cross the RSC boundary).
+  const groups: TemplateGroup[] = defs.map((d) => ({
+    key: d.key,
+    title: d.title,
+    emoji: d.emoji,
+    items: [] as Template[],
+  }));
   const other: Template[] = [];
   for (const t of templates) {
     const d = defs.find((def) => def.match.test(t.title || ""));

@@ -24,6 +24,7 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
   const [noteText, setNoteText] = useState<Record<string, string>>({});
   const [noteBusy, setNoteBusy] = useState<string | null>(null);
   const [manageOpen, setManageOpen] = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
   const [, startTransition] = useTransition();
 
   // The team leader (first in the roster — Ashlee) can clock anyone on/off.
@@ -53,11 +54,17 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
   const toggleFor = (uid: string, detailer: string, active: boolean) => {
     if (!detailer) return;
     setBusyUid(uid);
+    setErr(null);
     startTransition(async () => {
-      if (active) await clockOff(uid, detailer);
-      else await clockOn(uid, detailer);
-      router.refresh();
-      setBusyUid(null);
+      try {
+        if (active) await clockOff(uid, detailer);
+        else await clockOn(uid, detailer);
+        router.refresh();
+      } catch {
+        setErr("Couldn't update the clock — check your connection and try again.");
+      } finally {
+        setBusyUid(null);
+      }
     });
   };
   const toggle = (uid: string, active: boolean) => {
@@ -71,12 +78,18 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
   };
   const saveNote = (uid: string) => {
     setNoteBusy(uid);
+    setErr(null);
     const text = noteText[uid] ?? "";
     startTransition(async () => {
-      await saveJobNote(uid, text);
-      router.refresh();
-      setNoteBusy(null);
-      setNoteOpen(null);
+      try {
+        await saveJobNote(uid, text);
+        router.refresh();
+        setNoteOpen(null);
+      } catch {
+        setErr("Couldn't save the note — check your connection and try again.");
+      } finally {
+        setNoteBusy(null);
+      }
     });
   };
 
@@ -108,6 +121,12 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
           </p>
         )}
       </div>
+
+      {err && (
+        <div className="mt-3 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-2.5 text-sm text-brand-yellow">
+          {err}
+        </div>
+      )}
 
       {jobs.length === 0 ? (
         <p className="mt-6 text-sm text-white/45">
