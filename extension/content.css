@@ -82,4 +82,6 @@
   cursor: pointer;
 }
 .smiths-lh-copy { background: #111827 !important; color: #fff !important; border-color: #111827 !important; }
+.smiths-lh-new { background: #059669 !important; color: #fff !important; border-color: #059669 !important; }
+.smiths-lh-redo { flex: 0 0 auto; }
 .smiths-lh-actions button:hover { filter: brightness(0.96); }

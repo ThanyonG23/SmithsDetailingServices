@@ -34,6 +34,7 @@
       <div class="smiths-lh-read"></div>
       <div class="smiths-lh-actions">
         <button class="smiths-lh-copy">Copy reply</button>
+        <button class="smiths-lh-new">＋ New Lead</button>
         <button class="smiths-lh-redo">Redraft</button>
       </div>
     </div>`;
@@ -43,6 +44,7 @@
   const replyEl = panel.querySelector(".smiths-lh-reply");
   const readEl = panel.querySelector(".smiths-lh-read");
   const copyBtn = panel.querySelector(".smiths-lh-copy");
+  const newBtn = panel.querySelector(".smiths-lh-new");
   const redoBtn = panel.querySelector(".smiths-lh-redo");
 
   panel.querySelector(".smiths-lh-x").addEventListener("click", () => {
@@ -108,6 +110,9 @@
   replyEl.addEventListener("input", autosize);
 
   btn.addEventListener("click", run);
+  // "New Lead": grab whatever's highlighted now (the next conversation) and
+  // draft fresh, so you never close the panel between leads.
+  newBtn.addEventListener("click", run);
   redoBtn.addEventListener("click", () => {
     if (lastThread) {
       setStatus("Redrafting…", "");
