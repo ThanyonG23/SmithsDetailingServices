@@ -41,7 +41,12 @@ const connectionString =
 const sql = postgres(connectionString, {
   ssl: "require",
   prepare: false,
-  max: 1,
+  // Vercel Fluid Compute runs several requests in ONE instance, so max:1 meant
+  // the whole crew fought over a single connection and some requests deadlocked
+  // to the timeout. Each request still loads its queries SEQUENTIALLY (never
+  // Promise.all — that deadlocks the pooler), so a bigger pool only ever serves
+  // one query per connection at a time: concurrent *requests* each get their own.
+  max: 8,
   idle_timeout: 20, // recycle idle connections (serverless-friendly)
   connect_timeout: 15, // allow a cold/waking Supabase pooler time to answer (pages cap the overall wait)
 });
