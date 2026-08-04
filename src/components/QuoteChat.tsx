@@ -383,7 +383,7 @@ export default function QuoteChat() {
                     value={vehicleInput}
                     onChange={(e) => setVehicleInput(e.target.value)}
                     placeholder="e.g. Toyota Landcruiser"
-                    className="w-full rounded-xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white outline-none placeholder:text-white/25 focus:border-brand-green"
+                    className="w-full rounded-xl border border-white/15 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/25 focus:border-brand-green text-[16px]"
                   />
                   <button
                     type="submit"
@@ -489,21 +489,21 @@ export default function QuoteChat() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Name"
-                    className="w-full rounded-xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white outline-none placeholder:text-white/25 focus:border-brand-green"
+                    className="w-full rounded-xl border border-white/15 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/25 focus:border-brand-green text-[16px]"
                   />
                   <input
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Email"
                     type="email"
-                    className="w-full rounded-xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white outline-none placeholder:text-white/25 focus:border-brand-green"
+                    className="w-full rounded-xl border border-white/15 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/25 focus:border-brand-green text-[16px]"
                   />
                   <input
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="Phone"
                     type="tel"
-                    className="w-full rounded-xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white outline-none placeholder:text-white/25 focus:border-brand-green"
+                    className="w-full rounded-xl border border-white/15 bg-black/40 px-4 py-3 text-white outline-none placeholder:text-white/25 focus:border-brand-green text-[16px]"
                   />
                   {error && <div className="text-xs font-semibold text-red-400">{error}</div>}
                   <button
