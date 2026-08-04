@@ -3,6 +3,7 @@ import { requireOwner } from "@/lib/ops/auth";
 import { getTemplates, type Template } from "@/lib/ops/db";
 import { saveTemplate, seedTemplates } from "../actions";
 import TemplateGroups, { type TemplateGroup } from "@/components/ops/TemplateGroups";
+import LeadReplyHelper from "@/components/ops/LeadReplyHelper";
 
 export const metadata: Metadata = {
   title: "Templates | Smiths Detailing",
@@ -127,6 +128,8 @@ export default async function TemplatesPage({
           Save template(s)
         </button>
       </form>
+
+      <LeadReplyHelper />
 
       <p className="mt-14 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-white/20">
         Smiths Detailing · Cairns · Team only
