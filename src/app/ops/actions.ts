@@ -483,8 +483,8 @@ ${BOOK}`;
 
 function interiorBody(price: string): string {
   return `Hey! We can definitely take care of your vehicle with our Premium Interior Package
-
 This Package Also Includes:
+
 ✅ Interior Vacuum
 ✅ Carpet Shampoo
 ✅ Carpet Extraction
@@ -495,6 +495,7 @@ This Package Also Includes:
 ⏱️ 2-3 hours
 💵 $${price}
 ${LOC}
+
 ${GUARANTEE}
 
 ${BOOK}`;
@@ -502,8 +503,8 @@ ${BOOK}`;
 
 function premiumBody(price: string, hrs: string): string {
   return `Hey! We can definitely take care of your vehicle with our Premium Interior & Exterior Detail
-
 This package also includes:
+
 ✅ Deep Interior Clean
 ✅ Carpet Shampoo & Extraction
 ✅ Plastic Rejuvenation
@@ -514,6 +515,7 @@ This package also includes:
 ⏱️ Takes ${hrs}
 💵 $${price}
 ${LOC}
+
 ${GUARANTEE}
 
 ${BOOK}`;
@@ -521,8 +523,8 @@ ${BOOK}`;
 
 function cutPolishBody(price: string): string {
   return `Hey! We can definitely take care of your vehicle with our Premium Interior & Exterior Detail + Cut & Polish Package
-
 This package also includes:
+
 ✅ Deep Interior Clean
 ✅ Carpet Shampoo & Extraction
 ✅ Plastic Rejuvenation
@@ -535,6 +537,7 @@ This package also includes:
 ⏱️ 24 hour turnaround
 💰 $${price}
 ${LOC}
+
 ${GUARANTEE}
 
 ${BOOK}`;
