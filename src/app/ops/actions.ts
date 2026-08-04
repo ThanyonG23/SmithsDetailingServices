@@ -479,6 +479,25 @@ ${GUARANTEE}
 ${BOOK}`;
 }
 
+function interiorBody(price: string): string {
+  return `Hey! We can definitely take care of your vehicle with our Premium Interior Package
+
+This Package Also Includes:
+✅ Interior Vacuum
+✅ Carpet Shampoo
+✅ Carpet Extraction
+✅ Interior Surfaces Cleaned
+✅ Interior Plastic Rejuvenated
+✅ Windows Streak Free
+
+⏱️ 2-3 hours
+💵 $${price}
+${LOC}
+${GUARANTEE}
+
+${BOOK}`;
+}
+
 function premiumBody(price: string, hrs: string): string {
   return `Hey! We can definitely take care of your vehicle with our Premium Interior & Exterior Detail
 
@@ -578,6 +597,10 @@ const STANDARD_TEMPLATES: { title: string; body: string; sort: number }[] = [
   { title: "Correction — Sedan/Dual Cab ($2,100)", body: correctionBody(280, 450, "2,100"), sort: 1 },
   { title: "Correction — SUV ($2,200)", body: correctionBody(330, 500, "2,200"), sort: 2 },
   { title: "Correction — 7 Seater ($2,300)", body: correctionBody(350, 535, "2,300"), sort: 3 },
+  { title: "Interior Only — Single Cab ($250)", body: interiorBody("250"), sort: 5 },
+  { title: "Interior Only — Sedan/Dual Cab ($300)", body: interiorBody("300"), sort: 6 },
+  { title: "Interior Only — SUV ($330)", body: interiorBody("330"), sort: 7 },
+  { title: "Interior Only — 7 Seater ($350)", body: interiorBody("350"), sort: 8 },
   { title: "Cut & Polish — Single Cab ($850)", body: cutPolishBody("850"), sort: 10 },
   { title: "Cut & Polish — Sedan/Dual Cab ($1,000)", body: cutPolishBody("1,000"), sort: 11 },
   { title: "Cut & Polish — SUV ($1,100)", body: cutPolishBody("1,100"), sort: 12 },

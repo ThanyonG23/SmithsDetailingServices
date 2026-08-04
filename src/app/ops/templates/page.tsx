@@ -63,9 +63,9 @@ export default async function TemplatesPage({
       {/* load the standard Cairns set */}
       <form action={seedTemplates} className={`mt-5 ${CARD} flex flex-wrap items-center justify-between gap-3 p-4`}>
         <div>
-          <div className="text-sm font-bold text-white">Load Smiths standard templates (16)</div>
+          <div className="text-sm font-bold text-white">Load Smiths standard templates (20)</div>
           <div className="mt-0.5 text-xs text-white/45">
-            Booking flow + Correction · Cut &amp; Polish · Premium Detail (one per size).{" "}
+            Booking flow + Correction · Cut &amp; Polish · Premium Detail · Interior Only (one per size).{" "}
             <b className="text-brand-yellow/80">Replaces all current templates.</b>
           </div>
         </div>
