@@ -8,6 +8,7 @@ const INPUT =
 export default function LeadReplyHelper() {
   const [thread, setThread] = useState("");
   const [reply, setReply] = useState("");
+  const [read, setRead] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState("");
   const [copied, setCopied] = useState(false);
@@ -17,6 +18,7 @@ export default function LeadReplyHelper() {
     setLoading(true);
     setErr("");
     setReply("");
+    setRead("");
     setCopied(false);
     try {
       const r = await fetch("/api/ai-reply", {
@@ -26,7 +28,10 @@ export default function LeadReplyHelper() {
       });
       const d = await r.json();
       if (!r.ok) setErr(d.error || "Something went wrong.");
-      else setReply(d.reply || "");
+      else {
+        setReply(d.reply || "");
+        setRead(d.read || "");
+      }
     } catch {
       setErr("Couldn't reach the AI — check your connection and try again.");
     }
@@ -87,8 +92,15 @@ export default function LeadReplyHelper() {
         </div>
       )}
 
+      {read && (
+        <div className="mt-3 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-xs text-white/55">
+          <span className="font-bold text-white/40">📖 The read: </span>
+          {read}
+        </div>
+      )}
+
       {reply && (
-        <div className="mt-3 rounded-xl border border-white/12 bg-black/30 p-3">
+        <div className="mt-2 rounded-xl border border-white/12 bg-black/30 p-3">
           <div className="flex items-center justify-between gap-3">
             <div className="text-[10px] font-bold uppercase tracking-wider text-white/40">Suggested reply</div>
             <button

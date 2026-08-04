@@ -39,13 +39,13 @@ export async function POST(req: Request) {
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-haiku-4-5-20251001",
-        max_tokens: 400,
+        model: "claude-sonnet-5",
+        max_tokens: 600,
         system: buildSystemPrompt(),
         messages: [
           {
             role: "user",
-            content: `Here is the conversation so far with a lead (newest at the bottom, timestamps included where available):\n\n${thread}\n\nWrite the single best follow-up message to send them now.`,
+            content: `Here is the whole conversation with a lead (newest at the bottom, with timestamps where available). Read it carefully, work out where they are and why they haven't booked, then write the single best follow-up to send now.\n\n${thread}`,
           },
         ],
       }),
@@ -56,9 +56,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "AI error: " + t.slice(0, 300) }, { status: 502 });
     }
     const data = await r.json();
-    const reply = (data?.content?.[0]?.text || "").trim();
-    if (!reply) return NextResponse.json({ error: "AI returned nothing — try again." }, { status: 502 });
-    return NextResponse.json({ reply });
+    const raw = (data?.content?.[0]?.text || "").trim();
+    if (!raw) return NextResponse.json({ error: "AI returned nothing — try again." }, { status: 502 });
+
+    // Split the model's "READ: … REPLY: …" output into the two parts.
+    let read = "";
+    let reply = raw;
+    const m = raw.search(/(^|\n)\s*REPLY\s*:/i);
+    if (m >= 0) {
+      const cut = raw.indexOf(":", raw.search(/REPLY\s*:/i));
+      reply = raw.slice(cut + 1).trim();
+      const readMatch = raw.slice(0, m).match(/READ\s*:\s*([\s\S]*?)\s*$/i);
+      read = readMatch ? readMatch[1].trim() : "";
+    }
+    return NextResponse.json({ reply, read });
   } catch {
     return NextResponse.json({ error: "Couldn't reach the AI — try again in a moment." }, { status: 502 });
   }
