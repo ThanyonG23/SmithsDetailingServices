@@ -39,17 +39,26 @@ export async function POST(req: Request) {
   }
 
   let thread = "";
+  let note = "";
   try {
-    ({ thread } = await req.json());
+    const body = await req.json();
+    thread = body?.thread;
+    note = body?.note;
   } catch {
     /* ignore */
   }
   thread = String(thread || "").slice(0, 8000);
+  note = String(note || "").slice(0, 500).trim();
   if (!thread.trim()) {
     return res({ error: "Paste a message thread first." }, 400);
   }
 
-  const userContent = `Here is the whole conversation with a lead (newest at the bottom, with timestamps where available). Read it carefully, work out where they are and why they haven't booked, then write the single best follow-up to send now.\n\n${thread}`;
+  let userContent = `Here is the whole conversation with a lead (newest at the bottom, with timestamps where available). Read it carefully, work out where they are and why they haven't booked, then write the single best follow-up to send now.\n\n${thread}`;
+  if (note) {
+    // A steering note the team typed for THIS reply (e.g. "downsell to a cheaper
+    // package"). It overrides your own read — do what it says, in the Smiths voice.
+    userContent += `\n\n---\nINSTRUCTION FROM THE SMITHS TEAM for this specific reply. Follow it exactly, while keeping the Smiths voice and all the rules: ${note}`;
+  }
 
   // Call one model. Returns the raw text, or an error string if it failed.
   const call = async (model: string): Promise<{ raw?: string; err?: string }> => {

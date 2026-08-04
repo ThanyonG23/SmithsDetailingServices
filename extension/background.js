@@ -10,7 +10,7 @@ async function getSettings() {
   };
 }
 
-async function draft(thread) {
+async function draft(thread, note) {
   const { appUrl, token } = await getSettings();
   if (!token) {
     return { error: "Set the extension token first (click the Smiths icon up top)." };
@@ -20,7 +20,7 @@ async function draft(thread) {
     r = await fetch(`${appUrl}/api/ai-reply`, {
       method: "POST",
       headers: { "content-type": "application/json", "x-ext-token": token },
-      body: JSON.stringify({ thread }),
+      body: JSON.stringify({ thread, note: note || "" }),
     });
   } catch (e) {
     return { error: "Couldn't reach the app. Check the App URL in settings. " + (e && e.message ? e.message : "") };
@@ -39,7 +39,7 @@ async function draft(thread) {
 
 chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg && msg.type === "DRAFT_REPLY") {
-    draft(String(msg.thread || "")).then(sendResponse);
+    draft(String(msg.thread || ""), String(msg.note || "")).then(sendResponse);
     return true; // keep the channel open for the async reply
   }
 });

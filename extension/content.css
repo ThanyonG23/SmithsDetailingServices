@@ -70,6 +70,20 @@
   margin-top: 8px;
   font-style: italic;
 }
+.smiths-lh-note {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 10px;
+  border: 1px dashed #9ca3af;
+  border-radius: 9px;
+  padding: 8px 10px;
+  font: inherit;
+  color: #111827;
+  background: #f9fafb;
+}
+.smiths-lh-note::placeholder { color: #9ca3af; }
+.smiths-lh-note:focus { outline: 2px solid #059669; outline-offset: 0; border-style: solid; border-color: #059669; }
+
 .smiths-lh-actions { display: flex; gap: 8px; margin-top: 10px; }
 .smiths-lh-actions button {
   flex: 1;

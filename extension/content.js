@@ -32,6 +32,8 @@
       <div class="smiths-lh-status"></div>
       <textarea class="smiths-lh-reply" rows="5" spellcheck="false"></textarea>
       <div class="smiths-lh-read"></div>
+      <input class="smiths-lh-note" type="text" spellcheck="false"
+        placeholder="Note to AI (optional), e.g. downsell to a cheaper package — then Redraft" />
       <div class="smiths-lh-actions">
         <button class="smiths-lh-copy">Copy reply</button>
         <button class="smiths-lh-new">＋ New Lead</button>
@@ -46,6 +48,7 @@
   const copyBtn = panel.querySelector(".smiths-lh-copy");
   const newBtn = panel.querySelector(".smiths-lh-new");
   const redoBtn = panel.querySelector(".smiths-lh-redo");
+  const noteEl = panel.querySelector(".smiths-lh-note");
 
   panel.querySelector(".smiths-lh-x").addEventListener("click", () => {
     panel.style.display = "none";
@@ -86,7 +89,7 @@
     readEl.textContent = "";
     setStatus("Drafting…", "");
     btn.disabled = true;
-    chrome.runtime.sendMessage({ type: "DRAFT_REPLY", thread }, (resp) => {
+    chrome.runtime.sendMessage({ type: "DRAFT_REPLY", thread, note: noteEl.value.trim() }, (resp) => {
       btn.disabled = false;
       if (chrome.runtime.lastError || !resp) {
         setStatus("Something went wrong. Reload the page and try again.", "err");
@@ -110,14 +113,24 @@
   replyEl.addEventListener("input", autosize);
 
   btn.addEventListener("click", run);
-  // "New Lead": grab whatever's highlighted now (the next conversation) and
-  // draft fresh, so you never close the panel between leads.
-  newBtn.addEventListener("click", run);
+  // "New Lead": clear the previous note, grab whatever's highlighted now (the next
+  // conversation) and draft fresh, so you never close the panel between leads.
+  newBtn.addEventListener("click", () => {
+    noteEl.value = "";
+    run();
+  });
+  // Enter in the note box = Redraft, so you can type guidance and go.
+  noteEl.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      redoBtn.click();
+    }
+  });
   redoBtn.addEventListener("click", () => {
     if (lastThread) {
-      setStatus("Redrafting…", "");
+      setStatus(noteEl.value.trim() ? "Redrafting with your note…" : "Redrafting…", "");
       btn.disabled = true;
-      chrome.runtime.sendMessage({ type: "DRAFT_REPLY", thread: lastThread }, (resp) => {
+      chrome.runtime.sendMessage({ type: "DRAFT_REPLY", thread: lastThread, note: noteEl.value.trim() }, (resp) => {
         btn.disabled = false;
         if (resp && resp.reply) {
           replyEl.value = resp.reply;
