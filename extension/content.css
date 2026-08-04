@@ -1,0 +1,85 @@
+.smiths-lh-btn {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 2147483646;
+  background: #111827;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 11px 18px;
+  font: 600 14px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.28);
+  cursor: pointer;
+}
+.smiths-lh-btn:hover { background: #000; }
+.smiths-lh-btn:disabled { opacity: 0.6; cursor: default; }
+
+.smiths-lh-panel {
+  position: fixed;
+  right: 20px;
+  bottom: 72px;
+  z-index: 2147483647;
+  width: 360px;
+  max-width: calc(100vw - 40px);
+  background: #fff;
+  color: #111827;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
+  font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
+}
+.smiths-lh-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #111827;
+  color: #fff;
+}
+.smiths-lh-title { font-weight: 700; font-size: 14px; }
+.smiths-lh-x {
+  background: transparent; border: none; color: #cbd5e1;
+  font-size: 15px; cursor: pointer; line-height: 1;
+}
+.smiths-lh-x:hover { color: #fff; }
+.smiths-lh-body { padding: 12px 14px 14px; }
+
+.smiths-lh-status { font-size: 12.5px; margin-bottom: 8px; color: #6b7280; min-height: 16px; }
+.smiths-lh-status.ok { color: #059669; }
+.smiths-lh-status.warn { color: #b45309; }
+.smiths-lh-status.err { color: #dc2626; }
+
+.smiths-lh-reply {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #d1d5db;
+  border-radius: 9px;
+  padding: 9px 10px;
+  font: inherit;
+  color: #111827;
+  resize: vertical;
+  background: #fff;
+}
+.smiths-lh-reply:focus { outline: 2px solid #111827; outline-offset: 0; border-color: #111827; }
+
+.smiths-lh-read {
+  font-size: 12.5px;
+  color: #6b7280;
+  margin-top: 8px;
+  font-style: italic;
+}
+.smiths-lh-actions { display: flex; gap: 8px; margin-top: 10px; }
+.smiths-lh-actions button {
+  flex: 1;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  color: #111827;
+  border-radius: 9px;
+  padding: 8px 10px;
+  font: 600 13px/1 inherit;
+  cursor: pointer;
+}
+.smiths-lh-copy { background: #111827 !important; color: #fff !important; border-color: #111827 !important; }
+.smiths-lh-actions button:hover { filter: brightness(0.96); }

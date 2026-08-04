@@ -5,17 +5,36 @@ import { buildSystemPrompt } from "@/lib/ops/ai-prompt";
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
-/* Drafts a lead follow-up from a pasted conversation thread. Owner-only so the
+// The in-app helper calls this same-origin with the owner cookie. The browser
+// extension (running on Meta's site) calls it cross-origin with a shared token,
+// so we allow CORS and answer the preflight.
+const CORS: Record<string, string> = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "content-type, x-ext-token",
+  "Access-Control-Max-Age": "86400",
+};
+const res = (body: unknown, status = 200) =>
+  NextResponse.json(body, { status, headers: CORS });
+
+export async function OPTIONS() {
+  return new NextResponse(null, { status: 204, headers: CORS });
+}
+
+/* Drafts a lead follow-up from a pasted conversation thread. Authorised either by
+   the owner login (in-app helper) or the extension token (Chrome extension), so the
    API key can't be abused. Uses the fast/cheap Claude model — a few $0.001 each. */
 export async function POST(req: Request) {
-  if (!isOwner()) {
-    return NextResponse.json({ error: "Not authorised." }, { status: 401 });
+  const envToken = process.env.AI_REPLY_EXT_TOKEN || "";
+  const viaToken = !!envToken && (req.headers.get("x-ext-token") || "") === envToken;
+  if (!viaToken && !isOwner()) {
+    return res({ error: "Not authorised." }, 401);
   }
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) {
-    return NextResponse.json(
+    return res(
       { error: "AI isn't set up yet — add ANTHROPIC_API_KEY in Vercel → Settings → Environment Variables, then redeploy." },
-      { status: 503 }
+      503
     );
   }
 
@@ -27,7 +46,7 @@ export async function POST(req: Request) {
   }
   thread = String(thread || "").slice(0, 8000);
   if (!thread.trim()) {
-    return NextResponse.json({ error: "Paste a message thread first." }, { status: 400 });
+    return res({ error: "Paste a message thread first." }, 400);
   }
 
   const userContent = `Here is the whole conversation with a lead (newest at the bottom, with timestamps where available). Read it carefully, work out where they are and why they haven't booked, then write the single best follow-up to send now.\n\n${thread}`;
@@ -65,7 +84,7 @@ export async function POST(req: Request) {
   let out = await call("claude-sonnet-5");
   if (!out.raw) out = await call("claude-haiku-4-5-20251001");
   if (!out.raw) {
-    return NextResponse.json({ error: "AI error — " + (out.err || "no reply") }, { status: 502 });
+    return res({ error: "AI error — " + (out.err || "no reply") }, 502);
   }
 
   // The model writes the MESSAGE first, then "WHY: …". Split on WHY so the
@@ -95,7 +114,7 @@ export async function POST(req: Request) {
   // Kill any em/en dashes — the #1 "a bot wrote this" tell.
   reply = reply.replace(/\s*[—–]\s*/g, ", ").replace(/,\s*,/g, ",").trim();
   if (!reply) {
-    return NextResponse.json({ error: "AI didn't return a message, try again." }, { status: 502 });
+    return res({ error: "AI didn't return a message, try again." }, 502);
   }
-  return NextResponse.json({ reply, read });
+  return res({ reply, read });
 }

@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Smiths Lead Helper",
+  "version": "1.0.0",
+  "description": "Draft a Smiths-voice follow-up right inside Meta's Lead Centre. Highlight a thread, click Draft, copy, send.",
+  "permissions": ["storage", "clipboardWrite"],
+  "host_permissions": [
+    "https://business.facebook.com/*",
+    "https://www.facebook.com/*",
+    "https://smithsdetailingservices.com.au/*",
+    "https://*.smithsdetailingservices.com.au/*",
+    "https://*.vercel.app/*"
+  ],
+  "background": { "service_worker": "background.js" },
+  "action": {
+    "default_title": "Smiths Lead Helper settings",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://business.facebook.com/*", "https://www.facebook.com/*"],
+      "js": ["content.js"],
+      "css": ["content.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}

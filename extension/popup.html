@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        width: 280px;
+        margin: 0;
+        padding: 14px;
+        font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        color: #111827;
+      }
+      h1 { font-size: 14px; margin: 0 0 10px; }
+      label { display: block; font-weight: 600; margin: 10px 0 4px; }
+      input {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 8px 9px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font: inherit;
+      }
+      .hint { color: #6b7280; font-size: 11.5px; margin-top: 3px; }
+      button {
+        margin-top: 14px;
+        width: 100%;
+        background: #111827;
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 9px;
+        font: 600 13px/1 inherit;
+        cursor: pointer;
+      }
+      .saved { color: #059669; font-size: 12px; text-align: center; margin-top: 8px; min-height: 15px; }
+    </style>
+  </head>
+  <body>
+    <h1>Smiths Lead Helper</h1>
+    <label for="appUrl">App URL</label>
+    <input id="appUrl" type="text" placeholder="https://smithsdetailingservices.com.au" />
+    <div class="hint">Your ops app address. Leave the default unless it changed.</div>
+    <label for="token">Extension token</label>
+    <input id="token" type="password" placeholder="paste the token" />
+    <div class="hint">The AI_REPLY_EXT_TOKEN value from Vercel.</div>
+    <button id="save">Save</button>
+    <div class="saved" id="saved"></div>
+    <script src="popup.js"></script>
+  </body>
+</html>
