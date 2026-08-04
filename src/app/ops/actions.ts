@@ -562,37 +562,45 @@ Have a great day and talk soon :)`;
 
 const calendarBody = `Car:
 Quote:
-Phone:
-Email:
 Extras:
+Total:
+Email:
+Phone:
 Referral:
 
 📍 BOOKING CONFIRMATION
 
-Thanks so much: Your booking is confirmed and locked in!
+Thanks so much — your booking is confirmed and locked in!
 
 We'll also send you a friendly reminder the day before your booking.
 
 A few quick things to note:
 
-• Reschedule or cancel? Please give us more than 48 hours' notice — this really hurts our business if you don't.
+• Reschedule or cancel?
+Please give us more than 48 hours' notice — this really hurts our business if you don't.
 
-• Extra dirty vehicles: if your car is extra dirty and takes longer than usual, our team will let you know before starting and there may be a surcharge.
+• Extra dirty vehicles
+If your car is extra dirty and takes longer than usual, our team will let you know before starting and there may be a surcharge.
 
-• Pet hair: standing up you might not see much, but our team facedown vacuuming see everything. If your car has pet hair we charge a $55 pet hair fee (unless it's bad — we'll let you know beforehand).
+• Pet hair
+Standing up you might not see much, but our team facedown vacuuming see everything. If your car has pet hair we charge a $55 pet hair fee (unless it's bad — we'll let you know beforehand).
 
-• Seat covers: if you'd like your seats cleaned, please remove any seat covers beforehand — we won't remove them ourselves.
+• Seat covers
+If you'd like your seats cleaned, please remove any seat covers beforehand — we won't remove them ourselves.
 
-• Personal belongings: we'll safely remove and return anything left in the car, but it's faster and smoother if the vehicle is emptied beforehand.
+• Personal belongings
+We'll safely remove and return anything left in the car, but it's faster and smoother if the vehicle is emptied beforehand.
 
-• Timing (we aim to get your car back ASAP):
+• Timing (we aim to get your car back ASAP)
 Standard: 3-4 hours
 Premium: 4-5 hours
 Premium + Polish: 1 day
 Premium + Cut & Polish: 1-2 days
 Correction + Coat: 1-2 days
 
-Any questions at all, feel free to reach out. Thanks again — we look forward to seeing you!`;
+Any questions at all, feel free to reach out.
+
+Thanks again — we look forward to seeing you!`;
 
 const STANDARD_TEMPLATES: { title: string; body: string; sort: number }[] = [
   { title: "Booking — Ask for details", body: askDetailsBody, sort: 30 },
