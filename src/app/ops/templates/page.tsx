@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { requireOwner } from "@/lib/ops/auth";
 import { getTemplates, type Template } from "@/lib/ops/db";
-import { saveTemplate, removeTemplate, seedTemplates } from "../actions";
-import CopyButton from "@/components/ops/CopyButton";
+import { saveTemplate, seedTemplates } from "../actions";
+import TemplateGroups, { type TemplateGroup } from "@/components/ops/TemplateGroups";
 
 export const metadata: Metadata = {
   title: "Templates | Smiths Detailing",
@@ -34,6 +34,24 @@ export default async function TemplatesPage({
   } catch {
     dbError = true;
   }
+
+  // Group templates into package-type boxes by their title prefix.
+  const defs: { key: string; title: string; emoji: string; match: RegExp }[] = [
+    { key: "correction", title: "Correction & Coating", emoji: "✨", match: /^correction/i },
+    { key: "cutpolish", title: "Premium + Cut & Polish", emoji: "💎", match: /cut\s*&?\s*polish/i },
+    { key: "premium", title: "Premium", emoji: "⭐", match: /^premium/i },
+    { key: "interior", title: "Interior", emoji: "🧽", match: /^interior/i },
+    { key: "booking", title: "Booking messages", emoji: "💬", match: /^booking/i },
+  ];
+  const groups: TemplateGroup[] = defs.map((d) => ({ ...d, items: [] as Template[] }));
+  const other: Template[] = [];
+  for (const t of templates) {
+    const d = defs.find((def) => def.match.test(t.title || ""));
+    if (d) groups.find((g) => g.key === d.key)!.items.push(t);
+    else other.push(t);
+  }
+  const shownGroups = groups.filter((g) => g.items.length > 0);
+  if (other.length) shownGroups.push({ key: "other", title: "Other", emoji: "📄", items: other });
 
   return (
     <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
@@ -75,39 +93,10 @@ export default async function TemplatesPage({
       </form>
 
       {templates.length > 0 ? (
-        <div className="mt-6 flex flex-col gap-3">
-          {templates.map((t) => {
-            const body = t.body.replace(/\r\n/g, "\n").replace(/\n{3,}/g, "\n\n").trim();
-            return (
-              <div key={t.id} className={`${CARD} p-4`}>
-                <div className="flex items-start justify-between gap-3">
-                  <div className="font-display text-base font-extrabold tracking-tight text-white">
-                    {t.title || "Untitled"}
-                  </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <CopyButton text={body} />
-                    <form action={removeTemplate}>
-                      <button
-                        name="id"
-                        value={t.id}
-                        aria-label="Delete template"
-                        className="text-sm font-bold text-white/25 transition hover:text-red-400"
-                      >
-                        ✕
-                      </button>
-                    </form>
-                  </div>
-                </div>
-                <pre className="mt-2 max-h-56 overflow-y-auto whitespace-pre-wrap break-words font-sans text-sm leading-relaxed text-white/70">
-                  {body}
-                </pre>
-              </div>
-            );
-          })}
-        </div>
+        <TemplateGroups groups={shownGroups} />
       ) : (
         <p className="mt-6 text-sm text-white/45">
-          No templates yet — paste your Google Docs packages in below so every GM sends the same.
+          No templates yet — load the standard set above, or paste your packages in below.
         </p>
       )}
 
