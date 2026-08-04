@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { BUSINESS } from "@/lib/config";
 import { REF_STORAGE_KEY } from "@/lib/referrals";
 import {
@@ -74,8 +75,20 @@ function Bubbles({ items }: { items: Bubble[] }) {
   );
 }
 
+/* Strip the standalone "Hey!" opener when a quote is shown mid-conversation
+   — the chat already opened with a greeting, so repeating it reads oddly.
+   The /ops copy-paste templates (built from the same packages.ts) keep
+   "Hey!" since those are sent as a fresh, standalone message. */
+function dropHey(text: string): string {
+  return text.replace(/^Hey!\s*/, "");
+}
+
 export default function QuoteChat() {
   const [open, setOpen] = useState(false);
+  // Portal target: only render into document.body after mount, so SSR/
+  // hydration never sees a document reference.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   const [step, setStep] = useState<Step>("vehicle");
   const [messages, setMessages] = useState<Bubble[]>([
     {
@@ -155,8 +168,9 @@ export default function QuoteChat() {
     setMessages((m) => [
       ...m,
       { from: "user", text: s },
-      { from: "bot", text: q.body, mono: true },
-      { from: "bot", text: "Would you like to book this in?" },
+      // q.body already ends with "Would you like to book this in?" — no
+      // need for a second bubble repeating it.
+      { from: "bot", text: dropHey(q.body), mono: true },
     ]);
     setStep("quote");
   }
@@ -284,53 +298,67 @@ export default function QuoteChat() {
         ⚡ Get an Instant Quote
       </button>
 
-      {/* Floating launcher — bottom-right on every scroll position */}
-      {!open && (
-        <button
-          onClick={() => setOpen(true)}
-          aria-label="Open Smiths AI — get a fast, free quote"
-          className="fixed bottom-5 right-5 z-50 flex items-center gap-3 rounded-2xl border border-white/10 bg-[#0a0a0c]/95 py-3 pl-3 pr-4 shadow-[0_10px_40px_rgba(0,0,0,0.55)] backdrop-blur-md transition hover:border-brand-green/50 active:scale-95"
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={BUSINESS.logo} alt="" className="h-8 w-auto shrink-0" />
-          <div className="text-left leading-tight">
-            <div className="font-display text-[13px] font-extrabold text-white">Smiths AI</div>
-            <div className="text-[11px] font-bold text-brand-green">Get A Fast &amp; Free Quote</div>
-          </div>
-        </button>
-      )}
-
-      {open && (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/70 backdrop-blur-sm sm:items-center">
-          <div className="flex h-[88vh] w-full max-w-md flex-col overflow-hidden rounded-t-3xl border border-white/10 bg-[#0a0a0c] sm:h-[80vh] sm:rounded-3xl">
-            {/* header */}
-            <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
-              <div>
-                <div className="font-display text-base font-extrabold text-white">Instant Quote</div>
-                <div className="text-xs text-white/45">Smiths Detailing · Cairns</div>
-              </div>
+      {/* Rendered via a portal straight onto <body> — this component lives
+          inside the hero's <Reveal>, which applies a CSS transform for its
+          scroll-fade-in. A `position: fixed` descendant of a transformed
+          ancestor stops being fixed to the viewport and instead sticks to
+          that ancestor, which is what made the launcher drift and the
+          modal render messy on both mobile and desktop. Portalling to
+          document.body sidesteps that entirely. */}
+      {mounted &&
+        createPortal(
+          <>
+            {/* Floating launcher — sticky bottom-right on every scroll position */}
+            {!open && (
               <button
-                onClick={() => setOpen(false)}
-                aria-label="Close"
-                className="rounded-full border border-white/15 p-2 text-white/60 transition hover:text-white"
+                onClick={() => setOpen(true)}
+                aria-label="Open Smiths AI — get a fast, free quote"
+                className="fixed bottom-5 right-5 z-50 flex items-center gap-3 rounded-2xl border border-white/10 bg-[#0a0a0c]/95 py-3 pl-3 pr-4 shadow-[0_10px_40px_rgba(0,0,0,0.55)] backdrop-blur-md transition hover:border-brand-green/50 active:scale-95"
               >
-                ✕
-              </button>
-            </div>
-
-            {/* transcript */}
-            <div className="flex-1 overflow-y-auto px-4 py-5">
-              <Bubbles items={messages} />
-              {loadingSlots && (
-                <div className="mt-2.5 max-w-[88%] rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm text-white/50">
-                  Checking the calendar…
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={BUSINESS.logo} alt="" className="h-8 w-auto shrink-0" />
+                <div className="text-left leading-tight">
+                  <div className="font-display text-[13px] font-extrabold text-white">Smiths AI</div>
+                  <div className="text-[11px] font-bold text-brand-green">
+                    Get A Fast &amp; Free Quote
+                  </div>
                 </div>
-              )}
-            </div>
+              </button>
+            )}
 
-            {/* controls */}
-            <div className="border-t border-white/10 bg-black/30 p-4">
-              {step === "vehicle" && (
+            {open && (
+              <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/70 backdrop-blur-sm sm:items-center sm:p-4">
+                <div className="flex h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-t-3xl border border-white/10 bg-[#0a0a0c] sm:h-[80vh] sm:max-h-[640px] sm:rounded-3xl">
+                  {/* header */}
+                  <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-5 py-4">
+                    <div>
+                      <div className="font-display text-base font-extrabold text-white">
+                        Instant Quote
+                      </div>
+                      <div className="text-xs text-white/45">Smiths Detailing · Cairns</div>
+                    </div>
+                    <button
+                      onClick={() => setOpen(false)}
+                      aria-label="Close"
+                      className="rounded-full border border-white/15 p-2 text-white/60 transition hover:text-white"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {/* transcript */}
+                  <div className="flex-1 overflow-y-auto px-4 py-5">
+                    <Bubbles items={messages} />
+                    {loadingSlots && (
+                      <div className="mt-2.5 max-w-[88%] rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm text-white/50">
+                        Checking the calendar…
+                      </div>
+                    )}
+                  </div>
+
+                  {/* controls */}
+                  <div className="shrink-0 border-t border-white/10 bg-black/30 p-4">
+                    {step === "vehicle" && (
                 <form
                   onSubmit={(e) => {
                     e.preventDefault();
@@ -495,18 +523,21 @@ export default function QuoteChat() {
                 </div>
               )}
 
-              {step === "done" && (
-                <button
-                  onClick={() => setOpen(false)}
-                  className="w-full rounded-xl bg-brand-green px-4 py-3 text-sm font-black text-[#04130a] transition hover:brightness-110 active:scale-95"
-                >
-                  Done
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
+                    {step === "done" && (
+                      <button
+                        onClick={() => setOpen(false)}
+                        className="w-full rounded-xl bg-brand-green px-4 py-3 text-sm font-black text-[#04130a] transition hover:brightness-110 active:scale-95"
+                      >
+                        Done
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+          </>,
+          document.body
+        )}
     </>
   );
 }

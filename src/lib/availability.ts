@@ -32,6 +32,7 @@ export function roomOnDay(bookings: Booking[], date: string): number {
     the calendar upload today, only the date, so we offer the business's
     standard slots on any day that has capacity. */
 export const SLOTS = ["7:00am", "11:30am"];
+const SLOT_MINUTES: Record<string, number> = { "7:00am": 7 * 60, "11:30am": 11 * 60 + 30 };
 
 export interface AvailabilityDay {
   date: string;
@@ -44,9 +45,35 @@ function cairnsDatePlus(days: number): string {
   );
 }
 
-/** Next `wantDays` upcoming days (today included) that have room for the
-    given package/size, searched over a bounded window so it can never loop
-    forever if the calendar hasn't been uploaded in a while. */
+/** Minutes since midnight, Cairns local time, right now. */
+function cairnsMinutesNow(): number {
+  const parts = new Intl.DateTimeFormat("en-AU", {
+    timeZone: "Australia/Brisbane",
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(new Date());
+  const h = Number(parts.find((p) => p.type === "hour")?.value ?? 0);
+  const m = Number(parts.find((p) => p.type === "minute")?.value ?? 0);
+  return h * 60 + m;
+}
+
+/** For "today" (dayIndex 0), drop any slot that's already passed (or is
+    less than an hour away — not realistically bookable). Every later day
+    offers the full set. Without this, a customer checking the widget in
+    the afternoon would still see "7:00am today" as an option. */
+function slotsFor(dayIndex: number): string[] {
+  if (dayIndex !== 0) return SLOTS;
+  const now = cairnsMinutesNow();
+  return SLOTS.filter((s) => SLOT_MINUTES[s] - now >= 60);
+}
+
+/** Next `wantDays` upcoming days that have room for the given package/size
+    AND at least one bookable slot, searched over a bounded window so it can
+    never loop forever if the calendar hasn't been uploaded in a while.
+    NOTE: this only knows what's booked as of the last /ops calendar upload —
+    if today's real bookings haven't been uploaded yet, today can still look
+    more open here than it actually is. */
 export async function getUpcomingAvailability(
   packageId: PackageId,
   size: VehicleSize,
@@ -58,7 +85,8 @@ export async function getUpcomingAvailability(
   for (let i = 0; i < 21 && out.length < wantDays; i++) {
     const date = cairnsDatePlus(i);
     if (roomOnDay(bookings, date) >= required - 0.001) {
-      out.push({ date, slots: SLOTS });
+      const slots = slotsFor(i);
+      if (slots.length) out.push({ date, slots });
     }
   }
   return out;
