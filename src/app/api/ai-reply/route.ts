@@ -79,5 +79,7 @@ export async function POST(req: Request) {
     const readMatch = raw.slice(0, m).match(/READ\s*:\s*([\s\S]*?)\s*$/i);
     read = readMatch ? readMatch[1].trim() : "";
   }
+  // Kill any em/en dashes — the #1 "a bot wrote this" tell — before it's shown.
+  reply = reply.replace(/\s*[—–]\s*/g, ", ").replace(/,\s*,/g, ",");
   return NextResponse.json({ reply, read });
 }
