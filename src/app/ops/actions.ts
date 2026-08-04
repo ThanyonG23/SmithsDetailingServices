@@ -265,11 +265,12 @@ export async function saveJobNote(uid: string, note: string): Promise<void> {
   revalidatePath("/ops");
 }
 
-export async function clockOn(uid: string, detailer: string): Promise<void> {
+export async function clockOn(uid: string, detailer: string, minsAgo = 0): Promise<void> {
   const u = String(uid || "").slice(0, 200);
   const d = String(detailer || "").slice(0, 40);
   if (!u || !d) return;
-  await clockStart(u, d, cairnsToday());
+  const m = Number(minsAgo);
+  await clockStart(u, d, cairnsToday(), Number.isFinite(m) && m > 0 ? m : 0);
   revalidatePath("/ops/team");
   revalidatePath("/ops");
 }

@@ -704,9 +704,16 @@ async function recomputeJobDayHours(uid: string, date: string): Promise<void> {
 
 /** A detailer starts on a car. Closes any car they were already on (one car at
     a time), then opens a fresh clock. Recomputes any car that got closed. */
-export async function clockStart(uid: string, detailer: string, date: string): Promise<void> {
+export async function clockStart(
+  uid: string,
+  detailer: string,
+  date: string,
+  startedMinsAgo = 0
+): Promise<void> {
   await ensureTable();
   if (!uid || !detailer || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+  // Ashlee can backdate a forgotten start (capped at 12h so a typo can't wreck it).
+  const mins = Number.isFinite(startedMinsAgo) && startedMinsAgo > 0 ? Math.min(startedMinsAgo, 720) : 0;
   const closed = await sql`
     UPDATE job_clock SET end_ts = now(), updated_at = now()
     WHERE detailer = ${detailer} AND end_ts IS NULL
@@ -714,7 +721,7 @@ export async function clockStart(uid: string, detailer: string, date: string): P
   `;
   await sql`
     INSERT INTO job_clock (uid, detailer, work_date, start_ts)
-    VALUES (${uid}, ${detailer}, ${date}, now());
+    VALUES (${uid}, ${detailer}, ${date}, now() - make_interval(mins => ${mins}));
   `;
   for (const r of closed as unknown as { uid: string; d: string }[]) {
     await recomputeJobDayHours(r.uid, r.d);

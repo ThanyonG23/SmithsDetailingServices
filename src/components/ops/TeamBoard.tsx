@@ -24,6 +24,7 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
   const [noteText, setNoteText] = useState<Record<string, string>>({});
   const [noteBusy, setNoteBusy] = useState<string | null>(null);
   const [manageOpen, setManageOpen] = useState<string | null>(null);
+  const [startFor, setStartFor] = useState<string | null>(null); // teammate whose start time Ashlee is setting
   const [err, setErr] = useState<string | null>(null);
   const [, startTransition] = useTransition();
 
@@ -70,6 +71,24 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
   const toggle = (uid: string, active: boolean) => {
     if (!me) return;
     toggleFor(uid, me, active);
+  };
+
+  // Start a teammate who forgot, backdated by minsAgo (0 = right now).
+  const startAgo = (uid: string, detailer: string, minsAgo: number) => {
+    if (!detailer) return;
+    setBusyUid(uid);
+    setErr(null);
+    startTransition(async () => {
+      try {
+        await clockOn(uid, detailer, minsAgo);
+        router.refresh();
+        setStartFor(null);
+      } catch {
+        setErr("Couldn't start the clock — check your connection and try again.");
+      } finally {
+        setBusyUid(null);
+      }
+    });
   };
 
   const openNote = (uid: string, current: string) => {
@@ -298,7 +317,10 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
                 {isLead && (
                   <div className="mt-2">
                     <button
-                      onClick={() => setManageOpen(manageOpen === j.uid ? null : j.uid)}
+                      onClick={() => {
+                        setManageOpen(manageOpen === j.uid ? null : j.uid);
+                        setStartFor(null);
+                      }}
                       className="w-full text-center text-[11px] font-bold text-white/40 transition hover:text-white"
                     >
                       {manageOpen === j.uid ? "Close" : "⚙ Someone forgot? Start / stop for a teammate"}
@@ -311,22 +333,64 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
                         <div className="mt-2 flex flex-wrap gap-1.5">
                           {staff.map((name) => {
                             const on = j.active.some((a) => a.detailer === name);
+                            if (on) {
+                              return (
+                                <button
+                                  key={name}
+                                  onClick={() => toggleFor(j.uid, name, true)}
+                                  disabled={busy}
+                                  className="rounded-full bg-red-500/80 px-3 py-1.5 text-xs font-bold text-white transition hover:brightness-110 active:scale-95 disabled:opacity-50"
+                                >
+                                  ■ Stop {name}
+                                </button>
+                              );
+                            }
                             return (
                               <button
                                 key={name}
-                                onClick={() => toggleFor(j.uid, name, on)}
+                                onClick={() => setStartFor(startFor === name ? null : name)}
                                 disabled={busy}
                                 className={`rounded-full px-3 py-1.5 text-xs font-bold transition active:scale-95 disabled:opacity-50 ${
-                                  on
-                                    ? "bg-red-500/80 text-white hover:brightness-110"
+                                  startFor === name
+                                    ? "bg-brand-green text-[#04130a]"
                                     : "border border-white/15 bg-white/[0.03] text-white/75 hover:border-brand-green hover:text-white"
                                 }`}
                               >
-                                {on ? `■ Stop ${name}` : `▶ Start ${name}`}
+                                ▶ {name}
                               </button>
                             );
                           })}
                         </div>
+
+                        {/* pick when they actually started */}
+                        {startFor && !j.active.some((a) => a.detailer === startFor) && (
+                          <div className="mt-2.5 rounded-lg border border-brand-green/25 bg-brand-green/[0.05] p-2.5">
+                            <div className="text-[10px] font-bold uppercase tracking-wider text-white/55">
+                              When did {startFor} start?
+                            </div>
+                            <div className="mt-1.5 flex flex-wrap gap-1.5">
+                              {[
+                                { l: "Now", m: 0 },
+                                { l: "10 min ago", m: 10 },
+                                { l: "20 min ago", m: 20 },
+                                { l: "30 min ago", m: 30 },
+                                { l: "45 min ago", m: 45 },
+                                { l: "1 hr ago", m: 60 },
+                                { l: "1.5 hr ago", m: 90 },
+                                { l: "2 hr ago", m: 120 },
+                              ].map((opt) => (
+                                <button
+                                  key={opt.l}
+                                  onClick={() => startAgo(j.uid, startFor, opt.m)}
+                                  disabled={busy}
+                                  className="rounded-full bg-brand-green px-3 py-1.5 text-xs font-black text-[#04130a] transition hover:brightness-110 active:scale-95 disabled:opacity-50"
+                                >
+                                  {opt.l}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
