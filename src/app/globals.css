@@ -10,14 +10,22 @@ html,
 body {
   background: #050506;
   color: #ffffff;
-  /* stop any stray element (glows, wide rows) from causing sideways scroll on mobile */
-  overflow-x: clip;
-  max-width: 100%;
 }
 
 body {
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Stop any stray element (glows, wide rows) from causing sideways scroll on
+   mobile. Deliberately NOT on html/body: iOS Safari treats overflow-x on
+   body as a scroll container and repositions `position: fixed` descendants
+   (like the Instant Quote widget, portalled onto <body>) relative to IT
+   instead of the real screen — squishing/clipping them. Scoped to this
+   wrapper around the page content instead, so <body> itself stays free. */
+.page-clip {
+  overflow-x: clip;
+  max-width: 100%;
 }
 
 /* Subtle brand glow backdrop (used by the booking/thank-you pages) */

@@ -66,7 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* Carries a detailer's referral code onto every "Text for a Free
             Quote" button, including on repeat visits. */}
         <RefTracker />
-        {children}
+        <div className="page-clip">{children}</div>
       </body>
     </html>
   );

@@ -89,6 +89,18 @@ export default function QuoteChat() {
   // hydration never sees a document reference.
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+  // Lock background scroll while the sheet is open — on mobile, a scrollable
+  // page behind a `fixed` overlay is a common source of the browser chrome
+  // (address bar) resizing mid-interaction, which is what makes a `vh`-sized
+  // sheet appear to squish.
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [open]);
   const [step, setStep] = useState<Step>("vehicle");
   const [messages, setMessages] = useState<Bubble[]>([
     {
@@ -328,7 +340,7 @@ export default function QuoteChat() {
 
             {open && (
               <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/70 backdrop-blur-sm sm:items-center sm:p-4">
-                <div className="flex h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-t-3xl border border-white/10 bg-[#0a0a0c] sm:h-[80vh] sm:max-h-[640px] sm:rounded-3xl">
+                <div className="flex h-[85dvh] w-full max-w-md flex-col overflow-hidden rounded-t-3xl border border-white/10 bg-[#0a0a0c] sm:h-[80dvh] sm:max-h-[640px] sm:rounded-3xl">
                   {/* header */}
                   <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-5 py-4">
                     <div>
