@@ -302,13 +302,9 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
         </div>
       </footer>
 
-      {/* Floating text CTA */}
-      <a
-        href={smsHref}
-        className="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full bg-brand-green px-5 py-3.5 text-sm font-black text-[#04130a] shadow-[0_10px_40px_rgba(43,255,122,0.35)] transition hover:brightness-110 active:scale-95"
-      >
-        💬 Free Quote
-      </a>
+      {/* Floating "Smiths AI" launcher lives inside QuoteChat, rendered
+          above in the hero — it's `fixed`, so it stays bottom-right on
+          every scroll position without needing to be re-mounted here. */}
     </main>
   );
 }

@@ -284,6 +284,22 @@ export default function QuoteChat() {
         ⚡ Get an Instant Quote
       </button>
 
+      {/* Floating launcher — bottom-right on every scroll position */}
+      {!open && (
+        <button
+          onClick={() => setOpen(true)}
+          aria-label="Open Smiths AI — get a fast, free quote"
+          className="fixed bottom-5 right-5 z-50 flex items-center gap-3 rounded-2xl border border-white/10 bg-[#0a0a0c]/95 py-3 pl-3 pr-4 shadow-[0_10px_40px_rgba(0,0,0,0.55)] backdrop-blur-md transition hover:border-brand-green/50 active:scale-95"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={BUSINESS.logo} alt="" className="h-8 w-auto shrink-0" />
+          <div className="text-left leading-tight">
+            <div className="font-display text-[13px] font-extrabold text-white">Smiths AI</div>
+            <div className="text-[11px] font-bold text-brand-green">Get A Fast &amp; Free Quote</div>
+          </div>
+        </button>
+      )}
+
       {open && (
         <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/70 backdrop-blur-sm sm:items-center">
           <div className="flex h-[88vh] w-full max-w-md flex-col overflow-hidden rounded-t-3xl border border-white/10 bg-[#0a0a0c] sm:h-[80vh] sm:rounded-3xl">
