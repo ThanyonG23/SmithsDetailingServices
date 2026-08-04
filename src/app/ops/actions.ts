@@ -476,6 +476,7 @@ Total Price Today: $${total}
 ${LOC}
 
 ${GUARANTEE}
+
 ${BOOK}`;
 }
 
