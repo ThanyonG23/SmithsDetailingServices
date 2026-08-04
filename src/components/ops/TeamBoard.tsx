@@ -23,7 +23,11 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
   const [noteOpen, setNoteOpen] = useState<string | null>(null);
   const [noteText, setNoteText] = useState<Record<string, string>>({});
   const [noteBusy, setNoteBusy] = useState<string | null>(null);
+  const [manageOpen, setManageOpen] = useState<string | null>(null);
   const [, startTransition] = useTransition();
+
+  // The team leader (first in the roster — Ashlee) can clock anyone on/off.
+  const isLead = !!me && me === staff[0];
   const tick = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // remember who this device belongs to
@@ -45,15 +49,20 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
     setMe(name);
   };
 
-  const toggle = (uid: string, active: boolean) => {
-    if (!me) return;
+  // Clock ANY detailer on/off a car (Ashlee uses this when someone forgets).
+  const toggleFor = (uid: string, detailer: string, active: boolean) => {
+    if (!detailer) return;
     setBusyUid(uid);
     startTransition(async () => {
-      if (active) await clockOff(uid, me);
-      else await clockOn(uid, me);
+      if (active) await clockOff(uid, detailer);
+      else await clockOn(uid, detailer);
       router.refresh();
       setBusyUid(null);
     });
+  };
+  const toggle = (uid: string, active: boolean) => {
+    if (!me) return;
+    toggleFor(uid, me, active);
   };
 
   const openNote = (uid: string, current: string) => {
@@ -264,6 +273,44 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
                   <p className="mt-1.5 text-center text-[11px] text-white/35">
                     {others.map((o) => o.detailer).join(", ")} already on it — you can jump on too.
                   </p>
+                )}
+
+                {/* Ashlee (team leader): clock anyone on/off if they forgot */}
+                {isLead && (
+                  <div className="mt-2">
+                    <button
+                      onClick={() => setManageOpen(manageOpen === j.uid ? null : j.uid)}
+                      className="w-full text-center text-[11px] font-bold text-white/40 transition hover:text-white"
+                    >
+                      {manageOpen === j.uid ? "Close" : "⚙ Someone forgot? Start / stop for a teammate"}
+                    </button>
+                    {manageOpen === j.uid && (
+                      <div className="mt-2 rounded-lg border border-white/10 bg-black/20 p-2.5">
+                        <div className="text-[10px] font-bold uppercase tracking-wider text-white/45">
+                          Clock a teammate on / off
+                        </div>
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {staff.map((name) => {
+                            const on = j.active.some((a) => a.detailer === name);
+                            return (
+                              <button
+                                key={name}
+                                onClick={() => toggleFor(j.uid, name, on)}
+                                disabled={busy}
+                                className={`rounded-full px-3 py-1.5 text-xs font-bold transition active:scale-95 disabled:opacity-50 ${
+                                  on
+                                    ? "bg-red-500/80 text-white hover:brightness-110"
+                                    : "border border-white/15 bg-white/[0.03] text-white/75 hover:border-brand-green hover:text-white"
+                                }`}
+                              >
+                                {on ? `■ Stop ${name}` : `▶ Start ${name}`}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             );
