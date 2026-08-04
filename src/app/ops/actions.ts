@@ -465,6 +465,7 @@ Our Exterior Correction Package Also Includes:
 ✅ 3 Year Ceramic Coating
 
 🎁 BONUS #1: FREE Premium Interior Detail (Valued At $${interior})
+
 🎁 BONUS #2: LIMITED TIME FREE UPGRADES
 ✅ Engine Bay Detail
 ✅ Exterior Plastic Restore
