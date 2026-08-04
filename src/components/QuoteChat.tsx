@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { BUSINESS } from "@/lib/config";
 import { REF_STORAGE_KEY } from "@/lib/referrals";
@@ -62,7 +62,7 @@ function Bubbles({ items }: { items: Bubble[] }) {
       {items.map((b, i) => (
         <div
           key={i}
-          className={`max-w-[88%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+          className={`bubble-in max-w-[88%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
             b.from === "bot"
               ? "self-start border border-white/10 bg-white/[0.04] text-white/85"
               : "self-end bg-brand-green text-[#04130a] font-semibold"
@@ -134,6 +134,14 @@ export default function QuoteChat() {
   const [phone, setPhone] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  // Keep the newest message pinned to the bottom, text-chat style — bounce
+  // the view down whenever a message arrives or the "checking…" bubble
+  // toggles.
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [messages, loadingSlots]);
 
   function reset() {
     setStep("vehicle");
@@ -371,14 +379,17 @@ export default function QuoteChat() {
                     </button>
                   </div>
 
-                  {/* transcript */}
-                  <div className="flex-1 overflow-y-auto px-4 py-5">
+                  {/* transcript — bottom-anchored, text-chat style: short
+                      conversations hug the bottom instead of floating at
+                      the top, and it auto-scrolls down as messages arrive */}
+                  <div className="flex flex-1 flex-col justify-end overflow-y-auto px-4 py-5">
                     <Bubbles items={messages} />
                     {loadingSlots && (
-                      <div className="mt-2.5 max-w-[88%] rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm text-white/50">
+                      <div className="bubble-in mt-2.5 max-w-[88%] self-start rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm text-white/50">
                         Checking the calendar…
                       </div>
                     )}
+                    <div ref={bottomRef} />
                   </div>
 
                   {/* controls */}

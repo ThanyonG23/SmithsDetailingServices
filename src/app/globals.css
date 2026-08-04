@@ -132,6 +132,23 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 /* ==================================================================
+   INSTANT QUOTE — chat bubbles bounce up into place, text-message style
+   ================================================================== */
+@keyframes bubbleIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.bubble-in {
+  animation: bubbleIn 0.28s cubic-bezier(0.22, 0.7, 0.24, 1) both;
+}
+
+/* ==================================================================
    Respect users who ask for less motion
    ================================================================== */
 @media (prefers-reduced-motion: reduce) {
@@ -148,5 +165,8 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   .group:hover .photo-zoom {
     transition: none;
     transform: none;
+  }
+  .bubble-in {
+    animation: none;
   }
 }
