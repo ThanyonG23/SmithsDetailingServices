@@ -44,7 +44,7 @@ export async function POST(req: Request) {
         },
         body: JSON.stringify({
           model,
-          max_tokens: 600,
+          max_tokens: 800,
           system: buildSystemPrompt(),
           messages: [{ role: "user", content: userContent }],
         }),
@@ -68,18 +68,34 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "AI error — " + (out.err || "no reply") }, { status: 502 });
   }
 
-  // Split the model's "READ: … REPLY: …" output into the two parts.
+  // The model writes the MESSAGE first, then "WHY: …". Split on WHY so the
+  // reply always survives even if the read line is missing or malformed.
   const raw = out.raw;
   let read = "";
   let reply = raw;
-  const m = raw.search(/(^|\n)\s*REPLY\s*:/i);
-  if (m >= 0) {
-    const cut = raw.indexOf(":", raw.search(/REPLY\s*:/i));
-    reply = raw.slice(cut + 1).trim();
-    const readMatch = raw.slice(0, m).match(/READ\s*:\s*([\s\S]*?)\s*$/i);
-    read = readMatch ? readMatch[1].trim() : "";
+  const w = raw.search(/(^|\n)\s*WHY\s*:/i);
+  if (w >= 0) {
+    reply = raw.slice(0, w).trim();
+    read = raw.slice(w).replace(/^[\s\S]*?WHY\s*:\s*/i, "").trim();
   }
-  // Kill any em/en dashes — the #1 "a bot wrote this" tell — before it's shown.
-  reply = reply.replace(/\s*[—–]\s*/g, ", ").replace(/,\s*,/g, ",");
+  // Defensive cleanup so a label can never leak into the customer-facing text:
+  // handle the old "READ: … REPLY: …" shape and strip any stray leading labels.
+  const rIdx = reply.search(/(^|\n)\s*REPLY\s*:/i);
+  if (rIdx >= 0) {
+    if (!read) {
+      const rd = reply.slice(0, rIdx).match(/READ\s*:\s*([\s\S]*?)\s*$/i);
+      read = rd ? rd[1].trim() : "";
+    }
+    reply = reply.slice(reply.indexOf(":", reply.search(/REPLY\s*:/i)) + 1).trim();
+  }
+  reply = reply
+    .replace(/^\s*READ\s*:[^\n]*\n+/i, "") // drop a leaked "READ: …" first line
+    .replace(/^\s*(reply|message)\s*:\s*/i, "") // drop a stray leading label
+    .trim();
+  // Kill any em/en dashes — the #1 "a bot wrote this" tell.
+  reply = reply.replace(/\s*[—–]\s*/g, ", ").replace(/,\s*,/g, ",").trim();
+  if (!reply) {
+    return NextResponse.json({ error: "AI didn't return a message, try again." }, { status: 502 });
+  }
   return NextResponse.json({ reply, read });
 }
