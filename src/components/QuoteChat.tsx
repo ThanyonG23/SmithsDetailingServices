@@ -101,6 +101,19 @@ export default function QuoteChat() {
       document.body.style.overflow = prev;
     };
   }, [open]);
+  // iOS Safari can be left "stuck" pinch-zoomed in from an earlier focus
+  // event, and doesn't reset that on its own between interactions in the
+  // same tab — even once every input is 16px+ so it stops happening again.
+  // Toggling maximum-scale on/off forces Safari to snap back to 1.0.
+  useEffect(() => {
+    if (!open) return;
+    const meta = document.querySelector('meta[name="viewport"]');
+    if (!meta) return;
+    const original = meta.getAttribute("content") || "width=device-width, initial-scale=1";
+    meta.setAttribute("content", `${original}, maximum-scale=1, user-scalable=no`);
+    const t = window.setTimeout(() => meta.setAttribute("content", original), 350);
+    return () => window.clearTimeout(t);
+  }, [open]);
   const [step, setStep] = useState<Step>("vehicle");
   const [messages, setMessages] = useState<Bubble[]>([
     {
