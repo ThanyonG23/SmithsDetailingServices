@@ -30,47 +30,54 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Paste a message thread first." }, { status: 400 });
   }
 
-  try {
-    const r = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": key,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-5",
-        max_tokens: 600,
-        system: buildSystemPrompt(),
-        messages: [
-          {
-            role: "user",
-            content: `Here is the whole conversation with a lead (newest at the bottom, with timestamps where available). Read it carefully, work out where they are and why they haven't booked, then write the single best follow-up to send now.\n\n${thread}`,
-          },
-        ],
-      }),
-    });
+  const userContent = `Here is the whole conversation with a lead (newest at the bottom, with timestamps where available). Read it carefully, work out where they are and why they haven't booked, then write the single best follow-up to send now.\n\n${thread}`;
 
-    if (!r.ok) {
-      const t = await r.text();
-      return NextResponse.json({ error: "AI error: " + t.slice(0, 300) }, { status: 502 });
+  // Call one model. Returns the raw text, or an error string if it failed.
+  const call = async (model: string): Promise<{ raw?: string; err?: string }> => {
+    try {
+      const r = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "x-api-key": key,
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: 600,
+          system: buildSystemPrompt(),
+          messages: [{ role: "user", content: userContent }],
+        }),
+      });
+      if (!r.ok) return { err: `${model}: ${(await r.text()).slice(0, 200)}` };
+      const data = await r.json();
+      // Grab the first TEXT block (robust to thinking/other block types).
+      const blocks = (data?.content || []) as { type?: string; text?: string }[];
+      const raw = (blocks.find((b) => b?.type === "text")?.text || blocks[0]?.text || "").trim();
+      return raw ? { raw } : { err: `${model}: empty response` };
+    } catch (e) {
+      return { err: `${model}: ${e instanceof Error ? e.message : "request failed"}` };
     }
-    const data = await r.json();
-    const raw = (data?.content?.[0]?.text || "").trim();
-    if (!raw) return NextResponse.json({ error: "AI returned nothing — try again." }, { status: 502 });
+  };
 
-    // Split the model's "READ: … REPLY: …" output into the two parts.
-    let read = "";
-    let reply = raw;
-    const m = raw.search(/(^|\n)\s*REPLY\s*:/i);
-    if (m >= 0) {
-      const cut = raw.indexOf(":", raw.search(/REPLY\s*:/i));
-      reply = raw.slice(cut + 1).trim();
-      const readMatch = raw.slice(0, m).match(/READ\s*:\s*([\s\S]*?)\s*$/i);
-      read = readMatch ? readMatch[1].trim() : "";
-    }
-    return NextResponse.json({ reply, read });
-  } catch {
-    return NextResponse.json({ error: "Couldn't reach the AI — try again in a moment." }, { status: 502 });
+  // Try the smart model; if it errors for ANY reason, fall back to the fast one
+  // so the helper always returns a reply.
+  let out = await call("claude-sonnet-5");
+  if (!out.raw) out = await call("claude-haiku-4-5-20251001");
+  if (!out.raw) {
+    return NextResponse.json({ error: "AI error — " + (out.err || "no reply") }, { status: 502 });
   }
+
+  // Split the model's "READ: … REPLY: …" output into the two parts.
+  const raw = out.raw;
+  let read = "";
+  let reply = raw;
+  const m = raw.search(/(^|\n)\s*REPLY\s*:/i);
+  if (m >= 0) {
+    const cut = raw.indexOf(":", raw.search(/REPLY\s*:/i));
+    reply = raw.slice(cut + 1).trim();
+    const readMatch = raw.slice(0, m).match(/READ\s*:\s*([\s\S]*?)\s*$/i);
+    read = readMatch ? readMatch[1].trim() : "";
+  }
+  return NextResponse.json({ reply, read });
 }
