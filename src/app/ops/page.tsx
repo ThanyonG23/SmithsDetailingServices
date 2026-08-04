@@ -13,14 +13,17 @@ import {
   getReorderCount,
   getGrowthSeries,
   getChecklist,
+  getQuoteLeads,
   type DailyLog,
   type Booking,
   type AdRow,
   type JobWithHours,
   type JobFollowup,
   type GrowthDay,
+  type QuoteLead,
 } from "@/lib/ops/db";
 import { OPS_TARGETS, OPS_STAFF, cairnsToday } from "@/lib/ops/config";
+import { roomOnDay } from "@/lib/availability";
 import {
   saveEntry,
   autoSaveDay,
@@ -29,6 +32,7 @@ import {
   uploadAds,
   logJobHours,
   setCheckin,
+  markQuoteLeadActioned,
 } from "./actions";
 import StaffHours from "@/components/ops/StaffHours";
 import RunSheet from "@/components/ops/RunSheet";
@@ -268,6 +272,7 @@ export default async function OpsPage({
   let reorderCount = 0;
   let growth: GrowthDay[] = [];
   let checklist: string[] = [];
+  let quoteLeads: QuoteLead[] = [];
   let dbError = false;
 
   // Ashlee's run-sheet ticks are the one thing she touches all day, so load
@@ -303,6 +308,7 @@ export default async function OpsPage({
         satisfaction: await getSatisfaction(monthStartISO, today),
         reorderCount: await getReorderCount(),
         growth: await getGrowthSeries(from60, today),
+        quoteLeads: await getQuoteLeads("pending"),
       }))(),
       new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 20000)),
     ]);
@@ -318,6 +324,7 @@ export default async function OpsPage({
       satisfaction,
       reorderCount,
       growth,
+      quoteLeads,
     } = data);
   } catch {
     dbError = true;
@@ -453,6 +460,11 @@ export default async function OpsPage({
 
   // ── alerts engine ──
   const alerts: { tone: "red" | "yellow"; text: string }[] = [];
+  if (quoteLeads.length > 0)
+    alerts.push({
+      tone: "red",
+      text: `${quoteLeads.length} new AI Instant Quote request(s) waiting — confirm or call them back.`,
+    });
   if (!loggedToday)
     alerts.push({ tone: "yellow", text: "Today isn't logged yet — fill in the day before you knock off." });
   if (rectifyList.length > 0)
@@ -595,6 +607,54 @@ export default async function OpsPage({
                 <span>{a.text}</span>
               </div>
             ))}
+          </section>
+        </Reveal>
+      )}
+
+      {/* ── AI INSTANT QUOTE LEADS (from the homepage widget) ──────── */}
+      {quoteLeads.length > 0 && (
+        <Reveal delay={50}>
+          <section className="mt-6">
+            <SectionTitle eyebrow="From the homepage" title="AI Instant Quote requests" />
+            <div className="flex flex-col gap-3">
+              {quoteLeads.map((q) => (
+                <div key={q.id} className={`${CARD} p-4`}>
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="font-display text-base font-extrabold tracking-tight text-white">
+                        {q.name || "(no name)"} · {q.vehicle_text || "vehicle unknown"}
+                      </div>
+                      <div className="mt-1 text-xs text-white/50">
+                        {q.package_title} ({q.vehicle_size}) · {money(q.price)}
+                        {q.requested_date &&
+                          ` · wants ${dayLabel(q.requested_date)} ${q.requested_slot}`}
+                        {q.referral_code && ` · Ref: ${q.referral_code.toUpperCase()}`}
+                      </div>
+                      <div className="mt-1.5 flex flex-wrap gap-3 text-xs">
+                        {q.phone && (
+                          <a href={`tel:${q.phone}`} className="font-bold text-brand-green">
+                            📞 {q.phone}
+                          </a>
+                        )}
+                        {q.email && (
+                          <a href={`mailto:${q.email}`} className="text-white/60 hover:text-white">
+                            ✉️ {q.email}
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                    <form action={markQuoteLeadActioned}>
+                      <input type="hidden" name="id" value={q.id} />
+                      <button
+                        className="shrink-0 rounded-full border border-white/15 px-3 py-1.5 text-[11px] font-bold text-white/70 transition hover:border-brand-green hover:text-brand-green"
+                      >
+                        Actioned ✓
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              ))}
+            </div>
           </section>
         </Reveal>
       )}
@@ -818,11 +878,8 @@ export default async function OpsPage({
                 const detailers = corr * 2 + others; // correction = 2, other job = 1
                 const overCrew = detailers > 3;
                 // capacity: a full day ≈ 2 corrections. correction=1, full detail=0.5, premium=0.25
-                const used = jobs.reduce(
-                  (a, j) => a + (j.is_correction ? 1 : j.value >= 700 ? 0.5 : 0.25),
-                  0
-                );
-                const roomUnits = 2 - used;
+                // (shared with the public Instant Quote widget via roomOnDay)
+                const roomUnits = roomOnDay(jobs, d);
                 const hasRoom = roomUnits >= 0.25;
                 const roomLabel =
                   roomUnits >= 1

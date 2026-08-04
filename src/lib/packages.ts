@@ -152,8 +152,10 @@ ${GUARANTEE}
 ${BOOK}`;
 }
 
-export function premiumBody(size: VehicleSize, vehicle?: string): string {
-  const { price, hrs } = PREMIUM[size];
+/* Low-level renderer, exposed for the one legacy "Larger vehicle" quote
+   (bigger than the 4 standard sizes) that /ops/templates still offers —
+   everything else should go through premiumBody(size, vehicle). */
+export function premiumBodyRaw(price: string, hrs: string, vehicle?: string): string {
   return `Hey! We can definitely take care of ${greeting(vehicle)} with our Premium Interior & Exterior Detail
 This package also includes:
 
@@ -171,6 +173,11 @@ ${LOC}
 ${GUARANTEE}
 
 ${BOOK}`;
+}
+
+export function premiumBody(size: VehicleSize, vehicle?: string): string {
+  const { price, hrs } = PREMIUM[size];
+  return premiumBodyRaw(String(price), hrs, vehicle);
 }
 
 export function cutPolishBody(size: VehicleSize, vehicle?: string): string {
@@ -224,4 +231,17 @@ export function buildQuote(priorities: Priority[], size: VehicleSize, vehicle?: 
     price: packagePrice(packageId, size),
     body: buildPackageBody(packageId, size, vehicle),
   };
+}
+
+/** Compact package + price table for the AI lead-follow-up helper, so it can
+    size up a vehicle and suggest the right alternative package. Built from the
+    same price source above, so the AI's numbers can never drift from staff's. */
+export function priceReferenceForAI(): string {
+  const ladder: PackageId[] = ["correction", "cutpolish", "premium", "interior"];
+  return ladder
+    .map((id) => {
+      const cells = VEHICLE_SIZES.map((s) => `${s} $${packagePrice(id, s).toLocaleString("en-AU")}`).join(" · ");
+      return `${PACKAGE_TITLES[id]}: ${cells}`;
+    })
+    .join("\n");
 }

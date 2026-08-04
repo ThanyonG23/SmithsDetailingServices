@@ -28,11 +28,19 @@ import {
   deleteTemplate,
   replaceTemplates,
   getStock,
+  setQuoteLeadStatus,
   type StockItem,
 } from "@/lib/ops/db";
 import { OPS_STAFF, hoursBetween, cairnsToday } from "@/lib/ops/config";
 import { parseBookingsIcs, parseCustomersIcs } from "@/lib/ops/calendar";
 import { parseAdsCsv, parseAdsDailyMessages } from "@/lib/ops/ads";
+import {
+  correctionBody,
+  interiorBody,
+  premiumBody,
+  premiumBodyRaw,
+  cutPolishBody,
+} from "@/lib/packages";
 
 export async function login(formData: FormData): Promise<void> {
   const password = String(formData.get("password") || "");
@@ -275,6 +283,16 @@ export async function clockOff(uid: string, detailer: string): Promise<void> {
   revalidatePath("/ops");
 }
 
+/* Mark an Instant Quote lead (from the public homepage widget) as actioned —
+   Ashlee has called/texted them and either confirmed the real Google
+   Calendar booking or ruled it out. This never touches the calendar itself;
+   that stays a manual step, same as every other booking. */
+export async function markQuoteLeadActioned(formData: FormData): Promise<void> {
+  const id = Number(formData.get("id"));
+  if (Number.isFinite(id) && id > 0) await setQuoteLeadStatus(id, "actioned");
+  revalidatePath("/ops");
+}
+
 /* Record a customer check-in outcome: happy (done), unhappy (needs rectify),
    or rectified (rectify job sorted). Auto-feeds the happy/unhappy tally. */
 export async function setCheckin(formData: FormData): Promise<void> {
@@ -449,100 +467,9 @@ export async function removeTemplate(formData: FormData): Promise<void> {
   redirect("/ops/templates?tok=deleted");
 }
 
-/* Smiths standard quote templates — clean, per vehicle size. */
-const LOC = "📍 209 Bunda Street, Parramatta Park, Cairns QLD";
-const GUARANTEE = "💯 If you're not happy: You don't pay.";
-const BOOK = "Would you like to book this in?";
-
-function correctionBody(interior: number, bonus: number, total: string): string {
-  return `Hey! We can definitely take care of your vehicle with our Exterior Correction Package
-Our Exterior Correction Package Also Includes:
-
-✅ Contact Wash
-✅ Decontamination Wash
-✅ Clay Bar Treatment
-✅ Multi Stage Paint Correction
-✅ 3 Year Ceramic Coating
-
-🎁 BONUS #1: FREE Premium Interior Detail (Valued At $${interior})
-
-🎁 BONUS #2: LIMITED TIME FREE UPGRADES
-✅ Engine Bay Detail
-✅ Exterior Plastic Restore
-
-Bonus Free Inclusions: $${bonus}
-Total Price Today: $${total}
-
-⏱️ 1-2 days turnaround
-${LOC}
-
-${GUARANTEE}
-
-${BOOK}`;
-}
-
-function interiorBody(price: string): string {
-  return `Hey! We can definitely take care of your vehicle with our Premium Interior Package
-This Package Also Includes:
-
-✅ Interior Vacuum
-✅ Carpet Shampoo
-✅ Carpet Extraction
-✅ Interior Surfaces Cleaned
-✅ Interior Plastic Rejuvenated
-✅ Windows Streak Free
-
-⏱️ 2-3 hours
-💵 $${price}
-${LOC}
-
-${GUARANTEE}
-
-${BOOK}`;
-}
-
-function premiumBody(price: string, hrs: string): string {
-  return `Hey! We can definitely take care of your vehicle with our Premium Interior & Exterior Detail
-This package also includes:
-
-✅ Deep Interior Clean
-✅ Carpet Shampoo & Extraction
-✅ Plastic Rejuvenation
-✅ Full Exterior Wash & Dry
-✅ Tyre Shine
-✅ Ceramic Spray Sealant
-
-⏱️ Takes ${hrs}
-💵 $${price}
-${LOC}
-
-${GUARANTEE}
-
-${BOOK}`;
-}
-
-function cutPolishBody(price: string): string {
-  return `Hey! We can definitely take care of your vehicle with our Premium Interior & Exterior Detail + Cut & Polish Package
-This package also includes:
-
-✅ Deep Interior Clean
-✅ Carpet Shampoo & Extraction
-✅ Plastic Rejuvenation
-✅ Decontamination Wash
-✅ Clay Bar Treatment
-✅ 1 Step Cut
-✅ 1 Step Polish
-✅ Ceramic Spray Sealant
-
-⏱️ 24 hour turnaround
-💰 $${price}
-${LOC}
-
-${GUARANTEE}
-
-${BOOK}`;
-}
-
+/* Smiths standard quote templates — clean, per vehicle size. Price tables and
+   body copy now live in src/lib/packages.ts (shared with the public Instant
+   Quote widget) so the two surfaces can never quote different prices. */
 const askDetailsBody = `Great! I just need the following please:
 
 Email:
@@ -606,23 +533,23 @@ const STANDARD_TEMPLATES: { title: string; body: string; sort: number }[] = [
   { title: "Booking — Ask for details", body: askDetailsBody, sort: 30 },
   { title: "Booking — Confirmed message", body: confirmedBody, sort: 31 },
   { title: "Booking — Calendar event (paste into GCal)", body: calendarBody, sort: 32 },
-  { title: "Correction — Single Cab ($1,500)", body: correctionBody(230, 400, "1,500"), sort: 0 },
-  { title: "Correction — Sedan/Dual Cab ($2,100)", body: correctionBody(280, 450, "2,100"), sort: 1 },
-  { title: "Correction — SUV ($2,200)", body: correctionBody(330, 500, "2,200"), sort: 2 },
-  { title: "Correction — 7 Seater ($2,300)", body: correctionBody(350, 535, "2,300"), sort: 3 },
-  { title: "Interior Only — Single Cab ($250)", body: interiorBody("250"), sort: 5 },
-  { title: "Interior Only — Sedan/Dual Cab ($300)", body: interiorBody("300"), sort: 6 },
-  { title: "Interior Only — SUV ($330)", body: interiorBody("330"), sort: 7 },
-  { title: "Interior Only — 7 Seater ($350)", body: interiorBody("350"), sort: 8 },
-  { title: "Cut & Polish — Single Cab ($850)", body: cutPolishBody("850"), sort: 10 },
-  { title: "Cut & Polish — Sedan/Dual Cab ($1,000)", body: cutPolishBody("1,000"), sort: 11 },
-  { title: "Cut & Polish — SUV ($1,100)", body: cutPolishBody("1,100"), sort: 12 },
-  { title: "Cut & Polish — 7 Seater ($1,200)", body: cutPolishBody("1,200"), sort: 13 },
-  { title: "Premium Detail — Single Cab ($350)", body: premiumBody("350", "3-4 hrs"), sort: 20 },
-  { title: "Premium Detail — Sedan/Dual Cab ($400)", body: premiumBody("400", "3-4 hrs"), sort: 21 },
-  { title: "Premium Detail — SUV ($430)", body: premiumBody("430", "3-4 hrs"), sort: 22 },
-  { title: "Premium Detail — 7 Seater ($450)", body: premiumBody("450", "4-5 hrs"), sort: 23 },
-  { title: "Premium Detail — Larger ($500-550)", body: premiumBody("500", "4-5 hrs"), sort: 24 },
+  { title: "Correction — Single Cab ($1,500)", body: correctionBody("Single Cab"), sort: 0 },
+  { title: "Correction — Sedan/Dual Cab ($2,100)", body: correctionBody("Sedan/Dual Cab"), sort: 1 },
+  { title: "Correction — SUV ($2,200)", body: correctionBody("SUV"), sort: 2 },
+  { title: "Correction — 7 Seater ($2,300)", body: correctionBody("7 Seater"), sort: 3 },
+  { title: "Interior Only — Single Cab ($250)", body: interiorBody("Single Cab"), sort: 5 },
+  { title: "Interior Only — Sedan/Dual Cab ($300)", body: interiorBody("Sedan/Dual Cab"), sort: 6 },
+  { title: "Interior Only — SUV ($330)", body: interiorBody("SUV"), sort: 7 },
+  { title: "Interior Only — 7 Seater ($350)", body: interiorBody("7 Seater"), sort: 8 },
+  { title: "Cut & Polish — Single Cab ($850)", body: cutPolishBody("Single Cab"), sort: 10 },
+  { title: "Cut & Polish — Sedan/Dual Cab ($1,000)", body: cutPolishBody("Sedan/Dual Cab"), sort: 11 },
+  { title: "Cut & Polish — SUV ($1,100)", body: cutPolishBody("SUV"), sort: 12 },
+  { title: "Cut & Polish — 7 Seater ($1,200)", body: cutPolishBody("7 Seater"), sort: 13 },
+  { title: "Premium Detail — Single Cab ($350)", body: premiumBody("Single Cab"), sort: 20 },
+  { title: "Premium Detail — Sedan/Dual Cab ($400)", body: premiumBody("Sedan/Dual Cab"), sort: 21 },
+  { title: "Premium Detail — SUV ($430)", body: premiumBody("SUV"), sort: 22 },
+  { title: "Premium Detail — 7 Seater ($450)", body: premiumBody("7 Seater"), sort: 23 },
+  { title: "Premium Detail — Larger ($500-550)", body: premiumBodyRaw("500", "4-5 hrs"), sort: 24 },
 ];
 
 export async function seedTemplates(): Promise<void> {

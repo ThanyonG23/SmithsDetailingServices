@@ -75,7 +75,7 @@ async function runEnsure(): Promise<void> {
     const rows = await sql`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'bookings' AND column_name = 'car'
+        WHERE table_name = 'quote_leads' AND column_name = 'status'
       ) AS ready;`;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
   } catch {
@@ -254,6 +254,29 @@ async function runEnsure(): Promise<void> {
       AND NOT EXISTS (SELECT 1 FROM job_day_hours)
     ON CONFLICT (uid, work_date) DO NOTHING;
   `;
+  // Instant Quote leads — from the public homepage AI widget. Always a
+  // "pending" request for Ashlee to confirm; never writes the calendar
+  // directly, same human-in-the-loop model as every other booking.
+  await sql`
+    CREATE TABLE IF NOT EXISTS quote_leads (
+      id             serial        PRIMARY KEY,
+      created_at     timestamptz   NOT NULL DEFAULT now(),
+      name           text          NOT NULL DEFAULT '',
+      email          text          NOT NULL DEFAULT '',
+      phone          text          NOT NULL DEFAULT '',
+      vehicle_text   text          NOT NULL DEFAULT '',
+      vehicle_size   text          NOT NULL DEFAULT '',
+      priorities     jsonb         NOT NULL DEFAULT '[]'::jsonb,
+      package_id     text          NOT NULL DEFAULT '',
+      package_title  text          NOT NULL DEFAULT '',
+      price          numeric(10,2) NOT NULL DEFAULT 0,
+      requested_date date,
+      requested_slot text          NOT NULL DEFAULT '',
+      referral_code  text          NOT NULL DEFAULT '',
+      status         text          NOT NULL DEFAULT 'pending'
+    );
+  `;
+
   // Indexes — keep queries fast as the tables grow. Wrapped so a failed
   // index can NEVER block a write (they're an optimisation, not required).
   try {
@@ -265,6 +288,7 @@ async function runEnsure(): Promise<void> {
     await sql`CREATE INDEX IF NOT EXISTS idx_job_day_hours_uid ON job_day_hours(uid);`;
     await sql`CREATE INDEX IF NOT EXISTS idx_job_clock_open ON job_clock(detailer) WHERE end_ts IS NULL;`;
     await sql`CREATE INDEX IF NOT EXISTS idx_job_clock_uid ON job_clock(uid, work_date);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_quote_leads_status ON quote_leads(status, created_at DESC);`;
   } catch {
     /* indexes are an optimisation — never let them break a write */
   }
@@ -1087,6 +1111,68 @@ export async function replaceTemplates(
   if (list.length) {
     await sql`INSERT INTO templates ${sql(list, "title", "body", "sort")}`;
   }
+}
+
+/* ---- quote_leads (public Instant Quote widget) ---------------------- */
+
+export interface QuoteLeadInput {
+  name: string;
+  email: string;
+  phone: string;
+  vehicle_text: string;
+  vehicle_size: string;
+  priorities: string[];
+  package_id: string;
+  package_title: string;
+  price: number;
+  requested_date: string; // YYYY-MM-DD
+  requested_slot: string;
+  referral_code: string;
+}
+
+export interface QuoteLead extends QuoteLeadInput {
+  id: number;
+  created_at: string; // Cairns-local "YYYY-MM-DDTHH:MM"
+  status: string; // pending | actioned
+}
+
+export async function insertQuoteLead(l: QuoteLeadInput): Promise<void> {
+  await ensureTable();
+  await sql`
+    INSERT INTO quote_leads
+      (name, email, phone, vehicle_text, vehicle_size, priorities,
+       package_id, package_title, price, requested_date, requested_slot, referral_code)
+    VALUES
+      (${l.name}, ${l.email}, ${l.phone}, ${l.vehicle_text}, ${l.vehicle_size},
+       ${sql.json(l.priorities)}, ${l.package_id}, ${l.package_title}, ${l.price},
+       ${l.requested_date}, ${l.requested_slot}, ${l.referral_code});
+  `;
+}
+
+/** Pending leads for the /ops dashboard card, newest first. */
+export async function getQuoteLeads(status = "pending"): Promise<QuoteLead[]> {
+  try {
+    const rows = await sql`
+      SELECT id, name, email, phone, vehicle_text, vehicle_size, priorities,
+             package_id, package_title, price::float8 AS price,
+             to_char(requested_date, 'YYYY-MM-DD') AS requested_date,
+             requested_slot, referral_code, status,
+             to_char(created_at AT TIME ZONE 'Australia/Brisbane',
+                     'YYYY-MM-DD"T"HH24:MI')      AS created_at
+      FROM quote_leads
+      WHERE status = ${status}
+      ORDER BY created_at DESC
+      LIMIT 100;
+    `;
+    return rows as unknown as QuoteLead[];
+  } catch {
+    return [];
+  }
+}
+
+export async function setQuoteLeadStatus(id: number, status: string): Promise<void> {
+  await ensureTable();
+  await sql`UPDATE quote_leads SET status = ${status} WHERE id = ${id};`;
 }
 
 /* ---- export --------------------------------------------------------- */

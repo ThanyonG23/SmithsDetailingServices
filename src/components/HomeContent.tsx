@@ -7,6 +7,7 @@ import ServiceShowcase from "@/components/ServiceShowcase";
 import BringBlackBack from "@/components/BringBlackBack";
 import Gallery from "@/components/Gallery";
 import Reveal from "@/components/Reveal";
+import QuoteChat from "@/components/QuoteChat";
 
 function TextCta({ href, className = "" }: { href: string; className?: string }) {
   return (
@@ -115,6 +116,7 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
           <Reveal delay={300}>
             <div className="mt-9 flex flex-wrap items-center gap-3">
               <TextCta href={smsHref} />
+              <QuoteChat />
               <a
                 href={`tel:${BUSINESS.phoneE164}`}
                 className="rounded-full border border-white/20 px-7 py-4 text-sm font-bold text-white transition hover:border-white/40"
