@@ -62,6 +62,13 @@ const CUTPOLISH_PRICE: Record<VehicleSize, number> = {
   "7 Seater": 1200,
 };
 
+const PREMIUM_POLISH_PRICE: Record<VehicleSize, number> = {
+  "Single Cab": 500,
+  "Sedan/Dual Cab": 600,
+  SUV: 650,
+  "7 Seater": 700,
+};
+
 /* interior = value of the bonus free interior detail, bonus = the other
    free upgrades' value, total = the price charged today. */
 const CORRECTION: Record<VehicleSize, { interior: number; bonus: number; total: number }> = {
@@ -192,6 +199,31 @@ This package also includes:
 ✅ Clay Bar Treatment
 ✅ 1 Step Cut
 ✅ 1 Step Polish
+✅ Ceramic Spray Sealant
+
+⏱️ 24 hour turnaround
+💰 $${price.toLocaleString("en-AU")}
+${LOC}
+
+${GUARANTEE}
+
+${BOOK}`;
+}
+
+/* "Premium Detail + Polish" — a mid-tier full detail with a 1-step paint
+   enhancement, above Premium Detail and below Cut & Polish. Template-only for
+   now (not part of the Instant Quote widget's PackageId ladder). */
+export function premiumPolishBody(size: VehicleSize, vehicle?: string): string {
+  const price = PREMIUM_POLISH_PRICE[size];
+  return `Hey! We can definitely take care of ${greeting(vehicle)} with our Premium Detail + Polish Package
+This package also includes:
+
+✅ Carpet Shampoo & Extraction
+✅ Plastic Rejuvenation
+✅ Full Exterior Wash
+✅ Decontamination Wash
+✅ Clay Bar Treatment
+✅ 1 Step Paint Enhancement
 ✅ Ceramic Spray Sealant
 
 ⏱️ 24 hour turnaround

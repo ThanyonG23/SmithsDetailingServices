@@ -40,6 +40,7 @@ export default async function TemplatesPage({
   const defs: { key: string; title: string; emoji: string; match: RegExp }[] = [
     { key: "correction", title: "Correction & Coating", emoji: "✨", match: /^correction/i },
     { key: "cutpolish", title: "Premium + Cut & Polish", emoji: "💎", match: /cut\s*&?\s*polish/i },
+    { key: "premiumpolish", title: "Premium Detail + Polish", emoji: "🔶", match: /detail \+ polish/i },
     { key: "premium", title: "Premium", emoji: "⭐", match: /^premium/i },
     { key: "interior", title: "Interior", emoji: "🧽", match: /^interior/i },
     { key: "booking", title: "Booking messages", emoji: "💬", match: /^booking/i },
@@ -90,9 +91,9 @@ export default async function TemplatesPage({
       {/* load the standard Cairns set */}
       <form action={seedTemplates} className={`mt-5 ${CARD} flex flex-wrap items-center justify-between gap-3 p-4`}>
         <div>
-          <div className="text-sm font-bold text-white">Load Smiths standard templates (20)</div>
+          <div className="text-sm font-bold text-white">Load Smiths standard templates (24)</div>
           <div className="mt-0.5 text-xs text-white/45">
-            Booking flow + Correction · Cut &amp; Polish · Premium Detail · Interior Only (one per size).{" "}
+            Booking flow + Correction · Cut &amp; Polish · Premium Detail + Polish · Premium Detail · Interior Only (one per size).{" "}
             <b className="text-brand-yellow/80">Replaces all current templates.</b>
           </div>
         </div>

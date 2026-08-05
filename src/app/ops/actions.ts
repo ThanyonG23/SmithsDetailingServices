@@ -39,6 +39,7 @@ import {
   interiorBody,
   premiumBody,
   premiumBodyRaw,
+  premiumPolishBody,
   cutPolishBody,
 } from "@/lib/packages";
 
@@ -546,6 +547,10 @@ const STANDARD_TEMPLATES: { title: string; body: string; sort: number }[] = [
   { title: "Cut & Polish — Sedan/Dual Cab ($1,000)", body: cutPolishBody("Sedan/Dual Cab"), sort: 11 },
   { title: "Cut & Polish — SUV ($1,100)", body: cutPolishBody("SUV"), sort: 12 },
   { title: "Cut & Polish — 7 Seater ($1,200)", body: cutPolishBody("7 Seater"), sort: 13 },
+  { title: "Premium Detail + Polish — Single Cab ($500)", body: premiumPolishBody("Single Cab"), sort: 15 },
+  { title: "Premium Detail + Polish — Sedan/Dual Cab ($600)", body: premiumPolishBody("Sedan/Dual Cab"), sort: 16 },
+  { title: "Premium Detail + Polish — SUV ($650)", body: premiumPolishBody("SUV"), sort: 17 },
+  { title: "Premium Detail + Polish — 7 Seater ($700)", body: premiumPolishBody("7 Seater"), sort: 18 },
   { title: "Premium Detail — Single Cab ($350)", body: premiumBody("Single Cab"), sort: 20 },
   { title: "Premium Detail — Sedan/Dual Cab ($400)", body: premiumBody("Sedan/Dual Cab"), sort: 21 },
   { title: "Premium Detail — SUV ($430)", body: premiumBody("SUV"), sort: 22 },
