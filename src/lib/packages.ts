@@ -269,11 +269,23 @@ export function buildQuote(priorities: Priority[], size: VehicleSize, vehicle?: 
     size up a vehicle and suggest the right alternative package. Built from the
     same price source above, so the AI's numbers can never drift from staff's. */
 export function priceReferenceForAI(): string {
-  const ladder: PackageId[] = ["correction", "cutpolish", "premium", "interior"];
-  return ladder
-    .map((id) => {
-      const cells = VEHICLE_SIZES.map((s) => `${s} $${packagePrice(id, s).toLocaleString("en-AU")}`).join(" · ");
-      return `${PACKAGE_TITLES[id]}: ${cells}`;
-    })
-    .join("\n");
+  const asMap = (id: PackageId): Record<VehicleSize, number> =>
+    Object.fromEntries(VEHICLE_SIZES.map((s) => [s, packagePrice(id, s)])) as Record<VehicleSize, number>;
+  const row = (title: string, prices: Record<VehicleSize, number>, bestFor: string) => {
+    const cells = VEHICLE_SIZES.map((s) => `${s} $${prices[s].toLocaleString("en-AU")}`).join(" · ");
+    return `${title}\n  Best for: ${bestFor}\n  ${cells}`;
+  };
+  // Cheapest → dearest, each with what it's actually for.
+  return [
+    row("Interior Only", asMap("interior"),
+      "inside only — vacuum, shampoo, extraction, plastics, windows. Dirty/smelly interior, kids or pets, no paint work wanted."),
+    row("Premium Detail", asMap("premium"),
+      "full clean inside AND out — deep interior, wash, tyre shine, ceramic spray sealant. A great all-round refresh with no polishing."),
+    row("Premium Detail + Polish", PREMIUM_POLISH_PRICE,
+      "the full detail PLUS a 1-step paint enhancement for extra gloss and to knock back light swirls. The step up when they want the paint to pop but don't need full correction."),
+    row("Premium + Cut & Polish", asMap("cutpolish"),
+      "the full detail PLUS a 1-step cut and 1-step polish for heavier swirls, oxidation, dull tired paint — bringing it back without a coating."),
+    row("Exterior Correction & Ceramic Coating", asMap("correction"),
+      "the top job — multi-stage paint correction + 3-year ceramic coating, and it includes a FREE interior detail + bonus upgrades. For someone who wants the best finish and long-term protection."),
+  ].join("\n\n");
 }
