@@ -60,8 +60,8 @@ export async function POST(req: Request) {
     userContent += `\n\n---\nINSTRUCTION FROM THE SMITHS TEAM for this specific reply. Follow it exactly, while keeping the Smiths voice and all the rules: ${note}`;
   }
 
-  // Call one model. Returns the raw text, or an error string if it failed.
-  const call = async (model: string): Promise<{ raw?: string; err?: string }> => {
+  // Call one model. Returns the raw text (+ whether it was cut off), or an error.
+  const call = async (model: string): Promise<{ raw?: string; err?: string; truncated?: boolean }> => {
     try {
       const r = await fetch("https://api.anthropic.com/v1/messages", {
         method: "POST",
@@ -71,8 +71,10 @@ export async function POST(req: Request) {
           "anthropic-version": "2023-06-01",
         },
         body: JSON.stringify({
+          // Generous ceiling so a reply (which is short) can never be cut off
+          // mid-sentence, even if the model spends tokens reasoning first.
           model,
-          max_tokens: 800,
+          max_tokens: 1500,
           system: buildSystemPrompt(),
           messages: [{ role: "user", content: userContent }],
         }),
@@ -82,16 +84,22 @@ export async function POST(req: Request) {
       // Grab the first TEXT block (robust to thinking/other block types).
       const blocks = (data?.content || []) as { type?: string; text?: string }[];
       const raw = (blocks.find((b) => b?.type === "text")?.text || blocks[0]?.text || "").trim();
-      return raw ? { raw } : { err: `${model}: empty response` };
+      // stop_reason "max_tokens" means the model was cut off before it finished.
+      const truncated = data?.stop_reason === "max_tokens";
+      return raw ? { raw, truncated } : { err: `${model}: empty response` };
     } catch (e) {
       return { err: `${model}: ${e instanceof Error ? e.message : "request failed"}` };
     }
   };
 
-  // Try the smart model; if it errors for ANY reason, fall back to the fast one
-  // so the helper always returns a reply.
+  // Try the smart model. If it errored OR came back cut off, try the fast one and
+  // prefer whichever gave a complete answer, so a half-message never reaches you.
   let out = await call("claude-sonnet-5");
-  if (!out.raw) out = await call("claude-haiku-4-5-20251001");
+  if (!out.raw || out.truncated) {
+    const alt = await call("claude-haiku-4-5-20251001");
+    if (alt.raw && !alt.truncated) out = alt;
+    else if (!out.raw && alt.raw) out = alt;
+  }
   if (!out.raw) {
     return res({ error: "AI error — " + (out.err || "no reply") }, 502);
   }
