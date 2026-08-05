@@ -695,18 +695,28 @@ export async function setJobCancelled(uid: string, cancelled: boolean): Promise<
   `;
 }
 
-/** Per-day crew hours (from the daily log's staff_hours) across a range. */
+/** Per-day crew hours + shift start/finish times across a range. */
 export async function getStaffHoursRange(
   fromISO: string,
   toISO: string
-): Promise<{ date: string; staff_hours: Record<string, number> }[]> {
+): Promise<
+  {
+    date: string;
+    staff_hours: Record<string, number>;
+    staff_shifts: Record<string, { start: string; end: string }>;
+  }[]
+> {
   try {
     const rows = await sql`
-      SELECT to_char(log_date, 'YYYY-MM-DD') AS date, staff_hours
+      SELECT to_char(log_date, 'YYYY-MM-DD') AS date, staff_hours, staff_shifts
       FROM daily_log
       WHERE log_date BETWEEN ${fromISO} AND ${toISO}
       ORDER BY log_date;`;
-    return rows as unknown as { date: string; staff_hours: Record<string, number> }[];
+    return rows as unknown as {
+      date: string;
+      staff_hours: Record<string, number>;
+      staff_shifts: Record<string, { start: string; end: string }>;
+    }[];
   } catch {
     return [];
   }
