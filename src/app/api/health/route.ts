@@ -5,6 +5,7 @@ import {
   dashDiagnostics,
   teamDiagnostics,
   getStaffHoursRange,
+  getBookingsDump,
 } from "@/lib/ops/db";
 
 /* Keep-warm health check. A free external pinger hits this every few minutes
@@ -21,14 +22,15 @@ export async function GET(req: Request) {
   const checklist = deep === "checklist" ? await checklistSelfTest() : undefined;
   const dash = deep === "dash" ? await dashDiagnostics() : undefined;
   const team = deep === "team" ? await teamDiagnostics() : undefined;
-  // Crew-hours read is token-gated (staff data), reusing AI_REPLY_EXT_TOKEN.
+  // Business-data reads are token-gated, reusing AI_REPLY_EXT_TOKEN.
   const token = req.headers.get("x-ext-token") || params.get("token") || "";
-  const hours =
-    deep === "hours" && process.env.AI_REPLY_EXT_TOKEN && token === process.env.AI_REPLY_EXT_TOKEN
-      ? await getStaffHoursRange(params.get("from") || "1970-01-01", params.get("to") || "2999-01-01")
-      : undefined;
+  const tokenOk = !!process.env.AI_REPLY_EXT_TOKEN && token === process.env.AI_REPLY_EXT_TOKEN;
+  const from = params.get("from") || "1970-01-01";
+  const to = params.get("to") || "2999-01-01";
+  const hours = deep === "hours" && tokenOk ? await getStaffHoursRange(from, to) : undefined;
+  const bookings = deep === "bookings" && tokenOk ? await getBookingsDump(from, to) : undefined;
   return NextResponse.json(
-    { ok, checklist, dash, team, hours, service: "smiths-ops", ts: new Date().toISOString() },
+    { ok, checklist, dash, team, hours, bookings, service: "smiths-ops", ts: new Date().toISOString() },
     { status: ok ? 200 : 503, headers: { "Cache-Control": "no-store" } }
   );
 }

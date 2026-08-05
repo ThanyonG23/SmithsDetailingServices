@@ -722,6 +722,36 @@ export async function getStaffHoursRange(
   }
 }
 
+/** Full booking rows (summary + extras + car) for offline analysis. */
+export async function getBookingsDump(
+  fromISO: string,
+  toISO: string
+): Promise<
+  { date: string; value: number; is_correction: boolean; summary: string; extras: string; car: string }[]
+> {
+  try {
+    const rows = await sql`
+      SELECT to_char(booking_date, 'YYYY-MM-DD') AS date,
+             value::float8 AS value, is_correction,
+             COALESCE(summary, '') AS summary,
+             COALESCE(extras, '')  AS extras,
+             COALESCE(car, '')     AS car
+      FROM bookings
+      WHERE booking_date BETWEEN ${fromISO} AND ${toISO}
+      ORDER BY booking_date;`;
+    return rows as unknown as {
+      date: string;
+      value: number;
+      is_correction: boolean;
+      summary: string;
+      extras: string;
+      car: string;
+    }[];
+  } catch {
+    return [];
+  }
+}
+
 /** No-show / cancellation counts by the job's booking date, for the ops tally. */
 export async function getCancellationStats(
   weekFromISO: string,
