@@ -75,7 +75,12 @@ export async function POST(req: Request) {
           // mid-sentence, even if the model spends tokens reasoning first.
           model,
           max_tokens: 1500,
-          system: buildSystemPrompt(),
+          // Cache the big static instruction block (voice + prices + examples) so
+          // back-to-back drafts reuse it instead of paying for it every time —
+          // ~90% cheaper input on it when working a queue, and a little faster.
+          system: [
+            { type: "text", text: buildSystemPrompt(), cache_control: { type: "ephemeral" } },
+          ],
           messages: [{ role: "user", content: userContent }],
         }),
       });
