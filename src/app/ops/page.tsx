@@ -14,6 +14,7 @@ import {
   getGrowthSeries,
   getChecklist,
   getQuoteLeads,
+  getQuoteLeadStats,
   type DailyLog,
   type Booking,
   type AdRow,
@@ -292,6 +293,7 @@ export default async function OpsPage({
   let growth: GrowthDay[] = [];
   let checklist: string[] = [];
   let quoteLeads: QuoteLead[] = [];
+  let quoteLeadStats = { total: 0, pending: 0, actioned: 0 };
   let dbError = false;
 
   // Ashlee's run-sheet ticks are the one thing she touches all day, so load
@@ -328,6 +330,7 @@ export default async function OpsPage({
         reorderCount: await getReorderCount(),
         growth: await getGrowthSeries(from60, today),
         quoteLeads: await getQuoteLeads("pending"),
+        quoteLeadStats: await getQuoteLeadStats(),
       }))(),
       new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 20000)),
     ]);
@@ -344,6 +347,7 @@ export default async function OpsPage({
       reorderCount,
       growth,
       quoteLeads,
+      quoteLeadStats,
     } = data);
   } catch {
     dbError = true;
@@ -631,12 +635,22 @@ export default async function OpsPage({
       )}
 
       {/* ── AI INSTANT QUOTE LEADS (from the homepage widget) ──────── */}
-      {quoteLeads.length > 0 && (
+      {quoteLeadStats.total > 0 && (
         <Reveal delay={50}>
           <section className="mt-6">
             <SectionTitle eyebrow="From the homepage" title="AI Instant Quote requests" />
-            <div className="flex flex-col gap-3">
-              {quoteLeads.map((q) => (
+            <div className={`${CARD} mb-3 px-4 py-3 text-sm text-white/70`}>
+              <b className="text-white">{quoteLeadStats.total}</b>{" "}
+              {quoteLeadStats.total === 1 ? "person has" : "people have"} got a quote through the
+              widget and not booked{" · "}
+              <b className="text-brand-green">{quoteLeadStats.pending}</b> new to chase
+              {quoteLeadStats.actioned > 0 && (
+                <span className="text-white/40">{` · ${quoteLeadStats.actioned} already followed up`}</span>
+              )}
+            </div>
+            {quoteLeads.length > 0 && (
+              <div className="flex flex-col gap-3">
+                {quoteLeads.map((q) => (
                 <div key={q.id} className={`${CARD} p-4`}>
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -672,8 +686,9 @@ export default async function OpsPage({
                     </form>
                   </div>
                 </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </section>
         </Reveal>
       )}

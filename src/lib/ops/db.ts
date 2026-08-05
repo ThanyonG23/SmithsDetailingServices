@@ -1182,6 +1182,23 @@ export async function setQuoteLeadStatus(id: number, status: string): Promise<vo
   await sql`UPDATE quote_leads SET status = ${status} WHERE id = ${id};`;
 }
 
+/** All-time instant-quote funnel: everyone who got a quote through the homepage
+    widget. `total` = every lead ever, `pending` = not yet actioned by the team.
+    None book through the widget (booking is manual), so total = quoted-not-booked. */
+export async function getQuoteLeadStats(): Promise<{ total: number; pending: number; actioned: number }> {
+  try {
+    const rows = await sql`
+      SELECT count(*)::int                                       AS total,
+             count(*) FILTER (WHERE status = 'pending')::int     AS pending,
+             count(*) FILTER (WHERE status = 'actioned')::int    AS actioned
+      FROM quote_leads;`;
+    const r = rows[0] as { total: number; pending: number; actioned: number } | undefined;
+    return r ?? { total: 0, pending: 0, actioned: 0 };
+  } catch {
+    return { total: 0, pending: 0, actioned: 0 };
+  }
+}
+
 /* ---- export --------------------------------------------------------- */
 
 export async function getAllLogs(): Promise<Record<string, unknown>[]> {
