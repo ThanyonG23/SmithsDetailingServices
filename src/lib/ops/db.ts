@@ -229,6 +229,8 @@ async function runEnsure(): Promise<void> {
   // A running note per car (what still needs doing, rectify items) that travels
   // with the job across days.
   await sql`ALTER TABLE job_progress ADD COLUMN IF NOT EXISTS notes text NOT NULL DEFAULT '';`;
+  // Cancellation / no-show flag so we can track weekly/monthly drop-outs.
+  await sql`ALTER TABLE job_progress ADD COLUMN IF NOT EXISTS cancelled boolean NOT NULL DEFAULT false;`;
   // Detailer time-clock: one row per detailer's start→stop on a car. Hours on a
   // car for a day = sum of these durations, rolled into job_day_hours.
   await sql`
@@ -586,6 +588,7 @@ export interface JobWithHours extends Booking {
   hours: number; // running total across every day worked
   hours_today: number; // hours logged for the day being viewed
   finished: boolean; // marked done (so it stops carrying over)
+  cancelled: boolean; // no-show / cancellation
   note: string; // running per-car note
 }
 
@@ -595,6 +598,7 @@ const JOB_HOURS_SELECT = (date: string) => sql`
          COALESCE((SELECT sum(hours) FROM job_day_hours d WHERE d.uid = b.uid), 0)::float8 AS hours,
          COALESCE((SELECT hours FROM job_day_hours d WHERE d.uid = b.uid AND d.work_date = ${date}), 0)::float8 AS hours_today,
          COALESCE(p.finished, false) AS finished,
+         COALESCE(p.cancelled, false) AS cancelled,
          COALESCE(p.notes, '') AS note
 `;
 
@@ -620,6 +624,7 @@ export async function getCarryoverJobs(today: string, sinceISO: string): Promise
     WHERE b.booking_date < ${today}
       AND b.booking_date >= ${sinceISO}
       AND COALESCE(p.finished, false) = false
+      AND COALESCE(p.cancelled, false) = false
     ORDER BY b.booking_date DESC;
   `;
   return rows as unknown as JobWithHours[];
@@ -674,6 +679,38 @@ export async function setJobFinished(uid: string, finished: boolean): Promise<vo
     VALUES (${uid}, ${finished}, now())
     ON CONFLICT (uid) DO UPDATE SET finished = EXCLUDED.finished, updated_at = now();
   `;
+}
+
+/** Mark a job as a no-show / cancellation (so it drops off the floor and is
+    counted in the weekly/monthly cancellation tally). Toggleable to undo. */
+export async function setJobCancelled(uid: string, cancelled: boolean): Promise<void> {
+  await ensureTable();
+  if (!uid) return;
+  await sql`
+    INSERT INTO job_progress (uid, cancelled, updated_at)
+    VALUES (${uid}, ${cancelled}, now())
+    ON CONFLICT (uid) DO UPDATE SET cancelled = EXCLUDED.cancelled, updated_at = now();
+  `;
+}
+
+/** No-show / cancellation counts by the job's booking date, for the ops tally. */
+export async function getCancellationStats(
+  weekFromISO: string,
+  monthFromISO: string,
+  toISO: string
+): Promise<{ week: number; month: number }> {
+  try {
+    const rows = await sql`
+      SELECT count(*) FILTER (WHERE b.booking_date >= ${weekFromISO})::int  AS week,
+             count(*) FILTER (WHERE b.booking_date >= ${monthFromISO})::int AS month
+      FROM job_progress p
+      JOIN bookings b ON b.uid = p.uid
+      WHERE p.cancelled = true AND b.booking_date <= ${toISO};`;
+    const r = rows[0] as { week: number; month: number } | undefined;
+    return r ?? { week: 0, month: 0 };
+  } catch {
+    return { week: 0, month: 0 };
+  }
 }
 
 /** Set the running per-car note (what still needs doing / rectify items). */

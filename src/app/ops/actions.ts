@@ -11,6 +11,7 @@ import {
   replaceAds,
   setJobDayHours,
   setJobFinished,
+  setJobCancelled,
   setJobNote,
   clockStart,
   clockStop,
@@ -233,6 +234,7 @@ export async function logJobHours(formData: FormData): Promise<void> {
   const entries: { uid: string; date: string; hours: number }[] = [];
   const onFloor: string[] = []; // every job shown (hidden job:: marker)
   const done = new Set<string>(); // the ones with "Done" ticked
+  const cancelled = new Set<string>(); // the ones marked no-show / cancelled
   const notes: { uid: string; note: string }[] = [];
   for (const [key] of formData.entries()) {
     if (key.startsWith("jh::")) {
@@ -242,14 +244,19 @@ export async function logJobHours(formData: FormData): Promise<void> {
       onFloor.push(key.slice(5));
     } else if (key.startsWith("fin::")) {
       done.add(key.slice(5));
+    } else if (key.startsWith("cancel::")) {
+      cancelled.add(key.slice(8));
     } else if (key.startsWith("note::")) {
       notes.push({ uid: key.slice(6), note: String(formData.get(key) || "").slice(0, 1000) });
     }
   }
   await setJobDayHours(entries);
-  // A job leaves the floor ONLY when its Done box is ticked; unticking puts it
-  // back. Toggle every job on the floor so it reflects the boxes exactly.
-  for (const uid of onFloor) await setJobFinished(uid, done.has(uid));
+  // A job leaves the floor when its Done box is ticked OR it's marked a no-show;
+  // unticking puts it back. Toggle every job on the floor to match the boxes.
+  for (const uid of onFloor) {
+    await setJobFinished(uid, done.has(uid));
+    await setJobCancelled(uid, cancelled.has(uid));
+  }
   for (const n of notes) await setJobNote(n.uid, n.note);
   revalidatePath("/ops");
   redirect("/ops?jobsok=1");

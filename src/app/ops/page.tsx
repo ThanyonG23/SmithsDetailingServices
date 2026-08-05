@@ -15,6 +15,7 @@ import {
   getChecklist,
   getQuoteLeads,
   getQuoteLeadStats,
+  getCancellationStats,
   type DailyLog,
   type Booking,
   type AdRow,
@@ -294,6 +295,7 @@ export default async function OpsPage({
   let checklist: string[] = [];
   let quoteLeads: QuoteLead[] = [];
   let quoteLeadStats = { total: 0, pending: 0, actioned: 0 };
+  let cancelStats = { week: 0, month: 0 };
   let dbError = false;
 
   // Ashlee's run-sheet ticks are the one thing she touches all day, so load
@@ -331,6 +333,7 @@ export default async function OpsPage({
         growth: await getGrowthSeries(from60, today),
         quoteLeads: await getQuoteLeads("pending"),
         quoteLeadStats: await getQuoteLeadStats(),
+        cancelStats: await getCancellationStats(weekStart, monthStartISO, today),
       }))(),
       new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 20000)),
     ]);
@@ -348,6 +351,7 @@ export default async function OpsPage({
       growth,
       quoteLeads,
       quoteLeadStats,
+      cancelStats,
     } = data);
   } catch {
     dbError = true;
@@ -413,7 +417,7 @@ export default async function OpsPage({
     ...todaysJobs,
     ...carryover.filter((c) => !todaysJobs.some((t) => t.uid === c.uid)),
   ];
-  const earnedToday = todaysJobs.reduce((a, j) => a + j.value, 0);
+  const earnedToday = todaysJobs.filter((j) => !j.cancelled).reduce((a, j) => a + j.value, 0);
   const hoursToday = floorJobs.reduce((a, j) => a + (j.hours_today || 0), 0);
   const jobsOk = searchParams?.jobsok;
 
@@ -995,6 +999,17 @@ export default async function OpsPage({
             </div>
           )}
 
+          <div className="mb-3 flex items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-4 py-2.5 text-xs text-white/55">
+            <span aria-hidden>🚫</span>
+            <span>
+              No-shows / cancellations:{" "}
+              <b className={cancelStats.week > 0 ? "text-red-300" : "text-white/70"}>{cancelStats.week}</b>{" "}
+              this week{" · "}
+              <b className={cancelStats.month > 0 ? "text-red-300" : "text-white/70"}>{cancelStats.month}</b>{" "}
+              this month
+            </span>
+          </div>
+
           {floorJobs.length === 0 ? (
             <p className="text-sm text-white/45">
               No jobs on the calendar for today — upload the latest calendar if that looks wrong.
@@ -1035,15 +1050,26 @@ export default async function OpsPage({
                       <div
                         key={j.uid}
                         className={`flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border bg-black/30 px-3 py-2.5 ${
-                          carried ? "border-brand-yellow/30" : "border-white/10"
+                          j.cancelled
+                            ? "border-red-500/40 opacity-60"
+                            : carried
+                            ? "border-brand-yellow/30"
+                            : "border-white/10"
                         }`}
                       >
                         <div className="min-w-0 flex-1">
-                          <div className="truncate text-sm font-semibold text-white/85">
+                          <div
+                            className={`truncate text-sm font-semibold ${
+                              j.cancelled ? "text-white/50 line-through" : "text-white/85"
+                            }`}
+                          >
                             {j.summary || "(no title)"}
                           </div>
                           <div className="text-xs text-white/40">
                             {money(j.value)}
+                            {j.cancelled && (
+                              <span className="ml-1.5 font-bold text-red-300">· no-show</span>
+                            )}
                             {j.is_correction && (
                               <span className="ml-1.5 font-bold text-brand-green">· correction</span>
                             )}
@@ -1089,6 +1115,21 @@ export default async function OpsPage({
                             className="h-3.5 w-3.5 accent-brand-green"
                           />
                           Done
+                        </label>
+                        <label
+                          className={`flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-2 text-xs font-bold transition ${
+                            j.cancelled
+                              ? "border-red-500/50 bg-red-500/10 text-red-300"
+                              : "border-white/12 text-white/60 hover:border-red-500/60 hover:text-red-300"
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            name={`cancel::${j.uid}`}
+                            defaultChecked={j.cancelled}
+                            className="h-3.5 w-3.5 accent-red-500"
+                          />
+                          No-show
                         </label>
                         <textarea
                           name={`note::${j.uid}`}
