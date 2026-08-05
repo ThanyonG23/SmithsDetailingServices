@@ -20,8 +20,22 @@ export const OPS_TARGETS = {
   jobsTarget: 2,
 };
 
-/** Hourly labour rate used to cost the day's crew hours. */
+/** Hourly labour rate used to cost the day's crew hours (detailers). */
 export const LABOUR_RATE = 32;
+
+/** Salaried staff are a FIXED daily cost, NOT hourly — costing a manager at the
+    detailer hourly rate badly understates their wage. Daily cost = annual salary
+    / work days per year. Update the salary here as pay changes (Ashlee steps to
+    $100,000 in month 2). */
+export const SALARY_ANNUAL: Record<string, number> = { Ashlee: 90000 };
+export const SALARY_WORK_DAYS = 260; // ~5 days/week
+export function isSalaried(name: string): boolean {
+  return (SALARY_ANNUAL[name] || 0) > 0;
+}
+export function dailySalaryCost(name: string): number {
+  const annual = SALARY_ANNUAL[name] || 0;
+  return annual > 0 ? Math.round(annual / SALARY_WORK_DAYS) : 0;
+}
 
 /** Whose hours get logged each day: the team leader + every active
     detailer. Add or retire a detailer in referrals.ts and this stays

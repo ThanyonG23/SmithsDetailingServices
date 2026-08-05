@@ -25,7 +25,6 @@ import {
   type QuoteLead,
 } from "@/lib/ops/db";
 import { OPS_TARGETS, OPS_STAFF, cairnsToday } from "@/lib/ops/config";
-import { roomOnDay } from "@/lib/availability";
 import {
   saveEntry,
   autoSaveDay,
@@ -915,16 +914,8 @@ export default async function OpsPage({
                 const others = jobs.length - corr;
                 const detailers = corr * 2 + others; // correction = 2, other job = 1
                 const overCrew = detailers > 3;
-                // capacity: a full day ≈ 2 corrections. correction=1, full detail=0.5, premium=0.25
-                // (shared with the public Instant Quote widget via roomOnDay)
-                const roomUnits = roomOnDay(jobs, d);
-                const hasRoom = roomUnits >= 0.25;
-                const roomLabel =
-                  roomUnits >= 1
-                    ? "a correction & coating"
-                    : roomUnits >= 0.5
-                    ? "a full detail"
-                    : "a premium detail";
+                // How much more booked revenue this day needs to hit the daily aim.
+                const toTarget = Math.max(0, aimRevenue - total);
                 return (
                   <div key={d} className={`${CARD} p-4`}>
                     <div className="flex items-center justify-between gap-3">
@@ -953,13 +944,13 @@ export default async function OpsPage({
                         👷 ≈ {detailers} detailer{detailers === 1 ? "" : "s"} + Ashlee
                         {overCrew && " · Ashlee on tools or move a job"}
                       </span>
-                      {hasRoom ? (
+                      {toTarget > 0 ? (
                         <span className="inline-flex items-center gap-1.5 rounded-full border border-red-500/40 bg-red-500/[0.12] px-2.5 py-1 text-[11px] font-bold text-red-300">
-                          🔴 Room to fill · {roomLabel}
+                          🔴 Need to book {money(toTarget)} to hit target
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1 text-[11px] font-bold text-white/50">
-                          Full ✓
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-green/15 px-2.5 py-1 text-[11px] font-bold text-brand-green">
+                          🎯 Target hit ✓
                         </span>
                       )}
                     </div>

@@ -715,6 +715,68 @@ export async function getCancellationStats(
   }
 }
 
+/** One row per day across a range, merging the daily log (earned/collected/ad
+    spend/jobs/leads), bookings (count/corrections/booked value) and cancellations
+    — the single source for the Analytics tab. */
+export interface AnalyticsDay {
+  date: string;
+  earned: number; // completed_revenue — work done that day (the scoreboard number)
+  collected: number; // cash actually taken
+  ad_spend: number;
+  jobs_completed: number;
+  leads: number; // enquiries logged that day
+  quotes: number;
+  redos: number;
+  booked: number; // $ value of bookings dated that day
+  bookings: number; // count of bookings dated that day
+  corrections: number; // of those bookings, how many corrections
+  cancellations: number; // no-shows dated that day
+}
+
+export async function getAnalytics(fromISO: string, toISO: string): Promise<AnalyticsDay[]> {
+  try {
+    const rows = await sql`
+      WITH days AS (
+        SELECT generate_series(${fromISO}::date, ${toISO}::date, interval '1 day')::date AS d
+      ),
+      bk AS (
+        SELECT booking_date AS d,
+               count(*)::int                              AS bookings,
+               count(*) FILTER (WHERE is_correction)::int AS corrections,
+               COALESCE(sum(value), 0)::float8            AS booked
+        FROM bookings
+        WHERE booking_date BETWEEN ${fromISO} AND ${toISO}
+        GROUP BY booking_date
+      ),
+      cx AS (
+        SELECT b.booking_date AS d, count(*)::int AS cancellations
+        FROM job_progress p JOIN bookings b ON b.uid = p.uid
+        WHERE p.cancelled = true AND b.booking_date BETWEEN ${fromISO} AND ${toISO}
+        GROUP BY b.booking_date
+      )
+      SELECT to_char(days.d, 'YYYY-MM-DD')                  AS date,
+             COALESCE(dl.completed_revenue, 0)::float8      AS earned,
+             COALESCE(dl.revenue_collected, 0)::float8      AS collected,
+             COALESCE(dl.ad_spend, 0)::float8              AS ad_spend,
+             COALESCE(dl.jobs_completed, 0)::int           AS jobs_completed,
+             COALESCE(dl.messages, 0)::int                 AS leads,
+             COALESCE(dl.quotes, 0)::int                   AS quotes,
+             COALESCE(dl.redos, 0)::int                    AS redos,
+             COALESCE(bk.booked, 0)::float8               AS booked,
+             COALESCE(bk.bookings, 0)::int                AS bookings,
+             COALESCE(bk.corrections, 0)::int             AS corrections,
+             COALESCE(cx.cancellations, 0)::int           AS cancellations
+      FROM days
+      LEFT JOIN daily_log dl ON dl.log_date = days.d
+      LEFT JOIN bk ON bk.d = days.d
+      LEFT JOIN cx ON cx.d = days.d
+      ORDER BY days.d;`;
+    return rows as unknown as AnalyticsDay[];
+  } catch {
+    return [];
+  }
+}
+
 /** Set the running per-car note (what still needs doing / rectify items). */
 export async function setJobNote(uid: string, note: string): Promise<void> {
   await ensureTable();

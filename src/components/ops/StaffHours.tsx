@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { hoursBetween, LABOUR_RATE } from "@/lib/ops/config";
+import { hoursBetween, LABOUR_RATE, isSalaried, dailySalaryCost } from "@/lib/ops/config";
 
 type Seed = { start?: string; end?: string; notes?: string };
 
@@ -37,6 +37,22 @@ export default function StaffHours({
       staff.reduce((a, n) => a + hoursBetween(shifts[n]?.start, shifts[n]?.end), 0) * 100
     ) / 100;
 
+  // Detailers cost hours × rate; salaried staff (Ashlee) cost a fixed daily
+  // amount if they worked, NOT hours × rate.
+  const hourlyCost = staff.reduce(
+    (a, n) => (isSalaried(n) ? a : a + hoursBetween(shifts[n]?.start, shifts[n]?.end) * LABOUR_RATE),
+    0
+  );
+  const salariedCost = staff.reduce(
+    (a, n) =>
+      isSalaried(n) && hoursBetween(shifts[n]?.start, shifts[n]?.end) > 0
+        ? a + dailySalaryCost(n)
+        : a,
+    0
+  );
+  const labourCost = Math.round(hourlyCost + salariedCost);
+  const salariedWorked = staff.filter((n) => isSalaried(n) && hoursBetween(shifts[n]?.start, shifts[n]?.end) > 0);
+
   return (
     <div className="flex flex-col gap-3">
       {staff.map((name) => {
@@ -64,6 +80,11 @@ export default function StaffHours({
               </span>
               <span className="min-w-0 flex-1 truncate font-display text-base font-extrabold tracking-tight text-white">
                 {name}
+                {isSalaried(name) && (
+                  <span className="ml-2 rounded-full bg-white/8 px-2 py-0.5 align-middle text-[9px] font-bold uppercase tracking-wider text-white/45">
+                    salary
+                  </span>
+                )}
               </span>
               <span
                 className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-bold tabular-nums transition ${
@@ -113,7 +134,8 @@ export default function StaffHours({
             Total hours today
           </span>
           <div className="mt-0.5 text-[11px] font-semibold text-white/45">
-            Labour cost @ ${LABOUR_RATE}/hr
+            Detailers @ ${LABOUR_RATE}/hr
+            {salariedWorked.length > 0 && ` + ${salariedWorked.join(", ")} on salary`}
           </div>
         </div>
         <div className="text-right">
@@ -121,7 +143,7 @@ export default function StaffHours({
             {total}h
           </span>
           <div className="mt-0.5 font-display text-sm font-extrabold tabular-nums text-white/80">
-            ${Math.round(total * LABOUR_RATE).toLocaleString("en-AU")}
+            ${labourCost.toLocaleString("en-AU")}
           </div>
         </div>
       </div>
