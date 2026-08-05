@@ -695,6 +695,23 @@ export async function setJobCancelled(uid: string, cancelled: boolean): Promise<
   `;
 }
 
+/** Per-day crew hours (from the daily log's staff_hours) across a range. */
+export async function getStaffHoursRange(
+  fromISO: string,
+  toISO: string
+): Promise<{ date: string; staff_hours: Record<string, number> }[]> {
+  try {
+    const rows = await sql`
+      SELECT to_char(log_date, 'YYYY-MM-DD') AS date, staff_hours
+      FROM daily_log
+      WHERE log_date BETWEEN ${fromISO} AND ${toISO}
+      ORDER BY log_date;`;
+    return rows as unknown as { date: string; staff_hours: Record<string, number> }[];
+  } catch {
+    return [];
+  }
+}
+
 /** No-show / cancellation counts by the job's booking date, for the ops tally. */
 export async function getCancellationStats(
   weekFromISO: string,
