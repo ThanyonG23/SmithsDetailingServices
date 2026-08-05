@@ -20,6 +20,15 @@ export const OPS_TARGETS = {
   jobsTarget: 2,
 };
 
+/** Crew performance bonus. Built into the team scoreboard but OFF until you're
+    ready — flip `live` to true and the crew sees their live pot. `rate` = the
+    share of revenue-above-break-even that goes into the crew pool (start small,
+    scale to ~10% once a real P&L confirms break-even). See the parked design. */
+export const BONUS = {
+  live: false,
+  rate: 0.1, // 10% of the above-break-even surplus, split across the detailers
+};
+
 /** Hourly labour rate used to cost the day's crew hours (detailers). */
 export const LABOUR_RATE = 32;
 

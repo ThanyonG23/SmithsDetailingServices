@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 const TABS = [
   { href: "/ops", label: "Dashboard" },
   { href: "/ops/analytics", label: "Analytics" },
+  { href: "/ops/scoreboard", label: "Scoreboard" },
   { href: "/ops/team", label: "Team" },
   { href: "/ops/ads", label: "Ads" },
   { href: "/ops/stock", label: "Stock" },
@@ -18,8 +19,12 @@ export default function OpsTabs({ role }: { role?: "owner" | "crew" | null }) {
   const path = usePathname() || "";
   if (path.endsWith("/login")) return null; // no tabs on the login screen
 
-  // Detailers (crew) only get their Team board — never the rest of ops.
-  const tabs = role === "crew" ? TABS.filter((t) => t.href === "/ops/team") : TABS;
+  // Detailers (crew) get their Team board + the read-only Scoreboard — never the
+  // rest of ops (numbers, CRM, costs).
+  const tabs =
+    role === "crew"
+      ? TABS.filter((t) => t.href === "/ops/team" || t.href === "/ops/scoreboard")
+      : TABS;
 
   return (
     // Client-side navigation (fast, no full reload) + prefetch. Own z-50
