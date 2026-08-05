@@ -75,7 +75,7 @@ async function runEnsure(): Promise<void> {
     const rows = await sql`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'quote_leads' AND column_name = 'status'
+        WHERE table_name = 'job_progress' AND column_name = 'cancelled'
       ) AS ready;`;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
   } catch {
@@ -603,6 +603,7 @@ const JOB_HOURS_SELECT = (date: string) => sql`
 `;
 
 export async function getJobsForDate(date: string): Promise<JobWithHours[]> {
+  await ensureTable(); // JOB_HOURS_SELECT reads p.cancelled — make sure it exists
   const rows = await sql`
     ${JOB_HOURS_SELECT(date)}
     FROM bookings b
@@ -617,6 +618,7 @@ export async function getJobsForDate(date: string): Promise<JobWithHours[]> {
     leaves the floor on its own; only marking it done removes it. Bounded to a
     recent window so a forgotten job can't linger forever. */
 export async function getCarryoverJobs(today: string, sinceISO: string): Promise<JobWithHours[]> {
+  await ensureTable(); // JOB_HOURS_SELECT reads p.cancelled — make sure it exists
   const rows = await sql`
     ${JOB_HOURS_SELECT(today)}
     FROM bookings b
