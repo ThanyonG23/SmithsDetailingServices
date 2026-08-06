@@ -42,8 +42,10 @@ export default async function TemplatesPage({
     { key: "cutpolish", title: "Premium + Cut & Polish", emoji: "💎", match: /cut\s*&?\s*polish/i },
     { key: "premiumpolish", title: "Premium Detail + Polish", emoji: "🔶", match: /detail \+ polish/i },
     { key: "premium", title: "Premium", emoji: "⭐", match: /^premium/i },
+    { key: "standard", title: "Standard Detail", emoji: "🧼", match: /^standard/i },
     { key: "interior", title: "Interior", emoji: "🧽", match: /^interior/i },
     { key: "booking", title: "Booking messages", emoji: "💬", match: /^booking/i },
+    { key: "checkin", title: "Customer check-ins", emoji: "🤝", match: /^check-?in/i },
   ];
   // NOTE: only serializable fields go into the group objects — the `match`
   // RegExp must NOT be spread in, or passing groups to the client component
@@ -91,9 +93,9 @@ export default async function TemplatesPage({
       {/* load the standard Cairns set */}
       <form action={seedTemplates} className={`mt-5 ${CARD} flex flex-wrap items-center justify-between gap-3 p-4`}>
         <div>
-          <div className="text-sm font-bold text-white">Load Smiths standard templates (24)</div>
+          <div className="text-sm font-bold text-white">Load Smiths standard templates (33)</div>
           <div className="mt-0.5 text-xs text-white/45">
-            Booking flow + Correction · Cut &amp; Polish · Premium Detail + Polish · Premium Detail · Interior Only (one per size).{" "}
+            Booking flow + reminder + check-ins · Correction · Cut &amp; Polish · Premium + Polish · Premium · Standard · Interior (one per size).{" "}
             <b className="text-brand-yellow/80">Replaces all current templates.</b>
           </div>
         </div>

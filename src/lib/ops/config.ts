@@ -27,6 +27,7 @@ export const OPS_TARGETS = {
     clock is reliable; start firm-but-fair. */
 export const TARGET_HOURS: { package: string; hours: number }[] = [
   { package: "Interior Only", hours: 2.5 },
+  { package: "Standard Detail", hours: 3 },
   { package: "Premium Detail", hours: 3.5 },
   { package: "Premium + Polish", hours: 5.5 },
   { package: "Premium + Cut & Polish", hours: 10 },
@@ -73,6 +74,8 @@ export function targetHoursForJob(job: {
     base = hrs("Premium + Polish");
   } else if (/premium/.test(s)) {
     base = hrs("Premium Detail");
+  } else if (/standard/.test(s)) {
+    base = hrs("Standard Detail");
   } else if (/interior/.test(s)) {
     base = hrs("Interior Only");
   } else if (v >= 1400) {

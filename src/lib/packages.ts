@@ -69,6 +69,13 @@ const PREMIUM_POLISH_PRICE: Record<VehicleSize, number> = {
   "7 Seater": 700,
 };
 
+const STANDARD_PRICE: Record<VehicleSize, number> = {
+  "Single Cab": 300,
+  "Sedan/Dual Cab": 350,
+  SUV: 380,
+  "7 Seater": 400,
+};
+
 /* interior = value of the bonus free interior detail, bonus = the other
    free upgrades' value, total = the price charged today. */
 const CORRECTION: Record<VehicleSize, { interior: number; bonus: number; total: number }> = {
@@ -228,6 +235,26 @@ This package also includes:
 
 ⏱️ 24 hour turnaround
 💰 $${price.toLocaleString("en-AU")}
+${LOC}
+
+${GUARANTEE}
+
+${BOOK}`;
+}
+
+/** "Standard Detail" — a full interior + exterior wash tier below Premium. */
+export function standardBody(size: VehicleSize, vehicle?: string): string {
+  const price = STANDARD_PRICE[size];
+  return `Hey! We can definitely take care of ${greeting(vehicle)}, here is our Standard Detail Package
+This package also includes:
+
+✅ Deep Interior Clean
+✅ Plastic Rejuvenation
+✅ Full Exterior Wash & Dry
+✅ Tyre Shine
+
+⏱️ Takes 2-3 hrs
+💵 $${price}
 ${LOC}
 
 ${GUARANTEE}

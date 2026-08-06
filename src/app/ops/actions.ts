@@ -38,6 +38,7 @@ import { parseAdsCsv, parseAdsDailyMessages } from "@/lib/ops/ads";
 import {
   correctionBody,
   interiorBody,
+  standardBody,
   premiumBody,
   premiumBodyRaw,
   premiumPolishBody,
@@ -538,10 +539,33 @@ Any questions at all, feel free to reach out.
 
 Thanks again — we look forward to seeing you!`;
 
+const reminderBody = `Hey [Name], this is Ashlee from Smiths Detailing.
+
+Just a friendly reminder about your detail tomorrow at [time], at 209 Bunda St, Parramatta Park, Cairns QLD.
+
+See you then! 🙂`;
+
+const checkinBody = `Good afternoon [Name], Ashlee here from Smiths Detailing Services.
+
+Just wanted to check in and make sure you were 100% happy with your service yesterday?`;
+
+const checkinNoResponseBody = `Hey [Name], I noticed you didn't respond — I really just want to check in and make sure you were happy with the service.
+
+We don't ask for reviews, just making sure everything's okay?`;
+
+const checkinHappyBody = `That's amazing to hear! Thank you for choosing Smiths Detailing as your detailer 🙌`;
+
+const checkinUnhappyBody = `I'm so sorry to hear that. Let's get your car booked back in to get that rectified for you — what date works best for you?`;
+
 const STANDARD_TEMPLATES: { title: string; body: string; sort: number }[] = [
   { title: "Booking — Ask for details", body: askDetailsBody, sort: 30 },
   { title: "Booking — Confirmed message", body: confirmedBody, sort: 31 },
   { title: "Booking — Calendar event (paste into GCal)", body: calendarBody, sort: 32 },
+  { title: "Booking — Friendly reminder", body: reminderBody, sort: 33 },
+  { title: "Check-in — Confirming great service", body: checkinBody, sort: 40 },
+  { title: "Check-in — No response", body: checkinNoResponseBody, sort: 41 },
+  { title: "Check-in — Happy reply", body: checkinHappyBody, sort: 42 },
+  { title: "Check-in — Unhappy reply", body: checkinUnhappyBody, sort: 43 },
   { title: "Correction — Single Cab ($1,500)", body: correctionBody("Single Cab"), sort: 0 },
   { title: "Correction — Sedan/Dual Cab ($2,100)", body: correctionBody("Sedan/Dual Cab"), sort: 1 },
   { title: "Correction — SUV ($2,200)", body: correctionBody("SUV"), sort: 2 },
@@ -558,6 +582,10 @@ const STANDARD_TEMPLATES: { title: string; body: string; sort: number }[] = [
   { title: "Premium Detail + Polish — Sedan/Dual Cab ($600)", body: premiumPolishBody("Sedan/Dual Cab"), sort: 16 },
   { title: "Premium Detail + Polish — SUV ($650)", body: premiumPolishBody("SUV"), sort: 17 },
   { title: "Premium Detail + Polish — 7 Seater ($700)", body: premiumPolishBody("7 Seater"), sort: 18 },
+  { title: "Standard Detail — Single Cab ($300)", body: standardBody("Single Cab"), sort: 26 },
+  { title: "Standard Detail — Sedan/Dual Cab ($350)", body: standardBody("Sedan/Dual Cab"), sort: 27 },
+  { title: "Standard Detail — SUV ($380)", body: standardBody("SUV"), sort: 28 },
+  { title: "Standard Detail — 7 Seater ($400)", body: standardBody("7 Seater"), sort: 29 },
   { title: "Premium Detail — Single Cab ($350)", body: premiumBody("Single Cab"), sort: 20 },
   { title: "Premium Detail — Sedan/Dual Cab ($400)", body: premiumBody("Sedan/Dual Cab"), sort: 21 },
   { title: "Premium Detail — SUV ($430)", body: premiumBody("SUV"), sort: 22 },
