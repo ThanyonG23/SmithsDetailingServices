@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { requireAuth, getRole } from "@/lib/ops/auth";
 import { getJobsForDate, getAnalytics, type AnalyticsDay } from "@/lib/ops/db";
-import { OPS_TARGETS, BONUS, cairnsToday } from "@/lib/ops/config";
+import { OPS_TARGETS, BONUS, TARGET_HOURS, cairnsToday } from "@/lib/ops/config";
 
 export const metadata: Metadata = {
   title: "Scoreboard | Smiths Detailing",
@@ -94,8 +94,10 @@ export default async function ScoreboardPage() {
         Score<span className="text-brand-green">board</span>
       </h1>
       <p className="mt-3 text-sm text-white/50">
-        How the team&apos;s tracking against target, today and this week.
-        {role === "crew" && " Read-only — nice work out there. 🙌"}
+        Two targets, two jobs: <span className="text-white/70">revenue is the shop&apos;s goal</span>{" "}
+        (booking the work is on the owner), and <span className="text-brand-green">the clock is yours</span>{" "}
+        — get every car done at or under its target hours.
+        {role === "crew" && " Nice work out there. 🙌"}
       </p>
 
       {dbError && (
@@ -179,6 +181,33 @@ export default async function ScoreboardPage() {
           <Mini label="Week target" value={money(weeklyTarget)} />
           <Mini label="Corrections / day" value={String(jobsTarget)} />
         </div>
+      </section>
+
+      {/* ── BEAT THE CLOCK (crew KPI) ── */}
+      <section className="mt-8">
+        <div className={EYEBROW}>Beat the clock · your target per car</div>
+        <p className="mt-2 text-sm text-white/50">
+          This is your number. Get each car done at or under its target hours — that&apos;s what
+          you control, and it&apos;s what the bonus will be built on.
+        </p>
+        <div className={`${CARD} mt-3 overflow-hidden`}>
+          {TARGET_HOURS.map((t, i) => (
+            <div
+              key={t.package}
+              className={`flex items-center justify-between px-4 py-3 ${
+                i > 0 ? "border-t border-white/8" : ""
+              }`}
+            >
+              <span className="text-sm font-semibold text-white/85">{t.package}</span>
+              <span className="font-display text-lg font-extrabold tabular-nums text-brand-green">
+                {t.hours}h
+              </span>
+            </div>
+          ))}
+        </div>
+        <p className="mt-2 text-[11px] text-white/35">
+          Actual-vs-target per car lights up here once the car timers are dialled in.
+        </p>
       </section>
 
       {/* ── BONUS ── */}

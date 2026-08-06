@@ -20,6 +20,19 @@ export const OPS_TARGETS = {
   jobsTarget: 2,
 };
 
+/** Target LABOUR hours per job (total person-hours on the car). This is the
+    CREW's KPI — "beat the clock" — and unlike a daily revenue target it's fully
+    in their control (booking enough jobs is the owner's job, not theirs). Also
+    the cycle-time lever. Calibrate these from real per-car data once the team
+    clock is reliable; start firm-but-fair. */
+export const TARGET_HOURS: { package: string; hours: number }[] = [
+  { package: "Interior Only", hours: 2.5 },
+  { package: "Premium Detail", hours: 3.5 },
+  { package: "Premium + Polish", hours: 5 },
+  { package: "Cut & Polish", hours: 8 },
+  { package: "Correction & Coating", hours: 14 },
+];
+
 /** Crew performance bonus. Built into the team scoreboard but OFF until you're
     ready — flip `live` to true and the crew sees their live pot. `rate` = the
     share of revenue-above-break-even that goes into the crew pool (start small,
