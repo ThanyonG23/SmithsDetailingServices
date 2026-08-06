@@ -1080,7 +1080,7 @@ export default async function OpsPage({
                             name={`jh::${j.uid}`}
                             defaultValue={j.hours_today || ""}
                             min={0}
-                            step={0.25}
+                            step="any"
                             inputMode="decimal"
                             placeholder="0"
                             aria-label={`Hours today for ${j.summary}`}
