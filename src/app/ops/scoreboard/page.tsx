@@ -10,6 +10,7 @@ import {
 import {
   OPS_TARGETS,
   BONUS,
+  MOTTO,
   TARGET_HOURS,
   EXTRA_HOURS,
   targetHoursForJob,
@@ -102,6 +103,24 @@ export default async function ScoreboardPage() {
   const weekPct = (weekEarned / weeklyTarget) * 100;
   const toAim = Math.max(0, aimRevenue - todayEarned);
 
+  // Leaderboard, built from this week's completed jobs: cars each detailer
+  // worked, how many beat the clock, and hours on the tools. Ranks by cars, then
+  // clock-beats, then hours. (Only counts detailers who clocked on.)
+  const board: Record<string, { name: string; cars: number; beat: number; hours: number }> = {};
+  for (const j of completed) {
+    const beat = j.total_hours <= targetHoursForJob(j);
+    for (const c of j.crew) {
+      const e = (board[c.detailer] ||= { name: c.detailer, cars: 0, beat: 0, hours: 0 });
+      e.cars += 1;
+      e.hours += c.hours;
+      if (beat) e.beat += 1;
+    }
+  }
+  const leaderboard = Object.values(board).sort(
+    (a, b) => b.cars - a.cars || b.beat - a.beat || b.hours - a.hours
+  );
+  const medal = (i: number) => ["🥇", "🥈", "🥉"][i];
+
   return (
     <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
       <div className={EYEBROW}>Smiths Detailing · Team</div>
@@ -114,6 +133,12 @@ export default async function ScoreboardPage() {
         — get every car done at or under its target hours.
         {role === "crew" && " Nice work out there. 🙌"}
       </p>
+
+      <div className="mt-6 rounded-2xl border border-brand-green/25 bg-gradient-to-b from-brand-green/[0.08] to-transparent px-5 py-6 text-center">
+        <p className="font-display text-xl font-extrabold italic tracking-tight text-white sm:text-2xl">
+          &ldquo;{MOTTO}&rdquo;
+        </p>
+      </div>
 
       {dbError && (
         <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
@@ -186,6 +211,38 @@ export default async function ScoreboardPage() {
           <Mini label="Above break-even" value={money(weekSurplus)} tone="green" />
         </div>
       </section>
+
+      {/* ── LEADERBOARD ── */}
+      {leaderboard.length > 0 && (
+        <section className="mt-8">
+          <div className={EYEBROW}>🏁 Leaderboard · this week</div>
+          <div className={`${CARD} mt-3 overflow-hidden`}>
+            {leaderboard.map((e, i) => (
+              <div
+                key={e.name}
+                className={`flex items-center gap-3 px-4 py-3.5 ${i > 0 ? "border-t border-white/8" : ""} ${
+                  i === 0 ? "bg-brand-green/[0.05]" : ""
+                }`}
+              >
+                <span className="w-7 shrink-0 text-center text-xl">
+                  {medal(i) || <span className="text-sm font-black text-white/40">{i + 1}</span>}
+                </span>
+                <span className="flex-1 font-display text-base font-extrabold text-white">{e.name}</span>
+                <span className="shrink-0 text-xs font-semibold tabular-nums text-white/55">
+                  <span className="text-white/85">{e.cars}</span> car{e.cars === 1 ? "" : "s"}
+                  {" · "}
+                  <span className="text-brand-green">{e.beat} beat</span>
+                  {" · "}
+                  {Math.round(e.hours * 10) / 10}h
+                </span>
+              </div>
+            ))}
+          </div>
+          <p className="mt-2 text-[11px] text-white/35">
+            Ranked by cars completed, then how many beat the clock. Fresh every week.
+          </p>
+        </section>
+      )}
 
       {/* ── COMPLETED THIS WEEK (actual vs target) ── */}
       <section className="mt-8">

@@ -89,6 +89,9 @@ export function targetHoursForJob(job: {
   return base + extra;
 }
 
+/** The team rallying cry, shown up top on the scoreboard. Change it any time. */
+export const MOTTO = "If it was easy, everybody would do it.";
+
 /** Crew performance bonus. Built into the team scoreboard but OFF until you're
     ready — flip `live` to true and the crew sees their live pot. `rate` = the
     share of revenue-above-break-even that goes into the crew pool (start small,
