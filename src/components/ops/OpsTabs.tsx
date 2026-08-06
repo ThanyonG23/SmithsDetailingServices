@@ -32,7 +32,7 @@ export default function OpsTabs({ role }: { role?: "owner" | "crew" | null }) {
   return (
     // Client-side navigation (fast, no full reload) + prefetch. Own z-50
     // layer so the blurred sticky header can't swallow the click.
-    <nav className="relative z-50 mx-auto flex max-w-3xl gap-2 overflow-x-auto px-4 pb-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <nav className="relative z-50 mx-auto flex max-w-3xl gap-2 overflow-x-auto px-4 pb-2.5 [scrollbar-color:rgba(255,255,255,0.28)_transparent] [scrollbar-width:thin] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-white/25 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:h-1.5 hover:[&::-webkit-scrollbar-thumb]:bg-white/40">
       {tabs.map((t) => {
         const active = t.href === "/ops" ? path === "/ops" : path.startsWith(t.href);
         return (
