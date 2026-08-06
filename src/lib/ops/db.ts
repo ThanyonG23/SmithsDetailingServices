@@ -752,6 +752,58 @@ export async function getBookingsDump(
   }
 }
 
+/** Jobs marked done since a date, with total hours + who worked them and for how
+    long — the completed-jobs feed on the scoreboard (actual vs target). */
+export interface CompletedJob {
+  uid: string;
+  summary: string;
+  car: string;
+  value: number;
+  is_correction: boolean;
+  extras: string;
+  done_date: string;
+  total_hours: number;
+  crew: { detailer: string; hours: number }[];
+}
+
+export async function getCompletedJobs(fromISO: string, limit = 40): Promise<CompletedJob[]> {
+  try {
+    const jobs = await sql`
+      SELECT b.uid, COALESCE(b.summary, '') AS summary, COALESCE(b.car, '') AS car,
+             b.value::float8 AS value, b.is_correction, COALESCE(b.extras, '') AS extras,
+             to_char(p.updated_at AT TIME ZONE 'Australia/Brisbane', 'YYYY-MM-DD') AS done_date,
+             COALESCE((SELECT sum(hours) FROM job_day_hours d WHERE d.uid = b.uid), 0)::float8 AS total_hours
+      FROM job_progress p
+      JOIN bookings b ON b.uid = p.uid
+      WHERE p.finished = true
+        AND COALESCE(p.cancelled, false) = false
+        AND p.updated_at >= ${fromISO}
+      ORDER BY p.updated_at DESC
+      LIMIT ${limit};`;
+    const list = jobs as unknown as CompletedJob[];
+    if (!list.length) return [];
+    const uids = list.map((j) => j.uid);
+    const clocks = await sql`
+      SELECT uid, detailer,
+             sum(EXTRACT(EPOCH FROM (end_ts - start_ts)) / 3600.0)::float8 AS hours
+      FROM job_clock
+      WHERE uid IN ${sql(uids)} AND end_ts IS NOT NULL
+      GROUP BY uid, detailer;`;
+    const byUid: Record<string, { detailer: string; hours: number }[]> = {};
+    for (const c of clocks as unknown as { uid: string; detailer: string; hours: number }[]) {
+      (byUid[c.uid] ||= []).push({ detailer: c.detailer, hours: Number(c.hours) });
+    }
+    return list.map((j) => ({
+      ...j,
+      value: Number(j.value),
+      total_hours: Number(j.total_hours),
+      crew: (byUid[j.uid] || []).sort((a, b) => b.hours - a.hours),
+    }));
+  } catch {
+    return [];
+  }
+}
+
 /** No-show / cancellation counts by the job's booking date, for the ops tally. */
 export async function getCancellationStats(
   weekFromISO: string,

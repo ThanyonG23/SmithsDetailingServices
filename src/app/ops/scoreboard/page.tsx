@@ -1,7 +1,20 @@
 import type { Metadata } from "next";
 import { requireAuth, getRole } from "@/lib/ops/auth";
-import { getJobsForDate, getAnalytics, type AnalyticsDay } from "@/lib/ops/db";
-import { OPS_TARGETS, BONUS, TARGET_HOURS, EXTRA_HOURS, cairnsToday } from "@/lib/ops/config";
+import {
+  getJobsForDate,
+  getAnalytics,
+  getCompletedJobs,
+  type AnalyticsDay,
+  type CompletedJob,
+} from "@/lib/ops/db";
+import {
+  OPS_TARGETS,
+  BONUS,
+  TARGET_HOURS,
+  EXTRA_HOURS,
+  targetHoursForJob,
+  cairnsToday,
+} from "@/lib/ops/config";
 
 export const metadata: Metadata = {
   title: "Scoreboard | Smiths Detailing",
@@ -61,6 +74,7 @@ export default async function ScoreboardPage() {
     todayJobs = 0,
     todayCorr = 0;
   let series: AnalyticsDay[] = [];
+  let completed: CompletedJob[] = [];
   let dbError = false;
   try {
     const floor = await getJobsForDate(today);
@@ -69,6 +83,7 @@ export default async function ScoreboardPage() {
     todayJobs = live.length;
     todayCorr = live.filter((j) => j.is_correction).length;
     series = await getAnalytics(weekStart, today);
+    completed = await getCompletedJobs(weekStart);
   } catch {
     dbError = true;
   }
@@ -170,6 +185,64 @@ export default async function ScoreboardPage() {
           <Mini label="Corrections" value={String(weekCorr)} tone="green" />
           <Mini label="Above break-even" value={money(weekSurplus)} tone="green" />
         </div>
+      </section>
+
+      {/* ── COMPLETED THIS WEEK (actual vs target) ── */}
+      <section className="mt-8">
+        <div className={EYEBROW}>Completed this week · actual vs target</div>
+        {completed.length === 0 ? (
+          <p className="mt-3 text-sm text-white/40">
+            No cars marked done yet this week — as jobs get ticked Done, they land here with who
+            worked them and whether they beat the clock.
+          </p>
+        ) : (
+          <div className="mt-3 flex flex-col gap-3">
+            {completed.map((j) => {
+              const [nm, ...rest] = (j.summary || "").split(":");
+              const pkg = rest.join(":").trim();
+              const target = targetHoursForJob(j);
+              const beat = j.total_hours <= target;
+              const diff = Math.round(Math.abs(target - j.total_hours) * 10) / 10;
+              return (
+                <div key={j.uid} className={`${CARD} p-4`}>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-bold text-white/90">
+                        🚗 {j.car || nm?.trim() || "Car"}
+                      </div>
+                      {pkg && <div className="truncate text-xs font-semibold text-brand-green">{pkg}</div>}
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <div className="font-display text-lg font-extrabold tabular-nums text-white">
+                        {Math.round(j.total_hours * 10) / 10}h
+                        <span className="text-xs font-semibold text-white/35"> / {target}h</span>
+                      </div>
+                      <div
+                        className={`mt-0.5 text-[11px] font-black ${
+                          beat ? "text-brand-green" : "text-red-300"
+                        }`}
+                      >
+                        {beat ? `Beat by ${diff}h ✓` : `Over by ${diff}h`}
+                      </div>
+                    </div>
+                  </div>
+                  {j.crew.length > 0 && (
+                    <div className="mt-2.5 flex flex-wrap gap-1.5">
+                      {j.crew.map((c) => (
+                        <span
+                          key={c.detailer}
+                          className="rounded-full bg-white/8 px-2.5 py-1 text-[11px] font-semibold tabular-nums text-white/70"
+                        >
+                          {c.detailer} · {Math.round(c.hours * 10) / 10}h
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </section>
 
       {/* ── TARGETS ── */}
