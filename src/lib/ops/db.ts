@@ -970,7 +970,9 @@ export async function getFollowups(fromISO: string, toISO: string): Promise<JobF
            COALESCE(f.status, 'pending') AS status
     FROM bookings b
     LEFT JOIN job_followups f ON f.uid = b.uid
+    LEFT JOIN job_progress p ON p.uid = b.uid
     WHERE b.booking_date >= ${fromISO} AND b.booking_date <= ${toISO}
+      AND COALESCE(p.cancelled, false) = false
     ORDER BY b.booking_date DESC;
   `;
   return rows as unknown as JobFollowup[];

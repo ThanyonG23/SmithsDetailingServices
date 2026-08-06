@@ -39,6 +39,37 @@ export const EXTRA_HOURS: { name: string; hours: number }[] = [
   { name: "Touch-up paint", hours: 1 },
 ];
 
+/** Best-guess target labour hours for a booking, from its package + any extras.
+    Corrections are exact (the is_correction flag); the others fall back to price
+    tiers because bookings don't store the package explicitly. Note: a
+    "Free Interior Offer" is a Premium + Cut & Polish job. */
+export function targetHoursForJob(job: {
+  summary?: string;
+  value?: number;
+  is_correction?: boolean;
+  extras?: string;
+}): number {
+  const s = `${job.summary || ""} ${job.extras || ""}`.toLowerCase();
+  const v = job.value || 0;
+  const hrs = (name: string) => TARGET_HOURS.find((t) => t.package === name)?.hours || 0;
+  let base: number;
+  if (job.is_correction || /correction|coating|ceramic|reset detail/.test(s) || v >= 1400) {
+    base = hrs("Correction & Coating");
+  } else if (/cut ?&? ?polish|cut and polish|free interior/.test(s) || v >= 800) {
+    base = hrs("Premium + Cut & Polish");
+  } else if (/premium.*polish|\+ ?polish/.test(s) || v >= 500) {
+    base = hrs("Premium + Polish");
+  } else if (/premium/.test(s) || v >= 380) {
+    base = hrs("Premium Detail");
+  } else {
+    base = hrs("Interior Only");
+  }
+  let extra = 0;
+  if (/headlight/.test(s)) extra += EXTRA_HOURS.find((e) => e.name === "Headlights")?.hours || 0;
+  if (/touch.?up/.test(s)) extra += EXTRA_HOURS.find((e) => e.name === "Touch-up paint")?.hours || 0;
+  return base + extra;
+}
+
 /** Crew performance bonus. Built into the team scoreboard but OFF until you're
     ready — flip `live` to true and the crew sees their live pot. `rate` = the
     share of revenue-above-break-even that goes into the crew pool (start small,

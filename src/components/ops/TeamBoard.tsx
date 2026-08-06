@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { clockOn, clockOff, saveJobNote } from "@/app/ops/actions";
+import { targetHoursForJob } from "@/lib/ops/config";
 import type { TeamJob } from "@/lib/ops/db";
 
 function fmtDur(ms: number): string {
@@ -161,6 +162,8 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
             const runningMs = j.active.reduce((a, x) => a + (now - x.start_ms), 0);
             const liveTotal = j.hours_total + runningMs / 3600000;
             const liveToday = j.hours_today + runningMs / 3600000;
+            const target = targetHoursForJob(j);
+            const left = Math.round((target - liveTotal) * 10) / 10;
             const busy = busyUid === j.uid;
             // Split into items on delimiters OR on a price (e.g. "…: $100 …: +$85"),
             // then strip any leftover dollar amounts — no pricing on the crew board.
@@ -219,6 +222,18 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
                     </div>
                     <div className="text-[10px] font-bold uppercase tracking-wider text-white/35">
                       {j.carried ? `${Math.round(liveToday * 100) / 100}h today` : "on this car"}
+                    </div>
+                    {left > 0 ? (
+                      <div className="mt-1.5 rounded-md bg-brand-yellow/15 px-2 py-1 text-xs font-black tabular-nums text-brand-yellow">
+                        {left}h left
+                      </div>
+                    ) : (
+                      <div className="mt-1.5 rounded-md bg-brand-green/15 px-2 py-1 text-xs font-black text-brand-green">
+                        On target ✓
+                      </div>
+                    )}
+                    <div className="mt-0.5 text-[10px] font-semibold text-white/30 tabular-nums">
+                      target {target}h
                     </div>
                   </div>
                 </div>
