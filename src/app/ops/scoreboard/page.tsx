@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { requireAuth, getRole } from "@/lib/ops/auth";
 import { getJobsForDate, getAnalytics, type AnalyticsDay } from "@/lib/ops/db";
-import { OPS_TARGETS, BONUS, TARGET_HOURS, cairnsToday } from "@/lib/ops/config";
+import { OPS_TARGETS, BONUS, TARGET_HOURS, EXTRA_HOURS, cairnsToday } from "@/lib/ops/config";
 
 export const metadata: Metadata = {
   title: "Scoreboard | Smiths Detailing",
@@ -203,6 +203,14 @@ export default async function ScoreboardPage() {
                 {t.hours}h
               </span>
             </div>
+          ))}
+        </div>
+        <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-white/50">
+          <span className="font-semibold text-white/60">Extras add on top:</span>
+          {EXTRA_HOURS.map((e) => (
+            <span key={e.name}>
+              {e.name} <b className="text-brand-green">+{e.hours}h</b>
+            </span>
           ))}
         </div>
         <p className="mt-2 text-[11px] text-white/35">

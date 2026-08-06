@@ -28,9 +28,15 @@ export const OPS_TARGETS = {
 export const TARGET_HOURS: { package: string; hours: number }[] = [
   { package: "Interior Only", hours: 2.5 },
   { package: "Premium Detail", hours: 3.5 },
-  { package: "Premium + Polish", hours: 5 },
-  { package: "Cut & Polish", hours: 8 },
-  { package: "Correction & Coating", hours: 14 },
+  { package: "Premium + Polish", hours: 5.5 },
+  { package: "Premium + Cut & Polish", hours: 10 },
+  { package: "Correction & Coating", hours: 20 },
+];
+
+/** Extras add to a job's target time on top of the base package. */
+export const EXTRA_HOURS: { name: string; hours: number }[] = [
+  { name: "Headlights", hours: 1.5 },
+  { name: "Touch-up paint", hours: 1 },
 ];
 
 /** Crew performance bonus. Built into the team scoreboard but OFF until you're
