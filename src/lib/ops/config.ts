@@ -52,21 +52,40 @@ export function targetHoursForJob(job: {
   const s = `${job.summary || ""} ${job.extras || ""}`.toLowerCase();
   const v = job.value || 0;
   const hrs = (name: string) => TARGET_HOURS.find((t) => t.package === name)?.hours || 0;
+
+  // Extras add on top of the base package (headlights, touch-up). Detected from
+  // the text so an extra never inflates the BASE package guess.
+  let extra = 0;
+  if (/headlight/.test(s)) extra += EXTRA_HOURS.find((e) => e.name === "Headlights")?.hours || 0;
+  if (/touch.?up/.test(s)) extra += EXTRA_HOURS.find((e) => e.name === "Touch-up paint")?.hours || 0;
+
+  // Base package: trust the package NAME first (most reliable), and only fall
+  // back to price when there's no name to go on. Price is unreliable on its own
+  // because an extra bumps it into the next tier. "Free interior offer" is a
+  // Premium + Cut & Polish job. Order matters: check "+ polish" before plain
+  // "premium", and specific names before the price fallback.
   let base: number;
-  if (job.is_correction || /correction|coating|ceramic|reset detail/.test(s) || v >= 1400) {
+  if (job.is_correction || /correction|coating|ceramic|reset detail/.test(s)) {
     base = hrs("Correction & Coating");
-  } else if (/cut ?&? ?polish|cut and polish|free interior/.test(s) || v >= 800) {
+  } else if (/cut ?&? ?polish|cut and polish|free interior/.test(s)) {
     base = hrs("Premium + Cut & Polish");
-  } else if (/premium.*polish|\+ ?polish/.test(s) || v >= 500) {
+  } else if (/premium.*polish|\+\s*polish/.test(s)) {
     base = hrs("Premium + Polish");
-  } else if (/premium/.test(s) || v >= 380) {
+  } else if (/premium/.test(s)) {
+    base = hrs("Premium Detail");
+  } else if (/interior/.test(s)) {
+    base = hrs("Interior Only");
+  } else if (v >= 1400) {
+    base = hrs("Correction & Coating");
+  } else if (v >= 800) {
+    base = hrs("Premium + Cut & Polish");
+  } else if (v >= 500) {
+    base = hrs("Premium + Polish");
+  } else if (v >= 380) {
     base = hrs("Premium Detail");
   } else {
     base = hrs("Interior Only");
   }
-  let extra = 0;
-  if (/headlight/.test(s)) extra += EXTRA_HOURS.find((e) => e.name === "Headlights")?.hours || 0;
-  if (/touch.?up/.test(s)) extra += EXTRA_HOURS.find((e) => e.name === "Touch-up paint")?.hours || 0;
   return base + extra;
 }
 

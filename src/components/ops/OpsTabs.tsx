@@ -7,6 +7,7 @@ const TABS = [
   { href: "/ops", label: "Dashboard" },
   { href: "/ops/analytics", label: "Analytics" },
   { href: "/ops/scoreboard", label: "Scoreboard" },
+  { href: "/ops/training", label: "Training" },
   { href: "/ops/team", label: "Team" },
   { href: "/ops/ads", label: "Ads" },
   { href: "/ops/stock", label: "Stock" },
@@ -23,7 +24,9 @@ export default function OpsTabs({ role }: { role?: "owner" | "crew" | null }) {
   // rest of ops (numbers, CRM, costs).
   const tabs =
     role === "crew"
-      ? TABS.filter((t) => t.href === "/ops/team" || t.href === "/ops/scoreboard")
+      ? TABS.filter((t) =>
+          ["/ops/team", "/ops/scoreboard", "/ops/training"].includes(t.href)
+        )
       : TABS;
 
   return (

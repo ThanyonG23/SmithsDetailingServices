@@ -247,18 +247,17 @@ export default async function ScoreboardPage() {
                 {money(pot)}
               </div>
               <p className="mt-1 text-sm text-white/60">
-                The crew pool so far this week — {Math.round(BONUS.rate * 100)}% of everything earned
-                above break-even, split between the detailers. It grows every day you beat{" "}
-                {money(breakEvenRevenue)}.
+                The crew pool so far this week, split between the detailers. It grows when the team
+                hits its targets — cars done inside the clock and good days on the board. Keep it
+                climbing.
               </p>
             </>
           ) : (
             <p className="mt-3 text-sm text-white/60">
-              Soon, every day the team beats{" "}
-              <span className="font-bold text-white/80">{money(breakEvenRevenue)}</span>, a share of
-              everything above it goes into a crew bonus pool — split between the detailers. The more
-              corrections out the door, the bigger it gets. Keep smashing the aim and it&apos;ll be
-              waiting for you. 💪
+              Soon, hitting your targets pays. Get your cars done{" "}
+              <span className="font-bold text-white/80">inside the clock</span>, and help the team hit
+              its days, and a bonus pool builds for the crew to split. The better and faster the work,
+              the bigger it gets. Keep smashing your targets and it&apos;ll be waiting for you. 💪
             </p>
           )}
         </div>
