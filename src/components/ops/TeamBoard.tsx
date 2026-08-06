@@ -2,8 +2,8 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { clockOn, clockOff, saveJobNote } from "@/app/ops/actions";
-import { targetHoursForJob } from "@/lib/ops/config";
+import { clockOn, clockOff, saveJobNote, signOffCar } from "@/app/ops/actions";
+import { targetHoursForJob, QC_CHECKLIST } from "@/lib/ops/config";
 import type { TeamJob } from "@/lib/ops/db";
 
 function fmtDur(ms: number): string {
@@ -26,6 +26,9 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
   const [noteBusy, setNoteBusy] = useState<string | null>(null);
   const [manageOpen, setManageOpen] = useState<string | null>(null);
   const [startFor, setStartFor] = useState<string | null>(null); // teammate whose start time Ashlee is setting
+  const [qcFor, setQcFor] = useState<string | null>(null); // car whose final-check panel is open
+  const [qcTicks, setQcTicks] = useState<boolean[]>([]);
+  const [qcBusy, setQcBusy] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [, startTransition] = useTransition();
 
@@ -88,6 +91,34 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
         setErr("Couldn't start the clock — check your connection and try again.");
       } finally {
         setBusyUid(null);
+      }
+    });
+  };
+
+  const openQc = (uid: string) => {
+    setQcFor(uid);
+    setQcTicks(QC_CHECKLIST.map(() => false));
+    setErr(null);
+  };
+  const toggleQc = (i: number) =>
+    setQcTicks((t) => t.map((v, idx) => (idx === i ? !v : v)));
+  const signOff = (uid: string) => {
+    if (!me) {
+      setErr("Tap your name up top first, so we know who signed it off.");
+      return;
+    }
+    if (!qcTicks.every(Boolean)) return;
+    setQcBusy(uid);
+    setErr(null);
+    startTransition(async () => {
+      try {
+        await signOffCar(uid, me);
+        router.refresh();
+        setQcFor(null);
+      } catch {
+        setErr("Couldn't sign it off — check your connection and try again.");
+      } finally {
+        setQcBusy(null);
       }
     });
   };
@@ -327,6 +358,62 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
                     {others.map((o) => o.detailer).join(", ")} already on it — you can jump on too.
                   </p>
                 )}
+
+                {/* Final check — any staff ticks the QC list and signs off, which
+                    passes the quality gate AND marks the car done. */}
+                <div className="mt-2.5">
+                  {qcFor === j.uid ? (
+                    <div className="rounded-xl border border-brand-green/30 bg-brand-green/[0.05] p-3">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-brand-green">
+                        Final check — tick every item, then sign off
+                      </div>
+                      <div className="mt-2.5 flex flex-col gap-2">
+                        {QC_CHECKLIST.map((item, i) => (
+                          <label
+                            key={i}
+                            className="flex cursor-pointer items-start gap-2.5 text-sm text-white/85"
+                          >
+                            <input
+                              type="checkbox"
+                              checked={qcTicks[i] || false}
+                              onChange={() => toggleQc(i)}
+                              className="mt-0.5 h-4 w-4 shrink-0 accent-brand-green"
+                            />
+                            <span>{item}</span>
+                          </label>
+                        ))}
+                      </div>
+                      <div className="mt-3 flex gap-2">
+                        <button
+                          onClick={() => signOff(j.uid)}
+                          disabled={!qcTicks.every(Boolean) || !me || qcBusy === j.uid}
+                          className="flex-1 rounded-xl bg-brand-green px-4 py-3 text-sm font-black text-[#04130a] transition active:scale-[0.98] disabled:opacity-40"
+                        >
+                          {qcBusy === j.uid
+                            ? "…"
+                            : !me
+                            ? "Tap your name first"
+                            : !qcTicks.every(Boolean)
+                            ? "Tick every item"
+                            : `✓ Sign off & mark done — ${me}`}
+                        </button>
+                        <button
+                          onClick={() => setQcFor(null)}
+                          className="rounded-xl border border-white/15 px-4 py-3 text-xs font-bold text-white/60"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => openQc(j.uid)}
+                      className="w-full rounded-xl border border-brand-green/25 bg-brand-green/[0.04] px-4 py-2.5 text-sm font-black text-brand-green transition hover:bg-brand-green/10"
+                    >
+                      ✓ Final check &amp; sign off
+                    </button>
+                  )}
+                </div>
 
                 {/* Ashlee (team leader): clock anyone on/off if they forgot */}
                 {isLead && (

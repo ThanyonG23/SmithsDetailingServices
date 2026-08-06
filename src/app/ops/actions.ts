@@ -12,6 +12,7 @@ import {
   setJobDayHours,
   setJobFinished,
   setJobCancelled,
+  signOffJob,
   setJobNote,
   clockStart,
   clockStop,
@@ -270,6 +271,17 @@ export async function saveJobNote(uid: string, note: string): Promise<void> {
   const u = String(uid || "").slice(0, 200);
   if (!u) return;
   await setJobNote(u, String(note || "").slice(0, 1000));
+  revalidatePath("/ops/team");
+  revalidatePath("/ops");
+}
+
+/** Final QC sign-off from the Team board: records who signed and marks the car
+    done. Any signed-in staff member can complete a car by passing the check. */
+export async function signOffCar(uid: string, name: string): Promise<void> {
+  const u = String(uid || "").slice(0, 200);
+  const n = String(name || "").slice(0, 40);
+  if (!u) return;
+  await signOffJob(u, n);
   revalidatePath("/ops/team");
   revalidatePath("/ops");
 }

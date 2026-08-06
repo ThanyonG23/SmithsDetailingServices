@@ -95,6 +95,18 @@ export function targetHoursForJob(job: {
 /** The team rallying cry, shown up top on the scoreboard. Change it any time. */
 export const MOTTO = "If it was easy, everybody would do it.";
 
+/** Final quality-check checklist, ticked and signed off per car on the Team
+    board before it's marked done. Keep in sync with the Quality Check training
+    module. This is the last line before the "not happy = don't pay" guarantee. */
+export const QC_CHECKLIST: string[] = [
+  "Paint checked under lights — no missed swirls or holograms",
+  "Glass streak-free, inside and out",
+  "No product residue in trim, badges or shuts",
+  "Wheels, tyres & arches clean and dressed",
+  "Interior — vents dusted, seats & mats done",
+  "Final walk with fresh eyes — would you pay for this?",
+];
+
 /** Crew performance bonus. Built into the team scoreboard but OFF until you're
     ready — flip `live` to true and the crew sees their live pot. `rate` = the
     share of revenue-above-break-even that goes into the crew pool (start small,

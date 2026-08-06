@@ -302,6 +302,11 @@ export default async function ScoreboardPage() {
                       ))}
                     </div>
                   )}
+                  {j.signed_by && (
+                    <div className="mt-2 text-[11px] font-semibold text-brand-green/80">
+                      ✓ Signed off by {j.signed_by}
+                    </div>
+                  )}
                 </div>
               );
             })}

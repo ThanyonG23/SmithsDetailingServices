@@ -75,7 +75,7 @@ async function runEnsure(): Promise<void> {
     const rows = await sql`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'job_progress' AND column_name = 'cancelled'
+        WHERE table_name = 'job_progress' AND column_name = 'signed_by'
       ) AS ready;`;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
   } catch {
@@ -231,6 +231,9 @@ async function runEnsure(): Promise<void> {
   await sql`ALTER TABLE job_progress ADD COLUMN IF NOT EXISTS notes text NOT NULL DEFAULT '';`;
   // Cancellation / no-show flag so we can track weekly/monthly drop-outs.
   await sql`ALTER TABLE job_progress ADD COLUMN IF NOT EXISTS cancelled boolean NOT NULL DEFAULT false;`;
+  // Final quality-check sign-off: who signed the car off and when.
+  await sql`ALTER TABLE job_progress ADD COLUMN IF NOT EXISTS signed_by text NOT NULL DEFAULT '';`;
+  await sql`ALTER TABLE job_progress ADD COLUMN IF NOT EXISTS signed_at timestamptz;`;
   // Detailer time-clock: one row per detailer's start→stop on a car. Hours on a
   // car for a day = sum of these durations, rolled into job_day_hours.
   await sql`
@@ -683,6 +686,19 @@ export async function setJobFinished(uid: string, finished: boolean): Promise<vo
   `;
 }
 
+/** Final quality-check sign-off: records who signed the car off and marks it
+    done. Any staff can do it — passing QC is what completes the car. */
+export async function signOffJob(uid: string, name: string): Promise<void> {
+  await ensureTable();
+  if (!uid) return;
+  await sql`
+    INSERT INTO job_progress (uid, finished, signed_by, signed_at, updated_at)
+    VALUES (${uid}, true, ${name}, now(), now())
+    ON CONFLICT (uid) DO UPDATE
+      SET finished = true, signed_by = EXCLUDED.signed_by, signed_at = now(), updated_at = now();
+  `;
+}
+
 /** Mark a job as a no-show / cancellation (so it drops off the floor and is
     counted in the weekly/monthly cancellation tally). Toggleable to undo. */
 export async function setJobCancelled(uid: string, cancelled: boolean): Promise<void> {
@@ -763,6 +779,7 @@ export interface CompletedJob {
   extras: string;
   done_date: string;
   total_hours: number;
+  signed_by: string;
   crew: { detailer: string; hours: number }[];
 }
 
@@ -772,6 +789,7 @@ export async function getCompletedJobs(fromISO: string, limit = 40): Promise<Com
       SELECT b.uid, COALESCE(b.summary, '') AS summary, COALESCE(b.car, '') AS car,
              b.value::float8 AS value, b.is_correction, COALESCE(b.extras, '') AS extras,
              to_char(p.updated_at AT TIME ZONE 'Australia/Brisbane', 'YYYY-MM-DD') AS done_date,
+             COALESCE(p.signed_by, '') AS signed_by,
              COALESCE((SELECT sum(hours) FROM job_day_hours d WHERE d.uid = b.uid), 0)::float8 AS total_hours
       FROM job_progress p
       JOIN bookings b ON b.uid = p.uid
