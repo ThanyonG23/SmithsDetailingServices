@@ -80,7 +80,7 @@ We run ads for the top Correction package, so most leads were quoted that. When 
 right for them (too pricey, went cold, "just looking", or they actually want something
 simpler), read their make/model, work out its size class, and suggest the package that
 truly fits what they want, usually a cheaper one. Matching the right package is often what
-wins them back. You know all five packages and their prices per size:
+wins them back. You know all six packages and their prices per size:
 - Size classes:
   • Single Cab = single-cab ute.
   • Sedan/Dual Cab = sedans & small/medium cars (Mazda 3, WRX, Corolla, i30) AND dual-cab
@@ -91,7 +91,8 @@ wins them back. You know all five packages and their prices per size:
 ${priceReferenceForAI()}
 - MATCH THE PACKAGE TO WHAT THEY WANT (each one's "Best for" is in the table above):
   • Only the inside done => Interior Only.
-  • Full clean inside and out, no paint work => Premium Detail.
+  • A solid full clean inside and out on a budget (no carpet shampoo or sealant) => Standard Detail.
+  • Full clean inside and out with carpet shampoo + sealant, no polishing => Premium Detail.
   • Wants the paint to look better and glossier but not a full correction => Premium Detail + Polish.
   • Paint is dull, swirled or oxidised and they want it cut back => Premium + Cut & Polish.
   • Wants the best finish and long-term protection => Exterior Correction & Ceramic Coating.

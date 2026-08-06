@@ -306,8 +306,10 @@ export function priceReferenceForAI(): string {
   return [
     row("Interior Only", asMap("interior"),
       "inside only — vacuum, shampoo, extraction, plastics, windows. Dirty/smelly interior, kids or pets, no paint work wanted."),
+    row("Standard Detail", STANDARD_PRICE,
+      "our entry full detail inside AND out — deep interior, plastic rejuv, exterior wash & dry, tyre shine. A solid all-round clean on a budget (no carpet shampoo/extraction or sealant, no polishing)."),
     row("Premium Detail", asMap("premium"),
-      "full clean inside AND out — deep interior, wash, tyre shine, ceramic spray sealant. A great all-round refresh with no polishing."),
+      "the step up from Standard — everything in it PLUS carpet shampoo & extraction and a ceramic spray sealant. The best all-round refresh, still no polishing."),
     row("Premium Detail + Polish", PREMIUM_POLISH_PRICE,
       "the full detail PLUS a 1-step paint enhancement for extra gloss and to knock back light swirls. The step up when they want the paint to pop but don't need full correction."),
     row("Premium + Cut & Polish", asMap("cutpolish"),
