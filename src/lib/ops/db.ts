@@ -75,7 +75,7 @@ async function runEnsure(): Promise<void> {
     const rows = await sql`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'job_progress' AND column_name = 'signed_by'
+        WHERE table_name = 'bookings' AND column_name = 'source'
       ) AS ready;`;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
   } catch {
@@ -114,6 +114,8 @@ async function runEnsure(): Promise<void> {
   await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS uid text NOT NULL DEFAULT '';`;
   await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS extras text NOT NULL DEFAULT '';`;
   await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS car text NOT NULL DEFAULT '';`;
+  // Where the lead came from (the calendar "Referral:" field) — for conversion attribution.
+  await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS source text NOT NULL DEFAULT '';`;
   await sql`
     CREATE TABLE IF NOT EXISTS job_hours (
       uid        text          PRIMARY KEY,
@@ -470,7 +472,8 @@ export async function replaceBookings(list: Booking[]): Promise<void> {
         "is_correction",
         "summary",
         "extras",
-        "car"
+        "car",
+        "source"
       )}`;
     }
   });
@@ -1210,6 +1213,34 @@ export async function getAds(): Promise<AdRow[]> {
 }
 
 /* ---- customers (CRM, auto-built from the calendar) ----------------- */
+
+/** Where bookings (conversions) come from — grouped by the normalised source,
+    with count, corrections, and revenue. The heart of ad/channel attribution. */
+export interface SourceRow {
+  source: string;
+  bookings: number;
+  corrections: number;
+  revenue: number;
+}
+export async function getSourceBreakdown(
+  fromISO = "2000-01-01",
+  toISO = "2999-01-01"
+): Promise<SourceRow[]> {
+  try {
+    const rows = await sql`
+      SELECT COALESCE(NULLIF(trim(source), ''), 'Not recorded') AS source,
+             count(*)::int                              AS bookings,
+             count(*) FILTER (WHERE is_correction)::int AS corrections,
+             COALESCE(sum(value), 0)::float8            AS revenue
+      FROM bookings
+      WHERE booking_date BETWEEN ${fromISO} AND ${toISO}
+      GROUP BY 1
+      ORDER BY revenue DESC;`;
+    return rows as unknown as SourceRow[];
+  } catch {
+    return [];
+  }
+}
 
 export interface Customer {
   dedupe_key: string;

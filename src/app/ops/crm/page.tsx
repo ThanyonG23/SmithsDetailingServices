@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { requireOwner } from "@/lib/ops/auth";
-import { getCustomers, type Customer } from "@/lib/ops/db";
+import { getCustomers, getSourceBreakdown, type Customer, type SourceRow } from "@/lib/ops/db";
 
 export const metadata: Metadata = {
   title: "CRM | Smiths Detailing",
@@ -21,15 +21,18 @@ export default async function CrmPage({ searchParams }: { searchParams: { q?: st
 
   const q = (searchParams?.q || "").slice(0, 60);
   let customers: Customer[] = [];
+  let sources: SourceRow[] = [];
   let dbError = false;
   try {
     customers = await Promise.race([
       getCustomers(q),
       new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 20000)),
     ]);
+    sources = await getSourceBreakdown();
   } catch {
     dbError = true;
   }
+  const sourceRevTotal = sources.reduce((a, s) => a + s.revenue, 0) || 1;
 
   return (
     <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
@@ -45,6 +48,39 @@ export default async function CrmPage({ searchParams }: { searchParams: { q?: st
         <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
           Database didn&apos;t respond — refresh in a moment.
         </div>
+      )}
+
+      {sources.length > 0 && (
+        <section className="mt-6">
+          <div className={EYEBROW}>Where your bookings come from</div>
+          <div className={`${CARD} mt-3 overflow-hidden`}>
+            {sources.map((s, i) => (
+              <div key={s.source} className={`px-4 py-3 ${i > 0 ? "border-t border-white/8" : ""}`}>
+                <div className="flex items-center justify-between gap-3">
+                  <span className="text-sm font-bold text-white/90">{s.source}</span>
+                  <span className="shrink-0 text-xs tabular-nums text-white/55">
+                    {s.bookings} booking{s.bookings === 1 ? "" : "s"}
+                    {s.corrections > 0 && (
+                      <span className="text-brand-green"> · {s.corrections} corr</span>
+                    )}{" "}
+                    · {money(s.revenue)}
+                  </span>
+                </div>
+                <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-white/10">
+                  <div
+                    className="h-full rounded-full bg-brand-green"
+                    style={{ width: `${Math.round((s.revenue / sourceRevTotal) * 100)}%` }}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="mt-2 text-[11px] text-white/35">
+            Pulled from each booking&apos;s &ldquo;Referral&rdquo; line. Want ad-level tracking?
+            Write the ad name in that field (e.g. &ldquo;Facebook Ads – 100% Correction&rdquo;) and it
+            splits out here.
+          </p>
+        </section>
       )}
 
       <form className="mt-6 flex gap-2">

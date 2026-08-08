@@ -16,6 +16,7 @@ export interface Booking {
   summary: string;
   extras: string; // any "Extras:" the customer added (for the team board)
   car: string; // vehicle make/model (for the team board)
+  source: string; // where the lead came from (the "Referral:" field), normalised
 }
 
 const BS = String.fromCharCode(92); // backslash
@@ -64,6 +65,21 @@ function fieldFrom(blob: string, labelAlt: string): string {
   );
   const m = blob.match(re);
   return m ? m[1].trim() : "";
+}
+
+/** Normalise the free-text "Referral:" into clean channel buckets so conversions
+    can be grouped by where they came from. Unknown text is kept as-is (trimmed);
+    for ad-level tracking, write the ad name in the Referral field. */
+function normalizeSource(raw: string): string {
+  const s = (raw || "").toLowerCase();
+  if (!s.trim()) return "";
+  if (/face\s?book|fb|meta/.test(s)) return "Facebook Ads";
+  if (/insta|\big\b/.test(s)) return "Instagram";
+  if (/google|adwords|search/.test(s)) return "Google";
+  if (/walk\s?-?\s?in/.test(s)) return "Walk-in";
+  if (/repeat|return(ing)?|existing|again/.test(s)) return "Repeat customer";
+  if (/referr?al|friend|word of mouth|mate|recommend|family/.test(s)) return "Referral";
+  return raw.trim().slice(0, 40);
 }
 
 /** The vehicle make/model from a booking's "Car:/Vehicle:/Make:" field, cleaned
@@ -170,6 +186,13 @@ export function parseBookingsIcs(rawInput: string): Booking[] {
       .join("\n")
       .slice(0, 300);
 
+    const source = normalizeSource(
+      fieldFrom(blob, "Referral|Source|Lead source|Heard about")
+        .split(/📍|BOOKING CONFIRMATION|Thanks so much|Phone\s*:|Email\s*:/i)[0]
+        .replace(/<[^>]+>/g, " ")
+        .trim()
+    );
+
     out.push({
       uid: (uidRaw.trim() || `${booking_date}|${value}|${summary.slice(0, 24)}`).slice(0, 200),
       booking_date,
@@ -181,6 +204,7 @@ export function parseBookingsIcs(rawInput: string): Booking[] {
       summary: summary.slice(0, 200),
       extras,
       car: carFrom(blob, summary),
+      source,
     });
   }
   return out;
