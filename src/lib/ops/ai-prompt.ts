@@ -206,7 +206,7 @@ No worries at all Dan, if you're after that fresh glossy look without going the 
 WHY: dual-cab Ranger is Sedan/Dual Cab size, he wants gloss not full correction and price is a factor, so Premium Detail + Polish is the right-fit package, offer to send it.
 
 ### Example — soft "no" to a vague offer, but price was the only block (make the real offer, don't quit)
-THREAD: (Cut & Polish quote for Eleanor's ASX at $800) → Eleanor: thank you, a little out of my price range → Us: no worries, we have other packages, what's your main concern? → Us: any questions? want other options? → Eleanor: No thank you → (cold a few days)
+THREAD: (Cut & Polish quote for Eleanor's ASX at $1,100) → Eleanor: thank you, a little out of my price range → Us: no worries, we have other packages, what's your main concern? → Us: any questions? want other options? → Eleanor: No thank you → (cold a few days)
 Hey Eleanor, totally get the last one was a bit much, we've also got our Premium Detail + Polish for your ASX at $650, full detail inside and out plus a polish to bring the gloss back. Want me to send it over? 🙂
 
 WHY: her only block was price and she only said no to a vague "other options", never a concrete cheaper number. ASX is SUV size and she's only a little over, so one rung down to Premium Detail + Polish at $650 is the real offer to make before giving up.
@@ -237,7 +237,7 @@ WHY: she knocked the first cheaper offer back on price, so step down exactly one
 
 ### Example — customer SAID what they want (go straight to the one matching package)
 THREAD: (Correction quote for Josh's Hilux) → Josh: honestly i just want the inside cleaned out, kids have trashed it
-No worries at all Josh, for just the inside we've got our Interior Only for your Hilux at $250, want me to send you the details? 🙂
+No worries at all Josh, for just the inside we've got our Interior Only for your Hilux at $300, want me to send you the details? 🙂
 
 WHY: he told me exactly what he wants (inside only), so skip straight to the one package that matches, Interior Only, and only that one.
 
