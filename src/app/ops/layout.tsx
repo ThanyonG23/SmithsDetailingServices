@@ -16,7 +16,7 @@ export default function OpsLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="brand-backdrop min-h-screen bg-[#050506] text-white">
       <header className="sticky top-0 z-40 border-b border-white/5 bg-black/50 backdrop-blur-md">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-4 py-3">
+        <div className="mx-auto flex max-w-none items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
           <Link href="/" aria-label="Smiths Detailing home" className="flex items-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={BUSINESS.logo} alt={BUSINESS.name} className="h-9 w-auto sm:h-10" />

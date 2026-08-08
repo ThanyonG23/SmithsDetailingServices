@@ -526,7 +526,7 @@ export default async function OpsPage({
     alerts.push({ tone: "yellow", text: `CAC is ${money(weekCAC)} this week — refresh the ad creative if it keeps climbing.` });
 
   return (
-    <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
+    <main className="mx-auto max-w-none px-4 pb-24 pt-8 sm:px-6 lg:px-8">
       {/* ── header ───────────────────────────────────────────────── */}
       <Reveal>
         <div className="flex items-start justify-between gap-4">
