@@ -526,7 +526,7 @@ export default async function OpsPage({
     alerts.push({ tone: "yellow", text: `CAC is ${money(weekCAC)} this week — refresh the ad creative if it keeps climbing.` });
 
   return (
-    <main className="mx-auto max-w-none px-4 pb-24 pt-8 sm:px-6 lg:px-8">
+    <main className="mx-auto max-w-none px-4 pb-24 pt-8 sm:px-6 lg:px-8 2xl:max-w-[1760px]">
       {/* ── header ───────────────────────────────────────────────── */}
       <Reveal>
         <div className="flex items-start justify-between gap-4">
@@ -705,9 +705,11 @@ export default async function OpsPage({
         </Reveal>
       )}
 
+      {/* ── HERO BAND: scoreboard + today's stat tiles ───────────── */}
+      <div className="mt-7 grid gap-4 xl:grid-cols-3 xl:items-start">
       {/* ── SCOREBOARD (hero) ────────────────────────────────────── */}
       <Reveal delay={80}>
-        <section className="relative mt-7">
+        <section className="relative xl:col-span-2">
           {status.tone !== "neutral" && (
             <div
               className={`pointer-events-none absolute -inset-6 ${
@@ -772,7 +774,7 @@ export default async function OpsPage({
       </Reveal>
 
       <Reveal delay={140}>
-        <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-3 xl:content-start">
           <StatTile
             label="Jobs done"
             value={String(entry?.jobs_completed ?? 0)}
@@ -799,10 +801,13 @@ export default async function OpsPage({
           />
         </div>
       </Reveal>
+      </div>
 
+      {/* ── PACE + BOOKINGS band ─────────────────────────────────── */}
+      <div className="mt-8 grid gap-6 xl:grid-cols-2 xl:items-start">
       {/* ── WEEK & MONTH PACE ────────────────────────────────────── */}
       <Reveal delay={200}>
-        <section className="mt-8">
+        <section>
           <SectionTitle eyebrow="The targets" title="Week &amp; month pace" />
           <div className="grid gap-3 sm:grid-cols-2">
             <PaceCard label="This week" current={weekRevenue} target={weeklyTarget} />
@@ -836,7 +841,7 @@ export default async function OpsPage({
 
       {/* ── BOOKINGS & ADS (from calendar) ───────────────────────── */}
       <Reveal delay={240}>
-        <section className="mt-8">
+        <section>
           <SectionTitle eyebrow="From your calendar" title="Bookings &amp; ads" />
 
           {hasBookings ? (
@@ -896,10 +901,13 @@ export default async function OpsPage({
           </form>
         </section>
       </Reveal>
+      </div>
 
+      {/* ── SCHEDULE + TODAY'S JOBS band ─────────────────────────── */}
+      <div className="mt-8 grid gap-6 xl:grid-cols-2 xl:items-start">
       {/* ── SCHEDULE (upcoming, from the calendar) ───────────────── */}
       <Reveal delay={245}>
-        <section className="mt-8">
+        <section>
           <SectionTitle eyebrow="What's booked" title="Schedule" />
           {scheduleDays.length === 0 ? (
             <p className="text-sm text-white/45">
@@ -981,7 +989,7 @@ export default async function OpsPage({
 
       {/* ── TODAY'S JOBS (hours per car) ─────────────────────────── */}
       <Reveal delay={250}>
-        <section className="mt-8">
+        <section>
           <SectionTitle eyebrow="On the floor today" title="Today's jobs" />
 
           {jobsOk && (
@@ -1141,6 +1149,7 @@ export default async function OpsPage({
           )}
         </section>
       </Reveal>
+      </div>
 
       {/* ── CUSTOMER CHECK-INS (happy → done · unhappy → rectify) ── */}
       <Reveal delay={255}>
@@ -1250,8 +1259,11 @@ export default async function OpsPage({
           form and re-seeds from that day's data — otherwise yesterday's typed
           values stay stuck in the inputs even though the server sent fresh. */}
       <AutoSaveForm key={date} action={saveEntry} autoSave={autoSaveDay}>
+        {/* numbers + crew (left) · the day's story (right) */}
+        <div className="mt-10 grid gap-6 xl:grid-cols-2 xl:items-start">
+        <div className="flex flex-col gap-8">
         {/* the numbers */}
-        <section className={`mt-10 ${CARD} p-6`}>
+        <section className={`${CARD} p-6`}>
           <SectionTitle
             eyebrow={entry ? "Update the log" : "Log the day"}
             title="The numbers"
@@ -1314,13 +1326,14 @@ export default async function OpsPage({
         </section>
 
         {/* the crew */}
-        <section className="mt-8">
+        <section>
           <SectionTitle eyebrow="Who was on" title="The crew" />
           <StaffHours staff={OPS_STAFF} initial={crewInitial} />
         </section>
+        </div>
 
         {/* the day */}
-        <section className={`mt-8 ${CARD} p-6`}>
+        <section className={`${CARD} p-6`}>
           <SectionTitle eyebrow="The story" title="How the day went" />
           <textarea
             name="notes_today"
@@ -1337,6 +1350,7 @@ export default async function OpsPage({
             Save the day →
           </button>
         </section>
+        </div>
       </AutoSaveForm>
 
       {/* ── HISTORY ──────────────────────────────────────────────── */}
