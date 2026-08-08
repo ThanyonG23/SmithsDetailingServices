@@ -7,6 +7,7 @@ import { passwordRole, sessionCookieValue, OPS_COOKIE } from "@/lib/ops/auth";
 import {
   upsertDailyLog,
   replaceBookings,
+  replaceLeads,
   recordBookingsSeen,
   replaceAds,
   setJobDayHours,
@@ -36,6 +37,7 @@ import {
 import { OPS_STAFF, hoursBetween, cairnsToday } from "@/lib/ops/config";
 import { parseBookingsIcs, parseCustomersIcs } from "@/lib/ops/calendar";
 import { parseAdsCsv, parseAdsDailyMessages } from "@/lib/ops/ads";
+import { parseLeadsCsv } from "@/lib/ops/leads";
 import {
   correctionBody,
   interiorBody,
@@ -227,6 +229,23 @@ export async function uploadAds(formData: FormData): Promise<void> {
   revalidatePath("/ops");
   revalidatePath("/ops/ads");
   redirect(`/ops/ads?adok=${rows.length}`);
+}
+
+/* Upload the Meta Leads Centre export (leads.csv) → parse ad_id + stage per
+   lead → replace the snapshot, so the ops manager can flag the follow-up
+   backlog and attribute conversions to ads. */
+export async function uploadLeads(formData: FormData): Promise<void> {
+  const file = formData.get("leads") as File | null;
+  if (!file || file.size === 0) redirect("/ops/uploads?leaderr=nofile");
+
+  const text = Buffer.from(await file.arrayBuffer()).toString("utf8");
+  const list = parseLeadsCsv(text);
+  if (!list.length) redirect("/ops/uploads?leaderr=noleads");
+  await replaceLeads(list);
+
+  revalidatePath("/ops/uploads");
+  revalidatePath("/ops");
+  redirect(`/ops/uploads?leadok=${list.length}`);
 }
 
 /* Save the hours each car took TODAY, keyed to the calendar UID + today's

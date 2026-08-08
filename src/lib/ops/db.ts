@@ -75,7 +75,7 @@ async function runEnsure(): Promise<void> {
     const rows = await sql`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'bookings' AND column_name = 'source'
+        WHERE table_name = 'meta_leads' AND column_name = 'stage'
       ) AS ready;`;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
   } catch {
@@ -116,6 +116,20 @@ async function runEnsure(): Promise<void> {
   await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS car text NOT NULL DEFAULT '';`;
   // Where the lead came from (the calendar "Referral:" field) — for conversion attribution.
   await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS source text NOT NULL DEFAULT '';`;
+  // Meta Leads Centre snapshot (uploaded from leads.csv) — ad_id + stage per lead.
+  await sql`
+    CREATE TABLE IF NOT EXISTS meta_leads (
+      id            serial       PRIMARY KEY,
+      name          text         NOT NULL DEFAULT '',
+      email         text         NOT NULL DEFAULT '',
+      phone         text         NOT NULL DEFAULT '',
+      source        text         NOT NULL DEFAULT '',
+      channel       text         NOT NULL DEFAULT '',
+      stage         text         NOT NULL DEFAULT '',
+      ad_id         text         NOT NULL DEFAULT '',
+      created_date  date,
+      loaded_at     timestamptz  NOT NULL DEFAULT now()
+    );`;
   await sql`
     CREATE TABLE IF NOT EXISTS job_hours (
       uid        text          PRIMARY KEY,
@@ -1239,6 +1253,57 @@ export async function getSourceBreakdown(
     return rows as unknown as SourceRow[];
   } catch {
     return [];
+  }
+}
+
+/* ---- Meta Leads Centre snapshot ------------------------------------- */
+
+export interface LeadStats {
+  total: number;
+  newThisWeek: number;
+  backlog: number; // warm, not yet converted, not junk — the "work these" pile
+  convertedThisWeek: number;
+  loadedAt: string | null;
+}
+
+export async function replaceLeads(
+  list: {
+    name: string; email: string; phone: string; source: string;
+    channel: string; stage: string; ad_id: string; created_date: string;
+  }[]
+): Promise<void> {
+  await ensureTable();
+  await sql.begin(async (tx) => {
+    await tx`DELETE FROM meta_leads;`;
+    const CHUNK = 500;
+    for (let i = 0; i < list.length; i += CHUNK) {
+      const slice = list.slice(i, i + CHUNK).map((l) => ({
+        name: l.name, email: l.email, phone: l.phone, source: l.source,
+        channel: l.channel, stage: l.stage, ad_id: l.ad_id,
+        created_date: /^\d{4}-\d{2}-\d{2}$/.test(l.created_date) ? l.created_date : null,
+      }));
+      if (slice.length)
+        await tx`INSERT INTO meta_leads ${tx(slice, "name", "email", "phone", "source", "channel", "stage", "ad_id", "created_date")}`;
+    }
+  });
+}
+
+export async function getLeadStats(weekStartISO: string): Promise<LeadStats> {
+  try {
+    const rows = await sql`
+      SELECT count(*)::int AS total,
+             count(*) FILTER (WHERE created_date >= ${weekStartISO})::int AS new_week,
+             count(*) FILTER (WHERE stage ILIKE '%follow up%' OR stage ILIKE 'intake' OR stage ILIKE 'qualified')::int AS backlog,
+             count(*) FILTER (WHERE stage ILIKE 'converted' AND created_date >= ${weekStartISO})::int AS conv_week,
+             to_char(max(loaded_at) AT TIME ZONE 'Australia/Brisbane', 'YYYY-MM-DD HH24:MI') AS loaded
+      FROM meta_leads;`;
+    const r = (rows[0] as { total: number; new_week: number; backlog: number; conv_week: number; loaded: string | null }) || {};
+    return {
+      total: r.total || 0, newThisWeek: r.new_week || 0, backlog: r.backlog || 0,
+      convertedThisWeek: r.conv_week || 0, loadedAt: r.loaded || null,
+    };
+  } catch {
+    return { total: 0, newThisWeek: 0, backlog: 0, convertedThisWeek: 0, loadedAt: null };
   }
 }
 
