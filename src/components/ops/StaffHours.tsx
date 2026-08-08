@@ -55,6 +55,7 @@ export default function StaffHours({
 
   return (
     <div className="flex flex-col gap-3">
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
       {staff.map((name) => {
         const s = shifts[name] ?? { start: "", end: "" };
         const h = hoursBetween(s.start, s.end);
@@ -127,6 +128,7 @@ export default function StaffHours({
           </div>
         );
       })}
+      </div>
 
       <div className="flex items-center justify-between rounded-xl border border-white/10 bg-black/20 px-4 py-3">
         <div>

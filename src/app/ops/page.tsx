@@ -903,18 +903,16 @@ export default async function OpsPage({
       </Reveal>
       </div>
 
-      {/* ── SCHEDULE + TODAY'S JOBS band ─────────────────────────── */}
-      <div className="mt-8 grid gap-6 xl:grid-cols-2 xl:items-start">
-      {/* ── SCHEDULE (upcoming, from the calendar) ───────────────── */}
+      {/* ── SCHEDULE (full-width week view — days tiled) ──────────── */}
       <Reveal delay={245}>
-        <section>
+        <section className="mt-8">
           <SectionTitle eyebrow="What's booked" title="Schedule" />
           {scheduleDays.length === 0 ? (
             <p className="text-sm text-white/45">
               Nothing upcoming — upload the latest calendar to see the schedule.
             </p>
           ) : (
-            <div className="flex flex-col gap-3">
+            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
               {scheduleDays.map((d) => {
                 const jobs = scheduleByDay.get(d) || [];
                 const total = jobs.reduce((a, j) => a + j.value, 0);
@@ -987,6 +985,8 @@ export default async function OpsPage({
         </section>
       </Reveal>
 
+      {/* ── TODAY'S JOBS + CHECK-INS band ────────────────────────── */}
+      <div className="mt-8 grid gap-6 xl:grid-cols-2 xl:items-start">
       {/* ── TODAY'S JOBS (hours per car) ─────────────────────────── */}
       <Reveal delay={250}>
         <section>
@@ -1149,11 +1149,10 @@ export default async function OpsPage({
           )}
         </section>
       </Reveal>
-      </div>
 
       {/* ── CUSTOMER CHECK-INS (happy → done · unhappy → rectify) ── */}
       <Reveal delay={255}>
-        <section className="mt-8">
+        <section>
           <SectionTitle eyebrow="Customer care" title="Check-ins" />
 
           {fuOk && (
@@ -1253,15 +1252,15 @@ export default async function OpsPage({
           )}
         </section>
       </Reveal>
+      </div>
 
       {/* ── ENTRY FORM (auto-saves as you go) ────────────────────── */}
       {/* key by date so a new day (or viewing another date) fully remounts the
           form and re-seeds from that day's data — otherwise yesterday's typed
           values stay stuck in the inputs even though the server sent fresh. */}
       <AutoSaveForm key={date} action={saveEntry} autoSave={autoSaveDay}>
-        {/* numbers + crew (left) · the day's story (right) */}
+        {/* the numbers (left) · the day's story (right) */}
         <div className="mt-10 grid gap-6 xl:grid-cols-2 xl:items-start">
-        <div className="flex flex-col gap-8">
         {/* the numbers */}
         <section className={`${CARD} p-6`}>
           <SectionTitle
@@ -1325,13 +1324,6 @@ export default async function OpsPage({
           </p>
         </section>
 
-        {/* the crew */}
-        <section>
-          <SectionTitle eyebrow="Who was on" title="The crew" />
-          <StaffHours staff={OPS_STAFF} initial={crewInitial} />
-        </section>
-        </div>
-
         {/* the day */}
         <section className={`${CARD} p-6`}>
           <SectionTitle eyebrow="The story" title="How the day went" />
@@ -1343,14 +1335,21 @@ export default async function OpsPage({
             className={`${FIELD} resize-y px-3 py-3 leading-relaxed`}
           />
 
-          <button
-            type="submit"
-            className="mt-6 w-full rounded-full bg-brand-green px-6 py-4 text-sm font-black text-[#04130a] shadow-[0_10px_40px_rgba(43,255,122,0.25)] transition hover:brightness-110 active:scale-95 sm:w-auto sm:px-14"
-          >
-            Save the day →
-          </button>
         </section>
         </div>
+
+        {/* the crew — full width, people tiled across columns */}
+        <section className="mt-8">
+          <SectionTitle eyebrow="Who was on" title="The crew" />
+          <StaffHours staff={OPS_STAFF} initial={crewInitial} />
+        </section>
+
+        <button
+          type="submit"
+          className="mt-8 w-full rounded-full bg-brand-green px-6 py-4 text-sm font-black text-[#04130a] shadow-[0_10px_40px_rgba(43,255,122,0.25)] transition hover:brightness-110 active:scale-95 sm:w-auto sm:px-14"
+        >
+          Save the day →
+        </button>
       </AutoSaveForm>
 
       {/* ── HISTORY ──────────────────────────────────────────────── */}
