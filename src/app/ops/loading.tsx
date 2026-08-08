@@ -2,7 +2,7 @@
    immediate feedback instead of feeling frozen. */
 export default function Loading() {
   return (
-    <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
+    <main className="mx-auto max-w-none px-4 pb-24 pt-8 sm:px-6 lg:px-8 2xl:max-w-[1760px]">
       <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">
         Smiths Detailing · Cairns
       </div>

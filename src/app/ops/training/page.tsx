@@ -17,7 +17,7 @@ export default function TrainingIndex() {
   const order: TrainingRole[] = ["all", "detailer", "admin"];
 
   return (
-    <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
+    <main className="mx-auto max-w-none px-4 pb-24 pt-8 sm:px-6 lg:px-8 2xl:max-w-[1760px]">
       <div className={EYEBROW}>Smiths Detailing · Team</div>
       <h1 className="mt-3 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
         Train<span className="text-brand-green">ing</span>

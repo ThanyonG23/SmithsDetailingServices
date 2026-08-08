@@ -83,7 +83,7 @@ export default async function DayReportPage({ params }: { params: { date: string
   })).filter((c) => c.hours > 0 || c.shift || c.note.trim());
 
   return (
-    <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
+    <main className="mx-auto max-w-none px-4 pb-24 pt-8 sm:px-6 lg:px-8 2xl:max-w-[1760px]">
       <Link
         href="/ops/history"
         className="inline-flex rounded-full border border-white/12 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white/60 transition hover:text-white"

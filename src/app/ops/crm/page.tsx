@@ -35,7 +35,7 @@ export default async function CrmPage({ searchParams }: { searchParams: { q?: st
   const sourceRevTotal = sources.reduce((a, s) => a + s.revenue, 0) || 1;
 
   return (
-    <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
+    <main className="mx-auto max-w-none px-4 pb-24 pt-8 sm:px-6 lg:px-8 2xl:max-w-[1760px]">
       <div className={EYEBROW}>Smiths Detailing · Cairns</div>
       <h1 className="mt-3 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
         C<span className="text-brand-green">RM</span>
@@ -102,7 +102,7 @@ export default async function CrmPage({ searchParams }: { searchParams: { q?: st
             : "No customers yet — upload the calendar on the Dashboard to build the list."}
         </p>
       ) : (
-        <div className="mt-3 flex flex-col gap-2">
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
           {customers.map((c) => (
             <div key={c.dedupe_key} className={`${CARD} p-3.5`}>
               <div className="flex items-start justify-between gap-3">

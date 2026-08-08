@@ -17,7 +17,7 @@ export default function TemplateGroups({ groups }: { groups: TemplateGroup[] }) 
   const [open, setOpen] = useState<string | null>(null);
 
   return (
-    <div className="mt-6 flex flex-col gap-3">
+    <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-3 xl:items-start">
       {groups.map((g) => {
         const isOpen = open === g.key;
         return (

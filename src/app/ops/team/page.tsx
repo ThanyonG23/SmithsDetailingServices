@@ -41,7 +41,7 @@ export default async function TeamPage() {
   });
 
   return (
-    <main className="mx-auto max-w-2xl px-4 pb-24 pt-8">
+    <main className="mx-auto max-w-none px-4 pb-24 pt-8 sm:px-6 lg:px-8 2xl:max-w-[1760px]">
       <div className={EYEBROW}>Smiths Detailing · Cairns</div>
       <h1 className="mt-3 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
         The <span className="text-brand-green">Team</span>

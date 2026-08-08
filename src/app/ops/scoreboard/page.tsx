@@ -125,7 +125,7 @@ export default async function ScoreboardPage() {
     .sort((a, b) => b.hours - a.hours);
 
   return (
-    <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
+    <main className="mx-auto max-w-none px-4 pb-24 pt-8 sm:px-6 lg:px-8 2xl:max-w-[1760px]">
       <div className={EYEBROW}>Smiths Detailing · Team</div>
       <h1 className="mt-3 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
         Score<span className="text-brand-green">board</span>
@@ -149,8 +149,10 @@ export default async function ScoreboardPage() {
         </div>
       )}
 
+      {/* ── TODAY + THIS WEEK band ───────────────────────────────── */}
+      <div className="mt-7 grid gap-4 xl:grid-cols-2 xl:items-start">
       {/* ── TODAY ── */}
-      <section className="mt-7">
+      <section>
         <div className={`${CARD} p-5`}>
           <div className="flex items-end justify-between gap-3">
             <div>
@@ -187,7 +189,7 @@ export default async function ScoreboardPage() {
       </section>
 
       {/* ── THIS WEEK ── */}
-      <section className="mt-8">
+      <section>
         <div className={`${CARD} p-5`}>
           <div className="flex items-end justify-between gap-3">
             <div>
@@ -214,6 +216,7 @@ export default async function ScoreboardPage() {
           <Mini label="Above break-even" value={money(weekSurplus)} tone="green" />
         </div>
       </section>
+      </div>
 
       {/* ── TEAM THIS WEEK ── */}
       {carsDone > 0 && (
@@ -260,7 +263,7 @@ export default async function ScoreboardPage() {
             worked them and whether they beat the clock.
           </p>
         ) : (
-          <div className="mt-3 flex flex-col gap-3">
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3 xl:items-start">
             {completed.map((j) => {
               const [nm, ...rest] = (j.summary || "").split(":");
               const pkg = rest.join(":").trim();

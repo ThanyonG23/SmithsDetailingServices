@@ -184,7 +184,7 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
           No cars on the board today. If that looks wrong, ask Ashlee to upload the latest calendar.
         </p>
       ) : (
-        <div className="mt-4 flex flex-col gap-3">
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3 xl:items-start">
           {jobs.map((j) => {
             const [name, ...rest] = (j.summary || "").split(":");
             const pkg = rest.join(":").trim();
