@@ -6,6 +6,7 @@ import {
   teamDiagnostics,
   getStaffHoursRange,
   getBookingsDump,
+  leadDiagnostics,
 } from "@/lib/ops/db";
 
 /* Keep-warm health check. A free external pinger hits this every few minutes
@@ -29,8 +30,9 @@ export async function GET(req: Request) {
   const to = params.get("to") || "2999-01-01";
   const hours = deep === "hours" && tokenOk ? await getStaffHoursRange(from, to) : undefined;
   const bookings = deep === "bookings" && tokenOk ? await getBookingsDump(from, to) : undefined;
+  const leads = deep === "leads" && tokenOk ? await leadDiagnostics() : undefined;
   return NextResponse.json(
-    { ok, checklist, dash, team, hours, bookings, service: "smiths-ops", ts: new Date().toISOString() },
+    { ok, checklist, dash, team, hours, bookings, leads, service: "smiths-ops", ts: new Date().toISOString() },
     { status: ok ? 200 : 503, headers: { "Cache-Control": "no-store" } }
   );
 }

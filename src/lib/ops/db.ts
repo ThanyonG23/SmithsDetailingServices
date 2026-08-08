@@ -1307,6 +1307,25 @@ export async function getLeadStats(weekStartISO: string): Promise<LeadStats> {
   }
 }
 
+/** Diagnostic snapshot of the meta_leads table — to confirm an upload landed. */
+export async function leadDiagnostics(): Promise<unknown> {
+  try {
+    const c = await sql`
+      SELECT count(*)::int AS total,
+             count(*) FILTER (WHERE ad_id <> '')::int AS with_ad,
+             count(*) FILTER (WHERE created_date IS NOT NULL)::int AS with_date,
+             to_char(max(loaded_at) AT TIME ZONE 'Australia/Brisbane', 'YYYY-MM-DD HH24:MI') AS loaded
+      FROM meta_leads;`;
+    const stages = await sql`SELECT stage, count(*)::int AS n FROM meta_leads GROUP BY stage ORDER BY n DESC LIMIT 12;`;
+    const recent = await sql`
+      SELECT name, stage, ad_id, to_char(created_date, 'YYYY-MM-DD') AS created
+      FROM meta_leads WHERE created_date IS NOT NULL ORDER BY created_date DESC LIMIT 6;`;
+    return { ...(c[0] as object), stages, recent };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "err" };
+  }
+}
+
 export interface Customer {
   dedupe_key: string;
   name: string;
