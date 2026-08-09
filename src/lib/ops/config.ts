@@ -95,6 +95,19 @@ export function targetHoursForJob(job: {
 /** The team rallying cry, shown up top on the scoreboard. Change it any time. */
 export const MOTTO = "If it was easy, everybody would do it.";
 
+/** Friendly names for Meta ad IDs (the Lead Centre export tags each lead with an
+    ad_id like "120255319076630538"). Add an entry here whenever you launch a new
+    ad and its real name will show through the Leads analytics instead of a number.
+    Find the ID in the Ads tab / Leads export Labels column. */
+export const AD_LABELS: Record<string, string> = {
+  "120255319076630538": "100% Correction & Protection",
+};
+/** Turn a raw ad_id into a readable label, falling back to the last 6 digits. */
+export function adLabel(adId: string): string {
+  if (!adId) return "Unknown ad";
+  return AD_LABELS[adId] || `Ad …${adId.slice(-6)}`;
+}
+
 /** Final quality-check checklist, ticked and signed off per car on the Team
     board before it's marked done. Keep in sync with the Quality Check training
     module. This is the last line before the "not happy = don't pay" guarantee. */

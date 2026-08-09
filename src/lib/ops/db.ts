@@ -1307,6 +1307,143 @@ export async function getLeadStats(weekStartISO: string): Promise<LeadStats> {
   }
 }
 
+/* ---- Lead Centre analytics (funnel · follow-up aging · conversion) --- */
+
+export interface LeadAnalytics {
+  loadedAt: string | null;
+  total: number;
+  real: number; // genuine enquiries = total minus junk (Abused)
+  abused: number;
+  // current funnel snapshot
+  intake: number;
+  qualified: number;
+  followUp: number;
+  fu1: number;
+  fu2: number;
+  fu3: number;
+  converted: number;
+  working: number; // still in play (intake + qualified + follow-ups)
+  conversionRate: number; // converted ÷ real, 0-100
+  // follow-up backlog aged by how long since the lead came in
+  fuFresh: number; // ≤ 7 days — chase now
+  fuWarm: number; // 8-21 days
+  fuStale: number; // 22-60 days
+  fuCold: number; // 60+ days — likely dead
+  // selected period (by lead created_date)
+  newInPeriod: number;
+  convertedInPeriod: number;
+  // trends & attribution
+  weekly: { week: string; leads: number; converted: number }[];
+  byAd: { ad_id: string; leads: number; converted: number; rate: number }[];
+  bySource: { source: string; leads: number; converted: number }[];
+}
+
+const EMPTY_LEAD_ANALYTICS: LeadAnalytics = {
+  loadedAt: null, total: 0, real: 0, abused: 0, intake: 0, qualified: 0,
+  followUp: 0, fu1: 0, fu2: 0, fu3: 0, converted: 0, working: 0, conversionRate: 0,
+  fuFresh: 0, fuWarm: 0, fuStale: 0, fuCold: 0, newInPeriod: 0, convertedInPeriod: 0,
+  weekly: [], byAd: [], bySource: [],
+};
+
+/** Everything the Leads section (Analytics + Uploads) needs, from the current
+    Lead Centre snapshot. Aging is measured from each lead's created_date; the
+    funnel is a live snapshot (a replaced upload overwrites it). */
+export async function getLeadAnalytics(
+  fromISO: string,
+  toISO: string,
+  todayISO: string
+): Promise<LeadAnalytics> {
+  const shift = (iso: string, n: number): string => {
+    const d = new Date(iso + "T00:00:00Z");
+    d.setUTCDate(d.getUTCDate() + n);
+    return d.toISOString().slice(0, 10);
+  };
+  const d7 = shift(todayISO, -7);
+  const d21 = shift(todayISO, -21);
+  const d60 = shift(todayISO, -60);
+  try {
+    const rows = await sql`
+      SELECT
+        count(*)::int AS total,
+        count(*) FILTER (WHERE stage ILIKE 'abused')::int AS abused,
+        count(*) FILTER (WHERE stage ILIKE 'intake')::int AS intake,
+        count(*) FILTER (WHERE stage ILIKE 'qualified')::int AS qualified,
+        count(*) FILTER (WHERE stage ILIKE '%1st follow%')::int AS fu1,
+        count(*) FILTER (WHERE stage ILIKE '%2nd follow%')::int AS fu2,
+        count(*) FILTER (WHERE stage ILIKE '%3rd follow%')::int AS fu3,
+        count(*) FILTER (WHERE stage ILIKE '%follow up%')::int AS followup,
+        count(*) FILTER (WHERE stage ILIKE 'converted')::int AS converted,
+        count(*) FILTER (WHERE created_date >= ${fromISO} AND created_date <= ${toISO})::int AS new_period,
+        count(*) FILTER (WHERE stage ILIKE 'converted' AND created_date >= ${fromISO} AND created_date <= ${toISO})::int AS conv_period,
+        count(*) FILTER (WHERE stage ILIKE '%follow up%' AND created_date >= ${d7})::int AS fu_fresh,
+        count(*) FILTER (WHERE stage ILIKE '%follow up%' AND created_date < ${d7} AND created_date >= ${d21})::int AS fu_warm,
+        count(*) FILTER (WHERE stage ILIKE '%follow up%' AND created_date < ${d21} AND created_date >= ${d60})::int AS fu_stale,
+        count(*) FILTER (WHERE stage ILIKE '%follow up%' AND (created_date < ${d60} OR created_date IS NULL))::int AS fu_cold,
+        to_char(max(loaded_at) AT TIME ZONE 'Australia/Brisbane', 'YYYY-MM-DD HH24:MI') AS loaded
+      FROM meta_leads;`;
+    const r = rows[0] as Record<string, number | string | null>;
+    const num = (v: number | string | null | undefined) => Number(v) || 0;
+
+    const weekly = (await sql`
+      SELECT to_char(date_trunc('week', created_date), 'YYYY-MM-DD') AS week,
+             count(*)::int AS leads,
+             count(*) FILTER (WHERE stage ILIKE 'converted')::int AS converted
+      FROM meta_leads
+      WHERE created_date >= ${fromISO} AND created_date <= ${toISO}
+      GROUP BY 1 ORDER BY 1;`) as unknown as { week: string; leads: number; converted: number }[];
+
+    const byAd = (await sql`
+      SELECT ad_id,
+             count(*)::int AS leads,
+             count(*) FILTER (WHERE stage ILIKE 'converted')::int AS converted
+      FROM meta_leads
+      WHERE ad_id <> '' AND stage NOT ILIKE 'abused'
+      GROUP BY ad_id ORDER BY converted DESC, leads DESC LIMIT 8;`) as unknown as {
+      ad_id: string; leads: number; converted: number;
+    }[];
+
+    const bySource = (await sql`
+      SELECT COALESCE(NULLIF(source, ''), 'Unknown') AS source,
+             count(*)::int AS leads,
+             count(*) FILTER (WHERE stage ILIKE 'converted')::int AS converted
+      FROM meta_leads
+      WHERE stage NOT ILIKE 'abused'
+      GROUP BY 1 ORDER BY leads DESC LIMIT 6;`) as unknown as {
+      source: string; leads: number; converted: number;
+    }[];
+
+    const total = num(r.total);
+    const abused = num(r.abused);
+    const converted = num(r.converted);
+    const followUp = num(r.followup);
+    const intake = num(r.intake);
+    const qualified = num(r.qualified);
+    const real = Math.max(0, total - abused);
+    const working = intake + qualified + followUp;
+
+    return {
+      loadedAt: (r.loaded as string) || null,
+      total, real, abused, intake, qualified, followUp,
+      fu1: num(r.fu1), fu2: num(r.fu2), fu3: num(r.fu3),
+      converted, working,
+      conversionRate: real > 0 ? Math.round((converted / real) * 100) : 0,
+      fuFresh: num(r.fu_fresh), fuWarm: num(r.fu_warm),
+      fuStale: num(r.fu_stale), fuCold: num(r.fu_cold),
+      newInPeriod: num(r.new_period), convertedInPeriod: num(r.conv_period),
+      weekly: weekly.map((w) => ({ week: w.week, leads: Number(w.leads) || 0, converted: Number(w.converted) || 0 })),
+      byAd: byAd.map((a) => ({
+        ad_id: a.ad_id,
+        leads: Number(a.leads) || 0,
+        converted: Number(a.converted) || 0,
+        rate: Number(a.leads) > 0 ? Math.round((Number(a.converted) / Number(a.leads)) * 100) : 0,
+      })),
+      bySource: bySource.map((s) => ({ source: s.source, leads: Number(s.leads) || 0, converted: Number(s.converted) || 0 })),
+    };
+  } catch {
+    return { ...EMPTY_LEAD_ANALYTICS };
+  }
+}
+
 /** Diagnostic snapshot of the meta_leads table — to confirm an upload landed. */
 export async function leadDiagnostics(): Promise<unknown> {
   try {

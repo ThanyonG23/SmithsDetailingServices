@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { requireOwner } from "@/lib/ops/auth";
-import { getLeadStats, type LeadStats } from "@/lib/ops/db";
+import { getLeadAnalytics, type LeadAnalytics } from "@/lib/ops/db";
 import { uploadCalendar, uploadAds, uploadLeads } from "../actions";
 import { cairnsToday } from "@/lib/ops/config";
 
@@ -69,11 +69,11 @@ export default async function UploadsPage({
   const anchor = new Date(today + "T00:00:00Z");
   const weekStart = shift(today, -(((anchor.getUTCDay() + 6) % 7)));
 
-  let leads: LeadStats = { total: 0, newThisWeek: 0, backlog: 0, convertedThisWeek: 0, loadedAt: null };
+  let leads: LeadAnalytics | null = null;
   try {
-    leads = await getLeadStats(weekStart);
+    leads = await getLeadAnalytics(weekStart, today, today);
   } catch {
-    /* leave zeros */
+    /* leave null — the flags just won't render */
   }
 
   const errMsg = (code?: string) =>
@@ -95,36 +95,52 @@ export default async function UploadsPage({
       </p>
 
       {/* ── LEADS FLAGS (the reason to upload leads daily) ── */}
-      {leads.total > 0 && (
+      {leads && leads.total > 0 && (
         <section className="mt-6">
           <div className={EYEBROW}>From your last leads upload</div>
-          <div className="mt-3 grid grid-cols-3 gap-3">
+          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
             <div className={`${CARD} p-4`}>
-              <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">To follow up</div>
-              <div className={`mt-1 font-display text-3xl font-extrabold tabular-nums ${leads.backlog > 0 ? "text-brand-yellow" : "text-white"}`}>
-                {leads.backlog}
+              <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">Chase now</div>
+              <div className={`mt-1 font-display text-3xl font-extrabold tabular-nums ${leads.fuFresh > 0 ? "text-brand-green" : "text-white"}`}>
+                {leads.fuFresh}
               </div>
-              <div className="mt-0.5 text-[11px] text-white/45">warm leads not yet booked or closed</div>
+              <div className="mt-0.5 text-[11px] text-white/45">fresh follow-ups (≤7 days)</div>
+            </div>
+            <div className={`${CARD} p-4`}>
+              <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">In follow-up</div>
+              <div className="mt-1 font-display text-3xl font-extrabold tabular-nums text-white/80">{leads.followUp}</div>
+              <div className="mt-0.5 text-[11px] text-white/45">total not yet won or lost</div>
             </div>
             <div className={`${CARD} p-4`}>
               <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">New this week</div>
-              <div className="mt-1 font-display text-3xl font-extrabold tabular-nums text-white">{leads.newThisWeek}</div>
+              <div className="mt-1 font-display text-3xl font-extrabold tabular-nums text-white">{leads.newInPeriod}</div>
               <div className="mt-0.5 text-[11px] text-white/45">fresh enquiries</div>
             </div>
             <div className={`${CARD} p-4`}>
               <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">Converted (wk)</div>
-              <div className="mt-1 font-display text-3xl font-extrabold tabular-nums text-brand-green">{leads.convertedThisWeek}</div>
-              <div className="mt-0.5 text-[11px] text-white/45">marked converted</div>
+              <div className="mt-1 font-display text-3xl font-extrabold tabular-nums text-brand-green">{leads.convertedInPeriod}</div>
+              <div className="mt-0.5 text-[11px] text-white/45">this week&apos;s leads, won</div>
             </div>
           </div>
-          {leads.backlog > 0 && (
-            <div className="mt-3 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.07] px-4 py-2.5 text-sm text-brand-yellow">
-              🟡 <b>{leads.backlog} warm leads</b> are sitting in follow-up — work these first, they&apos;re your
-              fastest bookings (already paid for).
+
+          {/* aging strip — turns the big backlog into a chase list */}
+          <div className="mt-3 flex flex-wrap gap-2 text-xs">
+            <span className="rounded-full bg-brand-green/15 px-3 py-1 font-semibold text-brand-green">Fresh ≤7d · {leads.fuFresh}</span>
+            <span className="rounded-full bg-white/8 px-3 py-1 font-semibold text-white/70">Warm 8–21d · {leads.fuWarm}</span>
+            <span className="rounded-full bg-white/8 px-3 py-1 font-semibold text-white/70">Stale 22–60d · {leads.fuStale}</span>
+            <span className="rounded-full bg-red-500/15 px-3 py-1 font-semibold text-red-300">Cold 60d+ · {leads.fuCold}</span>
+          </div>
+
+          {leads.fuFresh > 0 && (
+            <div className="mt-3 rounded-xl border border-brand-green/40 bg-brand-green/[0.07] px-4 py-2.5 text-sm text-brand-green">
+              🟢 <b>{leads.fuFresh} fresh follow-ups</b> to chase today — these convert fastest. Leave the
+              cold pile; mark those Abused so the backlog reads true.
             </div>
           )}
           <p className="mt-2 text-[11px] text-white/35">
-            Last leads upload: {leads.loadedAt || "—"} · mark leads &ldquo;Converted&rdquo; in the Leads Centre so this stays accurate.
+            Last leads upload: {leads.loadedAt || "—"} · full funnel on the{" "}
+            <b className="text-white/50">Analytics</b> tab · mark leads &ldquo;Converted&rdquo; / &ldquo;Abused&rdquo; in the
+            Leads Centre so this stays accurate.
           </p>
         </section>
       )}

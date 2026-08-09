@@ -6,9 +6,11 @@ import {
   getSatisfaction,
   getReorderCount,
   getQuoteLeadStats,
+  getLeadAnalytics,
   type AnalyticsDay,
+  type LeadAnalytics,
 } from "@/lib/ops/db";
-import { cairnsToday, OPS_TARGETS } from "@/lib/ops/config";
+import { cairnsToday, OPS_TARGETS, adLabel } from "@/lib/ops/config";
 
 export const metadata: Metadata = {
   title: "Analytics | Smiths Detailing",
@@ -107,15 +109,22 @@ export default async function AnalyticsPage({
   let satisfaction = { happy: 0, unhappy: 0 };
   let reorders = 0;
   let quoteStats = { total: 0, pending: 0, actioned: 0 };
+  let leads: LeadAnalytics | null = null;
   let dbError = false;
   try {
     series = await getAnalytics(fromISO, toISO);
     satisfaction = await getSatisfaction(fromISO, toISO);
     reorders = await getReorderCount();
     quoteStats = await getQuoteLeadStats();
+    leads = await getLeadAnalytics(fromISO, toISO, today);
   } catch {
     dbError = true;
   }
+
+  const fuMax = leads
+    ? Math.max(leads.intake, leads.qualified, leads.fu1, leads.fu2, leads.fu3, leads.converted, 1)
+    : 1;
+  const leadWeekMax = leads ? Math.max(...leads.weekly.map((w) => w.leads), 1) : 1;
 
   // ── aggregates ──
   const sum = (f: (d: AnalyticsDay) => number) => series.reduce((a, d) => a + f(d), 0);
@@ -297,6 +306,134 @@ export default async function AnalyticsPage({
           sub={`${quoteStats.pending} new · all-time`}
         />
       </div>
+
+      {/* ── LEAD CENTRE (funnel · follow-ups · conversion) ── */}
+      {leads && leads.total > 0 && (
+        <>
+          <SectionTitle eyebrow="From your Leads Centre uploads" title="Lead pipeline" />
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <Tile label="Real leads" value={String(leads.real)} sub={`${leads.total} incl. ${leads.abused} junk`} />
+            <Tile label="Converted" value={String(leads.converted)} sub={`${leads.convertedInPeriod} this period`} tone="green" />
+            <Tile
+              label="Conversion rate"
+              value={`${leads.conversionRate}%`}
+              sub="of real leads"
+              tone={leads.conversionRate >= 30 ? "green" : "neutral"}
+            />
+            <Tile label="In follow-up" value={String(leads.followUp)} sub="not yet won or lost" />
+          </div>
+
+          {/* funnel — where every lead sits right now */}
+          <div className={`${CARD} mt-3 p-4`}>
+            <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">
+              Where every lead sits right now
+            </div>
+            <div className="flex flex-col gap-2">
+              {[
+                { label: "Intake", n: leads.intake },
+                { label: "Qualified", n: leads.qualified },
+                { label: "1st follow-up", n: leads.fu1 },
+                { label: "2nd follow-up", n: leads.fu2 },
+                { label: "3rd follow-up", n: leads.fu3 },
+                { label: "Converted", n: leads.converted, green: true },
+              ].map((s) => (
+                <div key={s.label} className="flex items-center gap-3">
+                  <span className="w-28 shrink-0 text-xs font-semibold text-white/60">{s.label}</span>
+                  <div className="h-3 flex-1 overflow-hidden rounded-full bg-white/10">
+                    <div
+                      className={`h-full rounded-full ${s.green ? "bg-brand-green" : "bg-brand-green/40"}`}
+                      style={{ width: `${s.n ? Math.max(3, Math.round((s.n / fuMax) * 100)) : 0}%` }}
+                    />
+                  </div>
+                  <span className="w-10 shrink-0 text-right text-xs font-bold tabular-nums text-white/70">{s.n}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* follow-up backlog aged — which to chase, which are dead */}
+          <div className="mb-1 mt-4 text-[11px] font-bold uppercase tracking-[0.16em] text-white/40">
+            Follow-up backlog · by age
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <Tile label="Fresh · ≤7 days" value={String(leads.fuFresh)} sub="chase now — hottest" tone={leads.fuFresh > 0 ? "green" : "neutral"} />
+            <Tile label="Warm · 8–21 days" value={String(leads.fuWarm)} sub="still workable" />
+            <Tile label="Stale · 22–60 days" value={String(leads.fuStale)} sub="last-ditch effort" />
+            <Tile label="Cold · 60+ days" value={String(leads.fuCold)} sub="likely dead — mark abused" tone={leads.fuCold > 0 ? "red" : "neutral"} />
+          </div>
+          <p className="mt-2 text-xs leading-relaxed text-white/40">
+            Work the <b className="text-white/60">fresh</b> pile first — those convert fastest. The{" "}
+            <b className="text-white/60">cold</b> pile is why the raw follow-up number looks huge; mark
+            those Abused in the Leads Centre so the real backlog reads true.
+          </p>
+
+          {/* weekly lead volume */}
+          {leads.weekly.length > 0 && (
+            <div className={`${CARD} mt-4 p-4`}>
+              <div className="mb-2 flex items-center justify-between">
+                <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">Leads per week</span>
+                <span className="text-[10px] font-semibold text-brand-green">green = converted</span>
+              </div>
+              <div className="flex h-28 items-end gap-1 overflow-x-auto">
+                {leads.weekly.map((w) => {
+                  const h = Math.round((w.leads / leadWeekMax) * 100);
+                  const cph = w.leads ? Math.round((w.converted / w.leads) * 100) : 0;
+                  return (
+                    <div
+                      key={w.week}
+                      className="group relative flex min-w-[8px] flex-1 flex-col justify-end"
+                      title={`${w.week} · ${w.leads} leads · ${w.converted} converted`}
+                    >
+                      <div className="relative w-full rounded-t bg-white/12" style={{ height: `${Math.max(h, w.leads ? 3 : 1)}%` }}>
+                        <div className="absolute bottom-0 w-full rounded-t bg-brand-green" style={{ height: `${cph}%` }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* attribution — which ads / sources bring leads that convert */}
+          {leads.byAd.length > 0 && (
+            <div className="mt-4 grid gap-3 xl:grid-cols-2">
+              <div className={`${CARD} overflow-hidden`}>
+                <div className="border-b border-white/8 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">
+                  Ads that convert
+                </div>
+                {leads.byAd.map((a) => (
+                  <div key={a.ad_id} className="flex items-center justify-between gap-3 border-b border-white/[0.06] px-4 py-2.5 last:border-0">
+                    <span className="min-w-0 flex-1 truncate text-sm font-semibold text-white/85">{adLabel(a.ad_id)}</span>
+                    <span className="shrink-0 text-xs tabular-nums text-white/55">
+                      {a.leads} lead{a.leads === 1 ? "" : "s"} · <b className="text-brand-green">{a.converted} won</b> · {a.rate}%
+                    </span>
+                  </div>
+                ))}
+              </div>
+              {leads.bySource.length > 0 && (
+                <div className={`${CARD} overflow-hidden`}>
+                  <div className="border-b border-white/8 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">
+                    By source
+                  </div>
+                  {leads.bySource.map((s) => (
+                    <div key={s.source} className="flex items-center justify-between gap-3 border-b border-white/[0.06] px-4 py-2.5 last:border-0">
+                      <span className="min-w-0 flex-1 truncate text-sm font-semibold text-white/85">{s.source}</span>
+                      <span className="shrink-0 text-xs tabular-nums text-white/55">
+                        {s.leads} lead{s.leads === 1 ? "" : "s"} · <b className="text-brand-green">{s.converted} won</b>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          <p className="mt-3 text-[11px] text-white/35">
+            From your last Leads Centre upload{leads.loadedAt ? ` · ${leads.loadedAt}` : ""}. Conversion
+            counts leads by the date they came in, so it climbs as this period&apos;s leads get worked.
+          </p>
+        </>
+      )}
 
       {/* ── JOBS ── */}
       <SectionTitle eyebrow="Operations · how the work flowed" title="Jobs" />
