@@ -4,7 +4,10 @@
    in a public "inspections" bucket and are served by their public URL. */
 
 const SUPABASE_URL = (process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || "").replace(/\/$/, "");
-const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
+// Supabase renamed the full-access server key "service_role" → "secret key",
+// and the Vercel integration provisions it as SUPABASE_SECRET_KEY. Accept both.
+const KEY =
+  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY || "";
 const BUCKET = "inspections";
 
 export function storageConfigured(): boolean {
