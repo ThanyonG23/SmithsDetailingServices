@@ -93,8 +93,8 @@ export default function InspectionBuilder({
 
   function pickPreset(p: { title: string; price: number; description: string }) {
     setTitle(p.title);
-    setPrice(String(p.price));
     setDesc(p.description);
+    // price intentionally left for you to set per car
   }
 
   function addItem() {
@@ -223,7 +223,7 @@ export default function InspectionBuilder({
               onClick={() => pickPreset(p)}
               className="rounded-full border border-white/15 bg-white/[0.03] px-3 py-1.5 text-xs font-bold text-white/70 transition hover:border-brand-green hover:text-brand-green"
             >
-              {p.title} · {money(p.price)}
+              {p.title}
             </button>
           ))}
         </div>

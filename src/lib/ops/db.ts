@@ -1437,6 +1437,35 @@ export async function listRecentInspections(limit = 40): Promise<Inspection[]> {
   return (rows as Record<string, unknown>[]).map(mapInspection);
 }
 
+/** Diagnostic: does the save round-trip work, and what's actually stored? */
+export async function inspectDiagnostics(): Promise<unknown> {
+  const out: Record<string, unknown> = {};
+  try {
+    await ensureTable();
+    const slug = "selftest-" + Date.now().toString(36);
+    await sql`INSERT INTO inspections (slug, customer_name, vehicle) VALUES (${slug}, 'SelfTest', 'Test');`;
+    await saveInspectionItems(slug, [
+      { id: "a1", title: "Test extra", description: "d", price: 10, photos: [], selected: false },
+    ]);
+    const back = await getInspection(slug);
+    await sql`DELETE FROM inspections WHERE slug = ${slug};`;
+    out.selfTest = { ok: true, savedItems: back?.items.length ?? -1, status: back?.status };
+  } catch (e) {
+    out.selfTest = { ok: false, error: e instanceof Error ? e.message : String(e) };
+  }
+  try {
+    const recent = await sql`
+      SELECT slug, customer_name, status,
+             jsonb_array_length(items) AS item_count,
+             to_char(created_at AT TIME ZONE 'Australia/Brisbane', 'YYYY-MM-DD HH24:MI') AS created
+      FROM inspections ORDER BY created_at DESC LIMIT 10;`;
+    out.recent = recent;
+  } catch (e) {
+    out.recent = { error: e instanceof Error ? e.message : String(e) };
+  }
+  return out;
+}
+
 /* ---- Lead Centre analytics (funnel · follow-up aging · conversion) --- */
 
 export interface LeadAnalytics {
