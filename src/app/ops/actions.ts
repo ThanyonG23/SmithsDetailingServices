@@ -32,8 +32,14 @@ import {
   replaceTemplates,
   getStock,
   setQuoteLeadStatus,
+  createInspection,
+  saveInspectionItems,
+  recordInspectionResponse,
+  getInspection,
   type StockItem,
+  type InspectionItem,
 } from "@/lib/ops/db";
+import { uploadInspectionPhoto } from "@/lib/ops/storage";
 import { OPS_STAFF, hoursBetween, cairnsToday } from "@/lib/ops/config";
 import { parseBookingsIcs, parseCustomersIcs } from "@/lib/ops/calendar";
 import { parseAdsCsv, parseAdsDailyMessages } from "@/lib/ops/ads";
@@ -303,6 +309,60 @@ export async function signOffCar(uid: string, name: string): Promise<void> {
   await signOffJob(u, n);
   revalidatePath("/ops/team");
   revalidatePath("/ops");
+}
+
+/* ── Inspection portal (upsell) ─────────────────────────────────────── */
+
+/** Start a blank inspection for a car and open its builder. */
+export async function startInspection(formData: FormData): Promise<void> {
+  const uid = String(formData.get("uid") || "").slice(0, 200);
+  const name = String(formData.get("name") || "").slice(0, 80);
+  const vehicle = String(formData.get("vehicle") || "").slice(0, 80);
+  const slug = await createInspection({ bookingUid: uid, customerName: name, vehicle });
+  revalidatePath("/ops/inspect");
+  redirect(`/ops/inspect/${slug}`);
+}
+
+/** Resize+upload one photo (base64 data URL) and return its public URL. */
+export async function uploadInspectionPhotoAction(slug: string, dataUrl: string): Promise<string> {
+  const s = String(slug || "").slice(0, 60);
+  if (!s || !dataUrl.startsWith("data:image/")) throw new Error("bad-input");
+  const stamp = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  return uploadInspectionPhoto(dataUrl, `${s}/${stamp}`);
+}
+
+/** Persist the builder's item list. Called from the builder as it changes. */
+export async function saveInspection(slug: string, items: InspectionItem[]): Promise<void> {
+  const s = String(slug || "").slice(0, 60);
+  if (!s) return;
+  const clean = (Array.isArray(items) ? items : []).slice(0, 30).map((it) => ({
+    id: String(it.id || "").slice(0, 40),
+    title: String(it.title || "").slice(0, 120),
+    description: String(it.description || "").slice(0, 1000),
+    price: Math.max(0, Math.min(100000, Number(it.price) || 0)),
+    photos: (Array.isArray(it.photos) ? it.photos : []).slice(0, 8).map((p) => String(p).slice(0, 600)),
+    selected: !!it.selected,
+  }));
+  await saveInspectionItems(s, clean);
+  revalidatePath(`/ops/inspect/${s}`);
+  revalidatePath("/ops/inspect");
+}
+
+/** Customer submits which extras they want (public — no auth). */
+export async function submitInspectionResponse(
+  slug: string,
+  selectedIds: string[],
+  note: string
+): Promise<{ ok: boolean }> {
+  const s = String(slug || "").slice(0, 60);
+  if (!s) return { ok: false };
+  const insp = await getInspection(s);
+  if (!insp) return { ok: false };
+  const ids = (Array.isArray(selectedIds) ? selectedIds : []).map((x) => String(x).slice(0, 40));
+  await recordInspectionResponse(s, ids, String(note || "").slice(0, 800));
+  revalidatePath(`/v/${s}`);
+  revalidatePath("/ops/inspect");
+  return { ok: true };
 }
 
 export async function clockOn(uid: string, detailer: string, minsAgo = 0): Promise<void> {

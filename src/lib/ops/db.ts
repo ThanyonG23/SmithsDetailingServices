@@ -75,7 +75,7 @@ async function runEnsure(): Promise<void> {
     const rows = await sql`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'meta_leads' AND column_name = 'stage'
+        WHERE table_name = 'inspections' AND column_name = 'slug'
       ) AS ready;`;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
   } catch {
@@ -129,6 +129,21 @@ async function runEnsure(): Promise<void> {
       ad_id         text         NOT NULL DEFAULT '',
       created_date  date,
       loaded_at     timestamptz  NOT NULL DEFAULT now()
+    );`;
+  // Upsell inspection portal: one row per car inspected, items = JSONB list of
+  // recommended extras (photos + price). slug = the public /v/<slug> link.
+  await sql`
+    CREATE TABLE IF NOT EXISTS inspections (
+      id            serial       PRIMARY KEY,
+      slug          text         UNIQUE NOT NULL,
+      booking_uid   text         NOT NULL DEFAULT '',
+      customer_name text         NOT NULL DEFAULT '',
+      vehicle       text         NOT NULL DEFAULT '',
+      items         jsonb        NOT NULL DEFAULT '[]'::jsonb,
+      status        text         NOT NULL DEFAULT 'draft',
+      customer_note text         NOT NULL DEFAULT '',
+      created_at    timestamptz  NOT NULL DEFAULT now(),
+      responded_at  timestamptz
     );`;
   await sql`
     CREATE TABLE IF NOT EXISTS job_hours (
@@ -1305,6 +1320,121 @@ export async function getLeadStats(weekStartISO: string): Promise<LeadStats> {
   } catch {
     return { total: 0, newThisWeek: 0, backlog: 0, convertedThisWeek: 0, loadedAt: null };
   }
+}
+
+/* ---- Upsell inspection portal --------------------------------------- */
+
+export interface InspectionItem {
+  id: string;
+  title: string;
+  description: string;
+  price: number;
+  photos: string[];
+  selected?: boolean;
+}
+export interface Inspection {
+  slug: string;
+  booking_uid: string;
+  customer_name: string;
+  vehicle: string;
+  items: InspectionItem[];
+  status: "draft" | "sent" | "responded";
+  customer_note: string;
+  created_at: string;
+  responded_at: string | null;
+}
+
+function newSlug(): string {
+  // short, URL-safe, hard to guess enough for an unlisted link
+  return (
+    Math.abs(Date.now() % 1e6).toString(36) +
+    globalThis.crypto.randomUUID().replace(/-/g, "").slice(0, 8)
+  );
+}
+
+/** Create a blank inspection for a car and return its public slug. */
+export async function createInspection(input: {
+  bookingUid: string;
+  customerName: string;
+  vehicle: string;
+}): Promise<string> {
+  await ensureTable();
+  const slug = newSlug();
+  await sql`
+    INSERT INTO inspections (slug, booking_uid, customer_name, vehicle)
+    VALUES (${slug}, ${input.bookingUid || ""}, ${input.customerName || ""}, ${input.vehicle || ""});`;
+  return slug;
+}
+
+function mapInspection(r: Record<string, unknown>): Inspection {
+  const items = Array.isArray(r.items) ? (r.items as InspectionItem[]) : [];
+  return {
+    slug: String(r.slug),
+    booking_uid: String(r.booking_uid || ""),
+    customer_name: String(r.customer_name || ""),
+    vehicle: String(r.vehicle || ""),
+    items: items.map((it) => ({
+      id: String(it.id),
+      title: String(it.title || ""),
+      description: String(it.description || ""),
+      price: Number(it.price) || 0,
+      photos: Array.isArray(it.photos) ? it.photos.map(String) : [],
+      selected: !!it.selected,
+    })),
+    status: (r.status as Inspection["status"]) || "draft",
+    customer_note: String(r.customer_note || ""),
+    created_at: String(r.created_at || ""),
+    responded_at: r.responded_at ? String(r.responded_at) : null,
+  };
+}
+
+export async function getInspection(slug: string): Promise<Inspection | null> {
+  await ensureTable();
+  const rows = await sql`SELECT * FROM inspections WHERE slug = ${slug} LIMIT 1;`;
+  return rows[0] ? mapInspection(rows[0] as Record<string, unknown>) : null;
+}
+
+export async function getInspectionByBooking(uid: string): Promise<Inspection | null> {
+  await ensureTable();
+  const rows = await sql`SELECT * FROM inspections WHERE booking_uid = ${uid} ORDER BY created_at DESC LIMIT 1;`;
+  return rows[0] ? mapInspection(rows[0] as Record<string, unknown>) : null;
+}
+
+/** Save the builder's item list. Marks the inspection "sent" once it has items. */
+export async function saveInspectionItems(slug: string, items: InspectionItem[]): Promise<void> {
+  await ensureTable();
+  const json = JSON.stringify(items || []);
+  await sql`
+    UPDATE inspections
+    SET items = ${json}::jsonb,
+        status = CASE WHEN status = 'responded' THEN 'responded'
+                      WHEN ${items.length} > 0 THEN 'sent' ELSE 'draft' END
+    WHERE slug = ${slug};`;
+}
+
+/** Customer ticks the extras they want and sends it back. */
+export async function recordInspectionResponse(
+  slug: string,
+  selectedIds: string[],
+  note: string
+): Promise<void> {
+  await ensureTable();
+  const insp = await getInspection(slug);
+  if (!insp) return;
+  const items = insp.items.map((it) => ({ ...it, selected: selectedIds.includes(it.id) }));
+  await sql`
+    UPDATE inspections
+    SET items = ${JSON.stringify(items)}::jsonb,
+        status = 'responded',
+        customer_note = ${note || ""},
+        responded_at = now()
+    WHERE slug = ${slug};`;
+}
+
+export async function listRecentInspections(limit = 40): Promise<Inspection[]> {
+  await ensureTable();
+  const rows = await sql`SELECT * FROM inspections ORDER BY created_at DESC LIMIT ${limit};`;
+  return (rows as Record<string, unknown>[]).map(mapInspection);
 }
 
 /* ---- Lead Centre analytics (funnel · follow-up aging · conversion) --- */

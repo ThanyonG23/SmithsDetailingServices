@@ -108,6 +108,21 @@ export function adLabel(adId: string): string {
   return AD_LABELS[adId] || `Ad …${adId.slice(-6)}`;
 }
 
+/** Common upsell extras for the inspection portal — Ashlee taps one to prefill
+    the title + a starting price (she can adjust). Edit these as pricing changes. */
+export const EXTRA_PRESETS: { title: string; price: number; description: string }[] = [
+  { title: "Headlight Restoration", price: 120, description: "Sand back and re-clear cloudy, yellowed headlights so they look new and light the road properly." },
+  { title: "Pet Hair Removal", price: 55, description: "Deep extraction of embedded pet hair from carpets, seats and boot." },
+  { title: "Engine Bay Detail", price: 80, description: "Degrease, clean and dress the engine bay so it presents like new." },
+  { title: "Cut & Polish (1-step)", price: 350, description: "Machine cut and polish to remove swirls and light scratches and bring back the gloss." },
+  { title: "Interior Shampoo & Extraction", price: 120, description: "Hot-water shampoo and extraction of carpets and seats to lift stains and odours." },
+  { title: "Leather Clean & Condition", price: 90, description: "Clean and feed the leather so it stays soft and doesn't crack." },
+  { title: "Ceramic Spray Sealant", price: 80, description: "A protective ceramic layer for months of gloss and easier washing." },
+  { title: "Odour / Ozone Treatment", price: 90, description: "Neutralise smoke, pet or damp odours at the source, not just cover them." },
+  { title: "Plastic & Trim Restore", price: 60, description: "Restore faded exterior plastics and trim back to a deep black." },
+  { title: "Clay Bar Decontamination", price: 90, description: "Pull bonded contaminants out of the paint so it feels glass-smooth." },
+];
+
 /** Final quality-check checklist, ticked and signed off per car on the Team
     board before it's marked done. Keep in sync with the Quality Check training
     module. This is the last line before the "not happy = don't pay" guarantee. */
