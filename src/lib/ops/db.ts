@@ -1403,12 +1403,12 @@ export async function getInspectionByBooking(uid: string): Promise<Inspection | 
 /** Save the builder's item list. Marks the inspection "sent" once it has items. */
 export async function saveInspectionItems(slug: string, items: InspectionItem[]): Promise<void> {
   await ensureTable();
-  const json = JSON.stringify(items || []);
+  const list = items || [];
   await sql`
     UPDATE inspections
-    SET items = ${json}::jsonb,
+    SET items = ${sql.json(list as unknown as Parameters<typeof sql.json>[0])},
         status = CASE WHEN status = 'responded' THEN 'responded'
-                      WHEN ${items.length} > 0 THEN 'sent' ELSE 'draft' END
+                      WHEN ${list.length} > 0 THEN 'sent' ELSE 'draft' END
     WHERE slug = ${slug};`;
 }
 
@@ -1424,7 +1424,7 @@ export async function recordInspectionResponse(
   const items = insp.items.map((it) => ({ ...it, selected: selectedIds.includes(it.id) }));
   await sql`
     UPDATE inspections
-    SET items = ${JSON.stringify(items)}::jsonb,
+    SET items = ${sql.json(items as unknown as Parameters<typeof sql.json>[0])},
         status = 'responded',
         customer_note = ${note || ""},
         responded_at = now()
