@@ -1454,6 +1454,16 @@ export async function inspectDiagnostics(): Promise<unknown> {
     out.selfTest = { ok: false, error: e instanceof Error ? e.message : String(e) };
   }
   try {
+    // Repair any rows saved before the sql.json() fix (items is a scalar, not
+    // an array) so they read cleanly instead of showing empty forever.
+    const fixed = await sql`
+      UPDATE inspections SET items = '[]'::jsonb
+      WHERE jsonb_typeof(items) <> 'array' RETURNING slug;`;
+    out.repaired = (fixed as unknown[]).length;
+  } catch (e) {
+    out.repaired = e instanceof Error ? e.message : String(e);
+  }
+  try {
     const recent = await sql`
       SELECT slug, customer_name, status,
              jsonb_array_length(items) AS item_count,
