@@ -126,7 +126,7 @@ Our Exterior Correction Package Also Includes:
 ✅ Decontamination Wash
 ✅ Clay Bar Treatment
 ✅ Multi Stage Paint Correction
-✅ 3 Year Ceramic Coating
+✅ 9 Year Manufacturer-Guaranteed Ceramic Coating
 
 🎁 BONUS #1: FREE Premium Interior Detail (Valued At $${interior})
 
@@ -315,6 +315,6 @@ export function priceReferenceForAI(): string {
     row("Premium + Cut & Polish", asMap("cutpolish"),
       "the full detail PLUS a 1-step cut and 1-step polish for heavier swirls, oxidation, dull tired paint — bringing it back without a coating."),
     row("Exterior Correction & Ceramic Coating", asMap("correction"),
-      "the top job — multi-stage paint correction + 3-year ceramic coating, and it includes a FREE interior detail + bonus upgrades. For someone who wants the best finish and long-term protection."),
+      "the top job — multi-stage paint correction + 9-year manufacturer-guaranteed ceramic coating, and it includes a FREE interior detail + bonus upgrades. For someone who wants the best finish and long-term protection."),
   ].join("\n\n");
 }
