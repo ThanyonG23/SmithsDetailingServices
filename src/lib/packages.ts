@@ -76,13 +76,15 @@ const STANDARD_PRICE: Record<VehicleSize, number> = {
   "7 Seater": 400,
 };
 
-/* interior = value of the bonus free interior detail, bonus = the other
-   free upgrades' value, total = the price charged today. */
-const CORRECTION: Record<VehicleSize, { interior: number; bonus: number; total: number }> = {
-  "Single Cab": { interior: 230, bonus: 400, total: 1500 },
-  "Sedan/Dual Cab": { interior: 280, bonus: 450, total: 2100 },
-  SUV: { interior: 330, bonus: 500, total: 2200 },
-  "7 Seater": { interior: 350, bonus: 535, total: 2300 },
+/* bonus = the other free upgrades' value, total = the price charged today.
+   The FREE interior detail's value is NOT stored here — it's read live from
+   INTERIOR_PRICE so the "valued at $X" in the quote always matches current
+   interior pricing and can never drift. */
+const CORRECTION: Record<VehicleSize, { bonus: number; total: number }> = {
+  "Single Cab": { bonus: 400, total: 1500 },
+  "Sedan/Dual Cab": { bonus: 450, total: 2100 },
+  SUV: { bonus: 500, total: 2200 },
+  "7 Seater": { bonus: 535, total: 2300 },
 };
 
 export function packagePrice(id: PackageId, size: VehicleSize): number {
@@ -118,7 +120,9 @@ function greeting(vehicle?: string): string {
 }
 
 export function correctionBody(size: VehicleSize, vehicle?: string): string {
-  const { interior, bonus, total } = CORRECTION[size];
+  const { bonus, total } = CORRECTION[size];
+  // Free interior is valued at the real Interior Only price — always in sync.
+  const interior = INTERIOR_PRICE[size];
   return `Hey! We can definitely take care of ${greeting(vehicle)} with our Exterior Correction Package
 Our Exterior Correction Package Also Includes:
 
