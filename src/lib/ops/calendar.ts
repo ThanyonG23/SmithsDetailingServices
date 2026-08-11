@@ -167,7 +167,15 @@ export function parseBookingsIcs(rawInput: string): Booking[] {
 
     const tot = num((blob.match(/Total:\s*\$?\s*([0-9,]+(?:\.[0-9]{1,2})?)/i) || [])[1]);
     const quo = num((blob.match(/Quote:\s*\$?\s*([0-9,]+(?:\.[0-9]{1,2})?)/i) || [])[1]);
+    // Upsells are written as "+ $400" lines. When a Quote exists, make sure the
+    // value includes every extra — some are typed BELOW the "Total:" line and
+    // would otherwise be dropped. Require the "$" so a phone "+61…" isn't summed.
+    const extrasSum = [...blob.matchAll(/\+\s*\$\s*([0-9,]+(?:\.[0-9]{1,2})?)/g)]
+      .map((m) => num(m[1]))
+      .filter((v) => v >= 10 && v <= 5000)
+      .reduce((a, b) => a + b, 0);
     let value = tot || quo;
+    if (quo && extrasSum) value = Math.max(value, quo + extrasSum);
     if (!value) {
       const all = [...blob.matchAll(/\$\s*([0-9,]+(?:\.[0-9]{1,2})?)/g)]
         .map((m) => num(m[1]))
