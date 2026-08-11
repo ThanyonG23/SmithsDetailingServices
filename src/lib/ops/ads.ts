@@ -93,7 +93,9 @@ export function parseAdsCsv(text: string): AdRow[] {
   const has = (needle: string) => hdr.findIndex((h) => h.includes(needle));
   const exact = (name: string) => hdr.findIndex((h) => h === name);
 
-  const iName = has("ad name");
+  // Accept both the ad-level ("Ad name") and campaign-level ("Campaign name")
+  // Meta exports — either one uploads fine.
+  const iName = has("ad name") >= 0 ? has("ad name") : has("campaign name");
   const iSpend = has("amount spent");
   const iImpr = exact("impressions");
   const iReach = exact("reach");
