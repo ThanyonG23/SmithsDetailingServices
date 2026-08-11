@@ -1,6 +1,7 @@
 import postgres from "postgres";
 import type { Booking } from "./calendar";
 import type { AdRow } from "./ads";
+import { normName } from "./sales";
 
 /* =====================================================================
    DAILY OPS — data layer (Supabase / any Postgres via the `postgres` client)
@@ -75,7 +76,7 @@ async function runEnsure(): Promise<void> {
     const rows = await sql`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'inspections' AND column_name = 'slug'
+        WHERE table_name = 'sales' AND column_name = 'invoice_number'
       ) AS ready;`;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
   } catch {
@@ -144,6 +145,20 @@ async function runEnsure(): Promise<void> {
       customer_note text         NOT NULL DEFAULT '',
       created_at    timestamptz  NOT NULL DEFAULT now(),
       responded_at  timestamptz
+    );`;
+  // Real sales from Xero (SalesInvoices export) — one row per invoice, the
+  // source of truth for revenue (vs the calendar price estimate).
+  await sql`
+    CREATE TABLE IF NOT EXISTS sales (
+      invoice_number text         PRIMARY KEY,
+      contact_name   text         NOT NULL DEFAULT '',
+      contact_norm   text         NOT NULL DEFAULT '',
+      email          text         NOT NULL DEFAULT '',
+      invoice_date   date,
+      total          numeric(10,2) NOT NULL DEFAULT 0,
+      status         text         NOT NULL DEFAULT '',
+      description    text         NOT NULL DEFAULT '',
+      loaded_at      timestamptz  NOT NULL DEFAULT now()
     );`;
   await sql`
     CREATE TABLE IF NOT EXISTS job_hours (
@@ -1474,6 +1489,170 @@ export async function inspectDiagnostics(): Promise<unknown> {
     out.recent = { error: e instanceof Error ? e.message : String(e) };
   }
   return out;
+}
+
+/* ---- Real sales (Xero SalesInvoices) -------------------------------- */
+
+export interface SalesStats {
+  loadedAt: string | null;
+  revenue: number;
+  invoices: number;
+  avg: number;
+  allTimeRevenue: number;
+  allTimeInvoices: number;
+  monthly: { month: string; revenue: number; invoices: number }[];
+  byService: { service: string; revenue: number; count: number }[];
+}
+
+export async function replaceSales(
+  list: {
+    invoice_number: string; contact_name: string; email: string;
+    invoice_date: string; total: number; status: string; description: string;
+  }[]
+): Promise<void> {
+  await ensureTable();
+  await sql.begin(async (tx) => {
+    await tx`DELETE FROM sales;`;
+    const CHUNK = 500;
+    for (let i = 0; i < list.length; i += CHUNK) {
+      const slice = list.slice(i, i + CHUNK).map((s) => ({
+        invoice_number: s.invoice_number,
+        contact_name: s.contact_name,
+        contact_norm: normName(s.contact_name),
+        email: s.email,
+        invoice_date: /^\d{4}-\d{2}-\d{2}$/.test(s.invoice_date) ? s.invoice_date : null,
+        total: s.total,
+        status: s.status,
+        description: String(s.description || "").slice(0, 500),
+      }));
+      if (slice.length)
+        await tx`INSERT INTO sales ${tx(slice, "invoice_number", "contact_name", "contact_norm", "email", "invoice_date", "total", "status", "description")} ON CONFLICT (invoice_number) DO NOTHING`;
+    }
+  });
+}
+
+export async function getSalesStats(fromISO: string, toISO: string): Promise<SalesStats> {
+  const empty: SalesStats = {
+    loadedAt: null, revenue: 0, invoices: 0, avg: 0,
+    allTimeRevenue: 0, allTimeInvoices: 0, monthly: [], byService: [],
+  };
+  try {
+    await ensureTable();
+    const p = (await sql`
+      SELECT count(*)::int AS invoices, coalesce(sum(total),0)::float AS revenue,
+             to_char(max(loaded_at) AT TIME ZONE 'Australia/Brisbane', 'YYYY-MM-DD HH24:MI') AS loaded
+      FROM sales WHERE invoice_date >= ${fromISO} AND invoice_date <= ${toISO};`) as unknown as {
+      invoices: number; revenue: number; loaded: string | null;
+    }[];
+    const a = (await sql`SELECT count(*)::int AS invoices, coalesce(sum(total),0)::float AS revenue FROM sales;`) as unknown as {
+      invoices: number; revenue: number;
+    }[];
+    const monthly = (await sql`
+      SELECT to_char(invoice_date, 'YYYY-MM') AS month, coalesce(sum(total),0)::float AS revenue, count(*)::int AS invoices
+      FROM sales WHERE invoice_date >= ${fromISO} AND invoice_date <= ${toISO}
+      GROUP BY 1 ORDER BY 1;`) as unknown as { month: string; revenue: number; invoices: number }[];
+    const byService = (await sql`
+      SELECT CASE
+        WHEN description ILIKE '%correction%' OR description ILIKE '%coating%' OR description ILIKE '%ceramic%' THEN 'Correction / Coating'
+        WHEN description ILIKE '%cut%polish%' THEN 'Cut & Polish'
+        WHEN description ILIKE '%headlight%' THEN 'Headlight'
+        WHEN description ILIKE '%polish%' THEN 'Polish'
+        WHEN description ILIKE '%interior%' AND description ILIKE '%exterior%' THEN 'Full Detail'
+        WHEN description ILIKE '%full detail%' THEN 'Full Detail'
+        WHEN description ILIKE '%interior%' THEN 'Interior'
+        ELSE 'Other' END AS service,
+        coalesce(sum(total),0)::float AS revenue, count(*)::int AS count
+      FROM sales WHERE invoice_date >= ${fromISO} AND invoice_date <= ${toISO}
+      GROUP BY 1 ORDER BY revenue DESC;`) as unknown as { service: string; revenue: number; count: number }[];
+    const pr = p[0] || { invoices: 0, revenue: 0, loaded: null };
+    const ar = a[0] || { invoices: 0, revenue: 0 };
+    return {
+      loadedAt: pr.loaded || null,
+      revenue: pr.revenue || 0,
+      invoices: pr.invoices || 0,
+      avg: pr.invoices ? pr.revenue / pr.invoices : 0,
+      allTimeRevenue: ar.revenue || 0,
+      allTimeInvoices: ar.invoices || 0,
+      monthly: monthly.map((m) => ({ month: m.month, revenue: Number(m.revenue) || 0, invoices: Number(m.invoices) || 0 })),
+      byService: byService.map((s) => ({ service: s.service, revenue: Number(s.revenue) || 0, count: Number(s.count) || 0 })),
+    };
+  } catch {
+    return empty;
+  }
+}
+
+export interface LeadSaleMatch {
+  realLeads: number;
+  matchedLeads: number;
+  matchedRevenue: number;
+  matchRate: number;
+  byAd: { ad_id: string; leads: number; matched: number; revenue: number }[];
+}
+
+/** Cross-match Meta leads to real Xero invoices by normalised customer name —
+    a "confirmed paid" floor on conversion (Messenger leads have no email, and
+    names differ, so this UNDER-counts). */
+export async function getLeadSaleMatch(): Promise<LeadSaleMatch> {
+  const empty: LeadSaleMatch = { realLeads: 0, matchedLeads: 0, matchedRevenue: 0, matchRate: 0, byAd: [] };
+  try {
+    await ensureTable();
+    const sales = (await sql`
+      SELECT contact_norm, coalesce(sum(total),0)::float AS revenue
+      FROM sales WHERE contact_norm <> '' GROUP BY contact_norm;`) as unknown as {
+      contact_norm: string; revenue: number;
+    }[];
+    const saleRev = new Map<string, number>();
+    for (const s of sales) saleRev.set(s.contact_norm, Number(s.revenue) || 0);
+
+    const leads = (await sql`SELECT name, ad_id FROM meta_leads WHERE stage NOT ILIKE 'abused';`) as unknown as {
+      name: string; ad_id: string;
+    }[];
+
+    let realLeads = 0;
+    let matchedLeads = 0;
+    const matchedNames = new Set<string>();
+    const adMap = new Map<string, { leads: number; matched: number; names: Set<string> }>();
+    for (const l of leads) {
+      realLeads++;
+      const n = normName(l.name);
+      const hit = !!n && saleRev.has(n);
+      if (hit) {
+        matchedLeads++;
+        matchedNames.add(n);
+      }
+      const ad = l.ad_id || "";
+      if (ad) {
+        const e = adMap.get(ad) || { leads: 0, matched: 0, names: new Set<string>() };
+        e.leads++;
+        if (hit) {
+          e.matched++;
+          e.names.add(n);
+        }
+        adMap.set(ad, e);
+      }
+    }
+    let matchedRevenue = 0;
+    matchedNames.forEach((n) => (matchedRevenue += saleRev.get(n) || 0));
+    const byAd = [...adMap.entries()]
+      .map(([ad_id, v]) => ({
+        ad_id,
+        leads: v.leads,
+        matched: v.matched,
+        revenue: [...v.names].reduce((a, n) => a + (saleRev.get(n) || 0), 0),
+      }))
+      .filter((a) => a.matched > 0)
+      .sort((a, b) => b.revenue - a.revenue)
+      .slice(0, 8);
+    return {
+      realLeads,
+      matchedLeads,
+      matchedRevenue,
+      matchRate: realLeads ? Math.round((100 * matchedLeads) / realLeads) : 0,
+      byAd,
+    };
+  } catch {
+    return empty;
+  }
 }
 
 /* ---- Lead Centre analytics (funnel · follow-up aging · conversion) --- */

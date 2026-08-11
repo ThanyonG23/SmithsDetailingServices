@@ -7,8 +7,12 @@ import {
   getReorderCount,
   getQuoteLeadStats,
   getLeadAnalytics,
+  getSalesStats,
+  getLeadSaleMatch,
   type AnalyticsDay,
   type LeadAnalytics,
+  type SalesStats,
+  type LeadSaleMatch,
 } from "@/lib/ops/db";
 import { cairnsToday, OPS_TARGETS, adLabel } from "@/lib/ops/config";
 
@@ -110,6 +114,8 @@ export default async function AnalyticsPage({
   let reorders = 0;
   let quoteStats = { total: 0, pending: 0, actioned: 0 };
   let leads: LeadAnalytics | null = null;
+  let sales: SalesStats | null = null;
+  let saleMatch: LeadSaleMatch | null = null;
   let dbError = false;
   try {
     series = await getAnalytics(fromISO, toISO);
@@ -117,9 +123,12 @@ export default async function AnalyticsPage({
     reorders = await getReorderCount();
     quoteStats = await getQuoteLeadStats();
     leads = await getLeadAnalytics(fromISO, toISO, today);
+    sales = await getSalesStats(fromISO, toISO);
+    saleMatch = await getLeadSaleMatch();
   } catch {
     dbError = true;
   }
+  const salesMonthMax = sales ? Math.max(...sales.monthly.map((m) => m.revenue), 1) : 1;
 
   const fuMax = leads
     ? Math.max(leads.intake, leads.qualified, leads.fu1, leads.fu2, leads.fu3, leads.converted, 1)
@@ -190,8 +199,92 @@ export default async function AnalyticsPage({
         </div>
       )}
 
+      {/* ── REAL REVENUE (from Xero) ── */}
+      {sales && sales.allTimeInvoices > 0 && (
+        <>
+          <SectionTitle eyebrow="Real money · from your Xero invoices" title="Actual revenue" />
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            <Tile label="Revenue (real)" value={money(sales.revenue)} sub={`${sales.invoices} invoices`} tone="green" />
+            <Tile label="Avg invoice" value={sales.invoices ? money(sales.avg) : "—"} sub="incl. upsells" />
+            <Tile label="All-time loaded" value={money(sales.allTimeRevenue)} sub={`${sales.allTimeInvoices} invoices`} />
+            <Tile
+              label="Per day"
+              value={sales.invoices ? money(sales.revenue / Math.max(1, opDays)) : "—"}
+              sub={`aim ${money(aimRevenue)}`}
+              tone={sales.revenue / Math.max(1, opDays) >= aimRevenue ? "green" : "neutral"}
+            />
+          </div>
+          {sales.monthly.length > 0 && (
+            <div className={`${CARD} mt-3 p-4`}>
+              <div className="mb-2 text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">Real revenue by month</div>
+              <div className="flex flex-col gap-2">
+                {sales.monthly.slice(-12).map((m) => (
+                  <div key={m.month} className="flex items-center gap-3">
+                    <span className="w-16 shrink-0 text-xs font-semibold text-white/55">{m.month}</span>
+                    <div className="h-3 flex-1 overflow-hidden rounded-full bg-white/10">
+                      <div className="h-full rounded-full bg-brand-green" style={{ width: `${Math.max(3, Math.round((m.revenue / salesMonthMax) * 100))}%` }} />
+                    </div>
+                    <span className="w-20 shrink-0 text-right text-xs font-bold tabular-nums text-white/70">{money(m.revenue)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {sales.byService.length > 0 && (
+            <div className={`${CARD} mt-3 overflow-hidden`}>
+              <div className="border-b border-white/8 px-4 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">
+                Revenue by service (real)
+              </div>
+              {sales.byService.map((s) => (
+                <div key={s.service} className="flex items-center justify-between gap-3 border-b border-white/[0.06] px-4 py-2.5 last:border-0">
+                  <span className="text-sm font-semibold text-white/85">{s.service}</span>
+                  <span className="shrink-0 text-xs tabular-nums text-white/55">
+                    {s.count} job{s.count === 1 ? "" : "s"} · <b className="text-brand-green">{money(s.revenue)}</b>
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+          {saleMatch && saleMatch.matchedLeads > 0 && (
+            <div className={`${CARD} mt-3 p-4`}>
+              <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">
+                Leads → confirmed paid (matched to a Xero invoice)
+              </div>
+              <div className="mt-1.5 text-sm text-white/70">
+                <b className="text-brand-green">{saleMatch.matchedLeads}</b> of {saleMatch.realLeads} real leads are matched to a real invoice
+                {" "}(<b className="text-brand-green">{saleMatch.matchRate}%</b>) worth{" "}
+                <b className="text-brand-green">{money(saleMatch.matchedRevenue)}</b>.
+              </div>
+              <p className="mt-1.5 text-[11px] leading-relaxed text-white/40">
+                This is a <b className="text-white/60">floor</b>, not the exact rate — your Messenger leads carry no email, so this
+                matches on name only and under-counts (nicknames, business names, different spelling). Treat it as &ldquo;at least this
+                many provably paid.&rdquo;
+              </p>
+              {saleMatch.byAd.length > 0 && (
+                <div className="mt-3 border-t border-white/8 pt-3">
+                  <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">Real revenue by ad (matched)</div>
+                  <div className="mt-2 flex flex-col gap-1.5">
+                    {saleMatch.byAd.map((a) => (
+                      <div key={a.ad_id} className="flex items-center justify-between gap-3 text-xs">
+                        <span className="min-w-0 flex-1 truncate font-semibold text-white/80">{adLabel(a.ad_id)}</span>
+                        <span className="shrink-0 tabular-nums text-white/55">
+                          {a.matched}/{a.leads} paid · <b className="text-brand-green">{money(a.revenue)}</b>
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          <p className="mt-2 text-[11px] text-white/35">
+            This is real invoiced money from Xero — the section below (&ldquo;Revenue&rdquo;) is the estimate Ashlee logs day-to-day.
+          </p>
+        </>
+      )}
+
       {/* ── REVENUE (hero) ── */}
-      <SectionTitle eyebrow="Money · the number that keeps us alive" title="Revenue" />
+      <SectionTitle eyebrow="Money · what Ashlee logs (estimate)" title="Revenue" />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <Tile
           label="Earned"

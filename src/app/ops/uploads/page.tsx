@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { requireOwner } from "@/lib/ops/auth";
-import { getLeadAnalytics, type LeadAnalytics } from "@/lib/ops/db";
-import { uploadCalendar, uploadAds, uploadLeads } from "../actions";
+import { getLeadAnalytics, getSalesStats, type LeadAnalytics, type SalesStats } from "@/lib/ops/db";
+import { uploadCalendar, uploadAds, uploadLeads, uploadSales } from "../actions";
 import { cairnsToday } from "@/lib/ops/config";
 
 export const metadata: Metadata = {
@@ -61,26 +61,34 @@ function UploadCard({
 export default async function UploadsPage({
   searchParams,
 }: {
-  searchParams: { calok?: string; adok?: string; leadok?: string; calerr?: string; aderr?: string; leaderr?: string };
+  searchParams: {
+    calok?: string; adok?: string; leadok?: string; saleok?: string;
+    calerr?: string; aderr?: string; leaderr?: string; saleerr?: string;
+  };
 }) {
   requireOwner();
 
   const today = cairnsToday();
   const anchor = new Date(today + "T00:00:00Z");
   const weekStart = shift(today, -(((anchor.getUTCDay() + 6) % 7)));
+  const monthStart = today.slice(0, 8) + "01";
 
   let leads: LeadAnalytics | null = null;
+  let sales: SalesStats | null = null;
   try {
     leads = await getLeadAnalytics(weekStart, today, today);
+    sales = await getSalesStats(monthStart, today);
   } catch {
     /* leave null — the flags just won't render */
   }
+  const money = (n: number) => "$" + Math.round(n).toLocaleString("en-AU");
 
   const errMsg = (code?: string) =>
     code === "nofile" ? "No file picked — choose the file and try again."
       : code === "noics" ? "Couldn't find the Smiths Bookings calendar in that zip."
       : code === "noads" ? "That didn't look like the ads export — check the file."
       : code === "noleads" ? "That didn't look like the leads export — check the file."
+      : code === "nosales" ? "That didn't look like the Xero SalesInvoices export — check the file."
       : undefined;
 
   return (
@@ -145,10 +153,38 @@ export default async function UploadsPage({
         </section>
       )}
 
-      {/* ── THE THREE UPLOADS ── */}
+      {/* ── REAL REVENUE FLAG (from Xero) ── */}
+      {sales && sales.allTimeInvoices > 0 && (
+        <section className="mt-6">
+          <div className={EYEBROW}>Real revenue · from Xero</div>
+          <div className="mt-3 grid grid-cols-3 gap-3">
+            <div className={`${CARD} p-4`}>
+              <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">This month</div>
+              <div className="mt-1 font-display text-3xl font-extrabold tabular-nums text-brand-green">{money(sales.revenue)}</div>
+              <div className="mt-0.5 text-[11px] text-white/45">{sales.invoices} invoice{sales.invoices === 1 ? "" : "s"}</div>
+            </div>
+            <div className={`${CARD} p-4`}>
+              <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">Avg invoice</div>
+              <div className="mt-1 font-display text-3xl font-extrabold tabular-nums text-white">{sales.invoices ? money(sales.avg) : "—"}</div>
+              <div className="mt-0.5 text-[11px] text-white/45">real, incl. upsells</div>
+            </div>
+            <div className={`${CARD} p-4`}>
+              <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">All-time loaded</div>
+              <div className="mt-1 font-display text-3xl font-extrabold tabular-nums text-white">{money(sales.allTimeRevenue)}</div>
+              <div className="mt-0.5 text-[11px] text-white/45">{sales.allTimeInvoices} invoices</div>
+            </div>
+          </div>
+          <p className="mt-2 text-[11px] text-white/35">
+            Last Xero upload: {sales.loadedAt || "—"} · real numbers &amp; conversion on the{" "}
+            <b className="text-white/50">Analytics</b> tab.
+          </p>
+        </section>
+      )}
+
+      {/* ── THE UPLOADS ── */}
       <section className="mt-8">
-        <div className={EYEBROW}>The three uploads</div>
-        <div className="mt-3 grid gap-3 sm:grid-cols-3">
+        <div className={EYEBROW}>The uploads</div>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <UploadCard
             emoji="📅" title="Calendar" field="cal" accept=".zip,.ics" action={uploadCalendar}
             blurb="Google Calendar export (.zip or .ics). Refreshes bookings, jobs, the team board and CRM."
@@ -166,6 +202,12 @@ export default async function UploadsPage({
             blurb="Leads Centre export (leads.csv). Flags your follow-up backlog and tracks conversions per ad."
             ok={searchParams?.leadok} okLabel={`✓ ${searchParams?.leadok} leads loaded`}
             ctaErr={errMsg(searchParams?.leaderr)}
+          />
+          <UploadCard
+            emoji="💰" title="Sales" field="sales" accept=".csv" action={uploadSales}
+            blurb="Xero SalesInvoices export (.csv). Real revenue + true conversion (which ad actually got paid)."
+            ok={searchParams?.saleok} okLabel={`✓ ${searchParams?.saleok} invoices loaded`}
+            ctaErr={errMsg(searchParams?.saleerr)}
           />
         </div>
       </section>

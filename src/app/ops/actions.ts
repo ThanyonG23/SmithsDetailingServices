@@ -8,6 +8,7 @@ import {
   upsertDailyLog,
   replaceBookings,
   replaceLeads,
+  replaceSales,
   recordBookingsSeen,
   replaceAds,
   setJobDayHours,
@@ -44,6 +45,7 @@ import { OPS_STAFF, hoursBetween, cairnsToday } from "@/lib/ops/config";
 import { parseBookingsIcs, parseCustomersIcs } from "@/lib/ops/calendar";
 import { parseAdsCsv, parseAdsDailyMessages } from "@/lib/ops/ads";
 import { parseLeadsCsv } from "@/lib/ops/leads";
+import { parseSalesCsv } from "@/lib/ops/sales";
 import {
   correctionBody,
   interiorBody,
@@ -252,6 +254,20 @@ export async function uploadLeads(formData: FormData): Promise<void> {
   revalidatePath("/ops/uploads");
   revalidatePath("/ops");
   redirect(`/ops/uploads?leadok=${list.length}`);
+}
+
+export async function uploadSales(formData: FormData): Promise<void> {
+  const file = formData.get("sales") as File | null;
+  if (!file || file.size === 0) redirect("/ops/uploads?saleerr=nofile");
+
+  const text = Buffer.from(await file.arrayBuffer()).toString("utf8");
+  const list = parseSalesCsv(text);
+  if (!list.length) redirect("/ops/uploads?saleerr=nosales");
+  await replaceSales(list);
+
+  revalidatePath("/ops/uploads");
+  revalidatePath("/ops/analytics");
+  redirect(`/ops/uploads?saleok=${list.length}`);
 }
 
 /* Save the hours each car took TODAY, keyed to the calendar UID + today's
