@@ -1504,7 +1504,9 @@ export interface SalesStats {
   byService: { service: string; revenue: number; count: number }[];
 }
 
-export async function replaceSales(
+/** Merge Xero invoices in by invoice number — so multiple exports (the 500-row
+    cap forces splitting) accumulate, and re-uploading updates existing rows. */
+export async function upsertSales(
   list: {
     invoice_number: string; contact_name: string; email: string;
     invoice_date: string; total: number; status: string; description: string;
@@ -1512,7 +1514,6 @@ export async function replaceSales(
 ): Promise<void> {
   await ensureTable();
   await sql.begin(async (tx) => {
-    await tx`DELETE FROM sales;`;
     const CHUNK = 500;
     for (let i = 0; i < list.length; i += CHUNK) {
       const slice = list.slice(i, i + CHUNK).map((s) => ({
@@ -1526,7 +1527,16 @@ export async function replaceSales(
         description: String(s.description || "").slice(0, 500),
       }));
       if (slice.length)
-        await tx`INSERT INTO sales ${tx(slice, "invoice_number", "contact_name", "contact_norm", "email", "invoice_date", "total", "status", "description")} ON CONFLICT (invoice_number) DO NOTHING`;
+        await tx`INSERT INTO sales ${tx(slice, "invoice_number", "contact_name", "contact_norm", "email", "invoice_date", "total", "status", "description")}
+          ON CONFLICT (invoice_number) DO UPDATE SET
+            contact_name = EXCLUDED.contact_name,
+            contact_norm = EXCLUDED.contact_norm,
+            email = EXCLUDED.email,
+            invoice_date = EXCLUDED.invoice_date,
+            total = EXCLUDED.total,
+            status = EXCLUDED.status,
+            description = EXCLUDED.description,
+            loaded_at = now()`;
     }
   });
 }

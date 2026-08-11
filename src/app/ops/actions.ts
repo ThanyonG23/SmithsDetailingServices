@@ -8,7 +8,7 @@ import {
   upsertDailyLog,
   replaceBookings,
   replaceLeads,
-  replaceSales,
+  upsertSales,
   recordBookingsSeen,
   replaceAds,
   setJobDayHours,
@@ -263,7 +263,7 @@ export async function uploadSales(formData: FormData): Promise<void> {
   const text = Buffer.from(await file.arrayBuffer()).toString("utf8");
   const list = parseSalesCsv(text);
   if (!list.length) redirect("/ops/uploads?saleerr=nosales");
-  await replaceSales(list);
+  await upsertSales(list);
 
   revalidatePath("/ops/uploads");
   revalidatePath("/ops/analytics");
