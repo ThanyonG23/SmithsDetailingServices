@@ -63,7 +63,7 @@ export default function GarageWaitlist() {
 
   if (state === "done") {
     return (
-      <div className="rounded-3xl border border-brand-green/30 bg-brand-green/[0.06] p-8 text-center shadow-glowG">
+      <div className="rounded-3xl border border-brand-purple/40 bg-brand-purple/[0.08] p-8 text-center">
         <div className="text-4xl">🎉</div>
         <h3 className="mt-3 font-display text-2xl font-extrabold text-white">You&apos;re on the list</h3>
         <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-white/70">
@@ -76,7 +76,7 @@ export default function GarageWaitlist() {
   }
 
   const field =
-    "w-full rounded-xl border border-white/12 bg-white/[0.03] px-4 py-3 text-white placeholder-white/30 outline-none transition focus:border-brand-green/60 focus:bg-white/[0.05]";
+    "w-full rounded-xl border border-white/12 bg-white/[0.03] px-4 py-3 text-white placeholder-white/30 outline-none transition focus:border-brand-purple/60 focus:bg-white/[0.05]";
   const labelCls = "mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-white/40";
 
   return (
@@ -119,7 +119,7 @@ export default function GarageWaitlist() {
                 onClick={() => toggle(s.id)}
                 className={`rounded-full border px-3.5 py-1.5 text-sm font-semibold transition ${
                   on
-                    ? "border-brand-green/60 bg-brand-green/15 text-brand-green"
+                    ? "border-brand-purple bg-brand-purple/20 text-white"
                     : "border-white/15 text-white/60 hover:border-white/35 hover:text-white/80"
                 }`}
               >
@@ -168,7 +168,7 @@ export default function GarageWaitlist() {
         type="button"
         onClick={submit}
         disabled={state === "sending"}
-        className="mt-6 w-full rounded-full bg-brand-green px-6 py-4 font-display text-base font-extrabold text-brand-ink transition hover:brightness-110 disabled:opacity-60"
+        className="mt-6 w-full rounded-full bg-brand-purple px-6 py-4 font-display text-base font-extrabold text-white transition hover:brightness-110 disabled:opacity-60"
       >
         {state === "sending" ? "Adding you…" : "Join the waitlist →"}
       </button>

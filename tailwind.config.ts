@@ -8,6 +8,8 @@ const config: Config = {
         brand: {
           yellow: "#FFE600",
           green: "#2bff7a",
+          purple: "#7c2ff5",
+          "purple-soft": "#a970ff",
           ink: "#0a0a0a",
         },
       },
