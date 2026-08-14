@@ -76,7 +76,7 @@ async function runEnsure(): Promise<void> {
     const rows = await sql`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'sales' AND column_name = 'invoice_number'
+        WHERE table_name = 'waitlist' AND column_name = 'created_at'
       ) AS ready;`;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
   } catch {
@@ -327,6 +327,26 @@ async function runEnsure(): Promise<void> {
       status         text          NOT NULL DEFAULT 'pending'
     );
   `;
+  // Smiths Garage "coming soon" waitlist — from the public /garage page. Anyone
+  // who wants first dibs on the new services or the Maintenance Membership.
+  // Lives in the same Supabase DB the ops manager reads, so a sign-up shows up
+  // on the dashboard automatically. `interests` = which services they ticked;
+  // `membership` = they specifically want the maintenance plan.
+  await sql`
+    CREATE TABLE IF NOT EXISTS waitlist (
+      id          serial       PRIMARY KEY,
+      created_at  timestamptz  NOT NULL DEFAULT now(),
+      name        text         NOT NULL DEFAULT '',
+      email       text         NOT NULL DEFAULT '',
+      phone       text         NOT NULL DEFAULT '',
+      vehicle     text         NOT NULL DEFAULT '',
+      interests   jsonb        NOT NULL DEFAULT '[]'::jsonb,
+      membership  boolean      NOT NULL DEFAULT false,
+      message     text         NOT NULL DEFAULT '',
+      source      text         NOT NULL DEFAULT 'garage-waitlist',
+      status      text         NOT NULL DEFAULT 'pending'
+    );
+  `;
 
   // Indexes — keep queries fast as the tables grow. Wrapped so a failed
   // index can NEVER block a write (they're an optimisation, not required).
@@ -340,6 +360,7 @@ async function runEnsure(): Promise<void> {
     await sql`CREATE INDEX IF NOT EXISTS idx_job_clock_open ON job_clock(detailer) WHERE end_ts IS NULL;`;
     await sql`CREATE INDEX IF NOT EXISTS idx_job_clock_uid ON job_clock(uid, work_date);`;
     await sql`CREATE INDEX IF NOT EXISTS idx_quote_leads_status ON quote_leads(status, created_at DESC);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_waitlist_status ON waitlist(status, created_at DESC);`;
   } catch {
     /* indexes are an optimisation — never let them break a write */
   }
@@ -2095,6 +2116,75 @@ export async function getQuoteLeadStats(): Promise<{ total: number; pending: num
     return r ?? { total: 0, pending: 0, actioned: 0 };
   } catch {
     return { total: 0, pending: 0, actioned: 0 };
+  }
+}
+
+/* ---- waitlist (public Smiths Garage coming-soon page) --------------- */
+
+export interface WaitlistInput {
+  name: string;
+  email: string;
+  phone: string;
+  vehicle: string;
+  interests: string[];
+  membership: boolean;
+  message: string;
+}
+
+export interface WaitlistEntry extends WaitlistInput {
+  id: number;
+  created_at: string; // Cairns-local "YYYY-MM-DDTHH:MM"
+  status: string; // pending | actioned
+}
+
+export async function insertWaitlist(w: WaitlistInput): Promise<void> {
+  await ensureTable();
+  await sql`
+    INSERT INTO waitlist (name, email, phone, vehicle, interests, membership, message)
+    VALUES (${w.name}, ${w.email}, ${w.phone}, ${w.vehicle},
+            ${sql.json(w.interests)}, ${w.membership}, ${w.message});
+  `;
+}
+
+/** Waitlist sign-ups for the /ops dashboard, newest first. */
+export async function getWaitlist(status = "pending"): Promise<WaitlistEntry[]> {
+  try {
+    const rows = await sql`
+      SELECT id, name, email, phone, vehicle, interests, membership, message, status,
+             to_char(created_at AT TIME ZONE 'Australia/Brisbane',
+                     'YYYY-MM-DD"T"HH24:MI') AS created_at
+      FROM waitlist
+      WHERE status = ${status}
+      ORDER BY created_at DESC
+      LIMIT 200;
+    `;
+    return rows as unknown as WaitlistEntry[];
+  } catch {
+    return [];
+  }
+}
+
+export async function setWaitlistStatus(id: number, status: string): Promise<void> {
+  await ensureTable();
+  await sql`UPDATE waitlist SET status = ${status} WHERE id = ${id};`;
+}
+
+/** Waitlist funnel counts for the dashboard card. `members` = how many of the
+    pending sign-ups specifically want the Maintenance Membership. */
+export async function getWaitlistStats(): Promise<{
+  total: number; pending: number; actioned: number; members: number;
+}> {
+  try {
+    const rows = await sql`
+      SELECT count(*)::int                                                  AS total,
+             count(*) FILTER (WHERE status = 'pending')::int                AS pending,
+             count(*) FILTER (WHERE status = 'actioned')::int               AS actioned,
+             count(*) FILTER (WHERE membership AND status = 'pending')::int AS members
+      FROM waitlist;`;
+    const r = rows[0] as { total: number; pending: number; actioned: number; members: number } | undefined;
+    return r ?? { total: 0, pending: 0, actioned: 0, members: 0 };
+  } catch {
+    return { total: 0, pending: 0, actioned: 0, members: 0 };
   }
 }
 

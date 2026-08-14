@@ -33,6 +33,7 @@ import {
   replaceTemplates,
   getStock,
   setQuoteLeadStatus,
+  setWaitlistStatus,
   createInspection,
   saveInspectionItems,
   recordInspectionResponse,
@@ -407,6 +408,12 @@ export async function clockOff(uid: string, detailer: string): Promise<void> {
 export async function markQuoteLeadActioned(formData: FormData): Promise<void> {
   const id = Number(formData.get("id"));
   if (Number.isFinite(id) && id > 0) await setQuoteLeadStatus(id, "actioned");
+  revalidatePath("/ops");
+}
+
+export async function markWaitlistActioned(formData: FormData): Promise<void> {
+  const id = Number(formData.get("id"));
+  if (Number.isFinite(id) && id > 0) await setWaitlistStatus(id, "actioned");
   revalidatePath("/ops");
 }
 

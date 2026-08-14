@@ -12,6 +12,8 @@ import {
   getChecklist,
   getQuoteLeads,
   getQuoteLeadStats,
+  getWaitlist,
+  getWaitlistStats,
   getCancellationStats,
   getDashSummary,
   type Booking,
@@ -19,10 +21,16 @@ import {
   type JobWithHours,
   type JobFollowup,
   type QuoteLead,
+  type WaitlistEntry,
   type DashSummary,
 } from "@/lib/ops/db";
+import { GARAGE_SERVICES } from "@/lib/garage";
 import { OPS_TARGETS, cairnsToday } from "@/lib/ops/config";
-import { logout, logJobHours, setCheckin, markQuoteLeadActioned } from "./actions";
+import { logout, logJobHours, setCheckin, markQuoteLeadActioned, markWaitlistActioned } from "./actions";
+
+const SERVICE_LABEL: Record<string, string> = Object.fromEntries(
+  GARAGE_SERVICES.map((s) => [s.id, s.name]),
+);
 import RunSheet from "@/components/ops/RunSheet";
 
 const money = (n: number) => "$" + Math.round(n).toLocaleString("en-AU");
@@ -108,6 +116,8 @@ export default async function OpsPage({
   let checklist: string[] = [];
   let quoteLeads: QuoteLead[] = [];
   let quoteLeadStats = { total: 0, pending: 0, actioned: 0 };
+  let waitlist: WaitlistEntry[] = [];
+  let waitlistStats = { total: 0, pending: 0, actioned: 0, members: 0 };
   let cancelStats = { week: 0, month: 0 };
   let dash: DashSummary = {
     weekRev: 0, weekInv: 0, monthRev: 0, monthInv: 0, weekLeads: 0, monthLeads: 0, salesLoaded: null, leadsLoaded: null,
@@ -139,6 +149,8 @@ export default async function OpsPage({
         reorderCount: await getReorderCount(),
         quoteLeads: await getQuoteLeads("pending"),
         quoteLeadStats: await getQuoteLeadStats(),
+        waitlist: await getWaitlist("pending"),
+        waitlistStats: await getWaitlistStats(),
         cancelStats: await getCancellationStats(weekStart, monthStartISO, today),
         dash: await getDashSummary(weekStart, monthStartISO, today),
       }))(),
@@ -146,7 +158,7 @@ export default async function OpsPage({
     ]);
     ({
       bookings, ads, todaysJobs, carryover, followups, rectifyList,
-      satisfaction, reorderCount, quoteLeads, quoteLeadStats, cancelStats, dash,
+      satisfaction, reorderCount, quoteLeads, quoteLeadStats, waitlist, waitlistStats, cancelStats, dash,
     } = data);
   } catch {
     dbError = true;
@@ -190,6 +202,8 @@ export default async function OpsPage({
   const alerts: { tone: "red" | "yellow"; text: string }[] = [];
   if (quoteLeads.length > 0)
     alerts.push({ tone: "red", text: `${quoteLeads.length} new AI Instant Quote request(s) waiting — confirm or call them back.` });
+  if (waitlist.length > 0)
+    alerts.push({ tone: "yellow", text: `${waitlist.length} new Smiths Garage waitlist sign-up(s)${waitlistStats.members > 0 ? ` (${waitlistStats.members} want the membership)` : ""} — reach out while they're warm.` });
   if (rectifyList.length > 0)
     alerts.push({ tone: "red", text: `${rectifyList.length} unhappy customer(s) need a rectify job booked — sort it before it becomes a review.` });
   if (pendingFollowups > 0)
@@ -321,6 +335,58 @@ export default async function OpsPage({
                       <input type="hidden" name="id" value={q.id} />
                       <button className="shrink-0 rounded-full border border-white/15 px-3 py-1.5 text-[11px] font-bold text-white/70 transition hover:border-brand-green hover:text-brand-green">
                         Actioned ✓
+                      </button>
+                    </form>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
+      {/* ── SMITHS GARAGE WAITLIST ── */}
+      {waitlistStats.total > 0 && (
+        <section className="mt-8">
+          <SectionTitle eyebrow="Smiths Garage · coming soon" title="Waitlist sign-ups" />
+          <div className={`${CARD} mb-3 px-4 py-3 text-sm text-white/70`}>
+            <b className="text-white">{waitlistStats.total}</b>{" "}
+            {waitlistStats.total === 1 ? "person" : "people"} on the waitlist{" · "}
+            <b className="text-brand-green">{waitlistStats.pending}</b> new to reach out to
+            {waitlistStats.members > 0 && <span className="text-brand-yellow">{` · ${waitlistStats.members} want the membership`}</span>}
+            {waitlistStats.actioned > 0 && <span className="text-white/40">{` · ${waitlistStats.actioned} already contacted`}</span>}
+          </div>
+          {waitlist.length > 0 && (
+            <div className="flex flex-col gap-3">
+              {waitlist.map((w) => (
+                <div key={w.id} className={`${CARD} p-4`}>
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="font-display text-base font-extrabold tracking-tight text-white">
+                        {w.name || "(no name)"}
+                        {w.vehicle && <span className="text-white/50"> · {w.vehicle}</span>}
+                        {w.membership && (
+                          <span className="ml-2 rounded-full bg-brand-yellow/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-brand-yellow">
+                            Membership
+                          </span>
+                        )}
+                      </div>
+                      {w.interests.length > 0 && (
+                        <div className="mt-1 text-xs text-white/50">
+                          Wants: {w.interests.map((i) => SERVICE_LABEL[i] || i).join(" · ")}
+                        </div>
+                      )}
+                      {w.message && <div className="mt-1 text-xs italic text-white/45">“{w.message}”</div>}
+                      <div className="mt-1.5 flex flex-wrap gap-3 text-xs">
+                        {w.phone && <a href={`tel:${w.phone}`} className="font-bold text-brand-green">📞 {w.phone}</a>}
+                        {w.email && <a href={`mailto:${w.email}`} className="text-white/60 hover:text-white">✉️ {w.email}</a>}
+                        <span className="text-white/30">{w.created_at.replace("T", " ")}</span>
+                      </div>
+                    </div>
+                    <form action={markWaitlistActioned}>
+                      <input type="hidden" name="id" value={w.id} />
+                      <button className="shrink-0 rounded-full border border-white/15 px-3 py-1.5 text-[11px] font-bold text-white/70 transition hover:border-brand-green hover:text-brand-green">
+                        Contacted ✓
                       </button>
                     </form>
                   </div>
