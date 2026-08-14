@@ -37,7 +37,7 @@ export default function RunSheet({ today, initial }: { today: string; initial: s
     <section className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
       <div className="flex items-center justify-between gap-3">
         <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">
-          Ashlee&apos;s run sheet
+          Daily run sheet
         </div>
         <div className="flex items-center gap-2">
           {saveState !== "idle" && (
@@ -107,8 +107,8 @@ export default function RunSheet({ today, initial }: { today: string; initial: s
       </div>
 
       <p className="mt-3 text-[11px] text-white/30">
-        Resets each morning. The <b className="text-white/45">Close</b> steps are what keep the board
-        (and the business) running without Thanyon.
+        Resets each morning. The <b className="text-white/45">Close</b> steps are what keep the shed
+        tight day to day.
       </p>
     </section>
   );

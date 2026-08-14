@@ -1,8 +1,6 @@
 import Link from "next/link";
 import { requireOwner } from "@/lib/ops/auth";
 import {
-  getDailyLog,
-  getRecentLogs,
   getRecentBookings,
   getAds,
   getJobsForDate,
@@ -11,42 +9,23 @@ import {
   getRectifyList,
   getSatisfaction,
   getReorderCount,
-  getGrowthSeries,
   getChecklist,
   getQuoteLeads,
   getQuoteLeadStats,
   getCancellationStats,
-  type DailyLog,
+  getDashSummary,
   type Booking,
   type AdRow,
   type JobWithHours,
   type JobFollowup,
-  type GrowthDay,
   type QuoteLead,
+  type DashSummary,
 } from "@/lib/ops/db";
-import { OPS_TARGETS, OPS_STAFF, cairnsToday } from "@/lib/ops/config";
-import {
-  saveEntry,
-  autoSaveDay,
-  logout,
-  uploadCalendar,
-  uploadAds,
-  logJobHours,
-  setCheckin,
-  markQuoteLeadActioned,
-} from "./actions";
-import StaffHours from "@/components/ops/StaffHours";
+import { OPS_TARGETS, cairnsToday } from "@/lib/ops/config";
+import { logout, logJobHours, setCheckin, markQuoteLeadActioned } from "./actions";
 import RunSheet from "@/components/ops/RunSheet";
-import AutoSaveForm from "@/components/ops/AutoSaveForm";
-
-// Reveal is a no-op on ops — the scroll fade-in was slowing Ashlee down,
-// so render everything instantly.
-function Reveal({ children }: { children: React.ReactNode; delay?: number }) {
-  return <>{children}</>;
-}
 
 const money = (n: number) => "$" + Math.round(n).toLocaleString("en-AU");
-
 const dayLabel = (d: string) =>
   new Date(`${d}T00:00:00+10:00`).toLocaleDateString("en-AU", {
     weekday: "short",
@@ -55,134 +34,19 @@ const dayLabel = (d: string) =>
     timeZone: "Australia/Brisbane",
   });
 
-function totalHours(e: DailyLog | null): number {
-  const sh = e?.staff_hours;
-  if (!sh || typeof sh !== "object") return 0;
-  const t = Object.values(sh).reduce((a, b) => a + (Number(b) || 0), 0);
-  return Number.isFinite(t) ? Math.round(t * 100) / 100 : 0;
-}
-
-// A day counts as "logged" only when real numbers were actually entered — not
-// when a row merely exists. Ticking a run-sheet item auto-creates today's row
-// (with $0 everything), so without this the day looks logged the moment Ashlee
-// ticks her first box: the "log the day" reminder vanishes and a phantom $0 row
-// shows up in history. Any genuine field being non-empty makes it real.
-function isDayLogged(r: DailyLog): boolean {
-  return (
-    (r.revenue_collected ?? 0) > 0 ||
-    (r.completed_revenue ?? 0) > 0 ||
-    (r.jobs_completed ?? 0) > 0 ||
-    (r.ad_spend ?? 0) > 0 ||
-    (r.quotes ?? 0) > 0 ||
-    (r.messages ?? 0) > 0 ||
-    (r.redos ?? 0) > 0 ||
-    (r.notes_today ?? "").trim().length > 0 ||
-    Object.keys(r.staff_hours ?? {}).length > 0
-  );
-}
-
-function revenueStatus(rev: number) {
-  const { breakEvenRevenue, aimRevenue } = OPS_TARGETS;
-  if (rev <= 0) return { label: "Nothing logged yet", tone: "neutral" as const };
-  if (rev >= aimRevenue) return { label: "Smashing the aim", tone: "green" as const };
-  if (rev >= breakEvenRevenue) return { label: "Above break-even", tone: "green" as const };
-  return { label: "Below the line", tone: "yellow" as const };
-}
-
-/* --- brand tokens ----------------------------------------------------- */
 const EYEBROW = "text-[11px] font-bold uppercase tracking-[0.22em] text-white/40";
 const CARD = "rounded-2xl border border-white/10 bg-white/[0.02]";
-const FIELD =
-  "w-full rounded-xl border border-white/12 bg-black/40 text-white outline-none transition placeholder:text-white/25 focus:border-brand-green";
-
-/* --- helpers ---------------------------------------------------------- */
 
 function SectionTitle({ eyebrow, title }: { eyebrow: string; title: string }) {
   return (
     <div className="mb-4">
       <div className={EYEBROW}>{eyebrow}</div>
-      <h2 className="mt-2 font-display text-xl font-extrabold tracking-tight text-white">
-        {title}
-      </h2>
+      <h2 className="mt-2 font-display text-xl font-extrabold tracking-tight text-white">{title}</h2>
     </div>
   );
 }
 
-function NumField({
-  label,
-  name,
-  defaultValue,
-  prefix,
-  step = 1,
-}: {
-  label: string;
-  name: string;
-  defaultValue?: number | string;
-  prefix?: string;
-  step?: number;
-}) {
-  return (
-    <label className="flex flex-col gap-1.5">
-      <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/40">
-        {label}
-      </span>
-      <div className="flex items-center rounded-xl border border-white/12 bg-black/40 transition focus-within:border-brand-green">
-        {prefix && <span className="pl-3 font-semibold text-white/35">{prefix}</span>}
-        <input
-          type="number"
-          name={name}
-          defaultValue={defaultValue}
-          min={0}
-          step={step}
-          inputMode="decimal"
-          placeholder="0"
-          className="w-full bg-transparent px-3 py-3 text-white outline-none placeholder:text-white/20"
-        />
-      </div>
-    </label>
-  );
-}
-
-function PaceCard({
-  label,
-  current,
-  target,
-}: {
-  label: string;
-  current: number;
-  target: number;
-}) {
-  const pct = Math.min(100, Math.round((current / target) * 100));
-  const hit = current >= target;
-  return (
-    <div
-      className={`rounded-2xl border p-5 ${
-        hit ? "border-brand-green/40 bg-brand-green/[0.05]" : "border-white/10 bg-white/[0.02]"
-      }`}
-    >
-      <div className="flex items-baseline justify-between">
-        <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/40">
-          {label}
-        </div>
-        <div className="text-xs font-bold text-white/45">target {money(target)}</div>
-      </div>
-      <div className="mt-1 font-display text-3xl font-extrabold tabular-nums text-white">
-        {money(current)}
-      </div>
-      <div className="mt-3 h-2.5 overflow-hidden rounded-full bg-white/10">
-        <div
-          className={`h-full rounded-full ${hit ? "bg-brand-green" : "bg-brand-yellow"}`}
-          style={{ width: `${pct}%` }}
-        />
-      </div>
-      <div className="mt-1.5 text-xs font-semibold text-white/45">
-        {hit ? "Target smashed 🔥" : `${money(target - current)} to go · ${pct}%`}
-      </div>
-    </div>
-  );
-}
-
-function StatTile({
+function Stat({
   label,
   value,
   sub,
@@ -194,82 +58,36 @@ function StatTile({
   tone?: "neutral" | "green" | "yellow";
 }) {
   const accent =
-    tone === "green"
-      ? "before:bg-brand-green"
-      : tone === "yellow"
-      ? "before:bg-brand-yellow"
-      : "before:bg-white/20";
+    tone === "green" ? "before:bg-brand-green" : tone === "yellow" ? "before:bg-brand-yellow" : "before:bg-white/20";
   return (
     <div
       className={`relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02] p-4 before:absolute before:left-0 before:top-0 before:h-full before:w-[3px] ${accent}`}
     >
-      <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/40">
-        {label}
-      </div>
-      <div className="mt-1.5 font-display text-2xl font-extrabold tabular-nums text-white">
-        {value}
-      </div>
+      <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/40">{label}</div>
+      <div className="mt-1.5 font-display text-2xl font-extrabold tabular-nums text-white">{value}</div>
       {sub && <div className="mt-0.5 text-xs text-white/45">{sub}</div>}
     </div>
   );
 }
 
-/* --------------------------------------------------------------------- */
-
-// Pre-filled daily reflection template for "How the day went" — same GM
-// checklist every day so it imprints the habit. Detailer lines come from the
-// roster (OPS_STAFF minus the leader) so they stay in sync if the crew changes.
-const DAY_NOTES_TEMPLATE = [
-  "Good:",
-  "",
-  "Bad:",
-  "",
-  ...OPS_STAFF.slice(1).flatMap((name) => [`${name}:`, ""]),
-  "Room for improvement:",
-  "",
-  "What went really well:",
-  "",
-  "How do you maximise revenue:",
-  "",
-  "How did you cut costs:",
-  "",
-].join("\n");
-
-// Give the page real headroom. The default ~10s function budget meant a
-// cold or waking database blew the internal cap and showed "didn't respond".
-// Fluid Compute allows up to 60s; 30s is plenty for a cold start to complete.
 export const maxDuration = 30;
 export const dynamic = "force-dynamic";
 
 export default async function OpsPage({
   searchParams,
 }: {
-  searchParams: {
-    date?: string;
-    saved?: string;
-    calok?: string;
-    calerr?: string;
-    adok?: string;
-    aderr?: string;
-    jobsok?: string;
-    fuok?: string;
-  };
+  searchParams: { jobsok?: string; fuok?: string };
 }) {
   requireOwner();
 
-  // ── dates (computed up front so all DB reads can run in parallel) ──
   const today = cairnsToday();
-  const date = (searchParams?.date || today).slice(0, 10);
-  const isToday = date === today;
-  const saved = searchParams?.saved === "1";
-  const dateLabel = new Date(`${date}T00:00:00+10:00`).toLocaleDateString("en-AU", {
+  const dateLabel = new Date(`${today}T00:00:00+10:00`).toLocaleDateString("en-AU", {
     weekday: "long",
     day: "numeric",
     month: "long",
     timeZone: "Australia/Brisbane",
   });
-  const monthKey = today.slice(0, 7);
-  const monthStartISO = monthKey + "-01";
+  const monthStartISO = today.slice(0, 7) + "-01";
   const wt = new Date(`${today}T12:00:00+10:00`);
   const dow = (wt.getUTCDay() + 6) % 7; // 0 = Monday
   const brisDate = (ms: number) =>
@@ -279,9 +97,6 @@ export default async function OpsPage({
   const d14 = brisDate(Date.now() - 13 * 86400000);
   const fu3 = brisDate(Date.now() - 3 * 86400000);
 
-  // ── all DB reads in one parallel batch (was 9 sequential round trips) ──
-  let entry: DailyLog | null = null;
-  let recent: DailyLog[] = [];
   let bookings: Booking[] = [];
   let ads: AdRow[] = [];
   let todaysJobs: JobWithHours[] = [];
@@ -290,37 +105,30 @@ export default async function OpsPage({
   let rectifyList: JobFollowup[] = [];
   let satisfaction = { happy: 0, unhappy: 0 };
   let reorderCount = 0;
-  let growth: GrowthDay[] = [];
   let checklist: string[] = [];
   let quoteLeads: QuoteLead[] = [];
   let quoteLeadStats = { total: 0, pending: 0, actioned: 0 };
   let cancelStats = { week: 0, month: 0 };
+  let dash: DashSummary = {
+    weekRev: 0, weekInv: 0, monthRev: 0, monthInv: 0, weekLeads: 0, monthLeads: 0, salesLoaded: null, leadsLoaded: null,
+  };
   let dbError = false;
 
-  // Ashlee's run-sheet ticks are the one thing she touches all day, so load
-  // them FIRST and on their own budget. This also warms the pooled connection.
-  // If the heavy aggregate below times out, her ticks still render correctly
-  // (they were never lost — they're saved the instant she taps) instead of the
-  // whole run sheet flashing back to empty and looking like nothing saved.
+  // Run-sheet ticks load first on their own budget — the one thing touched all
+  // day — so a slow aggregate below can't wipe them off the screen.
   try {
     checklist = await Promise.race([
       getChecklist(today),
       new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 15000)),
     ]);
   } catch {
-    /* leave [] — the toggle still saves regardless of this read */
+    /* leave [] */
   }
 
   try {
-    // Load sequentially (object properties evaluate in order) on the single
-    // pooled connection — firing all 9 in parallel deadlocks Supabase's
-    // transaction pooler. Warm it's ~80ms; the generous cap (well under the
-    // 30s function budget) lets a cold/waking DB finish instead of showing
-    // "didn't respond".
+    // Sequential on the single pooled connection (parallel deadlocks the pooler).
     const data = await Promise.race([
       (async () => ({
-        entry: await getDailyLog(date),
-        recent: await getRecentLogs(30),
         bookings: await getRecentBookings(from60),
         ads: await getAds(),
         todaysJobs: await getJobsForDate(today),
@@ -329,95 +137,39 @@ export default async function OpsPage({
         rectifyList: await getRectifyList(),
         satisfaction: await getSatisfaction(monthStartISO, today),
         reorderCount: await getReorderCount(),
-        growth: await getGrowthSeries(from60, today),
         quoteLeads: await getQuoteLeads("pending"),
         quoteLeadStats: await getQuoteLeadStats(),
         cancelStats: await getCancellationStats(weekStart, monthStartISO, today),
+        dash: await getDashSummary(weekStart, monthStartISO, today),
       }))(),
       new Promise<never>((_, reject) => setTimeout(() => reject(new Error("db-timeout")), 20000)),
     ]);
     ({
-      entry,
-      recent,
-      bookings,
-      ads,
-      todaysJobs,
-      carryover,
-      followups,
-      rectifyList,
-      satisfaction,
-      reorderCount,
-      growth,
-      quoteLeads,
-      quoteLeadStats,
-      cancelStats,
+      bookings, ads, todaysJobs, carryover, followups, rectifyList,
+      satisfaction, reorderCount, quoteLeads, quoteLeadStats, cancelStats, dash,
     } = data);
   } catch {
     dbError = true;
   }
 
-  // ── derived values (no more DB calls below) ──
-  const crewInitial: Record<string, { start?: string; end?: string; notes?: string }> = {};
-  for (const name of OPS_STAFF) {
-    crewInitial[name] = {
-      start: entry?.staff_shifts?.[name]?.start,
-      end: entry?.staff_shifts?.[name]?.end,
-      notes: entry?.staff_notes?.[name],
-    };
-  }
-
-  // The scoreboard runs on revenue EARNED (work completed), not cash collected.
-  // Collected lags — deposits, payment timing — so it understates how much the
-  // team actually produced. Earned is the real "did we do enough to be
-  // profitable today" gauge; collected is shown alongside as the cash figure.
-  const earned = entry?.completed_revenue ?? 0;
-  const collected = entry?.revenue_collected ?? 0;
-  const status = revenueStatus(earned);
-  const { breakEvenRevenue, aimRevenue, jobsTarget, weeklyTarget, monthlyTarget } = OPS_TARGETS;
-  const aimPct = Math.min(100, Math.round((earned / aimRevenue) * 100));
-  const bePct = Math.min(100, Math.round((breakEvenRevenue / aimRevenue) * 100));
-
-  const weekRevenue = recent
-    .filter((r) => r.log_date >= weekStart && r.log_date <= today)
-    .reduce((a, r) => a + (r.completed_revenue || 0), 0);
-  const monthRevenue = recent
-    .filter((r) => r.log_date.startsWith(monthKey))
-    .reduce((a, r) => a + (r.completed_revenue || 0), 0);
+  // ── derived (bookings + uploads only — no manual data) ──
+  const { aimRevenue, weeklyTarget, monthlyTarget } = OPS_TARGETS;
+  const monthPct = Math.min(100, Math.round((dash.monthRev / monthlyTarget) * 100));
+  const weekPct = Math.min(100, Math.round((dash.weekRev / weeklyTarget) * 100));
 
   const last14 = bookings.filter((b) => b.booking_date >= d14 && b.booking_date <= today);
-  const corr14 = last14.filter((b) => b.is_correction).length;
-  const corrPerDay = corr14 / 10; // ~10 working days in 14
-  const weekBookings = bookings.filter((b) => b.booking_date >= weekStart && b.booking_date <= today);
-  const weekBookedValue = weekBookings.reduce((a, b) => a + b.value, 0);
-  const weekBookedCorr = weekBookings.filter((b) => b.is_correction).length;
+  const corrPerDay = last14.filter((b) => b.is_correction).length / 10;
   const pipeline = bookings.filter((b) => b.booking_date > today);
-  const pipelineValue = pipeline.reduce((a, b) => a + b.value, 0);
   const pipelineCorr = pipeline.filter((b) => b.is_correction).length;
-
-  const weekAdSpend = recent
-    .filter((r) => r.log_date >= weekStart && r.log_date <= today)
-    .reduce((a, r) => a + (r.ad_spend || 0), 0);
-  const weekCAC = weekBookings.length ? weekAdSpend / weekBookings.length : 0;
+  const pipelineCorrValue = pipeline.filter((b) => b.is_correction).reduce((a, b) => a + b.value, 0);
   const hasBookings = bookings.length > 0;
-  const calCount = searchParams?.calok;
-  const calErr = searchParams?.calerr;
-
   const adSpend = ads.reduce((a, r) => a + r.spend, 0);
-  const adMessages = ads.reduce((a, r) => a + r.messages, 0);
-  const adNewContacts = ads.reduce((a, r) => a + r.new_contacts, 0);
-  const adCostPerMsg = adMessages ? adSpend / adMessages : 0;
   const hasAds = ads.length > 0;
-  const adOk = searchParams?.adok;
-  const adErr = searchParams?.aderr;
 
-  // The floor = today's booked cars + any multi-day job carried over from an
-  // earlier day (deduped). Each row logs TODAY's hours and shows the total.
   const floorJobs = [
     ...todaysJobs,
     ...carryover.filter((c) => !todaysJobs.some((t) => t.uid === c.uid)),
   ];
-  const earnedToday = todaysJobs.filter((j) => !j.cancelled).reduce((a, j) => a + j.value, 0);
-  const hoursToday = floorJobs.reduce((a, j) => a + (j.hours_today || 0), 0);
   const jobsOk = searchParams?.jobsok;
 
   const upcoming = bookings.filter((b) => b.booking_date >= today);
@@ -429,231 +181,126 @@ export default async function OpsPage({
   }
   const scheduleDays = [...scheduleByDay.keys()].sort().slice(0, 12);
 
-  // Check-ins are a day-AFTER job: only cars from a previous day are due, never
-  // a car still being worked today. (fu3 already caps it to the last few days.)
   const dueFollowups = followups.filter((f) => f.booking_date < today);
   const pendingFollowupList = dueFollowups.filter((f) => f.status === "pending");
   const pendingFollowups = pendingFollowupList.length;
   const fuOk = searchParams?.fuok;
 
-  // ── growth: leads → bookings over the last 30 days (from the daily series) ──
-  const g30 = growth.slice(0, 30);
-  const gMsgs = g30.reduce((a, g) => a + g.messages, 0);
-  const gNewBookings = g30.reduce((a, g) => a + g.new_bookings, 0);
-  const gNewCorr = g30.reduce((a, g) => a + g.new_corrections, 0);
-  const gSpend = g30.reduce((a, g) => a + g.ad_spend, 0);
-  const gConv = gMsgs ? Math.round((gNewBookings / gMsgs) * 100) : 0;
-  const gCostBooking = gNewBookings ? gSpend / gNewBookings : 0;
-  const gCostMsg = gMsgs ? gSpend / gMsgs : 0;
-  const gRows = growth.slice(0, 14).filter((g) => g.messages || g.new_bookings || g.ad_spend);
-  const gHasData = gMsgs > 0 || gNewBookings > 0;
-
-  // ── funnel (this week) ──
-  const inWeek = (r: DailyLog) => r.log_date >= weekStart && r.log_date <= today;
-  const weekLoggedDays = recent.filter((r) => inWeek(r) && isDayLogged(r)).length;
-  const weekQuotes = recent.filter(inWeek).reduce((a, r) => a + (r.quotes || 0), 0);
-  const weekCompleted = recent.filter(inWeek).reduce((a, r) => a + (r.jobs_completed || 0), 0);
-  const weekRedos = recent.filter(inWeek).reduce((a, r) => a + (r.redos || 0), 0);
-  const quoteClose = weekQuotes ? Math.round((weekBookings.length / weekQuotes) * 100) : 0;
-
-  // ── profit vs break-even ──
-  // profit only charges break-even for days actually logged (not the whole
-  // calendar week) — otherwise unlogged days look like huge losses
-  const weekProfit = weekRevenue - breakEvenRevenue * weekLoggedDays;
-
-  // ── trend: last full week for context ──
-  const prevWeekStart = new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Brisbane" }).format(
-    new Date(wt.getTime() - (dow + 7) * 86400000)
-  );
-  const prevWeekEnd = new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Brisbane" }).format(
-    new Date(wt.getTime() - (dow + 1) * 86400000)
-  );
-  const prevWeekRevenue = recent
-    .filter((r) => r.log_date >= prevWeekStart && r.log_date <= prevWeekEnd)
-    .reduce((a, r) => a + (r.completed_revenue || 0), 0);
-
-  // ── did we log today / missing days ──
-  const loggedRecent = recent.filter(isDayLogged);
-  const loggedDates = new Set(loggedRecent.map((r) => r.log_date));
-  const loggedToday = loggedDates.has(today);
-  const missingLast7: string[] = [];
-  for (let i = 1; i <= 7; i++) {
-    const d = new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Brisbane" }).format(
-      new Date(wt.getTime() - i * 86400000)
-    );
-    if (!loggedDates.has(d)) missingLast7.push(d);
-  }
-
-  // ── alerts engine ──
+  // ── alerts (auto only) ──
   const alerts: { tone: "red" | "yellow"; text: string }[] = [];
   if (quoteLeads.length > 0)
-    alerts.push({
-      tone: "red",
-      text: `${quoteLeads.length} new AI Instant Quote request(s) waiting — confirm or call them back.`,
-    });
-  if (!loggedToday)
-    alerts.push({ tone: "yellow", text: "Today isn't logged yet — fill in the day before you knock off." });
+    alerts.push({ tone: "red", text: `${quoteLeads.length} new AI Instant Quote request(s) waiting — confirm or call them back.` });
   if (rectifyList.length > 0)
-    alerts.push({
-      tone: "red",
-      text: `${rectifyList.length} unhappy customer(s) need a rectify job booked — sort it before it becomes a review.`,
-    });
+    alerts.push({ tone: "red", text: `${rectifyList.length} unhappy customer(s) need a rectify job booked — sort it before it becomes a review.` });
   if (pendingFollowups > 0)
-    alerts.push({
-      tone: "yellow",
-      text: `${pendingFollowups} recent customer(s) not checked in yet — send the day-after "how'd it go?" and tick them off.`,
-    });
+    alerts.push({ tone: "yellow", text: `${pendingFollowups} recent customer(s) not checked in yet — send the day-after "how'd it go?" and tick them off.` });
   if (reorderCount > 0)
-    alerts.push({
-      tone: "yellow",
-      text: `${reorderCount} item(s) low on stock — check the Stock tab and reorder before you run out.`,
-    });
+    alerts.push({ tone: "yellow", text: `${reorderCount} item(s) low on stock — reorder before you run out.` });
   if (hasBookings && pipelineCorr === 0)
-    alerts.push({ tone: "red", text: "No corrections booked ahead — push the correction ad or call warm leads." });
-  if (hasBookings && corrPerDay < 1)
-    alerts.push({
-      tone: "yellow",
-      text: `Corrections running ${corrPerDay.toFixed(1)}/day — below the ~1/day break-even line.`,
-    });
-  if (weekRedos > 4)
-    alerts.push({ tone: "red", text: `${weekRedos} re-dos this week — over the target of 4. Check the crew's quality.` });
-  if (weekLoggedDays >= 2 && weekProfit < 0)
-    alerts.push({
-      tone: "yellow",
-      text: `Behind break-even this week by ${money(-weekProfit)} across ${weekLoggedDays} logged days — get more jobs out the door.`,
-    });
-  if (weekBookings.length > 0 && weekCAC > 300)
-    alerts.push({ tone: "yellow", text: `CAC is ${money(weekCAC)} this week — refresh the ad creative if it keeps climbing.` });
+    alerts.push({ tone: "red", text: "No corrections booked ahead — push the correction ad or work warm leads before the bay goes quiet." });
+  else if (hasBookings && pipelineCorr <= 2)
+    alerts.push({ tone: "yellow", text: `Only ${pipelineCorr} correction(s) booked ahead — thin pipeline, keep the correction ad feeding it.` });
 
   return (
     <main className="mx-auto max-w-none px-4 pb-24 pt-8 sm:px-6 lg:px-8 2xl:max-w-[1760px]">
-      {/* ── header ───────────────────────────────────────────────── */}
-      <Reveal>
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <div className={EYEBROW}>Smiths Detailing · Cairns</div>
-            <h1 className="mt-3 font-display text-4xl font-extrabold leading-[0.95] tracking-tight text-white sm:text-5xl">
-              Daily <span className="text-brand-green">Ops</span>
-            </h1>
-            <p className="mt-3 text-sm font-semibold text-white/50">
-              {dateLabel}
-              {isToday && <span className="ml-2 text-brand-green">· Today</span>}
-            </p>
-          </div>
-          <form action={logout}>
-            <button className="rounded-full border border-white/15 px-4 py-2 text-xs font-bold text-white/60 transition hover:border-white/35 hover:text-white">
-              Log out
-            </button>
-          </form>
-        </div>
-      </Reveal>
-
-      {/* ── THE DAILY RULE (motto) ───────────────────────────────── */}
-      <Reveal delay={20}>
-        <div className="mt-6 rounded-2xl border border-brand-green/25 bg-brand-green/[0.05] px-5 py-4">
-          <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-green/70">
-            The daily rule
-          </div>
-          <p className="mt-1.5 font-display text-xl font-extrabold leading-snug tracking-tight text-white">
-            Fill the day first, then cut what&apos;s not needed.
-          </p>
-          <p className="mt-1 text-sm font-bold text-brand-green">
-            Revenue first · cut cost second.
+      {/* ── header ── */}
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <div className={EYEBROW}>Smiths Detailing · Cairns</div>
+          <h1 className="mt-3 font-display text-4xl font-extrabold leading-[0.95] tracking-tight text-white sm:text-5xl">
+            Daily <span className="text-brand-green">Ops</span>
+          </h1>
+          <p className="mt-3 text-sm font-semibold text-white/50">
+            {dateLabel}
+            <span className="ml-2 text-brand-green">· Today</span>
           </p>
         </div>
-      </Reveal>
-
-      {!isToday && (
-        <div className="mt-4">
-          <Link
-            href="/ops"
-            className="inline-flex rounded-full border border-white/12 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-white/60 transition hover:text-white"
-          >
-            ← Back to today
-          </Link>
-        </div>
-      )}
-
-      {saved && (
-        <div className="mt-5 rounded-xl border border-brand-green/40 bg-brand-green/[0.08] px-4 py-3 text-sm font-semibold text-brand-green">
-          Saved ✓ {entry?.updated_at && `· ${entry.updated_at.replace("T", " ")}`}
-        </div>
-      )}
+        <form action={logout}>
+          <button className="rounded-full border border-white/15 px-4 py-2 text-xs font-bold text-white/60 transition hover:border-white/35 hover:text-white">
+            Log out
+          </button>
+        </form>
+      </div>
 
       {dbError && (
         <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
-          <b className="font-bold">Database didn&apos;t respond.</b> It may be
-          waking up or briefly busy — wait a minute and refresh. If it keeps
-          happening, open your Supabase project and check it&apos;s active (free
-          databases pause when idle) and that <code>POSTGRES_URL</code> is set in
-          Vercel. Your login is working fine.
+          <b className="font-bold">Database didn&apos;t respond.</b> It may be waking up — wait a minute and refresh.
         </div>
+      )}
+      {jobsOk && (
+        <div className="mt-5 rounded-xl border border-brand-green/40 bg-brand-green/[0.08] px-4 py-2.5 text-sm font-semibold text-brand-green">Hours saved ✓</div>
+      )}
+      {fuOk && (
+        <div className="mt-5 rounded-xl border border-brand-green/40 bg-brand-green/[0.08] px-4 py-2.5 text-sm font-semibold text-brand-green">Check-in saved ✓</div>
       )}
 
-      {calCount && (
-        <div className="mt-5 rounded-xl border border-brand-green/40 bg-brand-green/[0.08] px-4 py-3 text-sm font-semibold text-brand-green">
-          Calendar synced ✓ · {calCount} bookings loaded
-        </div>
-      )}
-      {calErr && (
-        <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
-          {calErr === "noics"
-            ? "Couldn't find the Smiths Bookings calendar in that file — upload the calendar .zip Google gives you."
-            : "No file received — pick the calendar .zip and try again."}
-        </div>
-      )}
-      {adOk && (
-        <div className="mt-5 rounded-xl border border-brand-green/40 bg-brand-green/[0.08] px-4 py-3 text-sm font-semibold text-brand-green">
-          Ads synced ✓ · {adOk} ads loaded
-        </div>
-      )}
-      {adErr && (
-        <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
-          {adErr === "noads"
-            ? "Couldn't read any ads in that file — upload the Meta Ads CSV export."
-            : "No file received — pick the ads CSV and try again."}
-        </div>
-      )}
-
-      {/* ── ALERTS ───────────────────────────────────────────────── */}
-      {alerts.length > 0 && (
-        <Reveal delay={40}>
-          <section className="mt-6 flex flex-col gap-2">
-            <div className={EYEBROW}>Fix these today</div>
-            {alerts.map((a, i) => (
-              <div
-                key={i}
-                className={`flex items-start gap-2.5 rounded-xl border px-4 py-2.5 text-sm ${
-                  a.tone === "red"
-                    ? "border-red-500/40 bg-red-500/[0.08] text-red-300"
-                    : "border-brand-yellow/40 bg-brand-yellow/[0.07] text-brand-yellow"
-                }`}
-              >
-                <span aria-hidden>{a.tone === "red" ? "🔴" : "🟡"}</span>
-                <span>{a.text}</span>
-              </div>
-            ))}
-          </section>
-        </Reveal>
-      )}
-
-      {/* ── AI INSTANT QUOTE LEADS (from the homepage widget) ──────── */}
-      {quoteLeadStats.total > 0 && (
-        <Reveal delay={50}>
-          <section className="mt-6">
-            <SectionTitle eyebrow="From the homepage" title="AI Instant Quote requests" />
-            <div className={`${CARD} mb-3 px-4 py-3 text-sm text-white/70`}>
-              <b className="text-white">{quoteLeadStats.total}</b>{" "}
-              {quoteLeadStats.total === 1 ? "person has" : "people have"} got a quote through the
-              widget and not booked{" · "}
-              <b className="text-brand-green">{quoteLeadStats.pending}</b> new to chase
-              {quoteLeadStats.actioned > 0 && (
-                <span className="text-white/40">{` · ${quoteLeadStats.actioned} already followed up`}</span>
-              )}
+      {/* ── THIS WEEK / MONTH — auto from your uploads ── */}
+      <section className="mt-7 grid gap-4 xl:grid-cols-3 xl:items-start">
+        {/* month hero */}
+        <div className={`relative rounded-3xl border p-6 sm:p-7 xl:col-span-2 ${dash.monthRev >= monthlyTarget ? "border-brand-green/40 bg-brand-green/[0.05]" : "border-white/10 bg-white/[0.02]"}`}>
+          <div className="flex items-center justify-between">
+            <div className={EYEBROW}>Revenue this month · real, from Xero</div>
+            <div className="rounded-full bg-white/5 px-3 py-1 text-[11px] font-black uppercase tracking-wider text-white/45">
+              {dash.monthInv} invoices
             </div>
-            {quoteLeads.length > 0 && (
-              <div className="flex flex-col gap-3">
-                {quoteLeads.map((q) => (
+          </div>
+          <div className="mt-3 font-display text-6xl font-extrabold leading-none tabular-nums text-white sm:text-7xl">
+            {money(dash.monthRev)}
+          </div>
+          <div className="mt-1.5 text-sm font-semibold text-white/45">
+            This week <span className="text-white/80">{money(dash.weekRev)}</span> · {dash.weekInv} job{dash.weekInv === 1 ? "" : "s"}
+          </div>
+          <div className="relative mt-6 h-3.5 overflow-hidden rounded-full bg-white/10">
+            <div className={`h-full rounded-full ${dash.monthRev >= monthlyTarget ? "bg-brand-green" : "bg-brand-yellow"}`} style={{ width: `${monthPct}%` }} />
+          </div>
+          <div className="mt-2 flex justify-between text-[11px] font-bold text-white/45">
+            <span>{monthPct}% of month target</span>
+            <span>Target {money(monthlyTarget)}</span>
+          </div>
+        </div>
+        {/* week + auto stats */}
+        <div className="grid grid-cols-2 gap-3 xl:content-start">
+          <Stat label="This week" value={money(dash.weekRev)} sub={`${weekPct}% of ${money(weeklyTarget)}`} tone={dash.weekRev >= weeklyTarget ? "green" : "neutral"} />
+          <Stat label="Corrections ahead" value={String(pipelineCorr)} sub={pipelineCorrValue > 0 ? `${money(pipelineCorrValue)} booked` : "keep the pipeline full"} tone={pipelineCorr >= 3 ? "green" : "yellow"} />
+          <Stat label="Leads this week" value={String(dash.weekLeads)} sub={`${dash.monthLeads} this month`} />
+          <Stat label="Ad spend" value={hasAds ? money(adSpend) : "—"} sub="last ads upload" />
+        </div>
+      </section>
+      <p className="mt-2 text-[11px] text-white/35">
+        Auto-tracked from your uploads{dash.salesLoaded ? ` · sales loaded ${dash.salesLoaded}` : ""}. Drop the day&apos;s
+        files on the <Link href="/ops/uploads" className="font-bold text-white/55 underline-offset-2 hover:underline">Uploads</Link> tab
+        and these update — full breakdown on <Link href="/ops/analytics" className="font-bold text-white/55 underline-offset-2 hover:underline">Analytics</Link>.
+      </p>
+
+      {/* ── ALERTS ── */}
+      {alerts.length > 0 && (
+        <section className="mt-8 flex flex-col gap-2">
+          <div className={EYEBROW}>Fix these today</div>
+          {alerts.map((a, i) => (
+            <div
+              key={i}
+              className={`flex items-start gap-2.5 rounded-xl border px-4 py-2.5 text-sm ${a.tone === "red" ? "border-red-500/40 bg-red-500/[0.08] text-red-300" : "border-brand-yellow/40 bg-brand-yellow/[0.07] text-brand-yellow"}`}
+            >
+              <span aria-hidden>{a.tone === "red" ? "🔴" : "🟡"}</span>
+              <span>{a.text}</span>
+            </div>
+          ))}
+        </section>
+      )}
+
+      {/* ── AI INSTANT QUOTE LEADS ── */}
+      {quoteLeadStats.total > 0 && (
+        <section className="mt-8">
+          <SectionTitle eyebrow="From the homepage" title="AI Instant Quote requests" />
+          <div className={`${CARD} mb-3 px-4 py-3 text-sm text-white/70`}>
+            <b className="text-white">{quoteLeadStats.total}</b>{" "}
+            {quoteLeadStats.total === 1 ? "person has" : "people have"} got a quote through the widget and not booked{" · "}
+            <b className="text-brand-green">{quoteLeadStats.pending}</b> new to chase
+            {quoteLeadStats.actioned > 0 && <span className="text-white/40">{` · ${quoteLeadStats.actioned} already followed up`}</span>}
+          </div>
+          {quoteLeads.length > 0 && (
+            <div className="flex flex-col gap-3">
+              {quoteLeads.map((q) => (
                 <div key={q.id} className={`${CARD} p-4`}>
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -662,314 +309,70 @@ export default async function OpsPage({
                       </div>
                       <div className="mt-1 text-xs text-white/50">
                         {q.package_title} ({q.vehicle_size}) · {money(q.price)}
-                        {q.requested_date &&
-                          ` · wants ${dayLabel(q.requested_date)} ${q.requested_slot}`}
+                        {q.requested_date && ` · wants ${dayLabel(q.requested_date)} ${q.requested_slot}`}
                         {q.referral_code && ` · Ref: ${q.referral_code.toUpperCase()}`}
                       </div>
                       <div className="mt-1.5 flex flex-wrap gap-3 text-xs">
-                        {q.phone && (
-                          <a href={`tel:${q.phone}`} className="font-bold text-brand-green">
-                            📞 {q.phone}
-                          </a>
-                        )}
-                        {q.email && (
-                          <a href={`mailto:${q.email}`} className="text-white/60 hover:text-white">
-                            ✉️ {q.email}
-                          </a>
-                        )}
+                        {q.phone && <a href={`tel:${q.phone}`} className="font-bold text-brand-green">📞 {q.phone}</a>}
+                        {q.email && <a href={`mailto:${q.email}`} className="text-white/60 hover:text-white">✉️ {q.email}</a>}
                       </div>
                     </div>
                     <form action={markQuoteLeadActioned}>
                       <input type="hidden" name="id" value={q.id} />
-                      <button
-                        className="shrink-0 rounded-full border border-white/15 px-3 py-1.5 text-[11px] font-bold text-white/70 transition hover:border-brand-green hover:text-brand-green"
-                      >
+                      <button className="shrink-0 rounded-full border border-white/15 px-3 py-1.5 text-[11px] font-bold text-white/70 transition hover:border-brand-green hover:text-brand-green">
                         Actioned ✓
                       </button>
                     </form>
                   </div>
                 </div>
-                ))}
-              </div>
-            )}
-          </section>
-        </Reveal>
-      )}
-
-      {/* ── ASHLEE'S RUN SHEET ───────────────────────────────────── */}
-      {isToday && (
-        <Reveal delay={60}>
-          <div className="mt-6">
-            <RunSheet key={today} today={today} initial={checklist} />
-          </div>
-        </Reveal>
-      )}
-
-      {/* ── HERO BAND: scoreboard + today's stat tiles ───────────── */}
-      <div className="mt-7 grid gap-4 xl:grid-cols-3 xl:items-start">
-      {/* ── SCOREBOARD (hero) ────────────────────────────────────── */}
-      <Reveal delay={80}>
-        <section className="relative xl:col-span-2">
-          {status.tone !== "neutral" && (
-            <div
-              className={`pointer-events-none absolute -inset-6 ${
-                status.tone === "green" ? "halo-green" : "halo-yellow"
-              }`}
-              aria-hidden
-            />
+              ))}
+            </div>
           )}
-
-          <div
-            className={`relative rounded-3xl border p-6 sm:p-7 ${
-              status.tone === "green"
-                ? "border-brand-green/40 bg-brand-green/[0.05]"
-                : status.tone === "yellow"
-                ? "border-brand-yellow/40 bg-brand-yellow/[0.05]"
-                : "border-white/10 bg-white/[0.02]"
-            }`}
-          >
-            <div className="flex items-center justify-between">
-              <div className={EYEBROW}>Revenue earned today</div>
-              <div
-                className={`rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-wider ${
-                  status.tone === "yellow"
-                    ? "bg-brand-yellow/15 text-brand-yellow"
-                    : status.tone === "green"
-                    ? "bg-brand-green/15 text-brand-green"
-                    : "bg-white/5 text-white/40"
-                }`}
-              >
-                {status.label}
-              </div>
-            </div>
-
-            <div className="mt-3 font-display text-6xl font-extrabold leading-none tabular-nums text-white sm:text-7xl">
-              {money(earned)}
-            </div>
-            <div className="mt-1.5 text-sm font-semibold text-white/45">
-              Work completed today · <span className="text-white/70">{money(collected)}</span> cash
-              collected so far
-            </div>
-
-            {/* progress toward the aim, with the break-even marker */}
-            <div className="relative mt-6 h-3.5 overflow-hidden rounded-full bg-white/10">
-              <div
-                className={`h-full rounded-full transition-all ${
-                  earned >= breakEvenRevenue ? "bg-brand-green" : "bg-brand-yellow"
-                }`}
-                style={{ width: `${aimPct}%` }}
-              />
-              <div
-                className="absolute top-[-2px] h-[calc(100%+4px)] w-0.5 bg-white"
-                style={{ left: `${bePct}%` }}
-                aria-hidden
-              />
-            </div>
-            <div className="mt-2 flex justify-between text-[11px] font-bold text-white/45">
-              <span>Break-even {money(breakEvenRevenue)}</span>
-              <span>Aim {money(aimRevenue)}</span>
-            </div>
-          </div>
         </section>
-      </Reveal>
+      )}
 
-      <Reveal delay={140}>
-        <div className="grid grid-cols-2 gap-3 xl:content-start">
-          <StatTile
-            label="Jobs done"
-            value={String(entry?.jobs_completed ?? 0)}
-            sub={`aim ${jobsTarget}/day`}
-            tone={(entry?.jobs_completed ?? 0) >= jobsTarget ? "green" : "neutral"}
-          />
-          <StatTile
-            label="Cash collected"
-            value={money(collected)}
-            sub="banked today"
-            tone={collected > 0 ? "green" : "neutral"}
-          />
-          <StatTile
-            label="Happy (mo)"
-            value={String(satisfaction.happy)}
-            sub="checked-in ✓"
-            tone={satisfaction.happy > 0 ? "green" : "neutral"}
-          />
-          <StatTile
-            label="Unhappy (mo)"
-            value={String(satisfaction.unhappy)}
-            sub="this month"
-            tone={satisfaction.unhappy > 0 ? "yellow" : "neutral"}
-          />
-        </div>
-      </Reveal>
+      {/* ── RUN SHEET ── */}
+      <div className="mt-8">
+        <RunSheet key={today} today={today} initial={checklist} />
       </div>
 
-      {/* ── PACE + BOOKINGS band ─────────────────────────────────── */}
+      {/* ── SCHEDULE + TODAY'S JOBS ── */}
       <div className="mt-8 grid gap-6 xl:grid-cols-2 xl:items-start">
-      {/* ── WEEK & MONTH PACE ────────────────────────────────────── */}
-      <Reveal delay={200}>
+        {/* schedule */}
         <section>
-          <SectionTitle eyebrow="The targets" title="Week &amp; month pace" />
-          <div className="grid gap-3 sm:grid-cols-2">
-            <PaceCard label="This week" current={weekRevenue} target={weeklyTarget} />
-            <PaceCard label="This month" current={monthRevenue} target={monthlyTarget} />
-          </div>
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3 text-sm">
-            <span className="text-white/50">
-              Week profit vs break-even{" "}
-              <span className="text-white/30">({weekLoggedDays}d logged)</span>
-            </span>
-            {weekLoggedDays === 0 ? (
-              <span className="text-sm font-semibold text-white/40">— start logging</span>
-            ) : (
-              <span
-                className={`font-display text-lg font-extrabold tabular-nums ${
-                  weekProfit >= 0 ? "text-brand-green" : "text-brand-yellow"
-                }`}
-              >
-                {weekProfit >= 0 ? "+" : ""}
-                {money(weekProfit)}
-              </span>
-            )}
-          </div>
-          {prevWeekRevenue > 0 && (
-            <div className="mt-1 text-xs text-white/35">
-              Last full week earned {money(prevWeekRevenue)}.
-            </div>
-          )}
-        </section>
-      </Reveal>
-
-      {/* ── BOOKINGS & ADS (from calendar) ───────────────────────── */}
-      <Reveal delay={240}>
-        <section>
-          <SectionTitle eyebrow="From your calendar" title="Bookings &amp; ads" />
-
-          {hasBookings ? (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              <StatTile
-                label="Corrections/day"
-                value={corrPerDay.toFixed(1)}
-                sub={`aim ${jobsTarget}/day · ${corr14} in 14d`}
-                tone={corrPerDay >= 1 ? "green" : corrPerDay > 0 ? "yellow" : "neutral"}
-              />
-              <StatTile
-                label="Booked this week"
-                value={String(weekBookings.length)}
-                sub={`${money(weekBookedValue)} · ${weekBookedCorr} corr`}
-              />
-              <StatTile
-                label="Pipeline ahead"
-                value={String(pipeline.length)}
-                sub={`${money(pipelineValue)} · ${pipelineCorr} corr`}
-                tone={pipeline.length > 0 ? "green" : "yellow"}
-              />
-              <StatTile
-                label="CAC this week"
-                value={weekCAC ? money(weekCAC) : "—"}
-                sub={`${money(weekAdSpend)} ad spend`}
-              />
-            </div>
-          ) : (
-            <p className="text-sm text-white/45">
-              No bookings loaded yet — upload your calendar below to switch this on.
-            </p>
-          )}
-
-          <form
-            action={uploadCalendar}
-            className={`mt-3 ${CARD} flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between`}
-          >
-            <div>
-              <div className="text-sm font-bold text-white">Sync bookings</div>
-              <div className="mt-0.5 text-xs text-white/45">
-                Drop in the Google Calendar export (.zip or .ics) — refreshes corrections/day &amp;
-                pipeline.
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <input
-                type="file"
-                name="cal"
-                accept=".zip,.ics"
-                required
-                className="max-w-[190px] text-xs text-white/70 file:mr-3 file:rounded-full file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-xs file:font-bold file:text-white hover:file:bg-white/20"
-              />
-              <button className="shrink-0 rounded-full bg-brand-green px-5 py-2.5 text-xs font-black text-[#04130a] transition hover:brightness-110 active:scale-95">
-                Upload
-              </button>
-            </div>
-          </form>
-        </section>
-      </Reveal>
-      </div>
-
-      {/* ── SCHEDULE (full-width week view — days tiled) ──────────── */}
-      <Reveal delay={245}>
-        <section className="mt-8">
           <SectionTitle eyebrow="What's booked" title="Schedule" />
           {scheduleDays.length === 0 ? (
-            <p className="text-sm text-white/45">
-              Nothing upcoming — upload the latest calendar to see the schedule.
-            </p>
+            <p className="text-sm text-white/45">Nothing upcoming — upload the latest calendar on the Uploads tab.</p>
           ) : (
-            <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+            <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3">
               {scheduleDays.map((d) => {
                 const jobs = scheduleByDay.get(d) || [];
                 const total = jobs.reduce((a, j) => a + j.value, 0);
                 const corr = jobs.filter((j) => j.is_correction).length;
-                const others = jobs.length - corr;
-                const detailers = corr * 2 + others; // correction = 2, other job = 1
-                const overCrew = detailers > 3;
-                // How much more booked revenue this day needs to hit the daily aim.
                 const toTarget = Math.max(0, aimRevenue - total);
                 return (
                   <div key={d} className={`${CARD} p-4`}>
                     <div className="flex items-center justify-between gap-3">
                       <div className="font-display text-base font-extrabold tracking-tight text-white">
                         {dayLabel(d)}
-                        {d === today && (
-                          <span className="ml-2 rounded-full bg-brand-green/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand-green">
-                            Today
-                          </span>
-                        )}
+                        {d === today && <span className="ml-2 rounded-full bg-brand-green/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-brand-green">Today</span>}
                       </div>
                       <div className="shrink-0 text-xs font-semibold text-white/50">
                         {jobs.length} · {money(total)}
                         {corr > 0 && <span className="text-brand-green"> · {corr} corr</span>}
                       </div>
                     </div>
-
-                    <div className="mt-2 flex flex-wrap items-center gap-2">
-                      <span
-                        className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold ${
-                          overCrew
-                            ? "bg-brand-yellow/15 text-brand-yellow"
-                            : "bg-brand-green/15 text-brand-green"
-                        }`}
-                      >
-                        👷 ≈ {detailers} detailer{detailers === 1 ? "" : "s"} + Ashlee
-                        {overCrew && " · Ashlee on tools or move a job"}
-                      </span>
-                      {toTarget > 0 ? (
-                        <span className="inline-flex items-center gap-1.5 rounded-full border border-red-500/40 bg-red-500/[0.12] px-2.5 py-1 text-[11px] font-bold text-red-300">
-                          🔴 Need to book {money(toTarget)} to hit target
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-green/15 px-2.5 py-1 text-[11px] font-bold text-brand-green">
-                          🎯 Target hit ✓
-                        </span>
-                      )}
-                    </div>
-
+                    {toTarget > 0 ? (
+                      <div className="mt-2 inline-flex items-center gap-1.5 rounded-full border border-red-500/40 bg-red-500/[0.12] px-2.5 py-1 text-[11px] font-bold text-red-300">
+                        🔴 Need {money(toTarget)} more to hit target
+                      </div>
+                    ) : (
+                      <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-brand-green/15 px-2.5 py-1 text-[11px] font-bold text-brand-green">🎯 Target hit ✓</div>
+                    )}
                     <div className="mt-2.5 flex flex-col gap-1.5">
                       {jobs.map((j, i) => (
-                        <div
-                          key={i}
-                          className="flex items-center justify-between gap-3 rounded-lg border border-white/[0.07] bg-black/20 px-3 py-2"
-                        >
-                          <span className="min-w-0 flex-1 truncate text-sm text-white/80">
-                            {j.summary || "(no title)"}
-                          </span>
+                        <div key={i} className="flex items-center justify-between gap-3 rounded-lg border border-white/[0.07] bg-black/20 px-3 py-2">
+                          <span className="min-w-0 flex-1 truncate text-sm text-white/80">{j.summary || "(no title)"}</span>
                           <span className="shrink-0 text-xs font-bold tabular-nums text-white/55">
                             {money(j.value)}
                             {j.is_correction && <span className="ml-1.5 text-brand-green">●</span>}
@@ -983,454 +386,135 @@ export default async function OpsPage({
             </div>
           )}
         </section>
-      </Reveal>
 
-      {/* ── TODAY'S JOBS + CHECK-INS band ────────────────────────── */}
-      <div className="mt-8 grid gap-6 xl:grid-cols-2 xl:items-start">
-      {/* ── TODAY'S JOBS (hours per car) ─────────────────────────── */}
-      <Reveal delay={250}>
+        {/* today's jobs — hours per car */}
         <section>
           <SectionTitle eyebrow="On the floor today" title="Today's jobs" />
-
-          {jobsOk && (
-            <div className="mb-3 rounded-xl border border-brand-green/40 bg-brand-green/[0.08] px-4 py-2.5 text-sm font-semibold text-brand-green">
-              Hours saved ✓
-            </div>
-          )}
-
           <div className="mb-3 flex items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-4 py-2.5 text-xs text-white/55">
             <span aria-hidden>🚫</span>
             <span>
               No-shows / cancellations:{" "}
-              <b className={cancelStats.week > 0 ? "text-red-300" : "text-white/70"}>{cancelStats.week}</b>{" "}
-              this week{" · "}
-              <b className={cancelStats.month > 0 ? "text-red-300" : "text-white/70"}>{cancelStats.month}</b>{" "}
-              this month
+              <b className={cancelStats.week > 0 ? "text-red-300" : "text-white/70"}>{cancelStats.week}</b> this week{" · "}
+              <b className={cancelStats.month > 0 ? "text-red-300" : "text-white/70"}>{cancelStats.month}</b> this month
+              {" · "}😊 {satisfaction.happy} / {satisfaction.unhappy} 🙁 (mo)
             </span>
           </div>
-
           {floorJobs.length === 0 ? (
-            <p className="text-sm text-white/45">
-              No jobs on the calendar for today — upload the latest calendar if that looks wrong.
-            </p>
+            <p className="text-sm text-white/45">No jobs on the calendar for today — upload the latest calendar if that looks wrong.</p>
           ) : (
-            <>
-              <div className="mb-3 grid grid-cols-3 gap-3">
-                <StatTile
-                  label="Earned today"
-                  value={money(earnedToday)}
-                  sub={`${todaysJobs.length} job${todaysJobs.length === 1 ? "" : "s"} on`}
-                />
-                <StatTile
-                  label="Collected"
-                  value={money(collected)}
-                  sub="cash logged"
-                  tone={collected > 0 && collected >= earnedToday ? "green" : "neutral"}
-                />
-                <StatTile
-                  label="Hours today"
-                  value={`${Math.round(hoursToday * 100) / 100}h`}
-                  sub={hoursToday > 0 ? `${money(earnedToday / hoursToday)}/hr` : "log hours ↓"}
-                />
-              </div>
-
-              <p className="mb-2 text-xs leading-relaxed text-white/45">
-                Log <b className="text-white/70">today&apos;s</b> hours on each car. A job worked over
-                several days keeps a running total and stays here until you tick{" "}
-                <b className="text-white/70">Done</b>.
-              </p>
-
-              <form action={logJobHours} className={`${CARD} p-4`}>
-                <div className="flex flex-col gap-2">
-                  {floorJobs.map((j) => {
-                    const carried = j.booking_date < today;
-                    const total = Math.round((j.hours || 0) * 100) / 100;
-                    return (
-                      <div
-                        key={j.uid}
-                        className={`flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border bg-black/30 px-3 py-2.5 ${
-                          j.cancelled
-                            ? "border-red-500/40 opacity-60"
-                            : carried
-                            ? "border-brand-yellow/30"
-                            : "border-white/10"
-                        }`}
-                      >
-                        <div className="min-w-0 flex-1">
-                          <div
-                            className={`truncate text-sm font-semibold ${
-                              j.cancelled ? "text-white/50 line-through" : "text-white/85"
-                            }`}
-                          >
-                            {j.summary || "(no title)"}
-                          </div>
-                          <div className="text-xs text-white/40">
-                            {money(j.value)}
-                            {j.cancelled && (
-                              <span className="ml-1.5 font-bold text-red-300">· no-show</span>
-                            )}
-                            {j.is_correction && (
-                              <span className="ml-1.5 font-bold text-brand-green">· correction</span>
-                            )}
-                            {carried && (
-                              <span className="ml-1.5 font-semibold text-brand-yellow">
-                                · carried from {dayLabel(j.booking_date)}
-                              </span>
-                            )}
-                            {total > 0 && (
-                              <span className="ml-1.5 text-white/55">· {total}h total</span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex shrink-0 items-center gap-1.5">
-                          <input
-                            type="number"
-                            name={`jh::${j.uid}`}
-                            defaultValue={j.hours_today || ""}
-                            min={0}
-                            step="any"
-                            inputMode="decimal"
-                            placeholder="0"
-                            aria-label={`Hours today for ${j.summary}`}
-                            className="w-16 rounded-lg border border-white/12 bg-black/50 px-2 py-2 text-right text-sm text-white outline-none focus:border-brand-green"
-                          />
-                          <span className="text-xs font-semibold text-white/40">hrs today</span>
-                        </div>
-                        <span className="w-14 shrink-0 text-right text-xs font-bold tabular-nums text-brand-green">
-                          {total > 0 ? `${money(j.value / total)}/hr` : ""}
-                        </span>
-                        <input type="hidden" name={`job::${j.uid}`} value="1" />
-                        <label
-                          className={`flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-2 text-xs font-bold transition ${
-                            j.finished
-                              ? "border-brand-green/50 bg-brand-green/10 text-brand-green"
-                              : "border-white/12 text-white/60 hover:border-brand-green hover:text-brand-green"
-                          }`}
-                        >
-                          <input
-                            type="checkbox"
-                            name={`fin::${j.uid}`}
-                            defaultChecked={j.finished}
-                            className="h-3.5 w-3.5 accent-brand-green"
-                          />
-                          Done
-                        </label>
-                        <label
-                          className={`flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-2 text-xs font-bold transition ${
-                            j.cancelled
-                              ? "border-red-500/50 bg-red-500/10 text-red-300"
-                              : "border-white/12 text-white/60 hover:border-red-500/60 hover:text-red-300"
-                          }`}
-                        >
-                          <input
-                            type="checkbox"
-                            name={`cancel::${j.uid}`}
-                            defaultChecked={j.cancelled}
-                            className="h-3.5 w-3.5 accent-red-500"
-                          />
-                          No-show
-                        </label>
-                        <textarea
-                          name={`note::${j.uid}`}
-                          defaultValue={j.note}
-                          rows={1}
-                          placeholder="Notes for the crew — what's left, anything to rectify…"
-                          className="mt-1 w-full resize-y rounded-lg border border-white/10 bg-black/30 px-2.5 py-2 text-xs text-white/80 outline-none placeholder:text-white/25 focus:border-brand-green"
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-                <button className="mt-3 rounded-full bg-brand-green px-6 py-2.5 text-xs font-black text-[#04130a] transition hover:brightness-110 active:scale-95">
-                  Save hours &amp; notes
-                </button>
-              </form>
-            </>
-          )}
-        </section>
-      </Reveal>
-
-      {/* ── CUSTOMER CHECK-INS (happy → done · unhappy → rectify) ── */}
-      <Reveal delay={255}>
-        <section>
-          <SectionTitle eyebrow="Customer care" title="Check-ins" />
-
-          {fuOk && (
-            <div className="mb-3 rounded-xl border border-brand-green/40 bg-brand-green/[0.08] px-4 py-2.5 text-sm font-semibold text-brand-green">
-              Saved ✓
-            </div>
-          )}
-
-          {/* unhappy → rectify jobs to book */}
-          {rectifyList.length > 0 && (
-            <div className="mb-4">
-              <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-red-300">
-                🔧 Rectify jobs to book
-              </div>
+            <form action={logJobHours} className={`${CARD} p-4`}>
               <div className="flex flex-col gap-2">
-                {rectifyList.map((f) => (
-                  <div
-                    key={f.uid}
-                    className="flex items-center gap-3 rounded-xl border border-red-500/30 bg-red-500/[0.06] px-3 py-2.5"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-semibold text-white/85">
-                        {f.summary || "(no title)"}
+                {floorJobs.map((j) => {
+                  const carried = j.booking_date < today;
+                  const total = Math.round((j.hours || 0) * 100) / 100;
+                  return (
+                    <div
+                      key={j.uid}
+                      className={`flex flex-wrap items-center gap-x-3 gap-y-2 rounded-xl border bg-black/30 px-3 py-2.5 ${j.cancelled ? "border-red-500/40 opacity-60" : carried ? "border-brand-yellow/30" : "border-white/10"}`}
+                    >
+                      <div className="min-w-0 flex-1">
+                        <div className={`truncate text-sm font-semibold ${j.cancelled ? "text-white/50 line-through" : "text-white/85"}`}>{j.summary || "(no title)"}</div>
+                        <div className="text-xs text-white/40">
+                          {money(j.value)}
+                          {j.cancelled && <span className="ml-1.5 font-bold text-red-300">· no-show</span>}
+                          {j.is_correction && <span className="ml-1.5 font-bold text-brand-green">· correction</span>}
+                          {carried && <span className="ml-1.5 font-semibold text-brand-yellow">· carried from {dayLabel(j.booking_date)}</span>}
+                          {total > 0 && <span className="ml-1.5 text-white/55">· {total}h total</span>}
+                        </div>
                       </div>
-                      <div className="text-xs text-white/40">
-                        {dayLabel(f.booking_date)} · {money(f.value)} · unhappy
+                      <div className="flex shrink-0 items-center gap-1.5">
+                        <input
+                          type="number"
+                          name={`jh::${j.uid}`}
+                          defaultValue={j.hours_today || ""}
+                          min={0}
+                          step="any"
+                          inputMode="decimal"
+                          placeholder="0"
+                          aria-label={`Hours today for ${j.summary}`}
+                          className="w-16 rounded-lg border border-white/12 bg-black/50 px-2 py-2 text-right text-sm text-white outline-none focus:border-brand-green"
+                        />
+                        <span className="text-xs font-semibold text-white/40">hrs</span>
                       </div>
+                      <input type="hidden" name={`job::${j.uid}`} value="1" />
+                      <label className={`flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-2 text-xs font-bold transition ${j.finished ? "border-brand-green/50 bg-brand-green/10 text-brand-green" : "border-white/12 text-white/60 hover:border-brand-green hover:text-brand-green"}`}>
+                        <input type="checkbox" name={`fin::${j.uid}`} defaultChecked={j.finished} className="h-3.5 w-3.5 accent-brand-green" />
+                        Done
+                      </label>
+                      <label className={`flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border px-2.5 py-2 text-xs font-bold transition ${j.cancelled ? "border-red-500/50 bg-red-500/10 text-red-300" : "border-white/12 text-white/60 hover:border-red-500/60 hover:text-red-300"}`}>
+                        <input type="checkbox" name={`cancel::${j.uid}`} defaultChecked={j.cancelled} className="h-3.5 w-3.5 accent-red-500" />
+                        No-show
+                      </label>
+                      <textarea
+                        name={`note::${j.uid}`}
+                        defaultValue={j.note}
+                        rows={1}
+                        placeholder="Notes for the crew — what's left, anything to rectify…"
+                        className="mt-1 w-full resize-y rounded-lg border border-white/10 bg-black/30 px-2.5 py-2 text-xs text-white/80 outline-none placeholder:text-white/25 focus:border-brand-green"
+                      />
                     </div>
-                    <form action={setCheckin}>
-                      <input type="hidden" name="uid" value={f.uid} />
-                      <button
-                        name="outcome"
-                        value="rectified"
-                        className="shrink-0 rounded-full border border-white/15 px-3 py-1.5 text-[11px] font-bold text-white/70 transition hover:border-brand-green hover:text-brand-green"
-                      >
-                        Rectify sorted ✓
-                      </button>
-                    </form>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
-            </div>
-          )}
-
-          {/* pending check-ins */}
-          {dueFollowups.length === 0 ? (
-            <p className="text-sm text-white/45">
-              Nothing due — check-ins show here the day after a car is done.
-            </p>
-          ) : pendingFollowupList.length === 0 ? (
-            <p className="text-sm font-semibold text-brand-green">
-              All recent customers checked in ✓ — nice work.
-            </p>
-          ) : (
-            <>
-              <p className="mb-3 text-xs leading-relaxed text-white/45">
-                Message each the day after. When they reply, mark it —{" "}
-                <b className="text-white/70">Happy</b> clears it,{" "}
-                <b className="text-white/70">Not happy</b> books a rectify job. This auto-fills your
-                happy/unhappy numbers.
-              </p>
-              <div className={`${CARD} flex flex-col gap-2 p-4`}>
-                {pendingFollowupList.map((f) => (
-                  <div
-                    key={f.uid}
-                    className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/25 px-3 py-2.5"
-                  >
-                    <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-semibold text-white/85">
-                        {f.summary || "(no title)"}
-                      </div>
-                      <div className="text-xs text-white/40">
-                        {dayLabel(f.booking_date)} · {money(f.value)}
-                      </div>
-                    </div>
-                    <form action={setCheckin} className="flex shrink-0 gap-1.5">
-                      <input type="hidden" name="uid" value={f.uid} />
-                      <button
-                        name="outcome"
-                        value="happy"
-                        className="rounded-full bg-brand-green px-3 py-1.5 text-[11px] font-black text-[#04130a] transition hover:brightness-110 active:scale-95"
-                      >
-                        😊 Happy
-                      </button>
-                      <button
-                        name="outcome"
-                        value="unhappy"
-                        className="rounded-full border border-red-500/40 bg-red-500/[0.12] px-3 py-1.5 text-[11px] font-bold text-red-300 transition hover:bg-red-500/20"
-                      >
-                        Not happy
-                      </button>
-                    </form>
-                  </div>
-                ))}
-              </div>
-            </>
+              <button className="mt-3 rounded-full bg-brand-green px-6 py-2.5 text-xs font-black text-[#04130a] transition hover:brightness-110 active:scale-95">
+                Save hours &amp; notes
+              </button>
+            </form>
           )}
         </section>
-      </Reveal>
       </div>
 
-      {/* ── ENTRY FORM (auto-saves as you go) ────────────────────── */}
-      {/* key by date so a new day (or viewing another date) fully remounts the
-          form and re-seeds from that day's data — otherwise yesterday's typed
-          values stay stuck in the inputs even though the server sent fresh. */}
-      <AutoSaveForm key={date} action={saveEntry} autoSave={autoSaveDay}>
-        {/* the numbers (left) · the day's story (right) */}
-        <div className="mt-10 grid gap-6 xl:grid-cols-2 xl:items-start">
-        {/* the numbers */}
-        <section className={`${CARD} p-6`}>
-          <SectionTitle
-            eyebrow={entry ? "Update the log" : "Log the day"}
-            title="The numbers"
-          />
-
-          <div className="flex flex-col gap-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/40">
-              Date
-            </span>
-            <input
-              type="date"
-              name="log_date"
-              defaultValue={date}
-              className={`${FIELD} px-3 py-3 sm:w-auto`}
-            />
-          </div>
-
-          <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-            <NumField
-              label="Jobs completed"
-              name="jobs_completed"
-              defaultValue={entry?.jobs_completed ?? ""}
-            />
-            <NumField
-              label="Revenue earned (est) — drives the board"
-              name="completed_revenue"
-              prefix="$"
-              step={0.01}
-              defaultValue={entry?.completed_revenue ?? ""}
-            />
-            <NumField
-              label="Cash collected today"
-              name="revenue_collected"
-              prefix="$"
-              step={0.01}
-              defaultValue={entry?.revenue_collected ?? ""}
-            />
-            <NumField
-              label="Ad spend today"
-              name="ad_spend"
-              prefix="$"
-              step={0.01}
-              defaultValue={entry?.ad_spend ?? ""}
-            />
-            <NumField
-              label="Other leads (SMS/web/call)"
-              name="messages"
-              defaultValue={entry?.messages ?? ""}
-            />
-            <NumField
-              label="Quotes sent"
-              name="quotes"
-              defaultValue={entry?.quotes ?? ""}
-            />
-            <NumField label="Re-dos" name="redos" defaultValue={entry?.redos ?? ""} />
-          </div>
-          <p className="mt-2 text-xs text-white/35">
-            Happy/unhappy customers are tracked automatically from the check-ins above.
-          </p>
-        </section>
-
-        {/* the day */}
-        <section className={`${CARD} p-6`}>
-          <SectionTitle eyebrow="The story" title="How the day went" />
-          <textarea
-            name="notes_today"
-            rows={16}
-            defaultValue={entry?.notes_today || DAY_NOTES_TEMPLATE}
-            placeholder="Fill in each line, the good and the bad."
-            className={`${FIELD} resize-y px-3 py-3 leading-relaxed`}
-          />
-
-        </section>
-        </div>
-
-        {/* the crew — full width, people tiled across columns */}
-        <section className="mt-8">
-          <SectionTitle eyebrow="Who was on" title="The crew" />
-          <StaffHours staff={OPS_STAFF} initial={crewInitial} />
-        </section>
-
-        <button
-          type="submit"
-          className="mt-8 w-full rounded-full bg-brand-green px-6 py-4 text-sm font-black text-[#04130a] shadow-[0_10px_40px_rgba(43,255,122,0.25)] transition hover:brightness-110 active:scale-95 sm:w-auto sm:px-14"
-        >
-          Save the day →
-        </button>
-      </AutoSaveForm>
-
-      {/* ── HISTORY ──────────────────────────────────────────────── */}
-      <Reveal>
-        <section className="mt-14">
-          <div className="mb-4 flex items-end justify-between gap-3">
-            <div>
-              <div className={EYEBROW}>The record</div>
-              <h2 className="mt-2 font-display text-xl font-extrabold tracking-tight text-white">
-                Recent logged days
-              </h2>
+      {/* ── CHECK-INS ── */}
+      <section className="mt-8">
+        <SectionTitle eyebrow="Customer care" title="Check-ins" />
+        {rectifyList.length > 0 && (
+          <div className="mb-4">
+            <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.16em] text-red-300">🔧 Rectify jobs to book</div>
+            <div className="flex flex-col gap-2">
+              {rectifyList.map((f) => (
+                <div key={f.uid} className="flex items-center gap-3 rounded-xl border border-red-500/30 bg-red-500/[0.06] px-3 py-2.5">
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-semibold text-white/85">{f.summary || "(no title)"}</div>
+                    <div className="text-xs text-white/40">{dayLabel(f.booking_date)} · {money(f.value)} · unhappy</div>
+                  </div>
+                  <form action={setCheckin}>
+                    <input type="hidden" name="uid" value={f.uid} />
+                    <button name="outcome" value="rectified" className="shrink-0 rounded-full border border-white/15 px-3 py-1.5 text-[11px] font-bold text-white/70 transition hover:border-brand-green hover:text-brand-green">
+                      Rectify sorted ✓
+                    </button>
+                  </form>
+                </div>
+              ))}
             </div>
-            <a
-              href="/ops/export"
-              className="shrink-0 rounded-full border border-white/15 px-4 py-2 text-xs font-bold text-white/60 transition hover:border-white/35 hover:text-white"
-            >
-              Export CSV ↓
-            </a>
           </div>
-
-          {missingLast7.length > 0 && (
-            <div className="mb-3 rounded-xl border border-brand-yellow/30 bg-brand-yellow/[0.05] px-4 py-2.5 text-xs text-brand-yellow">
-              Missing logs in the last 7 days: {missingLast7.join(", ")} — fill the gaps so the
-              numbers stay honest.
-            </div>
-          )}
-
-          {loggedRecent.length === 0 ? (
-            <p className="text-sm text-white/45">
-              No days logged yet — your first entry will show here.
+        )}
+        {dueFollowups.length === 0 ? (
+          <p className="text-sm text-white/45">Nothing due — check-ins show here the day after a car is done.</p>
+        ) : pendingFollowupList.length === 0 ? (
+          <p className="text-sm font-semibold text-brand-green">All recent customers checked in ✓ — nice work.</p>
+        ) : (
+          <>
+            <p className="mb-3 text-xs leading-relaxed text-white/45">
+              Message each the day after. <b className="text-white/70">Happy</b> clears it, <b className="text-white/70">Not happy</b> books a rectify job.
             </p>
-          ) : (
-            <div className={`overflow-x-auto ${CARD}`}>
-              <table className="w-full border-collapse text-sm tabular-nums">
-                <thead>
-                  <tr className="border-b border-white/10">
-                    {["Date", "Collected", "Compl", "Done", "Hrs"].map((h) => (
-                      <th
-                        key={h}
-                        className="whitespace-nowrap px-3 py-3 text-left text-[10px] font-bold uppercase tracking-[0.12em] text-white/40"
-                      >
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {loggedRecent.map((r) => {
-                    const ok = r.revenue_collected >= breakEvenRevenue;
-                    return (
-                      <tr
-                        key={r.log_date}
-                        className="border-b border-white/[0.06] transition last:border-0 hover:bg-white/[0.02]"
-                      >
-                        <td className="whitespace-nowrap px-3 py-3">
-                          <Link
-                            href={`/ops?date=${r.log_date}`}
-                            className="font-semibold text-white/85 underline-offset-4 hover:text-brand-green hover:underline"
-                          >
-                            {r.log_date}
-                          </Link>
-                        </td>
-                        <td
-                          className={`whitespace-nowrap px-3 py-3 font-black ${
-                            ok ? "text-brand-green" : "text-brand-yellow"
-                          }`}
-                        >
-                          {money(r.revenue_collected)}
-                        </td>
-                        <td className="px-3 py-3 text-white/60">{money(r.completed_revenue)}</td>
-                        <td className="px-3 py-3 text-white/70">{r.jobs_completed}</td>
-                        <td className="px-3 py-3 text-white/70">{totalHours(r)}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+            <div className={`${CARD} flex flex-col gap-2 p-4`}>
+              {pendingFollowupList.map((f) => (
+                <div key={f.uid} className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/25 px-3 py-2.5">
+                  <div className="min-w-0 flex-1">
+                    <div className="truncate text-sm font-semibold text-white/85">{f.summary || "(no title)"}</div>
+                    <div className="text-xs text-white/40">{dayLabel(f.booking_date)} · {money(f.value)}</div>
+                  </div>
+                  <form action={setCheckin} className="flex shrink-0 gap-1.5">
+                    <input type="hidden" name="uid" value={f.uid} />
+                    <button name="outcome" value="happy" className="rounded-full bg-brand-green px-3 py-1.5 text-[11px] font-black text-[#04130a] transition hover:brightness-110 active:scale-95">😊 Happy</button>
+                    <button name="outcome" value="unhappy" className="rounded-full border border-red-500/40 bg-red-500/[0.12] px-3 py-1.5 text-[11px] font-bold text-red-300 transition hover:bg-red-500/20">Not happy</button>
+                  </form>
+                </div>
+              ))}
             </div>
-          )}
-        </section>
-      </Reveal>
+          </>
+        )}
+      </section>
 
       <p className="mt-16 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-white/20">
         Smiths Detailing · Cairns · Team only

@@ -1591,6 +1591,65 @@ export async function getSalesStats(fromISO: string, toISO: string): Promise<Sal
   }
 }
 
+/** Lean dashboard headline numbers — real revenue (Xero) + leads (Meta) for
+    this week and month, in two queries. Auto-tracked from the uploads so the
+    day never needs manual logging. */
+export interface DashSummary {
+  weekRev: number;
+  weekInv: number;
+  monthRev: number;
+  monthInv: number;
+  weekLeads: number;
+  monthLeads: number;
+  salesLoaded: string | null;
+  leadsLoaded: string | null;
+}
+export async function getDashSummary(
+  weekStart: string,
+  monthStart: string,
+  todayISO: string
+): Promise<DashSummary> {
+  const empty: DashSummary = {
+    weekRev: 0, weekInv: 0, monthRev: 0, monthInv: 0,
+    weekLeads: 0, monthLeads: 0, salesLoaded: null, leadsLoaded: null,
+  };
+  try {
+    await ensureTable();
+    const s = (await sql`
+      SELECT
+        coalesce(sum(total) FILTER (WHERE invoice_date >= ${weekStart}), 0)::float AS week_rev,
+        count(*) FILTER (WHERE invoice_date >= ${weekStart})::int AS week_inv,
+        coalesce(sum(total) FILTER (WHERE invoice_date >= ${monthStart}), 0)::float AS month_rev,
+        count(*) FILTER (WHERE invoice_date >= ${monthStart})::int AS month_inv,
+        to_char(max(loaded_at) AT TIME ZONE 'Australia/Brisbane', 'YYYY-MM-DD HH24:MI') AS loaded
+      FROM sales WHERE invoice_date <= ${todayISO};`) as unknown as {
+      week_rev: number; week_inv: number; month_rev: number; month_inv: number; loaded: string | null;
+    }[];
+    const l = (await sql`
+      SELECT
+        count(*) FILTER (WHERE created_date >= ${weekStart})::int AS week_leads,
+        count(*) FILTER (WHERE created_date >= ${monthStart})::int AS month_leads,
+        to_char(max(loaded_at) AT TIME ZONE 'Australia/Brisbane', 'YYYY-MM-DD HH24:MI') AS loaded
+      FROM meta_leads;`) as unknown as {
+      week_leads: number; month_leads: number; loaded: string | null;
+    }[];
+    const sr = s[0] || ({} as (typeof s)[0]);
+    const lr = l[0] || ({} as (typeof l)[0]);
+    return {
+      weekRev: Number(sr.week_rev) || 0,
+      weekInv: Number(sr.week_inv) || 0,
+      monthRev: Number(sr.month_rev) || 0,
+      monthInv: Number(sr.month_inv) || 0,
+      weekLeads: Number(lr.week_leads) || 0,
+      monthLeads: Number(lr.month_leads) || 0,
+      salesLoaded: sr.loaded || null,
+      leadsLoaded: lr.loaded || null,
+    };
+  } catch {
+    return empty;
+  }
+}
+
 export interface LeadSaleMatch {
   realLeads: number;
   matchedLeads: number;
