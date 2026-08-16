@@ -7,22 +7,21 @@ import { BUSINESS } from "@/lib/config";
 export const metadata: Metadata = {
   title: "Smiths Garage Maintenance | Cairns",
   description:
-    "Keep your car clean and serviced every 3 months — one simple monthly plan from Smiths Garage, Cairns. Detailed, serviced, priority booking, one payment.",
+    "Keep your car clean and serviced every 3 months. One simple weekly plan from Smiths Garage, Cairns. Detailed, serviced, priority booking, one payment.",
   robots: { index: false, follow: false }, // sent direct to customers — not for search
   alternates: { canonical: "/membership" },
 };
 
 const LOGO = "/smiths-garage-logo.png";
 
-// ── The one number that makes or breaks the demand test. Change this line only. ──
-const PRICE = "$199";
+// ── The price. Change this line only. ──
+const PRICE = "$49";
 
 const INCLUSIONS: { icon: string; text: string }[] = [
-  { icon: "✨", text: "Full interior + exterior detail every 3 months — always fresh, never a big clean-up again" },
-  { icon: "🔧", text: "A service worked in to keep it roadworthy — oil, filters, fluids & safety check" },
-  { icon: "⚡", text: "Priority booking — members always come first" },
-  { icon: "💡", text: "Free headlight & touch-up top-ups as your car needs them" },
-  { icon: "💳", text: "One simple monthly payment — no surprise bills" },
+  { icon: "✨", text: "Full interior and exterior detail every 3 months" },
+  { icon: "🔧", text: "A basic service each visit (oil, filters, fluids)" },
+  { icon: "⚡", text: "Priority booking, members come first" },
+  { icon: "💳", text: "One simple weekly payment" },
 ];
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
@@ -70,14 +69,14 @@ export default function MembershipPage() {
           </Reveal>
           <Reveal delay={200}>
             <h1 className="mt-6 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-5xl">
-              Keep your car clean &amp; serviced —
+              Keep your car clean and serviced
               <span className="text-brand-purple-soft"> every 3 months.</span>
             </h1>
           </Reveal>
           <Reveal delay={300}>
             <p className="mx-auto mt-5 max-w-lg text-lg leading-relaxed text-white/65">
-              Stop thinking about your car. On the plan, it&apos;s detailed and serviced on a schedule —
-              always looking its best, always roadworthy — for one monthly payment.
+              Stop thinking about your car. On the plan it&apos;s detailed and serviced on a set
+              schedule, always looking its best, for one simple weekly payment.
             </p>
           </Reveal>
           <Reveal delay={400}>
@@ -106,11 +105,12 @@ export default function MembershipPage() {
                 <h2 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
                   Smiths Garage Maintenance
                 </h2>
-                <div className="mt-5 flex items-end justify-center gap-1">
+                <div className="mt-5 flex items-end justify-center gap-1.5">
+                  <span className="mb-2 text-lg font-bold text-white/50">From</span>
                   <span className="font-display text-5xl font-black text-white sm:text-6xl">{PRICE}</span>
-                  <span className="mb-2 text-lg font-bold text-white/50">/month</span>
+                  <span className="mb-2 text-lg font-bold text-white/50">/week</span>
                 </div>
-                <p className="mt-1 text-xs text-white/40">Billed monthly · cancel anytime · larger vehicles slightly more</p>
+                <p className="mt-1 text-xs text-white/40">Billed weekly · cancel anytime · larger vehicles slightly more</p>
               </div>
 
               <ul className="mt-8 flex flex-col gap-3">

@@ -64,7 +64,7 @@ export default function MembershipSignup() {
     <div className="rounded-3xl border border-white/12 bg-white/[0.03] p-6 sm:p-8">
       <h3 className="font-display text-2xl font-extrabold tracking-tight text-white">Reserve your spot</h3>
       <p className="mt-2 text-sm leading-relaxed text-white/60">
-        Spots are limited — pop your details in and we&apos;ll set you up.
+        Spots are limited, so pop in your details and we&apos;ll set you up.
       </p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -96,7 +96,7 @@ export default function MembershipSignup() {
       >
         {state === "sending" ? "Reserving…" : "Reserve my spot →"}
       </button>
-      <p className="mt-3 text-center text-xs text-white/35">No payment now — we&apos;ll confirm everything with you first.</p>
+      <p className="mt-3 text-center text-xs text-white/35">No payment now. We&apos;ll confirm everything with you first.</p>
     </div>
   );
 }
