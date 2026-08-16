@@ -2172,6 +2172,24 @@ export async function setWaitlistStatus(id: number, status: string): Promise<voi
   await sql`UPDATE waitlist SET status = ${status} WHERE id = ${id};`;
 }
 
+/** Every waitlist entry (any status) for the /ops/waitlist tab, newest first. */
+export async function getAllWaitlist(): Promise<WaitlistEntry[]> {
+  try {
+    const rows = await sql`
+      SELECT id, name, email, phone, vehicle, interests, membership, message, status,
+             coalesce(source, 'garage-waitlist') AS source,
+             to_char(created_at AT TIME ZONE 'Australia/Brisbane',
+                     'YYYY-MM-DD"T"HH24:MI') AS created_at
+      FROM waitlist
+      ORDER BY created_at DESC
+      LIMIT 500;
+    `;
+    return rows as unknown as WaitlistEntry[];
+  } catch {
+    return [];
+  }
+}
+
 /** Waitlist funnel counts for the dashboard card. `members` = how many of the
     pending sign-ups specifically want the Maintenance Membership. */
 export async function getWaitlistStats(): Promise<{
