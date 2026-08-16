@@ -24,7 +24,6 @@ export default function MembershipJoin() {
   const [email, setEmail] = useState("");
   const [vehicle, setVehicle] = useState("");
   const [rego, setRego] = useState("");
-  const [suburb, setSuburb] = useState("");
   const [preferred, setPreferred] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -49,7 +48,7 @@ export default function MembershipJoin() {
           membership: true,
           source: "membership-signup",
           interests: ["detailing", "servicing"],
-          message: `Tier: ${tier} | Rego: ${rego || "—"} | Suburb: ${suburb || "—"} | Preferred first visit: ${preferred || "—"} | Agreed: yes`,
+          message: `Tier: ${tier} | Rego: ${rego || "—"} | Preferred first visit: ${preferred || "—"} | Agreed to T&Cs: yes`,
         }),
       });
     } catch {
@@ -87,33 +86,40 @@ export default function MembershipJoin() {
           <input className={field} value={rego} onChange={(e) => setRego(e.target.value)} placeholder="ABC123" />
         </div>
         <div>
-          <label className={labelCls}>Suburb</label>
-          <input className={field} value={suburb} onChange={(e) => setSuburb(e.target.value)} placeholder="Parramatta Park" />
-        </div>
-        <div className="sm:col-span-2">
           <label className={labelCls}>Preferred first visit</label>
-          <input className={field} value={preferred} onChange={(e) => setPreferred(e.target.value)} placeholder="e.g. this Saturday, or next week" />
+          <input className={field} value={preferred} onChange={(e) => setPreferred(e.target.value)} placeholder="e.g. this Saturday" />
         </div>
       </div>
 
-      <button
-        type="button"
-        onClick={() => setAgreed((a) => !a)}
-        className={`mt-5 flex w-full items-start gap-3 rounded-2xl border px-4 py-3.5 text-left transition ${
-          agreed ? "border-brand-purple/50 bg-brand-purple/[0.07]" : "border-white/12 bg-white/[0.02] hover:border-white/25"
+      <div
+        className={`mt-5 flex items-start gap-3 rounded-2xl border px-4 py-3.5 transition ${
+          agreed ? "border-brand-purple/50 bg-brand-purple/[0.07]" : "border-white/12 bg-white/[0.02]"
         }`}
       >
-        <span
+        <button
+          type="button"
+          onClick={() => setAgreed((a) => !a)}
+          aria-pressed={agreed}
           className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 text-[11px] transition ${
-            agreed ? "border-brand-purple bg-brand-purple/20 text-brand-purple-soft" : "border-white/25 text-transparent"
+            agreed ? "border-brand-purple bg-brand-purple/20 text-brand-purple-soft" : "border-white/25 text-transparent hover:border-brand-purple/50"
           }`}
         >
           ✓
-        </span>
-        <span className="text-sm text-white/80">
-          I&apos;m joining the Smiths Garage Maintenance plan we discussed, and I understand I can cancel any time.
-        </span>
-      </button>
+        </button>
+        <label className="cursor-pointer text-sm text-white/80" onClick={() => setAgreed((a) => !a)}>
+          I&apos;m joining the Smiths Garage Maintenance plan and agree to the{" "}
+          <a
+            href="/membership/terms"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="font-semibold text-brand-purple-soft underline underline-offset-2 hover:text-white"
+          >
+            Terms &amp; Conditions
+          </a>
+          .
+        </label>
+      </div>
 
       {error && <p className="mt-4 text-sm font-semibold text-red-400">{error}</p>}
 
