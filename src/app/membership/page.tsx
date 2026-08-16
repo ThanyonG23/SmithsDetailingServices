@@ -145,6 +145,20 @@ export default function MembershipPage() {
       <section className="py-20 sm:py-24">
         <div className="mx-auto max-w-2xl px-4">
           <Reveal>
+            <div className="mb-4 flex items-center gap-3 rounded-2xl border border-brand-yellow/45 bg-gradient-to-r from-brand-yellow/[0.14] to-brand-yellow/[0.03] px-5 py-4 shadow-glowY">
+              <span className="text-2xl leading-none">🎁</span>
+              <div className="min-w-0">
+                <div className="font-display text-[15px] font-extrabold leading-tight text-white sm:text-lg">
+                  BONUS: Get a free Cut &amp; Polish <span className="whitespace-nowrap text-brand-yellow">valued at $750+</span>
+                </div>
+                <div className="mt-1 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-brand-yellow/80">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-yellow"></span>
+                  Limited time offer
+                </div>
+              </div>
+            </div>
+          </Reveal>
+          <Reveal>
             <div className="relative overflow-hidden rounded-3xl border border-brand-purple/30 bg-gradient-to-b from-brand-purple/[0.10] to-transparent p-7 sm:p-10">
               <div
                 className="pointer-events-none absolute -right-16 -top-16 h-60 w-60 rounded-full opacity-25 blur-[80px]"
