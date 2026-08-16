@@ -17,11 +17,29 @@ const LOGO = "/smiths-garage-logo.png";
 // ── The price. Change this line only. ──
 const PRICE = "$49";
 
-const INCLUSIONS: { icon: string; text: string }[] = [
-  { icon: "✨", text: "Full interior and exterior detail every 3 months" },
-  { icon: "🔧", text: "A basic service each visit (oil, filters, fluids)" },
-  { icon: "⚡", text: "Priority booking, members come first" },
-  { icon: "💳", text: "One simple weekly payment" },
+const PACKAGES: { icon: string; title: string; items: string[] }[] = [
+  {
+    icon: "✨",
+    title: "Deep Interior Clean",
+    items: ["Vacuum", "Carpet extraction", "All interior surfaces cleaned", "Plastics rejuvenated"],
+  },
+  {
+    icon: "🚿",
+    title: "Exterior Detail",
+    items: ["Wheels, tyres and mudflaps cleaned", "Full exterior contact wash", "Tyre shine", "Windows streak free"],
+  },
+  {
+    icon: "🔧",
+    title: "Basic Service",
+    items: [
+      "Oil filter",
+      "Oil change",
+      "Air filter blown out",
+      "Wiper blades checked, swapped if needed",
+      "Tyre pressure checked",
+      "Windshield fluid topped up",
+    ],
+  },
 ];
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
@@ -117,14 +135,32 @@ export default function MembershipPage() {
                 <p className="mt-1 text-xs text-white/40">Billed weekly · cancel anytime · larger vehicles slightly more</p>
               </div>
 
-              <ul className="mt-8 flex flex-col gap-3">
-                {INCLUSIONS.map((it) => (
-                  <li key={it.text} className="flex items-start gap-3 rounded-xl border border-white/8 bg-white/[0.02] px-4 py-3 text-[15px] text-white/85">
-                    <span className="text-lg leading-none">{it.icon}</span>
-                    <span>{it.text}</span>
-                  </li>
-                ))}
-              </ul>
+              <div className="mt-8">
+                <p className="mb-4 text-center text-[11px] font-bold uppercase tracking-[0.18em] text-white/40">
+                  Every 3 months, your car gets
+                </p>
+                <div className="flex flex-col gap-3">
+                  {PACKAGES.map((g) => (
+                    <div key={g.title} className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-xl leading-none">{g.icon}</span>
+                        <h3 className="font-display text-lg font-extrabold tracking-tight text-white">{g.title}</h3>
+                      </div>
+                      <ul className="mt-3 grid gap-x-4 gap-y-2 sm:grid-cols-2">
+                        {g.items.map((item) => (
+                          <li key={item} className="flex items-start gap-2 text-sm text-white/75">
+                            <span className="mt-0.5 shrink-0 text-brand-purple-soft">✓</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-4 text-center text-sm text-white/55">
+                  Plus priority booking, members always come first.
+                </p>
+              </div>
 
               <a
                 href="#reserve"
