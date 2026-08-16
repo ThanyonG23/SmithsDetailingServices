@@ -17,7 +17,10 @@ const LOGO = "/smiths-garage-logo.png";
 // ── The price. Change this line only. ──
 const PRICE = "$49";
 
-const PACKAGES: { icon: string; title: string; items: string[] }[] = [
+type Group = { icon: string; title: string; items: string[] };
+
+// Every visit (every 3 months): the detail + a top-up / health check.
+const EVERY_VISIT: Group[] = [
   {
     icon: "✨",
     title: "Deep Interior Clean",
@@ -29,21 +32,50 @@ const PACKAGES: { icon: string; title: string; items: string[] }[] = [
     items: ["Wheels, tyres and mudflaps cleaned", "Full exterior contact wash", "Tyre shine", "Windows streak free"],
   },
   {
-    icon: "🔧",
-    title: "Basic Service",
+    icon: "🩺",
+    title: "Top-Up & Health Check",
     items: [
-      "Oil filter",
-      "Oil change",
-      "Air filter blown out",
-      "Wiper blades checked, swapped if needed",
+      "All fluids topped up",
       "Tyre pressure checked",
-      "Windshield fluid topped up",
+      "Battery health checked",
+      "Brakes checked",
+      "Tyres checked for wear",
+      "Lights checked",
+      "Quick check for leaks",
     ],
+  },
+];
+
+// Every 6 months, that visit also includes the full service.
+const EVERY_6_MONTHS: Group[] = [
+  {
+    icon: "🔧",
+    title: "Full Service",
+    items: ["Oil change and new oil filter", "Air filter blown out", "Wiper blades checked, swapped if needed"],
   },
 ];
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">{children}</div>;
+}
+
+function GroupCard({ g }: { g: Group }) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
+      <div className="flex items-center gap-2.5">
+        <span className="text-xl leading-none">{g.icon}</span>
+        <h3 className="font-display text-lg font-extrabold tracking-tight text-white">{g.title}</h3>
+      </div>
+      <ul className="mt-3 grid gap-x-4 gap-y-2 sm:grid-cols-2">
+        {g.items.map((item) => (
+          <li key={item} className="flex items-start gap-2 text-sm text-white/75">
+            <span className="mt-0.5 shrink-0 text-brand-purple-soft">✓</span>
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
 export default function MembershipPage() {
@@ -136,28 +168,30 @@ export default function MembershipPage() {
               </div>
 
               <div className="mt-8">
-                <p className="mb-4 text-center text-[11px] font-bold uppercase tracking-[0.18em] text-white/40">
-                  Every 3 months, your car gets
+                <div className="rounded-2xl border border-brand-purple/20 bg-brand-purple/[0.05] px-4 py-3 text-center text-sm text-white/75">
+                  <b className="text-white">Every 3 months:</b> detail + top-up.{" "}
+                  <b className="text-white">Every 6 months:</b> detail + full service.
+                </div>
+
+                <p className="mb-3 mt-6 text-[11px] font-bold uppercase tracking-[0.18em] text-brand-purple-soft">
+                  Every visit (every 3 months)
                 </p>
                 <div className="flex flex-col gap-3">
-                  {PACKAGES.map((g) => (
-                    <div key={g.title} className="rounded-2xl border border-white/10 bg-white/[0.02] p-5">
-                      <div className="flex items-center gap-2.5">
-                        <span className="text-xl leading-none">{g.icon}</span>
-                        <h3 className="font-display text-lg font-extrabold tracking-tight text-white">{g.title}</h3>
-                      </div>
-                      <ul className="mt-3 grid gap-x-4 gap-y-2 sm:grid-cols-2">
-                        {g.items.map((item) => (
-                          <li key={item} className="flex items-start gap-2 text-sm text-white/75">
-                            <span className="mt-0.5 shrink-0 text-brand-purple-soft">✓</span>
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                  {EVERY_VISIT.map((g) => (
+                    <GroupCard key={g.title} g={g} />
                   ))}
                 </div>
-                <p className="mt-4 text-center text-sm text-white/55">
+
+                <p className="mb-3 mt-6 text-[11px] font-bold uppercase tracking-[0.18em] text-brand-yellow">
+                  Every 6 months, we also add
+                </p>
+                <div className="flex flex-col gap-3">
+                  {EVERY_6_MONTHS.map((g) => (
+                    <GroupCard key={g.title} g={g} />
+                  ))}
+                </div>
+
+                <p className="mt-5 text-center text-sm text-white/55">
                   Plus priority booking, members always come first.
                 </p>
               </div>
