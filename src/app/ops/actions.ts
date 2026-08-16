@@ -34,6 +34,7 @@ import {
   getStock,
   setQuoteLeadStatus,
   setWaitlistStatus,
+  deleteWaitlist,
   createInspection,
   saveInspectionItems,
   recordInspectionResponse,
@@ -413,7 +414,24 @@ export async function markQuoteLeadActioned(formData: FormData): Promise<void> {
 
 export async function markWaitlistActioned(formData: FormData): Promise<void> {
   const id = Number(formData.get("id"));
-  if (Number.isFinite(id) && id > 0) await setWaitlistStatus(id, "actioned");
+  if (Number.isFinite(id) && id > 0) await setWaitlistStatus(id, "contacted");
+  revalidatePath("/ops");
+  revalidatePath("/ops/waitlist");
+}
+
+const WAITLIST_STAGES = ["pending", "contacted", "interested", "member", "passed"];
+
+export async function setWaitlistStage(id: number, stage: string): Promise<void> {
+  if (Number.isFinite(id) && id > 0 && WAITLIST_STAGES.includes(stage)) {
+    await setWaitlistStatus(id, stage);
+  }
+  revalidatePath("/ops/waitlist");
+  revalidatePath("/ops");
+}
+
+export async function deleteWaitlistEntry(id: number): Promise<void> {
+  if (Number.isFinite(id) && id > 0) await deleteWaitlist(id);
+  revalidatePath("/ops/waitlist");
   revalidatePath("/ops");
 }
 

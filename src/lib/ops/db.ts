@@ -2172,6 +2172,11 @@ export async function setWaitlistStatus(id: number, status: string): Promise<voi
   await sql`UPDATE waitlist SET status = ${status} WHERE id = ${id};`;
 }
 
+export async function deleteWaitlist(id: number): Promise<void> {
+  await ensureTable();
+  await sql`DELETE FROM waitlist WHERE id = ${id};`;
+}
+
 /** Every waitlist entry (any status) for the /ops/waitlist tab, newest first. */
 export async function getAllWaitlist(): Promise<WaitlistEntry[]> {
   try {
