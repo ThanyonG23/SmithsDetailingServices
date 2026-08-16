@@ -7,7 +7,7 @@ import { BUSINESS } from "@/lib/config";
 export const metadata: Metadata = {
   title: "Smiths Garage Maintenance | Cairns",
   description:
-    "Keep your car clean and serviced every 3 months. One simple weekly plan from Smiths Garage, Cairns. Detailed, serviced, priority booking, one payment.",
+    "Hand us the keys and we'll keep your car clean and serviced on a schedule. A membership from Smiths Garage, Cairns, for people who'd rather not think about their car.",
   robots: { index: false, follow: false }, // sent direct to customers — not for search
   alternates: { canonical: "/membership" },
 };
@@ -69,14 +69,15 @@ export default function MembershipPage() {
           </Reveal>
           <Reveal delay={200}>
             <h1 className="mt-6 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-5xl">
-              Keep your car clean and serviced
-              <span className="text-brand-purple-soft"> every 3 months.</span>
+              Hand us the keys.
+              <span className="text-brand-purple-soft"> We&apos;ll take care of the rest.</span>
             </h1>
           </Reveal>
           <Reveal delay={300}>
             <p className="mx-auto mt-5 max-w-lg text-lg leading-relaxed text-white/65">
-              Stop thinking about your car. On the plan it&apos;s detailed and serviced on a set
-              schedule, always looking its best, for one simple weekly payment.
+              For the people who keep meaning to get their car detailed and serviced but never find
+              the time. Drop it off and we handle both, on a schedule, so it&apos;s always clean and
+              always sorted. You never think about it again.
             </p>
           </Reveal>
           <Reveal delay={400}>
@@ -101,11 +102,14 @@ export default function MembershipPage() {
                 aria-hidden
               />
               <div className="relative text-center">
-                <Eyebrow>The plan</Eyebrow>
+                <Eyebrow>The membership</Eyebrow>
                 <h2 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
                   Smiths Garage Maintenance
                 </h2>
-                <div className="mt-5 flex items-end justify-center gap-1.5">
+                <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-white/55">
+                  Everything your car needs, handled on a schedule. You just drop it off.
+                </p>
+                <div className="mt-6 flex items-end justify-center gap-1.5">
                   <span className="mb-2 text-lg font-bold text-white/50">From</span>
                   <span className="font-display text-5xl font-black text-white sm:text-6xl">{PRICE}</span>
                   <span className="mb-2 text-lg font-bold text-white/50">/week</span>

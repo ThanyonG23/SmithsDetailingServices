@@ -64,7 +64,7 @@ export default function MembershipSignup() {
     <div className="rounded-3xl border border-white/12 bg-white/[0.03] p-6 sm:p-8">
       <h3 className="font-display text-2xl font-extrabold tracking-tight text-white">Reserve your spot</h3>
       <p className="mt-2 text-sm leading-relaxed text-white/60">
-        Spots are limited, so pop in your details and we&apos;ll set you up.
+        Leave your details and we&apos;ll be in touch to get you set up.
       </p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
