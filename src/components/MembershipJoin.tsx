@@ -8,9 +8,9 @@ import { useState } from "react";
    subscription on each), then replace the placeholder URLs below.
    ────────────────────────────────────────────────────────────────────── */
 const STRIPE_LINKS: Record<string, string> = {
-  "Sedan / Dual Cab": "https://buy.stripe.com/REPLACE_SEDAN",
-  SUV: "https://buy.stripe.com/REPLACE_SUV",
-  "7 Seater": "https://buy.stripe.com/REPLACE_7SEATER",
+  "Sedan / Dual Cab": "https://buy.stripe.com/3cI3cv1bGe69eD6cGf6kg0r",
+  SUV: "https://buy.stripe.com/fZuaEX6w05zD1Qk6hR6kg0s",
+  "7 Seater": "https://buy.stripe.com/eVqcN5aMg4vz3YscGf6kg0t",
 };
 
 const TIERS = ["Sedan / Dual Cab", "SUV", "7 Seater"];
