@@ -3,7 +3,8 @@ import { requireOwner } from "@/lib/ops/auth";
 import { getAllWaitlist, getWaitlistStats, type WaitlistEntry } from "@/lib/ops/db";
 import { GARAGE_SERVICES } from "@/lib/garage";
 import { setWaitlistStage, deleteWaitlistEntry } from "../actions";
-import WaitlistRowControls, { stageOf } from "@/components/ops/WaitlistRowControls";
+import WaitlistRowControls from "@/components/ops/WaitlistRowControls";
+import { stageOf } from "@/lib/ops/waitlist-stages";
 
 export const metadata: Metadata = {
   title: "Waitlist | Smiths Detailing",

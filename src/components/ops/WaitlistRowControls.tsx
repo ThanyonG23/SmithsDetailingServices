@@ -1,20 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-
-const STAGES: { value: string; label: string }[] = [
-  { value: "pending", label: "New" },
-  { value: "contacted", label: "Contacted" },
-  { value: "interested", label: "Interested" },
-  { value: "member", label: "Member" },
-  { value: "passed", label: "Passed" },
-];
-
-/** Normalise legacy statuses to a known stage. */
-export function stageOf(status: string): string {
-  if (status === "actioned") return "contacted";
-  return STAGES.some((s) => s.value === status) ? status : "pending";
-}
+import { WAITLIST_STAGES, stageOf } from "@/lib/ops/waitlist-stages";
 
 export default function WaitlistRowControls({
   id,
@@ -42,7 +29,7 @@ export default function WaitlistRowControls({
         className="rounded-lg border border-white/15 bg-black/50 px-2.5 py-1.5 text-xs font-bold text-white outline-none transition focus:border-brand-green disabled:opacity-50"
         aria-label="Set stage"
       >
-        {STAGES.map((s) => (
+        {WAITLIST_STAGES.map((s) => (
           <option key={s.value} value={s.value}>
             {s.label}
           </option>
