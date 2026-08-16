@@ -2,10 +2,22 @@
 
 import { useState } from "react";
 
-/* Post-call sign-up form. The pitch + price happen on the phone; this page
-   just captures the details to set a new member up. Posts to /api/waitlist
-   tagged source="membership-signup" so it shows on the ops dashboard as a
-   committed sign-up (green badge), distinct from general interest. */
+/* ──────────────────────────────────────────────────────────────────────
+   STRIPE PAYMENT LINKS — paste your real links here (one per vehicle tier).
+   Create them in Stripe → Payment Links (set the $ sign-up fee + $/week
+   subscription on each), then replace the placeholder URLs below.
+   ────────────────────────────────────────────────────────────────────── */
+const STRIPE_LINKS: Record<string, string> = {
+  "Sedan / Dual Cab": "https://buy.stripe.com/REPLACE_SEDAN",
+  SUV: "https://buy.stripe.com/REPLACE_SUV",
+  "7 Seater": "https://buy.stripe.com/REPLACE_7SEATER",
+};
+
+const TIERS = ["Sedan / Dual Cab", "SUV", "7 Seater"];
+
+/* Post-call sign-up. The pitch + price happen on the phone; here the member
+   confirms their details (saved to the ops dashboard) then picks their vehicle
+   to continue to Stripe for payment. Tagged source="membership-signup". */
 export default function MembershipJoin() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -15,18 +27,18 @@ export default function MembershipJoin() {
   const [suburb, setSuburb] = useState("");
   const [preferred, setPreferred] = useState("");
   const [agreed, setAgreed] = useState(false);
-  const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
-  const submit = async () => {
+  const selectTier = async (tier: string) => {
     setError("");
     if (!name.trim()) return setError("Please add your name.");
     if (!phone.trim()) return setError("Please add a phone number so we can confirm your first visit.");
-    if (!vehicle.trim()) return setError("Please add your vehicle.");
     if (!agreed) return setError("Please tick the box to confirm you're joining.");
-    setState("sending");
+    setBusy(true);
+    // Save their details to the dashboard first (best-effort — never block payment).
     try {
-      const res = await fetch("/api/waitlist", {
+      await fetch("/api/waitlist", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -37,33 +49,15 @@ export default function MembershipJoin() {
           membership: true,
           source: "membership-signup",
           interests: ["detailing", "servicing"],
-          message: `Rego: ${rego || "—"} | Suburb: ${suburb || "—"} | Preferred first visit: ${preferred || "—"} | Agreed to plan: yes`,
+          message: `Tier: ${tier} | Rego: ${rego || "—"} | Suburb: ${suburb || "—"} | Preferred first visit: ${preferred || "—"} | Agreed: yes`,
         }),
       });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setError(data?.error || "Something went wrong — try again.");
-        setState("error");
-        return;
-      }
-      setState("done");
     } catch {
-      setError("Couldn't reach us — check your connection and try again.");
-      setState("error");
+      /* don't block the customer from paying if the save hiccups */
     }
+    // Hand off to Stripe.
+    window.location.href = STRIPE_LINKS[tier] || "#";
   };
-
-  if (state === "done") {
-    return (
-      <div className="rounded-3xl border border-brand-green/40 bg-brand-green/[0.08] p-8 text-center shadow-glowG">
-        <div className="text-4xl">✅</div>
-        <h3 className="mt-3 font-display text-2xl font-extrabold text-white">You&apos;re all set, {name.trim().split(" ")[0]}</h3>
-        <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-white/70">
-          Welcome to the plan. We&apos;ll text you shortly to lock in your first visit.
-        </p>
-      </div>
-    );
-  }
 
   const field =
     "w-full rounded-xl border border-white/12 bg-white/[0.03] px-4 py-3 text-white placeholder-white/30 outline-none transition focus:border-brand-purple/60 focus:bg-white/[0.05]";
@@ -85,7 +79,7 @@ export default function MembershipJoin() {
           <input className={field} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@email.com" />
         </div>
         <div>
-          <label className={labelCls}>Vehicle (make & model) *</label>
+          <label className={labelCls}>Vehicle (make & model)</label>
           <input className={field} value={vehicle} onChange={(e) => setVehicle(e.target.value)} placeholder="2019 Toyota Hilux" />
         </div>
         <div>
@@ -123,14 +117,27 @@ export default function MembershipJoin() {
 
       {error && <p className="mt-4 text-sm font-semibold text-red-400">{error}</p>}
 
-      <button
-        type="button"
-        onClick={submit}
-        disabled={state === "sending"}
-        className="mt-6 w-full rounded-full bg-brand-purple px-6 py-4 font-display text-base font-extrabold text-white transition hover:brightness-110 disabled:opacity-60"
-      >
-        {state === "sending" ? "Setting you up…" : "Confirm & join →"}
-      </button>
+      {/* Vehicle tier → Stripe */}
+      <div className="mt-7 border-t border-white/10 pt-6">
+        <p className="mb-3 text-center text-[11px] font-bold uppercase tracking-[0.16em] text-white/40">
+          Choose your vehicle to set up payment
+        </p>
+        <div className="flex flex-col gap-3">
+          {TIERS.map((tier) => (
+            <button
+              key={tier}
+              type="button"
+              disabled={busy}
+              onClick={() => selectTier(tier)}
+              className="flex w-full items-center justify-between rounded-full bg-brand-purple px-6 py-4 font-display text-base font-extrabold text-white transition hover:brightness-110 disabled:opacity-60"
+            >
+              <span>{tier}</span>
+              <span className="text-white/70">{busy ? "…" : "→"}</span>
+            </button>
+          ))}
+        </div>
+        <p className="mt-3 text-center text-xs text-white/35">Secure payment powered by Stripe.</p>
+      </div>
     </div>
   );
 }
