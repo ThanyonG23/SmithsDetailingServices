@@ -380,8 +380,8 @@ export default async function OpsPage({
                       <div className="mt-1.5 flex flex-wrap gap-3 text-xs">
                         {w.phone && <a href={`tel:${w.phone}`} className="font-bold text-brand-green">📞 {w.phone}</a>}
                         {w.email && <a href={`mailto:${w.email}`} className="text-white/60 hover:text-white">✉️ {w.email}</a>}
-                        <span className="rounded bg-white/5 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-white/40">
-                          {w.source === "membership-page" ? "Membership page" : "Garage waitlist"}
+                        <span className={`rounded px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wide ${w.source === "membership-signup" ? "bg-brand-green/15 text-brand-green" : "bg-white/5 text-white/40"}`}>
+                          {w.source === "membership-signup" ? "Signed up ✍️" : w.source === "membership-page" ? "Membership page" : "Garage waitlist"}
                         </span>
                         <span className="text-white/30">{w.created_at.replace("T", " ")}</span>
                       </div>

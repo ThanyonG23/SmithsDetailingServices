@@ -64,7 +64,7 @@ export async function POST(req: Request) {
   const vehicle = String(body.vehicle || "").trim().slice(0, 100);
   const message = String(body.message || "").trim().slice(0, 500);
   const membership = body.membership === true || body.membership === "true";
-  const SOURCES = ["garage-waitlist", "membership-page"];
+  const SOURCES = ["garage-waitlist", "membership-page", "membership-signup"];
   const source = SOURCES.includes(String(body.source)) ? String(body.source) : "garage-waitlist";
   // Only keep interests we recognise — never trust arbitrary strings from the browser.
   const interests = Array.isArray(body.interests)
