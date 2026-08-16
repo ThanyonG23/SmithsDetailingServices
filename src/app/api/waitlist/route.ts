@@ -64,6 +64,8 @@ export async function POST(req: Request) {
   const vehicle = String(body.vehicle || "").trim().slice(0, 100);
   const message = String(body.message || "").trim().slice(0, 500);
   const membership = body.membership === true || body.membership === "true";
+  const SOURCES = ["garage-waitlist", "membership-page"];
+  const source = SOURCES.includes(String(body.source)) ? String(body.source) : "garage-waitlist";
   // Only keep interests we recognise — never trust arbitrary strings from the browser.
   const interests = Array.isArray(body.interests)
     ? body.interests.map((p) => String(p)).filter((p) => GARAGE_SERVICE_IDS.includes(p)).slice(0, 12)
@@ -80,7 +82,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    await insertWaitlist({ name, email, phone, vehicle, interests, membership, message });
+    await insertWaitlist({ name, email, phone, vehicle, interests, membership, message, source });
     await notifyOwner({ name, email, phone, vehicle, interests, membership, message });
     return NextResponse.json({ ok: true });
   } catch {

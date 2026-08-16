@@ -2129,6 +2129,7 @@ export interface WaitlistInput {
   interests: string[];
   membership: boolean;
   message: string;
+  source: string; // "garage-waitlist" | "membership-page"
 }
 
 export interface WaitlistEntry extends WaitlistInput {
@@ -2140,9 +2141,10 @@ export interface WaitlistEntry extends WaitlistInput {
 export async function insertWaitlist(w: WaitlistInput): Promise<void> {
   await ensureTable();
   await sql`
-    INSERT INTO waitlist (name, email, phone, vehicle, interests, membership, message)
+    INSERT INTO waitlist (name, email, phone, vehicle, interests, membership, message, source)
     VALUES (${w.name}, ${w.email}, ${w.phone}, ${w.vehicle},
-            ${sql.json(w.interests)}, ${w.membership}, ${w.message});
+            ${sql.json(w.interests)}, ${w.membership}, ${w.message},
+            ${w.source || "garage-waitlist"});
   `;
 }
 
@@ -2151,6 +2153,7 @@ export async function getWaitlist(status = "pending"): Promise<WaitlistEntry[]> 
   try {
     const rows = await sql`
       SELECT id, name, email, phone, vehicle, interests, membership, message, status,
+             coalesce(source, 'garage-waitlist') AS source,
              to_char(created_at AT TIME ZONE 'Australia/Brisbane',
                      'YYYY-MM-DD"T"HH24:MI') AS created_at
       FROM waitlist
