@@ -39,8 +39,11 @@ import {
   saveInspectionItems,
   recordInspectionResponse,
   getInspection,
+  createServiceJob,
+  saveServiceJob,
   type StockItem,
   type InspectionItem,
+  type ServiceJob,
 } from "@/lib/ops/db";
 import { uploadInspectionPhoto } from "@/lib/ops/storage";
 import { OPS_STAFF, hoursBetween, cairnsToday } from "@/lib/ops/config";
@@ -381,6 +384,60 @@ export async function submitInspectionResponse(
   revalidatePath(`/v/${s}`);
   revalidatePath("/ops/inspect");
   return { ok: true };
+}
+
+/* ── Service job card ───────────────────────────────────────────────── */
+
+/** Start a service job from the new-service form and open its card. */
+export async function startService(formData: FormData): Promise<void> {
+  const slug = await createServiceJob({
+    customerName: String(formData.get("customer_name") || "").slice(0, 80),
+    customerPhone: String(formData.get("customer_phone") || "").replace(/[^\d+ ]/g, "").slice(0, 20),
+    customerEmail: String(formData.get("customer_email") || "").slice(0, 120),
+    rego: String(formData.get("rego") || "").toUpperCase().slice(0, 12),
+    vehicle: String(formData.get("vehicle") || "").slice(0, 80),
+    odometer: String(formData.get("odometer") || "").slice(0, 20),
+    technician: String(formData.get("technician") || "").slice(0, 40),
+  });
+  revalidatePath("/ops/service");
+  redirect(`/ops/service/${slug}`);
+}
+
+/** Upload one service photo and return its public URL (reuses the store). */
+export async function uploadServicePhotoAction(slug: string, dataUrl: string): Promise<string> {
+  const s = String(slug || "").slice(0, 60);
+  if (!s || !dataUrl.startsWith("data:image/")) throw new Error("bad-input");
+  const stamp = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  return uploadInspectionPhoto(dataUrl, `service/${s}/${stamp}`);
+}
+
+/** Save the whole card (client sends its full state as it fills it out). */
+export async function saveService(slug: string, job: Omit<ServiceJob, "slug" | "created_at">): Promise<void> {
+  const s = String(slug || "").slice(0, 60);
+  if (!s) return;
+  const checklist = (Array.isArray(job.checklist) ? job.checklist : []).slice(0, 40).map((it) => ({
+    key: String(it.key || "").slice(0, 40),
+    label: String(it.label || "").slice(0, 80),
+    hint: String(it.hint || "").slice(0, 120),
+    state: (["pending", "ok", "attention", "urgent", "na"].includes(String(it.state)) ? it.state : "pending") as ServiceJob["checklist"][number]["state"],
+    detail: String(it.detail || "").slice(0, 500),
+    photos: (Array.isArray(it.photos) ? it.photos : []).slice(0, 8).map((p) => String(p).slice(0, 600)),
+  }));
+  await saveServiceJob(s, {
+    customer_name: String(job.customer_name || "").slice(0, 80),
+    customer_phone: String(job.customer_phone || "").slice(0, 20),
+    customer_email: String(job.customer_email || "").slice(0, 120),
+    rego: String(job.rego || "").slice(0, 12),
+    vehicle: String(job.vehicle || "").slice(0, 80),
+    odometer: String(job.odometer || "").slice(0, 20),
+    technician: String(job.technician || "").slice(0, 40),
+    checklist,
+    notes: String(job.notes || "").slice(0, 2000),
+    next_service: String(job.next_service || "").slice(0, 60),
+    status: job.status === "completed" ? "completed" : "in_progress",
+  });
+  revalidatePath(`/ops/service/${s}`);
+  revalidatePath("/ops/service");
 }
 
 export async function clockOn(uid: string, detailer: string, minsAgo = 0): Promise<void> {

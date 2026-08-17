@@ -2,6 +2,7 @@ import postgres from "postgres";
 import type { Booking } from "./calendar";
 import type { AdRow } from "./ads";
 import { normName } from "./sales";
+import { freshChecklist, type ServiceChecklistItem } from "./service";
 
 /* =====================================================================
    DAILY OPS — data layer (Supabase / any Postgres via the `postgres` client)
@@ -76,7 +77,7 @@ async function runEnsure(): Promise<void> {
     const rows = await sql`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'waitlist' AND column_name = 'created_at'
+        WHERE table_name = 'service_jobs' AND column_name = 'created_at'
       ) AS ready;`;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
   } catch {
@@ -347,6 +348,27 @@ async function runEnsure(): Promise<void> {
       status      text         NOT NULL DEFAULT 'pending'
     );
   `;
+  // Smiths Garage service job card — one row per service, filled out on the
+  // phone as the work is done. checklist = the JSONB service/inspection sheet
+  // (per-item state, detail, photos). slug = the public /s/<slug> customer report.
+  await sql`
+    CREATE TABLE IF NOT EXISTS service_jobs (
+      slug           text        PRIMARY KEY,
+      created_at     timestamptz NOT NULL DEFAULT now(),
+      updated_at     timestamptz NOT NULL DEFAULT now(),
+      customer_name  text        NOT NULL DEFAULT '',
+      customer_phone text        NOT NULL DEFAULT '',
+      customer_email text        NOT NULL DEFAULT '',
+      rego           text        NOT NULL DEFAULT '',
+      vehicle        text        NOT NULL DEFAULT '',
+      odometer       text        NOT NULL DEFAULT '',
+      technician     text        NOT NULL DEFAULT '',
+      checklist      jsonb       NOT NULL DEFAULT '[]'::jsonb,
+      notes          text        NOT NULL DEFAULT '',
+      next_service   text        NOT NULL DEFAULT '',
+      status         text        NOT NULL DEFAULT 'in_progress'
+    );
+  `;
 
   // Indexes — keep queries fast as the tables grow. Wrapped so a failed
   // index can NEVER block a write (they're an optimisation, not required).
@@ -361,6 +383,7 @@ async function runEnsure(): Promise<void> {
     await sql`CREATE INDEX IF NOT EXISTS idx_job_clock_uid ON job_clock(uid, work_date);`;
     await sql`CREATE INDEX IF NOT EXISTS idx_quote_leads_status ON quote_leads(status, created_at DESC);`;
     await sql`CREATE INDEX IF NOT EXISTS idx_waitlist_status ON waitlist(status, created_at DESC);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_service_jobs_created ON service_jobs(created_at DESC);`;
   } catch {
     /* indexes are an optimisation — never let them break a write */
   }
@@ -2211,6 +2234,113 @@ export async function getWaitlistStats(): Promise<{
     return r ?? { total: 0, pending: 0, actioned: 0, members: 0 };
   } catch {
     return { total: 0, pending: 0, actioned: 0, members: 0 };
+  }
+}
+
+/* ---- service_jobs (Smiths Garage service card) --------------------- */
+
+export interface ServiceJob {
+  slug: string;
+  created_at: string;
+  customer_name: string;
+  customer_phone: string;
+  customer_email: string;
+  rego: string;
+  vehicle: string;
+  odometer: string;
+  technician: string;
+  checklist: ServiceChecklistItem[];
+  notes: string;
+  next_service: string;
+  status: string; // in_progress | completed
+}
+
+export async function createServiceJob(input: {
+  customerName: string;
+  customerPhone: string;
+  customerEmail: string;
+  rego: string;
+  vehicle: string;
+  odometer: string;
+  technician: string;
+}): Promise<string> {
+  await ensureTable();
+  const slug = newSlug();
+  const checklist = freshChecklist();
+  await sql`
+    INSERT INTO service_jobs
+      (slug, customer_name, customer_phone, customer_email, rego, vehicle, odometer, technician, checklist)
+    VALUES
+      (${slug}, ${input.customerName || ""}, ${input.customerPhone || ""}, ${input.customerEmail || ""},
+       ${input.rego || ""}, ${input.vehicle || ""}, ${input.odometer || ""}, ${input.technician || ""},
+       ${sql.json(checklist as unknown as Parameters<typeof sql.json>[0])});`;
+  return slug;
+}
+
+function mapServiceJob(r: Record<string, unknown>): ServiceJob {
+  const raw = Array.isArray(r.checklist) ? (r.checklist as ServiceChecklistItem[]) : [];
+  return {
+    slug: String(r.slug),
+    created_at: String(r.created_at || ""),
+    customer_name: String(r.customer_name || ""),
+    customer_phone: String(r.customer_phone || ""),
+    customer_email: String(r.customer_email || ""),
+    rego: String(r.rego || ""),
+    vehicle: String(r.vehicle || ""),
+    odometer: String(r.odometer || ""),
+    technician: String(r.technician || ""),
+    checklist: raw.map((it) => ({
+      key: String(it.key || ""),
+      label: String(it.label || ""),
+      hint: String(it.hint || ""),
+      state: (["pending", "ok", "attention", "urgent", "na"].includes(String(it.state))
+        ? it.state
+        : "pending") as ServiceChecklistItem["state"],
+      detail: String(it.detail || ""),
+      photos: Array.isArray(it.photos) ? it.photos.map(String) : [],
+    })),
+    notes: String(r.notes || ""),
+    next_service: String(r.next_service || ""),
+    status: String(r.status || "in_progress"),
+  };
+}
+
+export async function getServiceJob(slug: string): Promise<ServiceJob | null> {
+  await ensureTable();
+  const rows = await sql`SELECT * FROM service_jobs WHERE slug = ${slug} LIMIT 1;`;
+  return rows[0] ? mapServiceJob(rows[0] as Record<string, unknown>) : null;
+}
+
+/** Save the whole card (the client sends its full state). */
+export async function saveServiceJob(
+  slug: string,
+  j: Omit<ServiceJob, "slug" | "created_at">,
+): Promise<void> {
+  await ensureTable();
+  await sql`
+    UPDATE service_jobs SET
+      customer_name  = ${j.customer_name},
+      customer_phone = ${j.customer_phone},
+      customer_email = ${j.customer_email},
+      rego           = ${j.rego},
+      vehicle        = ${j.vehicle},
+      odometer       = ${j.odometer},
+      technician     = ${j.technician},
+      checklist      = ${sql.json(j.checklist as unknown as Parameters<typeof sql.json>[0])},
+      notes          = ${j.notes},
+      next_service   = ${j.next_service},
+      status         = ${j.status},
+      updated_at     = now()
+    WHERE slug = ${slug};`;
+}
+
+export async function listServiceJobs(limit = 80): Promise<ServiceJob[]> {
+  try {
+    await ensureTable();
+    const rows = await sql`SELECT * FROM service_jobs ORDER BY created_at DESC LIMIT ${limit};`;
+    return (rows as Record<string, unknown>[]).map(mapServiceJob);
+  } catch {
+    return [];
   }
 }
 
