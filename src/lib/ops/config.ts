@@ -3,8 +3,10 @@ import { ACTIVE_TEAM } from "@/lib/referrals";
 /* =====================================================================
    DAILY OPS — targets & roster
    ---------------------------------------------------------------------
-   Straight off the real bank-data cost model (3 detailers + team leader):
-     - breakEvenRevenue = daily break-even (business covered), ~$48k/mo
+   Cost model: owner + 2 detailers + 1 videographer/social (3 wages @ $32/hr).
+   Lower payroll than the old 4-wage team → lower break-even; 2 detailers (vs 3)
+   → slightly lower delivery capacity, so slightly lower targets.
+     - breakEvenRevenue = daily break-even (business covered), ~$36k/mo
      - aimRevenue       = the daily TARGET to beat break-even
      - weeklyTarget     = the target to run the week toward
      - monthlyTarget    = the target to run the month toward
@@ -13,11 +15,11 @@ import { ACTIVE_TEAM } from "@/lib/referrals";
    re-scores itself.
    ===================================================================== */
 export const OPS_TARGETS = {
-  breakEvenRevenue: 2200,
-  aimRevenue: 2500,
-  weeklyTarget: 12500,
-  monthlyTarget: 50000,
-  jobsTarget: 2,
+  breakEvenRevenue: 1650,
+  aimRevenue: 2000,
+  weeklyTarget: 10500,
+  monthlyTarget: 45000,
+  jobsTarget: 1,
 };
 
 /** Target LABOUR hours per job (total person-hours on the car). This is the
@@ -161,10 +163,9 @@ export function dailySalaryCost(name: string): number {
   return annual > 0 ? Math.round(annual / SALARY_WORK_DAYS) : 0;
 }
 
-/** Whose hours get logged each day: the team leader + every active
-    detailer. Add or retire a detailer in referrals.ts and this stays
-    in sync automatically. */
-export const OPS_STAFF: string[] = ["Ashlee", ...ACTIVE_TEAM.map((m) => m.name)];
+/** Whose hours get logged each day: every active detailer. Add or retire a
+    detailer in referrals.ts and this stays in sync automatically. */
+export const OPS_STAFF: string[] = [...ACTIVE_TEAM.map((m) => m.name)];
 
 /** Ashlee's daily run sheet — the tickable checklist on the dashboard.
     Keys are stable (don't rename) so saved ticks keep matching. */
