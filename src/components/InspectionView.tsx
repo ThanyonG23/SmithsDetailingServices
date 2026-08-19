@@ -104,7 +104,7 @@ export default function InspectionView({
 
       {member && (
         <div className="mt-4 flex items-center gap-2 rounded-xl border border-brand-green/30 bg-brand-green/[0.06] px-4 py-2.5 text-sm font-bold text-brand-green">
-          🎁 As a member, you get 10% off every upsell below.
+          🎁 As a member, you get 10% off every upgrade below.
         </div>
       )}
 
