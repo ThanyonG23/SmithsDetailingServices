@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
 import MembershipSignup from "@/components/MembershipSignup";
+import ReviewsSection from "@/components/ReviewsSection";
 import { BUSINESS } from "@/lib/config";
 
 /* Shared body for the membership pages. `bonus` toggles the free
@@ -218,6 +219,9 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
           </Reveal>
         </div>
       </section>
+
+      {/* ═══ REVIEWS ═══ */}
+      <ReviewsSection />
 
       {/* ═══ RESERVE ═══ */}
       <section id="reserve" className="scroll-mt-8 pb-24">

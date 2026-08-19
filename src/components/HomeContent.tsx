@@ -184,6 +184,27 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
       {/* ═══════════════════ REVIEWS ═══════════════════ */}
       <ReviewsSection />
 
+      {/* ═══════════════════ MEMBERSHIP BANNER ═══════════════════ */}
+      <section className="border-y border-white/10 bg-white/[0.02] py-16 sm:py-20">
+        <div className="mx-auto max-w-3xl px-4 text-center">
+          <Reveal>
+            <h2 className="font-display text-3xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-4xl">
+              Does your car need a regular{" "}
+              <span className="text-brand-green">service &amp; detail?</span>
+            </h2>
+            <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-white/60">
+              Keep it clean and serviced on a schedule — all handled for you, on one simple weekly plan.
+            </p>
+            <Link
+              href="/membership"
+              className="mt-7 inline-flex items-center justify-center rounded-full bg-brand-green px-8 py-4 text-sm font-black text-[#04130a] transition hover:brightness-110 active:scale-95"
+            >
+              See our membership →
+            </Link>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ═══════════════════ REELS ═══════════════════ */}
       <section className="mx-auto max-w-6xl px-4 py-20">
         <Reveal>
