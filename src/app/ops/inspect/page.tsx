@@ -106,6 +106,7 @@ export default async function InspectPage() {
                       <input type="hidden" name="uid" value={j.uid} />
                       <input type="hidden" name="name" value={nameOf(j.summary)} />
                       <input type="hidden" name="vehicle" value={j.car || ""} />
+                      <input type="hidden" name="member" value={/member/i.test(j.summary) ? "1" : "0"} />
                       <button className="rounded-full bg-brand-green px-4 py-2 text-xs font-black text-[#04130a] transition hover:brightness-110 active:scale-95">
                         + Start inspection
                       </button>

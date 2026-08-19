@@ -77,7 +77,7 @@ async function runEnsure(): Promise<void> {
     const rows = await sql`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'service_jobs' AND column_name = 'created_at'
+        WHERE table_name = 'inspections' AND column_name = 'member'
       ) AS ready;`;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
   } catch {
@@ -147,6 +147,8 @@ async function runEnsure(): Promise<void> {
       created_at    timestamptz  NOT NULL DEFAULT now(),
       responded_at  timestamptz
     );`;
+  // Member inspections give the customer a discount on every upsell.
+  await sql`ALTER TABLE inspections ADD COLUMN IF NOT EXISTS member boolean NOT NULL DEFAULT false;`;
   // Real sales from Xero (SalesInvoices export) — one row per invoice, the
   // source of truth for revenue (vs the calendar price estimate).
   await sql`
@@ -1399,6 +1401,7 @@ export interface Inspection {
   items: InspectionItem[];
   status: "draft" | "sent" | "responded";
   customer_note: string;
+  member: boolean; // member → 10% off every upsell on the customer view
   created_at: string;
   responded_at: string | null;
 }
@@ -1416,13 +1419,19 @@ export async function createInspection(input: {
   bookingUid: string;
   customerName: string;
   vehicle: string;
+  member?: boolean;
 }): Promise<string> {
   await ensureTable();
   const slug = newSlug();
   await sql`
-    INSERT INTO inspections (slug, booking_uid, customer_name, vehicle)
-    VALUES (${slug}, ${input.bookingUid || ""}, ${input.customerName || ""}, ${input.vehicle || ""});`;
+    INSERT INTO inspections (slug, booking_uid, customer_name, vehicle, member)
+    VALUES (${slug}, ${input.bookingUid || ""}, ${input.customerName || ""}, ${input.vehicle || ""}, ${!!input.member});`;
   return slug;
+}
+
+export async function setInspectionMember(slug: string, member: boolean): Promise<void> {
+  await ensureTable();
+  await sql`UPDATE inspections SET member = ${!!member} WHERE slug = ${slug};`;
 }
 
 function mapInspection(r: Record<string, unknown>): Inspection {
@@ -1442,6 +1451,7 @@ function mapInspection(r: Record<string, unknown>): Inspection {
     })),
     status: (r.status as Inspection["status"]) || "draft",
     customer_note: String(r.customer_note || ""),
+    member: !!r.member,
     created_at: String(r.created_at || ""),
     responded_at: r.responded_at ? String(r.responded_at) : null,
   };

@@ -41,6 +41,7 @@ export default async function CustomerInspectionPage({ params }: { params: { slu
             vehicle={insp.vehicle}
             items={insp.items}
             alreadyResponded={insp.status === "responded"}
+            member={insp.member}
           />
         )}
       </div>

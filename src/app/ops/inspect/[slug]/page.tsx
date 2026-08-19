@@ -20,8 +20,9 @@ export default async function InspectionBuilderPage({ params }: { params: { slug
   const insp = await getInspection(params.slug);
   if (!insp) notFound();
 
+  const rate = (p: number) => (insp.member ? p * 0.9 : p);
   const chosen = insp.items.filter((i) => i.selected);
-  const chosenTotal = chosen.reduce((a, i) => a + i.price, 0);
+  const chosenTotal = chosen.reduce((a, i) => a + rate(i.price), 0);
 
   return (
     <main className="mx-auto max-w-none px-4 pb-24 pt-8 sm:px-6 lg:px-8 2xl:max-w-[1760px]">
@@ -45,12 +46,13 @@ export default async function InspectionBuilderPage({ params }: { params: { slug
           <div className="mt-2 text-sm text-white/80">
             They want <b className="text-brand-green">{chosen.length}</b> of {insp.items.length} extras
             {" · "}
-            <b className="text-brand-green">{money(chosenTotal)}</b>:
+            <b className="text-brand-green">{money(chosenTotal)}</b>
+            {insp.member && <span className="text-brand-green/70"> (member rate — 10% off)</span>}:
           </div>
           <ul className="mt-2 list-disc space-y-0.5 pl-5 text-sm text-white/70 marker:text-brand-green">
             {chosen.map((c) => (
               <li key={c.id}>
-                {c.title} — {money(c.price)}
+                {c.title} — {money(rate(c.price))}
               </li>
             ))}
             {chosen.length === 0 && <li className="list-none text-white/45">— none selected</li>}
@@ -63,7 +65,7 @@ export default async function InspectionBuilderPage({ params }: { params: { slug
         </div>
       )}
 
-      <InspectionBuilder slug={insp.slug} initialItems={insp.items} status={insp.status} />
+      <InspectionBuilder slug={insp.slug} initialItems={insp.items} status={insp.status} initialMember={insp.member} />
     </main>
   );
 }

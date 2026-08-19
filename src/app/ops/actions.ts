@@ -39,6 +39,7 @@ import {
   saveInspectionItems,
   recordInspectionResponse,
   getInspection,
+  setInspectionMember,
   createServiceJob,
   saveServiceJob,
   type StockItem,
@@ -344,9 +345,19 @@ export async function startInspection(formData: FormData): Promise<void> {
   const uid = String(formData.get("uid") || "").slice(0, 200);
   const name = String(formData.get("name") || "").slice(0, 80);
   const vehicle = String(formData.get("vehicle") || "").slice(0, 80);
-  const slug = await createInspection({ bookingUid: uid, customerName: name, vehicle });
+  const member = String(formData.get("member") || "") === "1";
+  const slug = await createInspection({ bookingUid: uid, customerName: name, vehicle, member });
   revalidatePath("/ops/inspect");
   redirect(`/ops/inspect/${slug}`);
+}
+
+/** Toggle the member discount on an inspection (from the builder). */
+export async function markInspectionMember(slug: string, member: boolean): Promise<void> {
+  const s = String(slug || "").slice(0, 60);
+  if (!s) return;
+  await setInspectionMember(s, !!member);
+  revalidatePath(`/ops/inspect/${s}`);
+  revalidatePath(`/v/${s}`);
 }
 
 /** Resize+upload one photo (base64 data URL) and return its public URL. */

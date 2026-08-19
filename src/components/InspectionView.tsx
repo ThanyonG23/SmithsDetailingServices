@@ -5,6 +5,7 @@ import { submitInspectionResponse } from "@/app/ops/actions";
 import type { InspectionItem } from "@/lib/ops/db";
 
 const money = (n: number) => "$" + Math.round(n).toLocaleString("en-AU");
+const MEMBER_RATE = 0.9; // members get 10% off every upsell
 
 export default function InspectionView({
   slug,
@@ -12,13 +13,16 @@ export default function InspectionView({
   vehicle,
   items,
   alreadyResponded,
+  member,
 }: {
   slug: string;
   customerName: string;
   vehicle: string;
   items: InspectionItem[];
   alreadyResponded: boolean;
+  member: boolean;
 }) {
+  const rate = (p: number) => (member ? p * MEMBER_RATE : p);
   const [picked, setPicked] = useState<Set<string>>(
     () => new Set(items.filter((i) => i.selected).map((i) => i.id))
   );
@@ -34,7 +38,7 @@ export default function InspectionView({
       return n;
     });
 
-  const total = items.filter((i) => picked.has(i.id)).reduce((a, i) => a + i.price, 0);
+  const total = items.filter((i) => picked.has(i.id)).reduce((a, i) => a + rate(i.price), 0);
 
   async function send() {
     setState("sending");
@@ -70,7 +74,7 @@ export default function InspectionView({
               {chosen.map((c) => (
                 <li key={c.id} className="flex justify-between gap-3">
                   <span>{c.title}</span>
-                  <span className="font-bold tabular-nums text-brand-green">{money(c.price)}</span>
+                  <span className="font-bold tabular-nums text-brand-green">{money(rate(c.price))}</span>
                 </li>
               ))}
             </ul>
@@ -97,6 +101,12 @@ export default function InspectionView({
         While your car&apos;s with us we spotted a few things we can sort. Tick the ones you want and
         send it back — no pressure, only what you&apos;re happy with.
       </p>
+
+      {member && (
+        <div className="mt-4 flex items-center gap-2 rounded-xl border border-brand-green/30 bg-brand-green/[0.06] px-4 py-2.5 text-sm font-bold text-brand-green">
+          🎁 As a member, you get 10% off every upsell below.
+        </div>
+      )}
 
       <div className="mt-6 flex flex-col gap-3">
         {items.map((it) => {
@@ -131,9 +141,17 @@ export default function InspectionView({
                     <span className="font-display text-lg font-extrabold tracking-tight text-white">
                       {it.title}
                     </span>
-                    <span className="shrink-0 font-display text-lg font-extrabold tabular-nums text-brand-green">
-                      {money(it.price)}
-                    </span>
+                    {member ? (
+                      <span className="flex shrink-0 flex-col items-end leading-tight">
+                        <span className="text-xs font-semibold tabular-nums text-white/35 line-through">{money(it.price)}</span>
+                        <span className="font-display text-lg font-extrabold tabular-nums text-brand-green">{money(rate(it.price))}</span>
+                        <span className="text-[9px] font-bold uppercase tracking-wide text-brand-green/70">Members rate</span>
+                      </span>
+                    ) : (
+                      <span className="shrink-0 font-display text-lg font-extrabold tabular-nums text-brand-green">
+                        {money(it.price)}
+                      </span>
+                    )}
                   </div>
                   {it.description && <p className="mt-1 text-sm text-white/60">{it.description}</p>}
                 </div>

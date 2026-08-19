@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { EXTRA_PRESETS } from "@/lib/ops/config";
-import { saveInspection, uploadInspectionPhotoAction } from "@/app/ops/actions";
+import { saveInspection, uploadInspectionPhotoAction, markInspectionMember } from "@/app/ops/actions";
 import type { InspectionItem } from "@/lib/ops/db";
 
 const money = (n: number) => "$" + Math.round(n).toLocaleString("en-AU");
@@ -45,12 +45,16 @@ export default function InspectionBuilder({
   slug,
   initialItems,
   status,
+  initialMember,
 }: {
   slug: string;
   initialItems: InspectionItem[];
   status: string;
+  initialMember: boolean;
 }) {
   const [items, setItems] = useState<InspectionItem[]>(initialItems);
+  const [member, setMember] = useState(initialMember);
+  const [, startMember] = useTransition();
   const [title, setTitle] = useState("");
   const [desc, setDesc] = useState("");
   const [price, setPrice] = useState<string>("");
@@ -132,6 +136,29 @@ export default function InspectionBuilder({
 
   return (
     <div className="mt-6 flex flex-col gap-6">
+      {/* member discount toggle */}
+      <button
+        type="button"
+        onClick={() => {
+          const v = !member;
+          setMember(v);
+          startMember(() => markInspectionMember(slug, v));
+        }}
+        className={`flex items-center justify-between gap-3 rounded-2xl border px-4 py-3 text-left transition ${
+          member ? "border-brand-green/50 bg-brand-green/[0.06]" : "border-white/12 bg-white/[0.02]"
+        }`}
+      >
+        <div>
+          <div className="text-sm font-bold text-white">Smiths Garage member</div>
+          <div className="text-xs text-white/50">
+            {member ? "Customer sees 10% off every upsell" : "Turn on to give this customer the member discount"}
+          </div>
+        </div>
+        <span className={`relative h-6 w-11 shrink-0 rounded-full transition ${member ? "bg-brand-green" : "bg-white/15"}`}>
+          <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-all ${member ? "left-[22px]" : "left-0.5"}`} />
+        </span>
+      </button>
+
       {/* the shareable link */}
       <div className={`${CARD} p-4`}>
         <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">
