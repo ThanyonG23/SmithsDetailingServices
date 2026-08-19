@@ -220,17 +220,17 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
         </div>
       </section>
 
-      {/* ═══ REVIEWS ═══ */}
-      <ReviewsSection />
-
       {/* ═══ RESERVE ═══ */}
-      <section id="reserve" className="scroll-mt-8 pb-24">
+      <section id="reserve" className="scroll-mt-8 pb-16">
         <div className="mx-auto max-w-xl px-4">
           <Reveal>
             <MembershipSignup />
           </Reveal>
         </div>
       </section>
+
+      {/* ═══ REVIEWS ═══ */}
+      <ReviewsSection />
 
       {/* ═══ FOOTER ═══ */}
       <footer className="border-t border-white/10">
