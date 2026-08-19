@@ -62,6 +62,7 @@ export const TEAM: TeamMember[] = [
     handle: "laura.smithsdetailing",
     footageUrl:
       "https://1drv.ms/f/c/9ca96e60befd2607/IgBEwbh4OErDR5SflSxFONXLAXBl9LExV5pVIDXiNQkq2Rw?e=VhWb0D",
+    retired: true,
   },
 ];
 
