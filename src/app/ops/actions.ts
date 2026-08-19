@@ -166,7 +166,12 @@ export async function uploadCalendar(formData: FormData): Promise<void> {
     ics = buf.toString("utf8");
   }
 
-  const bookings = parseBookingsIcs(ics).filter((b) => b.value > 0);
+  // Keep priced bookings AND $0 member bookings — a Smiths Garage membership
+  // visit has no per-visit price, so filtering on value alone silently drops
+  // every member. Still drop internal/junk events (no value, no car, not a member).
+  const bookings = parseBookingsIcs(ics).filter(
+    (b) => b.value > 0 || !!b.car || /member/i.test(b.summary),
+  );
   await replaceBookings(bookings);
   await recordBookingsSeen(bookings, cairnsToday());
 
