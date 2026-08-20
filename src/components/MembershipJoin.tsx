@@ -194,9 +194,9 @@ export default function MembershipJoin() {
                 type="button"
                 disabled={!!busy}
                 onClick={() => selectTier(tier)}
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-brand-green px-5 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95 disabled:opacity-60"
+                className="mt-6 flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-full bg-brand-green px-5 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95 disabled:opacity-60"
               >
-                {busy === tier.key ? "Setting up…" : `Choose ${tier.key} →`}
+                {busy === tier.key ? "Setting up…" : "Choose this →"}
               </button>
             </div>
           ))}
