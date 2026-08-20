@@ -183,7 +183,7 @@ export default function MembershipJoin() {
                 </div>
               </div>
 
-              <ul className="mt-5 flex flex-col gap-2 text-[13px] leading-snug text-white/70">
+              <ul className="mt-5 mb-6 flex flex-col gap-2 text-[13px] leading-snug text-white/70">
                 <li className="flex items-start gap-2"><span className="mt-px w-4 shrink-0 text-center text-brand-green">✓</span><span>Full detail every 3 months</span></li>
                 <li className="flex items-start gap-2"><span className="mt-px w-4 shrink-0 text-center text-brand-green">✓</span><span>Full service every 6 months</span></li>
                 <li className="flex items-start gap-2"><span className="mt-px w-4 shrink-0 text-center text-brand-green">✓</span><span>Priority booking, cancel anytime</span></li>
@@ -194,7 +194,7 @@ export default function MembershipJoin() {
                 type="button"
                 disabled={!!busy}
                 onClick={() => selectTier(tier)}
-                className="mt-6 flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-full bg-brand-green px-5 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95 disabled:opacity-60"
+                className="mt-auto flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-full bg-brand-green px-5 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95 disabled:opacity-60"
               >
                 {busy === tier.key ? "Setting up…" : "Choose this →"}
               </button>
