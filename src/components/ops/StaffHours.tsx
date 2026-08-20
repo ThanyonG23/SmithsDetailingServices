@@ -37,7 +37,7 @@ export default function StaffHours({
       staff.reduce((a, n) => a + hoursBetween(shifts[n]?.start, shifts[n]?.end), 0) * 100
     ) / 100;
 
-  // Detailers cost hours × rate; salaried staff (Ashlee) cost a fixed daily
+  // Detailers cost hours × rate; salaried staff cost a fixed daily
   // amount if they worked, NOT hours × rate.
   const hourlyCost = staff.reduce(
     (a, n) => (isSalaried(n) ? a : a + hoursBetween(shifts[n]?.start, shifts[n]?.end) * LABOUR_RATE),

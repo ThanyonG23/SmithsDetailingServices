@@ -132,7 +132,7 @@ export async function saveEntry(formData: FormData): Promise<void> {
   redirect(`/ops?date=${encodeURIComponent(entry.log_date)}&saved=1`);
 }
 
-/** Auto-save the day's log as Ashlee fills it in — the SAME write as "Save the
+/** Auto-save the day's log as you fill it in — the SAME write as "Save the
     day" but with no redirect, so it fires quietly (debounced) on every change.
     revalidate keeps the router cache fresh so the numbers are still there when
     she switches tabs and comes back. */
@@ -476,7 +476,7 @@ export async function clockOff(uid: string, detailer: string): Promise<void> {
 }
 
 /* Mark an Instant Quote lead (from the public homepage widget) as actioned —
-   Ashlee has called/texted them and either confirmed the real Google
+   you've called/texted them and either confirmed the real Google
    Calendar booking or ruled it out. This never touches the calendar itself;
    that stays a manual step, same as every other booking. */
 export async function markQuoteLeadActioned(formData: FormData): Promise<void> {
@@ -571,7 +571,7 @@ export async function deleteStock(formData: FormData): Promise<void> {
   redirect("/ops/stock?stockok=deleted");
 }
 
-/* Save Ashlee's daily run-sheet ticks (called from the client, no reload). */
+/* Save the daily run-sheet ticks (called from the client, no reload). */
 export async function saveChecklist(date: string, keys: string[]): Promise<void> {
   const d = String(date || "").slice(0, 10);
   if (!/^\d{4}-\d{2}-\d{2}$/.test(d)) return;

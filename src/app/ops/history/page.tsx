@@ -196,7 +196,7 @@ export default async function HistoryPage() {
 
       {thin && !dbError && (
         <div className="mt-6 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3 text-sm text-white/50">
-          Not much logged yet — this fills in as Ashlee logs each day. Come back in a week and the
+          Not much logged yet — this fills in as you log each day. Come back in a week and the
           trends light up.
         </div>
       )}

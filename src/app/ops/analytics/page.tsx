@@ -278,13 +278,13 @@ export default async function AnalyticsPage({
             </div>
           )}
           <p className="mt-2 text-[11px] text-white/35">
-            This is real invoiced money from Xero — the section below (&ldquo;Revenue&rdquo;) is the estimate Ashlee logs day-to-day.
+            This is real invoiced money from Xero — the section below (&ldquo;Revenue&rdquo;) is the estimate you log day-to-day.
           </p>
         </>
       )}
 
       {/* ── REVENUE (hero) ── */}
-      <SectionTitle eyebrow="Money · what Ashlee logs (estimate)" title="Revenue" />
+      <SectionTitle eyebrow="Money · what you log (estimate)" title="Revenue" />
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         <Tile
           label="Earned"

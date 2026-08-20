@@ -232,8 +232,8 @@ export default function QuoteChat() {
       const data = await res.json();
       let days: Slot[] = Array.isArray(data?.days) ? data.days : [];
       if (days.length === 0) {
-        // Nothing free found — offer tomorrow anyway; Ashlee confirms the
-        // real time when she calls, this is a request, not a lock-in.
+        // Nothing free found — offer tomorrow anyway; the owner confirms the
+        // real time when they call, this is a request, not a lock-in.
         const tomorrow = new Date(Date.now() + 86400000);
         const iso = new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Brisbane" }).format(
           tomorrow

@@ -70,7 +70,7 @@ export default async function StockPage({
         Stock<span className="text-brand-green">take</span>
       </h1>
       <p className="mt-3 text-sm text-white/50">
-        Ashlee keeps the counts current through the week. Anything red needs ordering.
+        Keep the counts current through the week. Anything red needs ordering.
       </p>
 
       {dbError && (

@@ -25,14 +25,14 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
   const [noteText, setNoteText] = useState<Record<string, string>>({});
   const [noteBusy, setNoteBusy] = useState<string | null>(null);
   const [manageOpen, setManageOpen] = useState<string | null>(null);
-  const [startFor, setStartFor] = useState<string | null>(null); // teammate whose start time Ashlee is setting
+  const [startFor, setStartFor] = useState<string | null>(null); // teammate whose start time the lead is setting
   const [qcFor, setQcFor] = useState<string | null>(null); // car whose final-check panel is open
   const [qcTicks, setQcTicks] = useState<boolean[]>([]);
   const [qcBusy, setQcBusy] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [, startTransition] = useTransition();
 
-  // The team leader (first in the roster — Ashlee) can clock anyone on/off.
+  // The team leader (first name in the roster) can clock anyone on/off.
   const isLead = !!me && me === staff[0];
   const tick = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -55,7 +55,7 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
     setMe(name);
   };
 
-  // Clock ANY detailer on/off a car (Ashlee uses this when someone forgets).
+  // Clock ANY detailer on/off a car (the lead uses this when someone forgets).
   const toggleFor = (uid: string, detailer: string, active: boolean) => {
     if (!detailer) return;
     setBusyUid(uid);
@@ -181,7 +181,7 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
 
       {jobs.length === 0 ? (
         <p className="mt-6 text-sm text-white/45">
-          No cars on the board today. If that looks wrong, ask Ashlee to upload the latest calendar.
+          No cars on the board today. If that looks wrong, upload the latest calendar.
         </p>
       ) : (
         <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3 xl:items-start">
@@ -415,7 +415,7 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
                   )}
                 </div>
 
-                {/* Ashlee (team leader): clock anyone on/off if they forgot */}
+                {/* Team leader: clock anyone on/off if they forgot */}
                 {isLead && (
                   <div className="mt-2">
                     <button

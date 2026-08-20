@@ -110,8 +110,8 @@ export function adLabel(adId: string): string {
   return AD_LABELS[adId] || `Ad …${adId.slice(-6)}`;
 }
 
-/** Common upsell extras for the inspection portal — Ashlee taps one to prefill
-    the title + a starting price (she can adjust). Edit these as pricing changes. */
+/** Common upsell extras for the inspection portal — Thanyon taps one to prefill
+    the title + a starting price (you can adjust). Edit these as pricing changes. */
 export const EXTRA_PRESETS: { title: string; price: number; description: string }[] = [
   { title: "Headlight Restoration", price: 120, description: "Sand back and re-clear cloudy, yellowed headlights so they look new and light the road properly." },
   { title: "Pet Hair Removal", price: 55, description: "Deep extraction of embedded pet hair from carpets, seats and boot." },
@@ -151,9 +151,11 @@ export const LABOUR_RATE = 32;
 
 /** Salaried staff are a FIXED daily cost, NOT hourly — costing a manager at the
     detailer hourly rate badly understates their wage. Daily cost = annual salary
-    / work days per year. Update the salary here as pay changes (Ashlee steps to
-    $100,000 in month 2). */
-export const SALARY_ANNUAL: Record<string, number> = { Ashlee: 90000 };
+    / work days per year. Currently empty: the team is owner + 2 detailers + a
+    videographer, all costed hourly, and the owner draws profit rather than a
+    tracked wage. If you ever put yourself on salary, add { Thanyon: <annual> }
+    here and add your name to OPS_STAFF so the board costs your day. */
+export const SALARY_ANNUAL: Record<string, number> = {};
 export const SALARY_WORK_DAYS = 260; // ~5 days/week
 export function isSalaried(name: string): boolean {
   return (SALARY_ANNUAL[name] || 0) > 0;
@@ -167,7 +169,7 @@ export function dailySalaryCost(name: string): number {
     detailer in referrals.ts and this stays in sync automatically. */
 export const OPS_STAFF: string[] = [...ACTIVE_TEAM.map((m) => m.name)];
 
-/** Ashlee's daily run sheet — the tickable checklist on the dashboard.
+/** The owner's daily run sheet — the tickable checklist on the dashboard.
     Keys are stable (don't rename) so saved ticks keep matching. */
 export const RUN_SHEET: { key: string; label: string; phase: "Open" | "During" | "Close" }[] = [
   { key: "open", label: "Open up", phase: "Open" },

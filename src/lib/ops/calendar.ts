@@ -1,7 +1,7 @@
 /* =====================================================================
    OPS — Google Calendar (.ics) parser
    ---------------------------------------------------------------------
-   Ashlee uploads the "Smiths Bookings" calendar export (.zip or .ics);
+   Thanyon uploads the "Smiths Bookings" calendar export (.zip or .ics);
    this pulls each booking's date + dollar value out of the event.
    Values live in the SUMMARY/DESCRIPTION as "Total:" or "Quote:".
    iCal escapes commas as \,  so $1\,500 must have the backslash stripped

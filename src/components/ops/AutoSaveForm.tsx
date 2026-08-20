@@ -2,8 +2,8 @@
 
 import { useRef, useState } from "react";
 
-/* Wraps the daily-log form so it saves AS Ashlee fills it in, not only when she
-   taps "Save the day". On any input change it debounces, reads the whole form
+/* Wraps the daily-log form so it saves AS you fill it in, not only when you
+   tap "Save the day". On any input change it debounces, reads the whole form
    straight off the DOM (so the existing uncontrolled fields just work), and
    fires the auto-save action. The explicit submit button still works for a
    clean end-of-day sign-off. */

@@ -133,8 +133,9 @@ export default async function InspectPage() {
         ) : (
           <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {inspections.map((insp) => {
+              const rate = (p: number) => (insp.member ? p * 0.9 : p);
               const chosen = insp.items.filter((i) => i.selected);
-              const chosenTotal = chosen.reduce((a, i) => a + i.price, 0);
+              const chosenTotal = chosen.reduce((a, i) => a + rate(i.price), 0);
               const offered = insp.items.reduce((a, i) => a + i.price, 0);
               const tone =
                 insp.status === "responded"

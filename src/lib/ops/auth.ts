@@ -13,7 +13,7 @@ import { createHmac, timingSafeEqual } from "crypto";
    stored, and the cookie can't be forged without the secret.
 
    Set in Vercel:
-     OPS_PASSWORD       — the owner/manager password (you, Ashlee)
+     OPS_PASSWORD       — the owner/manager password (you, Thanyon)
      OPS_CREW_PASSWORD  — the detailers' password (Team board only)
      OPS_SECRET         — any long random string (signs the cookie)
    ===================================================================== */

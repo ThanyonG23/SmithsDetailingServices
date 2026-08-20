@@ -25,7 +25,7 @@ function dayLabel(d: string): string {
   });
 }
 
-/* Emails the new pending lead to the shop inbox so Ashlee can confirm it and
+/* Emails the new pending lead to the shop inbox so the owner can confirm it and
    send the calendar invite — same info that lands in /ops, just pushed to
    her inbox too instead of only waiting to be checked. Needs RESEND_API_KEY
    set in Vercel; silently skipped (never blocks the customer's request) if
@@ -82,7 +82,7 @@ waiting in /ops on the dashboard.`;
 }
 
 /* Public, no-auth: creates a PENDING lead from the homepage Instant Quote
-   widget. Never touches the Google Calendar — Ashlee confirms every booking
+   widget. Never touches the Google Calendar — the owner confirms every booking
    manually via the /ops dashboard, same as the existing text-to-quote flow. */
 export async function POST(req: Request) {
   let body: Record<string, unknown> = {};

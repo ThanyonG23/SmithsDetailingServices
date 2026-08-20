@@ -6,7 +6,7 @@ import { freshChecklist, type ServiceChecklistItem } from "./service";
 
 /* =====================================================================
    DAILY OPS — data layer (Supabase / any Postgres via the `postgres` client)
-   - daily_log : one row per day, what Ashlee logs
+   - daily_log : one row per day, what the owner logs
    - bookings  : parsed from the uploaded Google Calendar (full snapshot)
    Tables + newer columns are created lazily on first use.
    ===================================================================== */
@@ -309,7 +309,7 @@ async function runEnsure(): Promise<void> {
     ON CONFLICT (uid, work_date) DO NOTHING;
   `;
   // Instant Quote leads — from the public homepage AI widget. Always a
-  // "pending" request for Ashlee to confirm; never writes the calendar
+  // "pending" request for the owner to confirm; never writes the calendar
   // directly, same human-in-the-loop model as every other booking.
   await sql`
     CREATE TABLE IF NOT EXISTS quote_leads (
@@ -603,7 +603,7 @@ export async function setMetaMessages(date: string, count: number): Promise<void
   `;
 }
 
-/* ---- daily run sheet (Ashlee's checklist) -------------------------- */
+/* ---- daily run sheet (the owner's checklist) ---------------------- */
 
 /** Checked run-sheet item keys for a day. Crash-safe if the column doesn't
     exist yet (returns []), so it never breaks the dashboard pre-migration. */
@@ -1033,7 +1033,7 @@ export async function clockStart(
 ): Promise<void> {
   await ensureTable();
   if (!uid || !detailer || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
-  // Ashlee can backdate a forgotten start (capped at 12h so a typo can't wreck it).
+  // The lead can backdate a forgotten start (capped at 12h so a typo can't wreck it).
   const mins = Number.isFinite(startedMinsAgo) && startedMinsAgo > 0 ? Math.min(startedMinsAgo, 720) : 0;
   const closed = await sql`
     UPDATE job_clock SET end_ts = now(), updated_at = now()
@@ -1079,7 +1079,7 @@ export interface TeamJob {
 }
 
 /** Today's floor for the detailers: today's cars + any car still open from an
-    earlier day, EXCLUDING anything Ashlee has marked done. A car stays here —
+    earlier day, EXCLUDING anything the owner has marked done. A car stays here —
     and keeps accumulating time — until it's finished. */
 export async function getTeamDay(date: string, sinceISO: string): Promise<TeamJob[]> {
   const jobs = await sql`
