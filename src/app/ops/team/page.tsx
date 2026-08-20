@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { requireAuth } from "@/lib/ops/auth";
 import { getTeamDay, type TeamJob } from "@/lib/ops/db";
-import { OPS_STAFF, cairnsToday } from "@/lib/ops/config";
+import { OPS_BOARD, cairnsToday } from "@/lib/ops/config";
 import TeamBoard from "@/components/ops/TeamBoard";
 
 export const metadata: Metadata = {
@@ -54,7 +54,7 @@ export default async function TeamPage() {
         </div>
       )}
 
-      <TeamBoard jobs={jobs} staff={OPS_STAFF} />
+      <TeamBoard jobs={jobs} staff={OPS_BOARD} />
 
       <p className="mt-14 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-white/20">
         Smiths Detailing · Cairns · Crew

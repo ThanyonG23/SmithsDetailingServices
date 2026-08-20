@@ -165,9 +165,20 @@ export function dailySalaryCost(name: string): number {
   return annual > 0 ? Math.round(annual / SALARY_WORK_DAYS) : 0;
 }
 
-/** Whose hours get logged each day: every active detailer. Add or retire a
-    detailer in referrals.ts and this stays in sync automatically. */
+/** The floor lead — first on the Team board and the only one who can clock any
+    detailer on/off a car when they forget. That's you. Deliberately NOT in
+    OPS_STAFF, so your day isn't costed as a $32/hr detailer wage (you draw
+    profit, not a wage). */
+export const OPS_LEAD = "Thanyon";
+
+/** Whose hours get logged and COSTED each day: every active detailer. Add or
+    retire a detailer in referrals.ts and this stays in sync automatically. */
 export const OPS_STAFF: string[] = [...ACTIVE_TEAM.map((m) => m.name)];
+
+/** The full Team-board roster: the lead first (so isLead === staff[0] is you),
+    then the costed detailers. Used by the Team board only — costing/history
+    read OPS_STAFF, so the lead never lands in a labour-cost total. */
+export const OPS_BOARD: string[] = [OPS_LEAD, ...OPS_STAFF];
 
 /** The owner's daily run sheet — the tickable checklist on the dashboard.
     Keys are stable (don't rename) so saved ticks keep matching. */
