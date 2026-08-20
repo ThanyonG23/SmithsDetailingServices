@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BUSINESS } from "@/lib/config";
+import { packagePrice, VEHICLE_SIZES } from "@/lib/packages";
 
 export const metadata: Metadata = {
   title: "Membership Terms · Smiths Garage",
@@ -11,7 +12,17 @@ export const metadata: Metadata = {
 
 const LOGO = "/smiths-garage-logo.png";
 
-const TERMS: { heading: string; body: string }[] = [
+/* Standard (non-member) going rate for a basic, non-logbook service. Kept here
+   so the cancellation clause quotes a real number; the detail half is read live
+   from packages.ts so it always matches the staff templates. */
+const SERVICE_GOING_RATE = 220;
+const money = (n: number) => "$" + Math.round(n).toLocaleString("en-AU");
+const FIRST_VISIT_PRICES = VEHICLE_SIZES.map((size) => {
+  const detail = packagePrice("premium", size);
+  return { size, detail, service: SERVICE_GOING_RATE, total: detail + SERVICE_GOING_RATE };
+});
+
+const TERMS: { heading: string; body: string; firstVisitPrices?: boolean }[] = [
   {
     heading: "1. The membership",
     body: "Smiths Garage Maintenance keeps your vehicle detailed and serviced on a schedule. Every 3 months we carry out a full interior and exterior detail plus a top-up and health check. Every 6 months, that visit also includes a basic service (oil change, filter and checks). Priority booking is included for members.",
@@ -34,14 +45,19 @@ const TERMS: { heading: string; body: string }[] = [
   },
   {
     heading: "6. Cancelling",
-    body: "There is no lock-in contract — you can cancel any time. Please give us at least 7 days' notice before your next payment so we can stop your billing. The sign-up fee is non-refundable.",
+    body: "Once you've had your second visit there is no lock-in — you can cancel any time. Please give us at least 7 days' notice before your next payment so we can stop your billing. The sign-up fee is non-refundable. Cancelling before your second visit is covered separately below.",
   },
   {
-    heading: "7. Vehicle condition",
+    heading: "7. Cancelling before your second visit",
+    body: "Your first visit — a full detail plus a basic service — is provided at a discounted member rate, on the understanding that you continue your membership. If you cancel before your second scheduled visit, that discount no longer applies: the first visit is charged at our standard, non-member going rate shown below, with the sign-up fee you've already paid credited toward it, so only the difference is payable. Standard going rate for a first visit (full detail + basic service), by vehicle size:",
+    firstVisitPrices: true,
+  },
+  {
+    heading: "8. Vehicle condition",
     body: "Our pricing assumes a vehicle in normal condition. Excessive mess, pet hair or damage may require extra work, which we will always quote separately before starting.",
   },
   {
-    heading: "8. Our promise",
+    heading: "9. Our promise",
     body: "We hold the same standard we always have. If you're not happy with a visit, tell us and we'll make it right.",
   },
 ];
@@ -64,11 +80,35 @@ export default function MembershipTermsPage() {
             <section key={t.heading}>
               <h2 className="font-display text-lg font-extrabold tracking-tight text-white">{t.heading}</h2>
               <p className="mt-2 text-[15px] leading-relaxed text-white/70">{t.body}</p>
+              {t.firstVisitPrices && (
+                <div className="mt-4 overflow-hidden rounded-xl border border-white/10">
+                  <table className="w-full text-left text-[14px]">
+                    <thead>
+                      <tr className="bg-white/[0.04] text-white/50">
+                        <th className="px-4 py-2.5 font-semibold">Vehicle</th>
+                        <th className="px-4 py-2.5 font-semibold">Full detail</th>
+                        <th className="px-4 py-2.5 font-semibold">Basic service</th>
+                        <th className="px-4 py-2.5 text-right font-semibold text-white/70">Going rate</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {FIRST_VISIT_PRICES.map((r) => (
+                        <tr key={r.size} className="border-t border-white/[0.06]">
+                          <td className="px-4 py-2.5 text-white/70">{r.size}</td>
+                          <td className="px-4 py-2.5 text-white/50">{money(r.detail)}</td>
+                          <td className="px-4 py-2.5 text-white/50">{money(r.service)}</td>
+                          <td className="px-4 py-2.5 text-right font-bold text-white">{money(r.total)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </section>
           ))}
 
           <section>
-            <h2 className="font-display text-lg font-extrabold tracking-tight text-white">9. Contact</h2>
+            <h2 className="font-display text-lg font-extrabold tracking-tight text-white">10. Contact</h2>
             <p className="mt-2 text-[15px] leading-relaxed text-white/70">
               Questions? Call us on{" "}
               <a href={`tel:${BUSINESS.phoneE164}`} className="font-semibold text-brand-purple-soft hover:text-white">
