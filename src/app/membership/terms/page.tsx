@@ -19,7 +19,10 @@ const SERVICE_GOING_RATE = 220;
 const money = (n: number) => "$" + Math.round(n).toLocaleString("en-AU");
 const FIRST_VISIT_PRICES = VEHICLE_SIZES.map((size) => {
   const detail = packagePrice("premium", size);
-  return { size, detail, service: SERVICE_GOING_RATE, total: detail + SERVICE_GOING_RATE };
+  // The paint work on its own = the "Premium + Cut & Polish" package less the
+  // detail that's already counted in the table above, so nothing double-counts.
+  const cutPolish = packagePrice("cutpolish", size) - detail;
+  return { size, detail, service: SERVICE_GOING_RATE, cutPolish, total: detail + SERVICE_GOING_RATE };
 });
 
 const TERMS: { heading: string; body: string; firstVisitPrices?: boolean }[] = [
@@ -49,7 +52,7 @@ const TERMS: { heading: string; body: string; firstVisitPrices?: boolean }[] = [
   },
   {
     heading: "7. Cancelling before your second visit",
-    body: "Your first visit — a full detail plus a basic service — is provided at a discounted member rate, on the understanding that you continue your membership. If you cancel before your second scheduled visit, that discount no longer applies: the first visit is charged at our standard, non-member going rate shown below, with the sign-up fee you've already paid credited toward it, so only the difference is payable. Standard going rate for a first visit (full detail + basic service), by vehicle size:",
+    body: "Your first visit — a full detail plus a basic service — is provided at a discounted member rate, on the understanding that you continue your membership. If you cancel before your second scheduled visit, that discount no longer applies: the first visit is charged at our standard, non-member going rate shown below, with the sign-up fee you've already paid credited toward it, so only the difference is payable. If your first visit also included a complimentary Cut & Polish — a limited-time sign-up bonus — its standard going rate is added on top, as listed under the table. Standard going rate for a first visit (full detail + basic service), by vehicle size:",
     firstVisitPrices: true,
   },
   {
@@ -103,6 +106,19 @@ export default function MembershipTermsPage() {
                     </tbody>
                   </table>
                 </div>
+              )}
+              {t.firstVisitPrices && (
+                <p className="mt-3 text-[14px] leading-relaxed text-white/55">
+                  <span className="font-semibold text-white/70">If a complimentary Cut &amp; Polish was included,</span> add its
+                  standard going rate to the above:{" "}
+                  {FIRST_VISIT_PRICES.map((r, i) => (
+                    <span key={r.size}>
+                      {i > 0 ? " · " : ""}
+                      {r.size} {money(r.cutPolish)}
+                    </span>
+                  ))}
+                  .
+                </p>
               )}
             </section>
           ))}
