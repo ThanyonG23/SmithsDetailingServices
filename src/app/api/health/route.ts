@@ -8,6 +8,10 @@ import {
   getBookingsDump,
   leadDiagnostics,
   inspectDiagnostics,
+  getAds,
+  getSalesStats,
+  getLeadAnalytics,
+  getLeadSaleMatch,
 } from "@/lib/ops/db";
 
 /* Keep-warm health check. A free external pinger hits this every few minutes
@@ -33,8 +37,12 @@ export async function GET(req: Request) {
   const bookings = deep === "bookings" && tokenOk ? await getBookingsDump(from, to) : undefined;
   const leads = deep === "leads" && tokenOk ? await leadDiagnostics() : undefined;
   const inspect = deep === "inspect" && tokenOk ? await inspectDiagnostics() : undefined;
+  const ads = deep === "ads" && tokenOk ? await getAds() : undefined;
+  const sales = deep === "sales" && tokenOk ? await getSalesStats(from, to) : undefined;
+  const leadan = deep === "leadan" && tokenOk ? await getLeadAnalytics(from, to, to) : undefined;
+  const leadmatch = deep === "leadmatch" && tokenOk ? await getLeadSaleMatch() : undefined;
   return NextResponse.json(
-    { ok, checklist, dash, team, hours, bookings, leads, inspect, service: "smiths-ops", ts: new Date().toISOString() },
+    { ok, checklist, dash, team, hours, bookings, leads, inspect, ads, sales, leadan, leadmatch, service: "smiths-ops", ts: new Date().toISOString() },
     { status: ok ? 200 : 503, headers: { "Cache-Control": "no-store" } }
   );
 }
