@@ -172,13 +172,14 @@ export default function MembershipJoin() {
           {TIERS.map((tier) => (
             <div
               key={tier.key}
-              className="flex w-[78%] shrink-0 snap-start flex-col rounded-2xl border border-white/12 bg-white/[0.03] p-5 transition hover:border-brand-green/40 sm:w-[46%]"
+              className="flex w-[80%] shrink-0 snap-start flex-col rounded-2xl border border-white/12 bg-white/[0.03] p-5 transition hover:border-brand-green/40 sm:w-[47%]"
             >
-              <div className="flex items-center gap-2.5">
+              {/* header — fixed height so descriptions of different lengths still line up */}
+              <div className="flex min-h-[3.25rem] items-center gap-2.5">
                 <span className="text-2xl leading-none">{tier.emoji}</span>
-                <div>
+                <div className="min-w-0">
                   <h4 className="font-display text-lg font-extrabold leading-tight tracking-tight text-white">{tier.key}</h4>
-                  <p className="text-xs text-white/45">{tier.desc}</p>
+                  <p className="text-xs leading-snug text-white/45">{tier.desc}</p>
                 </div>
               </div>
 
@@ -186,22 +187,22 @@ export default function MembershipJoin() {
                 <span className="font-display text-4xl font-black text-white">${tier.weekly}</span>
                 <span className="mb-1 text-sm font-bold text-white/50">/week</span>
               </div>
-              <p className="mt-1 text-[13px] text-white/55">
+              <p className="mt-1.5 text-[13px] leading-snug text-white/55">
                 First visit <b className="text-white">${tier.first}</b> — full detail + first service
               </p>
 
-              <ul className="mt-4 flex flex-col gap-1.5 text-[13px] text-white/70">
-                <li className="flex items-start gap-2"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Full detail every 3 months</li>
-                <li className="flex items-start gap-2"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Full service every 6 months</li>
-                <li className="flex items-start gap-2"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Priority booking, cancel anytime</li>
-                <li className="flex items-start gap-2"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">Free Cut &amp; Polish (next 15 members)</span></li>
+              <ul className="mt-4 flex flex-col gap-2 text-[13px] leading-snug text-white/70">
+                <li className="flex items-start gap-2"><span className="mt-px w-4 shrink-0 text-center text-brand-green">✓</span><span>Full detail every 3 months</span></li>
+                <li className="flex items-start gap-2"><span className="mt-px w-4 shrink-0 text-center text-brand-green">✓</span><span>Full service every 6 months</span></li>
+                <li className="flex items-start gap-2"><span className="mt-px w-4 shrink-0 text-center text-brand-green">✓</span><span>Priority booking, cancel anytime</span></li>
+                <li className="flex items-start gap-2"><span className="mt-px w-4 shrink-0 text-center">🎁</span><span className="text-brand-yellow">Free Cut &amp; Polish (next 15 members)</span></li>
               </ul>
 
               <button
                 type="button"
                 disabled={!!busy}
                 onClick={() => selectTier(tier)}
-                className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-brand-green px-5 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95 disabled:opacity-60"
+                className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-brand-green px-5 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95 disabled:opacity-60"
               >
                 {busy === tier.key ? "Setting up…" : `Choose ${tier.key} →`}
               </button>
