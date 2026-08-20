@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import MembershipContent from "@/components/MembershipContent";
 
 export const metadata: Metadata = {
-  title: "Smiths Garage Maintenance | Cairns",
+  title: "The Smiths Detailing Membership | Cairns",
   description:
-    "Hand us the keys and we'll keep your car clean and serviced on a schedule. A membership from Smiths Garage, Cairns, for people who'd rather not think about their car.",
-  robots: { index: false, follow: false }, // sent direct to customers — not for search
+    "Hand us the keys and we'll keep your car detailed and serviced on a schedule — from $49/week. Founding memberships from Smiths Detailing, Cairns, for people who'd rather not think about their car.",
+  robots: { index: false, follow: false }, // paid-ad landing page — not for search
   alternates: { canonical: "/membership" },
 };
 

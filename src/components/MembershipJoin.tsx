@@ -59,7 +59,7 @@ export default function MembershipJoin() {
   };
 
   const field =
-    "w-full rounded-xl border border-white/12 bg-white/[0.03] px-4 py-3 text-white placeholder-white/30 outline-none transition focus:border-brand-purple/60 focus:bg-white/[0.05]";
+    "w-full rounded-xl border border-white/12 bg-white/[0.03] px-4 py-3 text-white placeholder-white/30 outline-none transition focus:border-brand-green/60 focus:bg-white/[0.05]";
   const labelCls = "mb-1.5 block text-[11px] font-bold uppercase tracking-[0.14em] text-white/40";
 
   return (
@@ -93,7 +93,7 @@ export default function MembershipJoin() {
 
       <div
         className={`mt-5 flex items-start gap-3 rounded-2xl border px-4 py-3.5 transition ${
-          agreed ? "border-brand-purple/50 bg-brand-purple/[0.07]" : "border-white/12 bg-white/[0.02]"
+          agreed ? "border-brand-green/50 bg-brand-green/[0.07]" : "border-white/12 bg-white/[0.02]"
         }`}
       >
         <button
@@ -101,19 +101,19 @@ export default function MembershipJoin() {
           onClick={() => setAgreed((a) => !a)}
           aria-pressed={agreed}
           className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border-2 text-[11px] transition ${
-            agreed ? "border-brand-purple bg-brand-purple/20 text-brand-purple-soft" : "border-white/25 text-transparent hover:border-brand-purple/50"
+            agreed ? "border-brand-green bg-brand-green/20 text-brand-green" : "border-white/25 text-transparent hover:border-brand-green/50"
           }`}
         >
           ✓
         </button>
         <label className="cursor-pointer text-sm text-white/80" onClick={() => setAgreed((a) => !a)}>
-          I&apos;m joining the Smiths Garage Maintenance plan and agree to the{" "}
+          I&apos;m joining the Smiths Detailing membership and agree to the{" "}
           <a
             href="/membership/terms"
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => e.stopPropagation()}
-            className="font-semibold text-brand-purple-soft underline underline-offset-2 hover:text-white"
+            className="font-semibold text-brand-green underline underline-offset-2 hover:text-white"
           >
             Terms &amp; Conditions
           </a>
@@ -135,10 +135,10 @@ export default function MembershipJoin() {
               type="button"
               disabled={busy}
               onClick={() => selectTier(tier)}
-              className="flex w-full items-center justify-between rounded-full bg-brand-purple px-6 py-4 font-display text-base font-extrabold text-white transition hover:brightness-110 disabled:opacity-60"
+              className="flex w-full items-center justify-between rounded-full bg-brand-green px-6 py-4 font-display text-base font-extrabold text-brand-ink transition hover:brightness-110 disabled:opacity-60"
             >
               <span>{tier}</span>
-              <span className="text-white/70">{busy ? "…" : "→"}</span>
+              <span className="text-brand-ink/60">{busy ? "…" : "→"}</span>
             </button>
           ))}
         </div>

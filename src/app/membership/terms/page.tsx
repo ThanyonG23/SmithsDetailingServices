@@ -4,13 +4,13 @@ import { BUSINESS } from "@/lib/config";
 import { packagePrice, VEHICLE_SIZES } from "@/lib/packages";
 
 export const metadata: Metadata = {
-  title: "Membership Terms · Smiths Garage",
-  description: "Terms & conditions for the Smiths Garage Maintenance membership.",
+  title: "Membership Terms · Smiths Detailing",
+  description: "Terms & conditions for the Smiths Detailing membership.",
   robots: { index: false, follow: false },
   alternates: { canonical: "/membership/terms" },
 };
 
-const LOGO = "/smiths-garage-logo.png";
+const LOGO = BUSINESS.logo;
 
 /* Standard (non-member) going rate for a basic, non-logbook service. Kept here
    so the cancellation clause quotes a real number; the detail half is read live
@@ -28,7 +28,7 @@ const FIRST_VISIT_PRICES = VEHICLE_SIZES.map((size) => {
 const TERMS: { heading: string; body: string; firstVisitPrices?: boolean }[] = [
   {
     heading: "1. The membership",
-    body: "Smiths Garage Maintenance keeps your vehicle detailed and serviced on a schedule. Every 3 months we carry out a full interior and exterior detail plus a top-up and health check. Every 6 months, that visit also includes a basic service (oil change, filter and checks). Priority booking is included for members.",
+    body: "The Smiths Detailing membership keeps your vehicle detailed and serviced on a schedule. Every 3 months we carry out a full interior and exterior detail plus a top-up and health check. Every 6 months, that visit also includes a basic service (oil change, filter and checks). Priority booking is included for members.",
   },
   {
     heading: "2. Payments",
@@ -71,11 +71,11 @@ export default function MembershipTermsPage() {
       <div className="mx-auto max-w-2xl px-5 py-14 sm:py-20">
         <div className="text-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={LOGO} alt="Smiths Garage" className="mx-auto w-full max-w-[220px] mix-blend-screen" />
+          <img src={LOGO} alt="Smiths Detailing" className="mx-auto w-full max-w-[220px]" />
           <h1 className="mt-6 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
             Membership Terms &amp; Conditions
           </h1>
-          <p className="mt-2 text-sm text-white/40">Smiths Garage Maintenance · Last updated August 2026</p>
+          <p className="mt-2 text-sm text-white/40">The Smiths Detailing Membership · Last updated August 2026</p>
         </div>
 
         <div className="mt-10 flex flex-col gap-7">
@@ -127,11 +127,11 @@ export default function MembershipTermsPage() {
             <h2 className="font-display text-lg font-extrabold tracking-tight text-white">10. Contact</h2>
             <p className="mt-2 text-[15px] leading-relaxed text-white/70">
               Questions? Call us on{" "}
-              <a href={`tel:${BUSINESS.phoneE164}`} className="font-semibold text-brand-purple-soft hover:text-white">
+              <a href={`tel:${BUSINESS.phoneE164}`} className="font-semibold text-brand-green hover:text-white">
                 {BUSINESS.phone}
               </a>{" "}
               or email{" "}
-              <a href={`mailto:${BUSINESS.email}`} className="font-semibold text-brand-purple-soft hover:text-white">
+              <a href={`mailto:${BUSINESS.email}`} className="font-semibold text-brand-green hover:text-white">
                 {BUSINESS.email}
               </a>
               .
