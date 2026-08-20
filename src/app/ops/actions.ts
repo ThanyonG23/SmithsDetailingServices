@@ -744,13 +744,13 @@ Any questions at all, feel free to reach out.
 
 Thanks again — we look forward to seeing you!`;
 
-const reminderBody = `Hey [Name], this is Ashlee from Smiths Detailing.
+const reminderBody = `Hey [Name], this is Thanyon from Smiths Detailing.
 
 Just a friendly reminder about your detail tomorrow at [time], at 209 Bunda St, Parramatta Park, Cairns QLD.
 
 See you then! 🙂`;
 
-const checkinBody = `Good afternoon [Name], Ashlee here from Smiths Detailing Services.
+const checkinBody = `Good afternoon [Name], Thanyon here from Smiths Detailing Services.
 
 Just wanted to check in and make sure you were 100% happy with your service yesterday?`;
 
