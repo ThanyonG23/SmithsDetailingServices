@@ -13,8 +13,8 @@ import { BUSINESS } from "@/lib/config";
 
 const LOGO = BUSINESS.logo; // Smiths Detailing logo
 
-// ── The price. Change this line only. ──
-const PRICE = "$49";
+// ── The "from" price (cheapest tier = Single Cab). Change this line only. ──
+const PRICE = "$39";
 
 // Green glow used behind the hero + plan card (brand green #2bff7a).
 const GREEN_GLOW = "radial-gradient(closest-side, #2bff7a, transparent 70%)";
@@ -125,7 +125,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full border border-brand-green/40 bg-brand-green/[0.08] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-green">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-green" />
-              Founding members · Cairns · 40 spots
+              Founding members · Cairns · 15 spots left
             </span>
           </Reveal>
           <Reveal delay={100}>
@@ -159,7 +159,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
               >
                 Reserve my spot →
               </a>
-              <p className="mt-3 text-xs text-white/40">No payment now · Only 40 founding spots</p>
+              <p className="mt-3 text-xs text-white/40">No payment now · Next 15 members get a free Cut &amp; Polish</p>
             </div>
           </Reveal>
         </div>
@@ -205,7 +205,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                   </div>
                   <div className="mt-1 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-brand-yellow/80">
                     <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-yellow"></span>
-                    Founding members only
+                    Next 15 members only
                   </div>
                 </div>
               </div>
@@ -233,8 +233,8 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                 </div>
                 <p className="mt-1 text-xs text-white/40">Billed weekly · cancel anytime · larger vehicles slightly more</p>
 
-                <div className="mx-auto mt-5 inline-flex items-center gap-2 rounded-full border border-brand-green/40 bg-brand-green/[0.08] px-4 py-2 text-[13px] font-bold text-brand-green">
-                  🔒 First 40 members lock this price for life
+                <div className="mx-auto mt-5 inline-flex items-center gap-2 rounded-full border border-brand-yellow/45 bg-brand-yellow/[0.10] px-4 py-2 text-[13px] font-bold text-brand-yellow">
+                  🎁 Next 15 members get a FREE Cut &amp; Polish valued at $750+
                 </div>
               </div>
 

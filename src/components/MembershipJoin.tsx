@@ -3,17 +3,53 @@
 import { useState } from "react";
 
 /* ──────────────────────────────────────────────────────────────────────
-   STRIPE PAYMENT LINKS — paste your real links here (one per vehicle tier).
-   Create them in Stripe → Payment Links (set the $ sign-up fee + $/week
-   subscription on each), then replace the placeholder URLs below.
+   MEMBERSHIP TIERS — one product card per vehicle size.
+   Each has its own Stripe Payment Link (sign-up first-service fee +
+   ongoing weekly subscription baked into the link).
    ────────────────────────────────────────────────────────────────────── */
-const STRIPE_LINKS: Record<string, string> = {
-  "Sedan / Dual Cab": "https://buy.stripe.com/3cI3cv1bGe69eD6cGf6kg0r",
-  SUV: "https://buy.stripe.com/fZuaEX6w05zD1Qk6hR6kg0s",
-  "7 Seater": "https://buy.stripe.com/eVqcN5aMg4vz3YscGf6kg0t",
+type Tier = {
+  key: string;
+  emoji: string;
+  desc: string;
+  weekly: number; // ongoing $/week
+  first: number; // first-visit (sign-up) price — detail + first service
+  link: string; // Stripe payment link
 };
 
-const TIERS = ["Sedan / Dual Cab", "SUV", "7 Seater"];
+const TIERS: Tier[] = [
+  {
+    key: "Single Cab",
+    emoji: "🛻",
+    desc: "Single cabs & small utes",
+    weekly: 39,
+    first: 630,
+    link: "https://buy.stripe.com/5kQ7sL9Ic6DH8eIbCb6kg0v",
+  },
+  {
+    key: "Sedan / Dual Cab",
+    emoji: "🚗",
+    desc: "Sedans, hatches & dual cabs",
+    weekly: 49,
+    first: 680,
+    link: "https://buy.stripe.com/fZu3cv1bG0fj2Uo21B6kg0w",
+  },
+  {
+    key: "SUV",
+    emoji: "🚙",
+    desc: "SUVs & wagons",
+    weekly: 59,
+    first: 730,
+    link: "https://buy.stripe.com/fZu14n7A45zDdz2bCb6kg0x",
+  },
+  {
+    key: "7 Seater",
+    emoji: "🚐",
+    desc: "7-seaters & people movers",
+    weekly: 69,
+    first: 780,
+    link: "https://buy.stripe.com/4gM00j7A43rv2Uo8pZ6kg0y",
+  },
+];
 
 /* Post-call sign-up. The pitch + price happen on the phone; here the member
    confirms their details (saved to the ops dashboard) then picks their vehicle
@@ -26,15 +62,15 @@ export default function MembershipJoin() {
   const [rego, setRego] = useState("");
   const [preferred, setPreferred] = useState("");
   const [agreed, setAgreed] = useState(false);
-  const [busy, setBusy] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState("");
 
-  const selectTier = async (tier: string) => {
+  const selectTier = async (tier: Tier) => {
     setError("");
     if (!name.trim()) return setError("Please add your name.");
     if (!phone.trim()) return setError("Please add a phone number so we can confirm your first visit.");
     if (!agreed) return setError("Please tick the box to confirm you're joining.");
-    setBusy(true);
+    setBusy(tier.key);
     // Save their details to the dashboard first (best-effort — never block payment).
     try {
       await fetch("/api/waitlist", {
@@ -48,14 +84,14 @@ export default function MembershipJoin() {
           membership: true,
           source: "membership-signup",
           interests: ["detailing", "servicing"],
-          message: `Tier: ${tier} | Rego: ${rego || "—"} | Preferred first visit: ${preferred || "—"} | Agreed to T&Cs: yes`,
+          message: `Tier: ${tier.key} ($${tier.weekly}/wk, first $${tier.first}) | Rego: ${rego || "—"} | Preferred first visit: ${preferred || "—"} | Agreed to T&Cs: yes`,
         }),
       });
     } catch {
       /* don't block the customer from paying if the save hiccups */
     }
     // Hand off to Stripe.
-    window.location.href = STRIPE_LINKS[tier] || "#";
+    window.location.href = tier.link || "#";
   };
 
   const field =
@@ -123,26 +159,56 @@ export default function MembershipJoin() {
 
       {error && <p className="mt-4 text-sm font-semibold text-red-400">{error}</p>}
 
-      {/* Vehicle tier → Stripe */}
+      {/* Vehicle tiers → Stripe. Horizontal-scrolling product cards. */}
       <div className="mt-7 border-t border-white/10 pt-6">
-        <p className="mb-3 text-center text-[11px] font-bold uppercase tracking-[0.16em] text-white/40">
-          Choose your vehicle to set up payment
-        </p>
-        <div className="flex flex-col gap-3">
+        <div className="flex items-baseline justify-between gap-3">
+          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/40">
+            Choose your vehicle
+          </p>
+          <p className="text-[11px] font-semibold text-white/30 sm:hidden">Swipe →</p>
+        </div>
+
+        <div className="-mx-1 mt-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-1 pb-4 [scrollbar-width:thin]">
           {TIERS.map((tier) => (
-            <button
-              key={tier}
-              type="button"
-              disabled={busy}
-              onClick={() => selectTier(tier)}
-              className="flex w-full items-center justify-between rounded-full bg-brand-green px-6 py-4 font-display text-base font-extrabold text-brand-ink transition hover:brightness-110 disabled:opacity-60"
+            <div
+              key={tier.key}
+              className="flex w-[78%] shrink-0 snap-start flex-col rounded-2xl border border-white/12 bg-white/[0.03] p-5 transition hover:border-brand-green/40 sm:w-[46%]"
             >
-              <span>{tier}</span>
-              <span className="text-brand-ink/60">{busy ? "…" : "→"}</span>
-            </button>
+              <div className="flex items-center gap-2.5">
+                <span className="text-2xl leading-none">{tier.emoji}</span>
+                <div>
+                  <h4 className="font-display text-lg font-extrabold leading-tight tracking-tight text-white">{tier.key}</h4>
+                  <p className="text-xs text-white/45">{tier.desc}</p>
+                </div>
+              </div>
+
+              <div className="mt-4 flex items-end gap-1">
+                <span className="font-display text-4xl font-black text-white">${tier.weekly}</span>
+                <span className="mb-1 text-sm font-bold text-white/50">/week</span>
+              </div>
+              <p className="mt-1 text-[13px] text-white/55">
+                First visit <b className="text-white">${tier.first}</b> — full detail + first service
+              </p>
+
+              <ul className="mt-4 flex flex-col gap-1.5 text-[13px] text-white/70">
+                <li className="flex items-start gap-2"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Full detail every 3 months</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Full service every 6 months</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Priority booking, cancel anytime</li>
+                <li className="flex items-start gap-2"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">Free Cut &amp; Polish (next 15 members)</span></li>
+              </ul>
+
+              <button
+                type="button"
+                disabled={!!busy}
+                onClick={() => selectTier(tier)}
+                className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-brand-green px-5 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95 disabled:opacity-60"
+              >
+                {busy === tier.key ? "Setting up…" : `Choose ${tier.key} →`}
+              </button>
+            </div>
           ))}
         </div>
-        <p className="mt-3 text-center text-xs text-white/35">Secure payment powered by Stripe.</p>
+        <p className="mt-1 text-center text-xs text-white/35">Secure payment powered by Stripe.</p>
       </div>
     </div>
   );
