@@ -2025,6 +2025,30 @@ export async function getCustomers(search = "", limit = 300): Promise<Customer[]
   }
 }
 
+/* Repeat-customer stats straight off the CRM (deduped on phone/email), for the
+   token-gated health diagnostic. Aggregates only + a small top-returning list. */
+export async function customerDiagnostics(): Promise<unknown> {
+  try {
+    await ensureTable();
+    const [totals] = (await sql`
+      SELECT count(*)::int AS customers, coalesce(sum(bookings),0)::int AS bookings,
+             coalesce(sum(total_value),0)::float AS revenue
+      FROM customers;`) as unknown as { customers: number; bookings: number; revenue: number }[];
+    const [rep] = (await sql`
+      SELECT count(*)::int AS repeat_customers, coalesce(sum(total_value),0)::float AS repeat_revenue
+      FROM customers WHERE bookings >= 2;`) as unknown as { repeat_customers: number; repeat_revenue: number }[];
+    const dist = (await sql`
+      SELECT bookings::int AS n, count(*)::int AS c FROM customers GROUP BY bookings ORDER BY bookings;`) as unknown as { n: number; c: number }[];
+    const topReturning = (await sql`
+      SELECT name, bookings::int AS bookings, total_value::float AS revenue,
+             to_char(first_seen,'YYYY-MM-DD') AS first_seen, to_char(last_seen,'YYYY-MM-DD') AS last_seen
+      FROM customers WHERE bookings >= 2 ORDER BY bookings DESC, total_value DESC LIMIT 25;`) as unknown as unknown[];
+    return { totals, repeat: rep, distribution: dist, topReturning };
+  } catch (e) {
+    return { error: String(e) };
+  }
+}
+
 export async function clearCustomers(): Promise<void> {
   await ensureTable();
   await sql`DELETE FROM customers;`;

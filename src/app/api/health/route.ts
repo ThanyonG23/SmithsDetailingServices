@@ -12,6 +12,7 @@ import {
   getSalesStats,
   getLeadAnalytics,
   getLeadSaleMatch,
+  customerDiagnostics,
 } from "@/lib/ops/db";
 
 /* Keep-warm health check. A free external pinger hits this every few minutes
@@ -41,8 +42,9 @@ export async function GET(req: Request) {
   const sales = deep === "sales" && tokenOk ? await getSalesStats(from, to) : undefined;
   const leadan = deep === "leadan" && tokenOk ? await getLeadAnalytics(from, to, to) : undefined;
   const leadmatch = deep === "leadmatch" && tokenOk ? await getLeadSaleMatch() : undefined;
+  const customers = deep === "customers" && tokenOk ? await customerDiagnostics() : undefined;
   return NextResponse.json(
-    { ok, checklist, dash, team, hours, bookings, leads, inspect, ads, sales, leadan, leadmatch, service: "smiths-ops", ts: new Date().toISOString() },
+    { ok, checklist, dash, team, hours, bookings, leads, inspect, ads, sales, leadan, leadmatch, customers, service: "smiths-ops", ts: new Date().toISOString() },
     { status: ok ? 200 : 503, headers: { "Cache-Control": "no-store" } }
   );
 }
