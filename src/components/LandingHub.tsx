@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
 import ReviewsSection from "@/components/ReviewsSection";
+import SiteNav from "@/components/SiteNav";
 import { BUSINESS } from "@/lib/config";
 
 /* Imagery — swap any path to change the photo. */
@@ -102,17 +103,7 @@ export default function LandingHub() {
   return (
     <main className="min-h-screen bg-[#050506]">
       {/* ═══ NAV ═══ */}
-      <header className="sticky top-0 z-40 border-b border-white/5 bg-black/50 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <Link href="/" className="flex items-center" aria-label="Smiths home">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={BUSINESS.logo} alt={BUSINESS.name} className="h-10 w-auto sm:h-11" />
-          </Link>
-          <a href={`tel:${BUSINESS.phoneE164}`} className="text-sm font-bold text-white/70 transition hover:text-white">
-            {BUSINESS.phone}
-          </a>
-        </div>
-      </header>
+      <SiteNav />
 
       {/* ═══ HERO (full-bleed photo) ═══ */}
       <section className="relative flex min-h-[72vh] items-end overflow-hidden">

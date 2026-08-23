@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
 import HireWaitlist from "@/components/HireWaitlist";
+import SiteNav from "@/components/SiteNav";
 import { BUSINESS } from "@/lib/config";
 
 export const metadata: Metadata = {
@@ -29,17 +30,7 @@ export default function HirePage() {
   return (
     <main className="min-h-screen bg-[#050506]">
       {/* ═══ NAV ═══ */}
-      <header className="sticky top-0 z-40 border-b border-white/5 bg-black/50 backdrop-blur-md">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <Link href="/" aria-label="Home">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={LOGO} alt="Smiths" className="h-10 w-auto sm:h-11" />
-          </Link>
-          <a href="#waitlist" className="rounded-full bg-brand-green px-4 py-2 text-xs font-black text-brand-ink transition hover:brightness-110">
-            Join Waitlist
-          </a>
-        </div>
-      </header>
+      <SiteNav cta={{ label: "Join Waitlist", href: "#waitlist" }} />
 
       {/* ═══ HERO ═══ */}
       <section className="relative flex min-h-[70vh] items-center overflow-hidden">

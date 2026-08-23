@@ -3,6 +3,7 @@ import { BUSINESS, REELS, SERVICES, HERO_IMAGE, CTA_IMAGE } from "@/lib/config";
 import { refSmsHref } from "@/lib/referrals";
 import Reels from "@/components/Reels";
 import ReviewsSection from "@/components/ReviewsSection";
+import SiteNav from "@/components/SiteNav";
 import ServiceShowcase from "@/components/ServiceShowcase";
 import BringBlackBack from "@/components/BringBlackBack";
 import Gallery from "@/components/Gallery";
@@ -49,28 +50,7 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
   return (
     <main className="min-h-screen bg-[#050506]">
       {/* ═══════════════════ NAV ═══════════════════ */}
-      <header className="sticky top-0 z-40 border-b border-white/5 bg-black/50 backdrop-blur-md">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-          <Link href="/" className="flex items-center" aria-label="Smiths Detailing home">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={BUSINESS.logo} alt={BUSINESS.name} className="h-10 w-auto sm:h-11" />
-          </Link>
-          <div className="flex items-center gap-4">
-            <a
-              href={`tel:${BUSINESS.phoneE164}`}
-              className="hidden text-sm font-bold text-white/70 transition hover:text-white sm:block"
-            >
-              {BUSINESS.phone}
-            </a>
-            <a
-              href={smsHref}
-              className="rounded-full bg-brand-green px-4 py-2 text-xs font-black text-[#04130a] transition hover:brightness-110"
-            >
-              Free Quote
-            </a>
-          </div>
-        </div>
-      </header>
+      <SiteNav cta={{ label: "Free Quote", href: smsHref }} />
 
       {/* ═══════════════════ HERO ═══════════════════ */}
       <section className="relative flex min-h-[86vh] items-end overflow-hidden">

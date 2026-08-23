@@ -2,6 +2,7 @@ import Link from "next/link";
 import Reveal from "@/components/Reveal";
 import MembershipSignup from "@/components/MembershipSignup";
 import ReviewsSection from "@/components/ReviewsSection";
+import SiteNav from "@/components/SiteNav";
 import { BUSINESS } from "@/lib/config";
 
 /* Shared body for the membership pages. `bonus` toggles the free
@@ -99,15 +100,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
   return (
     <main className="min-h-screen bg-[#050506]">
       {/* ═══ NAV ═══ */}
-      <header className="sticky top-0 z-40 border-b border-white/5 bg-black/50 backdrop-blur-md">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={LOGO} alt="Smiths Detailing" className="h-10 w-auto sm:h-11" />
-          <a href="#reserve" className="rounded-full bg-brand-green px-4 py-2 text-xs font-black text-brand-ink transition hover:brightness-110">
-            Reserve Spot
-          </a>
-        </div>
-      </header>
+      <SiteNav cta={{ label: "Reserve Spot", href: "#reserve" }} />
 
       {/* ═══ HERO ═══ */}
       <section className="relative flex min-h-[82vh] items-center overflow-hidden">
@@ -318,6 +311,33 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
               <p className="mt-3 text-center text-[13px] text-white/45">
                 💯 Backed by the Smiths promise: if you&apos;re not happy, you don&apos;t pay.
               </p>
+            </div>
+          </Reveal>
+
+          {/* ── MEMBER DRAW PROMO ── */}
+          <Reveal delay={80}>
+            <div className="mt-5 overflow-hidden rounded-2xl border border-brand-yellow/40 bg-gradient-to-br from-brand-yellow/[0.13] to-brand-yellow/[0.02] p-5 shadow-glowY sm:p-6">
+              <div className="flex items-start gap-3.5">
+                <span className="text-3xl leading-none">🎁</span>
+                <div className="min-w-0">
+                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
+                    Members&apos; draw · drawn 30 Sept
+                  </div>
+                  <h3 className="mt-1.5 font-display text-lg font-extrabold leading-tight text-white sm:text-xl">
+                    Join now and you&apos;re in the draw to win
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-white/70">
+                    One member wins <b className="text-white">$1,000 cash</b> or a{" "}
+                    <b className="text-white">Paint Correction &amp; Ceramic Coating valued at $2,200</b>. Every active member is automatically entered.
+                  </p>
+                  <Link
+                    href="/draw-terms"
+                    className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-brand-yellow transition hover:text-white"
+                  >
+                    See draw terms →
+                  </Link>
+                </div>
+              </div>
             </div>
           </Reveal>
         </div>
