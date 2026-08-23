@@ -3,8 +3,12 @@ import Reveal from "@/components/Reveal";
 import ReviewsSection from "@/components/ReviewsSection";
 import { BUSINESS } from "@/lib/config";
 
+/* Imagery — swap any path to change the photo. */
+const HERO_IMG = "/media/photos/cta.jpg";
+
 type Offer = {
   href: string;
+  image: string;
   icon: string;
   title: string;
   desc: string;
@@ -17,16 +21,18 @@ type Offer = {
 const OFFERS: Offer[] = [
   {
     href: "/detailing",
+    image: "/media/photos/paint-gloss.jpg",
     icon: "✨",
     title: "Detailing",
     desc: "Interior resets, cut & polish, multi-stage paint correction and ceramic coatings — done properly at our Cairns workshop.",
-    tag: "100+ 5★ Google reviews",
+    tag: "100+ 5★ reviews",
     cta: "Explore detailing",
     live: true,
     accent: "green",
   },
   {
     href: "/membership",
+    image: "/media/photos/hero-mustang-v2.jpg",
     icon: "🔑",
     title: "Membership",
     desc: "Hand us the keys and we keep your car detailed and serviced on a schedule — always clean, always sorted, one weekly payment.",
@@ -37,6 +43,7 @@ const OFFERS: Offer[] = [
   },
   {
     href: "/hire",
+    image: "/media/photos/exterior-wash.jpg",
     icon: "🚗",
     title: "Vehicle Hire",
     desc: "Need a set of wheels? Clean, well-maintained vehicles for hire in Cairns — detailed to the standard you know us for.",
@@ -54,28 +61,39 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 function OfferCard({ o }: { o: Offer }) {
   const accentText = o.accent === "yellow" ? "text-brand-yellow" : "text-brand-green";
   const accentBorder = o.accent === "yellow" ? "hover:border-brand-yellow/45" : "hover:border-brand-green/45";
-  const tagCls = o.live
-    ? `${accentText} border-white/12`
-    : "text-white/50 border-white/12";
   return (
     <Link
       href={o.href}
-      className={`group flex h-full flex-col rounded-3xl border border-white/12 bg-white/[0.02] p-7 transition hover:bg-white/[0.035] ${accentBorder}`}
+      className={`group flex h-full flex-col overflow-hidden rounded-3xl border border-white/12 bg-white/[0.02] transition hover:bg-white/[0.035] ${accentBorder}`}
     >
-      <div className="flex items-center justify-between">
-        <span className="text-4xl leading-none">{o.icon}</span>
-        <span className={`rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] ${tagCls}`}>
+      {/* photo */}
+      <div className="relative h-44 overflow-hidden">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={o.image}
+          alt={o.title}
+          className="h-full w-full object-cover transition duration-[600ms] ease-out group-hover:scale-[1.06]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0b0c] via-[#0a0b0c]/25 to-transparent" aria-hidden />
+        <span className="absolute left-4 top-4 text-3xl leading-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">{o.icon}</span>
+        <span
+          className={`absolute right-4 top-4 rounded-full border border-white/15 bg-black/50 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] backdrop-blur ${
+            o.live ? accentText : "text-white/70"
+          }`}
+        >
           {o.tag}
         </span>
       </div>
-      <h3 className="mt-6 font-display text-2xl font-extrabold tracking-tight text-white">{o.title}</h3>
-      <p className="mt-3 text-[15px] leading-relaxed text-white/60">{o.desc}</p>
-      <span
-        className={`mt-6 inline-flex items-center gap-1.5 font-display text-sm font-black ${accentText}`}
-      >
-        {o.cta}
-        <span className="transition-transform group-hover:translate-x-1">→</span>
-      </span>
+
+      {/* body */}
+      <div className="flex flex-1 flex-col p-7">
+        <h3 className="font-display text-2xl font-extrabold tracking-tight text-white">{o.title}</h3>
+        <p className="mt-3 text-[15px] leading-relaxed text-white/60">{o.desc}</p>
+        <span className={`mt-auto inline-flex items-center gap-1.5 pt-6 font-display text-sm font-black ${accentText}`}>
+          {o.cta}
+          <span className="transition-transform group-hover:translate-x-1">→</span>
+        </span>
+      </div>
     </Link>
   );
 }
@@ -90,36 +108,36 @@ export default function LandingHub() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={BUSINESS.logo} alt={BUSINESS.name} className="h-10 w-auto sm:h-11" />
           </Link>
-          <a
-            href={`tel:${BUSINESS.phoneE164}`}
-            className="text-sm font-bold text-white/70 transition hover:text-white"
-          >
+          <a href={`tel:${BUSINESS.phoneE164}`} className="text-sm font-bold text-white/70 transition hover:text-white">
             {BUSINESS.phone}
           </a>
         </div>
       </header>
 
-      {/* ═══ HERO ═══ */}
-      <section className="relative overflow-hidden">
+      {/* ═══ HERO (full-bleed photo) ═══ */}
+      <section className="relative flex min-h-[72vh] items-end overflow-hidden">
         <div
-          className="pointer-events-none absolute left-1/2 top-0 h-[440px] w-[560px] -translate-x-1/2 rounded-full opacity-[0.14] blur-[130px]"
-          style={{ background: "radial-gradient(closest-side, #2bff7a, transparent 70%)" }}
+          className="absolute inset-0 bg-cover"
+          style={{ backgroundImage: `url(${HERO_IMG})`, backgroundPosition: "72% center" }}
           aria-hidden
         />
-        <div className="relative mx-auto max-w-3xl px-5 pb-4 pt-20 text-center sm:pt-24">
+        <div className="absolute inset-0 bg-gradient-to-t from-[#050506] via-[#050506]/55 to-black/25" aria-hidden />
+        <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#050506] to-transparent" aria-hidden />
+
+        <div className="relative mx-auto w-full max-w-6xl px-4 pb-14 pt-32">
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/40 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.18em] text-white/70 backdrop-blur">
               📍 {BUSINESS.suburb}
             </span>
           </Reveal>
           <Reveal delay={100}>
-            <h1 className="mt-7 font-display text-5xl font-extrabold leading-[0.98] tracking-tight text-white sm:text-7xl">
+            <h1 className="mt-6 max-w-4xl font-display text-5xl font-extrabold leading-[0.95] tracking-tight text-white sm:text-7xl lg:text-8xl">
               Everything your car needs,
               <span className="text-brand-green"> in one place.</span>
             </h1>
           </Reveal>
           <Reveal delay={200}>
-            <p className="mx-auto mt-6 max-w-lg text-lg leading-relaxed text-white/65">
+            <p className="mt-6 max-w-lg text-lg leading-relaxed text-white/70">
               Detailing done properly, a membership that keeps your car clean and serviced on a schedule,
               and vehicle hire on the way. Pick where you&apos;d like to start.
             </p>
@@ -128,7 +146,7 @@ export default function LandingHub() {
       </section>
 
       {/* ═══ 3 OFFERS ═══ */}
-      <section className="px-4 pb-8 pt-8">
+      <section className="relative z-10 -mt-10 px-4 pb-8">
         <div className="mx-auto grid max-w-6xl gap-5 md:grid-cols-3">
           {OFFERS.map((o, i) => (
             <Reveal key={o.title} delay={i * 100}>

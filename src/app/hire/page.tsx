@@ -13,6 +13,7 @@ export const metadata: Metadata = {
 };
 
 const LOGO = BUSINESS.logo;
+const HERO_IMG = "/media/photos/exterior-wash.jpg";
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">{children}</div>;
@@ -42,6 +43,12 @@ export default function HirePage() {
 
       {/* ═══ HERO ═══ */}
       <section className="relative flex min-h-[70vh] items-center overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover"
+          style={{ backgroundImage: `url(${HERO_IMG})`, backgroundPosition: "center" }}
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-[#050506]/80" aria-hidden />
         <div
           className="pointer-events-none absolute left-1/2 top-[26%] h-[500px] w-[500px] -translate-x-1/2 rounded-full opacity-[0.16] blur-[120px]"
           style={{ background: "radial-gradient(closest-side, #2bff7a, transparent 70%)" }}

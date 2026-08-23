@@ -12,6 +12,8 @@ import { BUSINESS } from "@/lib/config";
    already recognises from 100+ Google reviews. */
 
 const LOGO = BUSINESS.logo; // Smiths Detailing logo
+const HERO_IMG = "/media/photos/hero-mustang-v2.jpg";
+const EXPLAINER_VIDEO = "/media/videos/membership-explainer.mp4";
 
 // ── The "from" price (cheapest tier = Single Cab). Change this line only. ──
 const PRICE = "$39";
@@ -109,6 +111,13 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
 
       {/* ═══ HERO ═══ */}
       <section className="relative flex min-h-[82vh] items-center overflow-hidden">
+        {/* full-bleed photo + darkening overlay for legible centered text */}
+        <div
+          className="absolute inset-0 bg-cover"
+          style={{ backgroundImage: `url(${HERO_IMG})`, backgroundPosition: "72% center" }}
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-[#050506]/80" aria-hidden />
         <div
           className="pointer-events-none absolute left-1/2 top-[22%] h-[520px] w-[520px] -translate-x-1/2 rounded-full opacity-[0.20] blur-[120px]"
           style={{ background: GREEN_GLOW }}
@@ -189,6 +198,39 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
               </Reveal>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* ═══ EXPLAINER VIDEO ═══ */}
+      <section className="py-16 sm:py-20">
+        <div className="mx-auto max-w-2xl px-4 text-center">
+          <Reveal>
+            <Eyebrow>Watch</Eyebrow>
+            <h2 className="mt-3 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+              How it works, straight from us
+            </h2>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-white/55">
+              A quick look at how we keep your car detailed and serviced on the one simple plan.
+            </p>
+          </Reveal>
+          <Reveal delay={120}>
+            <div className="relative mx-auto mt-8 w-full max-w-[330px]">
+              <div
+                className="pointer-events-none absolute -inset-6 rounded-[2.5rem] opacity-40 blur-2xl"
+                style={{ background: GREEN_GLOW }}
+                aria-hidden
+              />
+              <div className="relative overflow-hidden rounded-3xl border border-white/12 bg-black shadow-[0_24px_70px_-24px_rgba(0,0,0,0.85)]">
+                <video
+                  src={EXPLAINER_VIDEO}
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="aspect-[9/16] w-full bg-black object-cover"
+                />
+              </div>
+            </div>
+          </Reveal>
         </div>
       </section>
 
