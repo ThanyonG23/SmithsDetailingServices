@@ -16,19 +16,19 @@ type Term = { heading: string; body: string; choices?: string[]; note?: string }
 const TERMS: Term[] = [
   {
     heading: "1. The promoter",
-    body: "Smiths Detailing Services (ABN [_____________]), of 209 Bunda Street, Parramatta Park, Cairns QLD (“Smiths”, “we”, “us”).",
+    body: "Smiths Detailing Services (ABN 70 600 522 475), of 209 Bunda Street, Parramatta Park, Cairns QLD (“Smiths”, “we”, “us”).",
   },
   {
     heading: "2. This is a game of chance",
     body: "The winner is chosen at random. No skill is involved.",
   },
   {
-    heading: "3. Promotion period",
-    body: "Entries are based on membership status from [start date] to [end date] at 11:59pm AEST.",
+    heading: "3. Eligibility cut-off",
+    body: "Entry is based on your Smiths Detailing membership being active (payments up to date) as at 11:59pm AEST on 29 September 2026 — the eligibility cut-off.",
   },
   {
     heading: "4. Who can enter",
-    body: "Entry is open to individuals who are 18 or older, are Australian residents, and hold an active Smiths Detailing membership in good standing (payments up to date) during the promotion period. Employees of Smiths and their immediate families are not eligible.",
+    body: "Entry is open to individuals who are 18 or older, are Australian residents, and hold an active Smiths Detailing membership in good standing (payments up to date) as at the eligibility cut-off in clause 3. Employees of Smiths and their immediate families are not eligible.",
   },
   {
     heading: "5. How to enter — it's free and automatic",
@@ -45,7 +45,7 @@ const TERMS: Term[] = [
   },
   {
     heading: "7. The draw",
-    body: "The winner will be drawn at random on [draw date] at our Cairns workshop. The draw may be recorded.",
+    body: "The winner will be drawn at random on 30 September 2026 at our Cairns workshop. The draw may be recorded.",
   },
   {
     heading: "8. Notifying the winner",
@@ -119,7 +119,7 @@ export default function DrawTermsPage() {
 
         <footer className="mt-12 border-t border-white/10 pt-6 text-center">
           <p className="text-xs text-white/30">
-            By being an active member during the promotion period you are automatically entered and accept these terms.
+            By being an active member as at the eligibility cut-off you are automatically entered and accept these terms.
           </p>
         </footer>
       </div>
