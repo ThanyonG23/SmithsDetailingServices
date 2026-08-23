@@ -305,7 +305,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
             </a>
           </p>
           <Link href="/" className="mt-5 inline-block text-sm text-white/50 underline underline-offset-4 transition hover:text-white">
-            ← Back to Smiths Detailing
+            ← Back to Smiths
           </Link>
         </div>
       </footer>
