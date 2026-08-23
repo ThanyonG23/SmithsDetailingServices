@@ -305,7 +305,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                 </div>
 
                 <p className="mt-5 text-center text-sm text-white/55">
-                  Plus <b className="text-white/75">10% off any add-on service</b> and priority booking — members always come first.
+                  Plus <b className="text-white/75">10% off add-ons and vehicle hire</b>, and priority booking — members always come first.
                 </p>
               </div>
 
