@@ -12,7 +12,7 @@ import { BUSINESS } from "@/lib/config";
    already recognises from 100+ Google reviews. */
 
 const LOGO = BUSINESS.logo; // Smiths Detailing logo
-const HERO_IMG = "/media/photos/hero-mustang-v2.jpg";
+const HERO_IMG = "/media/photos/cutpolish.jpg";
 const EXPLAINER_VIDEO = "/media/videos/membership-explainer.mp4";
 
 // ── The "from" price (cheapest tier = Single Cab). Change this line only. ──

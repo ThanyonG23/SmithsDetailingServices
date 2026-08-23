@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 const LOGO = BUSINESS.logo;
-const HERO_IMG = "/media/photos/exterior-wash.jpg";
+const HERO_IMG = "/media/photos/hand-wax.jpg";
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">{children}</div>;

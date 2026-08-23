@@ -4,7 +4,7 @@ import ReviewsSection from "@/components/ReviewsSection";
 import { BUSINESS } from "@/lib/config";
 
 /* Imagery — swap any path to change the photo. */
-const HERO_IMG = "/media/photos/cta.jpg";
+const HERO_IMG = "/media/photos/hero-mustang-v2.jpg";
 
 type Offer = {
   href: string;
@@ -32,7 +32,7 @@ const OFFERS: Offer[] = [
   },
   {
     href: "/membership",
-    image: "/media/photos/hero-mustang-v2.jpg",
+    image: "/media/photos/cutpolish.jpg",
     icon: "🔑",
     title: "Membership",
     desc: "Hand us the keys and we keep your car detailed and serviced on a schedule — always clean, always sorted, one weekly payment.",
@@ -43,7 +43,7 @@ const OFFERS: Offer[] = [
   },
   {
     href: "/hire",
-    image: "/media/photos/exterior-wash.jpg",
+    image: "/media/photos/hand-wax.jpg",
     icon: "🚗",
     title: "Vehicle Hire",
     desc: "Need a set of wheels? Clean, well-maintained vehicles for hire in Cairns — detailed to the standard you know us for.",
