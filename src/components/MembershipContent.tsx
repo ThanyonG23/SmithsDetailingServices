@@ -70,6 +70,16 @@ const STEPS: { n: string; title: string; body: string; image?: string }[] = [
   { n: "3", title: "Hand us the keys", body: "We keep it detailed and serviced on a schedule. You never think about car admin again.", image: "/media/photos/step-keys.png" },
 ];
 
+// Value stack for the "skip the call" section. `highlight` = show the value in yellow.
+const VALUE_STACK: { label: string; value: string; highlight?: boolean }[] = [
+  { label: "Full detail, every 3 months", value: "$400 / visit" },
+  { label: "Full service, every 6 months", value: "$220 / visit" },
+  { label: "FREE Cut & Polish to start", value: "$750+", highlight: true },
+  { label: "Entry to win $1,000 or a $2,200 detail", value: "Drawn 14 Sept", highlight: true },
+  { label: "10% off add-ons & vehicle hire", value: "Ongoing" },
+  { label: "Priority booking, members first", value: "Included" },
+];
+
 function Eyebrow({ children }: { children: React.ReactNode }) {
   return <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">{children}</div>;
 }
@@ -388,30 +398,49 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
           style={{ background: GREEN_GLOW }}
           aria-hidden
         />
-        <div className="relative mx-auto w-full max-w-2xl px-5 py-16 text-center">
+        <div className="relative mx-auto w-full max-w-lg px-4 py-16">
           <Reveal>
-            <span className="inline-flex items-center gap-2 rounded-full border border-brand-green/40 bg-brand-green/[0.08] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-green">
-              Ready to go?
-            </span>
-          </Reveal>
-          <Reveal delay={100}>
-            <h2 className="mt-5 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-5xl">
-              Know what you want? <span className="text-brand-green">Skip the call.</span>
-            </h2>
-          </Reveal>
-          <Reveal delay={200}>
-            <p className="mx-auto mt-4 max-w-md text-lg leading-relaxed text-white/70">
-              No forms, no waiting. Pick your vehicle, lock in your founding spot, and you&apos;re straight in the draw.
-            </p>
-          </Reveal>
-          <Reveal delay={300}>
-            <a
-              href="/membership/join"
-              className="mt-8 inline-flex rounded-full bg-brand-green px-8 py-4 font-display text-base font-extrabold text-brand-ink shadow-[0_10px_40px_rgba(43,255,122,0.25)] transition hover:brightness-110 active:scale-95"
-            >
-              Skip the call, join now →
-            </a>
-            <p className="mt-3 text-xs text-white/45">Secure checkout · cancel anytime</p>
+            <div className="rounded-3xl border border-white/12 bg-black/60 p-6 backdrop-blur-md sm:p-8">
+              <div className="text-center">
+                <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-green">Ready to book?</div>
+                <h2 className="mt-2 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+                  Here&apos;s everything you get
+                </h2>
+              </div>
+
+              <ul className="mt-6 flex flex-col divide-y divide-white/10">
+                {VALUE_STACK.map((s) => (
+                  <li key={s.label} className="flex items-center justify-between gap-3 py-2.5">
+                    <span className="flex items-start gap-2.5 text-sm text-white/85">
+                      <span className="mt-0.5 shrink-0 text-brand-green">✓</span>
+                      <span>{s.label}</span>
+                    </span>
+                    <span className={`shrink-0 text-sm font-bold tabular-nums ${s.highlight ? "text-brand-yellow" : "text-white/45"}`}>
+                      {s.value}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="mt-5 rounded-2xl border border-brand-green/25 bg-brand-green/[0.06] px-4 py-3 text-center text-sm text-white/75">
+                Over <b className="text-white">$1,370 of detailing</b> on your first visit alone, plus a shot at <b className="text-white">$2,200</b>.
+              </div>
+
+              <div className="mt-6 text-center">
+                <div className="flex items-end justify-center gap-1.5">
+                  <span className="mb-1 text-sm font-bold text-white/50">From</span>
+                  <span className="font-display text-4xl font-black text-white sm:text-5xl">$39</span>
+                  <span className="mb-1 text-sm font-bold text-white/50">/week</span>
+                </div>
+                <a
+                  href="/membership/join"
+                  className="mt-4 flex w-full items-center justify-center rounded-full bg-brand-green px-8 py-4 font-display text-base font-extrabold text-brand-ink shadow-[0_10px_40px_rgba(43,255,122,0.25)] transition hover:brightness-110 active:scale-95"
+                >
+                  Skip the call, join now →
+                </a>
+                <p className="mt-3 text-xs text-white/45">Secure checkout · cancel anytime</p>
+              </div>
+            </div>
           </Reveal>
         </div>
       </section>
