@@ -19,14 +19,14 @@ export default function SiteNav({ cta }: { cta?: { label: string; href: string }
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/5 bg-black/60 backdrop-blur-md">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+      <div className="relative mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
         <Link href="/" aria-label="Smiths home" className="flex shrink-0 items-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={BUSINESS.logo} alt={BUSINESS.name} className="h-10 w-auto sm:h-11" />
         </Link>
 
-        {/* desktop links */}
-        <nav className="hidden items-center gap-7 md:flex">
+        {/* desktop links, absolutely centred on the bar */}
+        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-7 md:flex">
           {LINKS.map((l) => (
             <Link key={l.href} href={l.href} className="text-sm font-semibold text-white/70 transition hover:text-white">
               {l.label}

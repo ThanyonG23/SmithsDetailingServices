@@ -3,7 +3,11 @@ import Reveal from "@/components/Reveal";
 import MembershipSignup from "@/components/MembershipSignup";
 import ReviewsSection from "@/components/ReviewsSection";
 import SiteNav from "@/components/SiteNav";
+import Countdown from "@/components/Countdown";
 import { BUSINESS } from "@/lib/config";
+
+// Entry cut-off for the member draw: 29 Sep 2026, 11:59:59pm AEST (UTC+10).
+const DRAW_CUTOFF = "2026-09-29T23:59:59+10:00";
 
 /* Shared body for the membership pages. `bonus` toggles the free
    cut & polish banner, on for /membership (new/cold ad traffic), off for
@@ -127,7 +131,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full border border-brand-green/40 bg-brand-green/[0.08] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-green">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-green" />
-              Founding members · Cairns · 15 spots left
+              Founding members · Cairns · 10 spots left
             </span>
           </Reveal>
           <Reveal delay={100}>
@@ -161,7 +165,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
               >
                 Reserve my spot →
               </a>
-              <p className="mt-3 text-xs text-white/40">No payment now · Next 15 members get a free Cut &amp; Polish</p>
+              <p className="mt-3 text-xs text-white/40">No payment now · Next <s className="text-white/30">15</s> 10 members get a free Cut &amp; Polish</p>
             </div>
           </Reveal>
         </div>
@@ -194,7 +198,13 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                 <p className="mt-2 text-sm leading-relaxed text-white/70">
                   Every active member is automatically entered. Join now and you&apos;re in.
                 </p>
-                <span className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-brand-yellow group-hover:text-white">
+                <div className="mt-4">
+                  <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-yellow/80">
+                    Entries close in
+                  </div>
+                  <Countdown target={DRAW_CUTOFF} />
+                </div>
+                <span className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-brand-yellow group-hover:text-white">
                   See draw terms
                   <span className="transition-transform group-hover:translate-x-1">→</span>
                 </span>
@@ -279,7 +289,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                   </div>
                   <div className="mt-1 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-brand-yellow/80">
                     <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-yellow"></span>
-                    Next 15 members only
+                    Next <s className="opacity-60">15</s> 10 members only
                   </div>
                 </div>
               </div>
@@ -308,7 +318,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                 <p className="mt-1 text-xs text-white/40">Billed weekly · cancel anytime · larger vehicles slightly more</p>
 
                 <div className="mx-auto mt-5 inline-flex items-center gap-2 rounded-full border border-brand-yellow/45 bg-brand-yellow/[0.10] px-4 py-2 text-[13px] font-bold text-brand-yellow">
-                  🎁 Next 15 members get a FREE Cut &amp; Polish valued at $750+
+                  🎁 Next <s className="opacity-60">15</s> 10 members get a FREE Cut &amp; Polish valued at $750+
                 </div>
               </div>
 
