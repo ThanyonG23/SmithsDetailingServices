@@ -215,98 +215,99 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
         </div>
       </section>
 
-      {/* ═══ MINI DRAW (this week) ═══ */}
-      <section className="pt-10 pb-4">
-        <div className="mx-auto max-w-2xl px-4">
+      {/* ═══ MEMBERS' DRAWS (mini + big, side by side on desktop) ═══ */}
+      <section className="py-12">
+        <div className="mx-auto max-w-5xl px-4">
           <Reveal>
             <div className="text-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-brand-green/40 bg-brand-green/[0.08] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-green">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-green" />
-                Drawn this Saturday
-              </span>
-              <h2 className="mt-4 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-                This week&apos;s <span className="text-brand-yellow">members&apos; draw</span>
+              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-green">Members&apos; draws</div>
+              <h2 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                Join now, you&apos;re in <span className="text-brand-yellow">both draws</span>
               </h2>
+              <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-white/60">
+                We just launched, so your odds have never been better. Every member goes in every draw, automatically.
+              </p>
             </div>
           </Reveal>
-          <Reveal delay={100}>
-            <div className="mt-6 overflow-hidden rounded-2xl border border-brand-yellow/40 shadow-glowY">
-              <div className="relative aspect-[16/9] w-full overflow-hidden bg-black">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/media/photos/mini-giveaway.png"
-                  alt="Smiths members' mini draw, win $300 cash or a $400+ detail"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <div className="bg-gradient-to-br from-brand-yellow/[0.14] to-brand-yellow/[0.02] p-5 text-center sm:p-6">
-                <p className="mx-auto max-w-md text-sm leading-relaxed text-white/80">
-                  We just launched, so your odds have never been better. Join now and you&apos;re in
-                  this week&apos;s draw, plus the big $1,000 draw on 14 Sept.
-                </p>
-                <div className="mt-4">
-                  <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-yellow/80">
-                    Drawn in
-                  </div>
-                  <Countdown target={DRAW_MINI_TIME} />
-                </div>
-                <a
-                  href="#join"
-                  className="mt-5 inline-flex rounded-full bg-brand-green px-7 py-3.5 font-display text-sm font-black text-brand-ink shadow-[0_10px_40px_rgba(43,255,122,0.25)] transition hover:brightness-110 active:scale-95"
-                >
-                  Join now, get in this week&apos;s draw →
-                </a>
-              </div>
-            </div>
-          </Reveal>
-        </div>
-      </section>
 
-      {/* ═══ GIVEAWAY PROMO ═══ */}
-      <section className="py-10">
-        <div className="mx-auto max-w-2xl px-4">
-          <Reveal>
-            <h2 className="mb-5 text-center font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-              The big <span className="text-brand-yellow">members&apos; draw</span>
-            </h2>
-          </Reveal>
-          <Reveal>
-            <Link
-              href="/draw-terms"
-              className="group block overflow-hidden rounded-2xl border border-brand-yellow/40 shadow-glowY transition hover:border-brand-yellow/60"
-            >
-              <div className="relative aspect-[16/9] w-full overflow-hidden bg-black">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/media/photos/giveaway.png"
-                  alt="Smiths Detailing members' giveaway, win $1,000 cash or a $2,200 paint correction and ceramic coating"
-                  className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-                />
-              </div>
-              <div className="bg-gradient-to-br from-brand-yellow/[0.14] to-brand-yellow/[0.02] p-5 sm:p-6">
-                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
-                  Members&apos; draw · drawn 14 Sept
+          <div className="mt-8 grid gap-6 md:grid-cols-2">
+            {/* mini draw */}
+            <Reveal>
+              <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-brand-yellow/40 shadow-glowY">
+                <div className="relative aspect-[16/9] w-full overflow-hidden bg-black">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/media/photos/mini-giveaway.png"
+                    alt="Smiths members' mini draw, win $300 cash or a $400+ detail"
+                    className="h-full w-full object-cover"
+                  />
                 </div>
-                <h3 className="mt-1.5 font-display text-xl font-extrabold leading-tight text-white sm:text-2xl">
-                  Win <span className="text-brand-yellow">$1,000 cash</span> or a{" "}
-                  <span className="text-brand-yellow">$2,200</span> paint correction &amp; coating
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/70">
-                  Every active member is automatically entered. Join now and you&apos;re in.
-                </p>
-                <div className="mt-4">
-                  <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-yellow/80">
-                    Drawn in
+                <div className="flex flex-1 flex-col bg-gradient-to-br from-brand-yellow/[0.14] to-brand-yellow/[0.02] p-5 sm:p-6">
+                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
+                    Mini draw · drawn 5 Sept
                   </div>
-                  <Countdown target={DRAW_TIME} />
+                  <h3 className="mt-1.5 font-display text-xl font-extrabold leading-tight text-white sm:text-2xl">
+                    Win <span className="text-brand-yellow">$300 cash</span> or a{" "}
+                    <span className="text-brand-yellow">$400+</span> detail
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-white/70">
+                    Our first mini draw. A brand new member pool means the best odds you will ever get.
+                  </p>
+                  <div className="mt-auto pt-4">
+                    <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-yellow/80">
+                      Drawn in
+                    </div>
+                    <Countdown target={DRAW_MINI_TIME} />
+                    <a
+                      href="#join"
+                      className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-brand-green px-6 py-3 font-display text-sm font-black text-brand-ink shadow-[0_10px_40px_rgba(43,255,122,0.25)] transition hover:brightness-110 active:scale-95"
+                    >
+                      Join now →
+                    </a>
+                  </div>
                 </div>
-                <span className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-brand-yellow group-hover:text-white">
-                  See draw terms
-                  <span className="transition-transform group-hover:translate-x-1">→</span>
-                </span>
               </div>
-            </Link>
-          </Reveal>
+            </Reveal>
+
+            {/* big draw */}
+            <Reveal delay={100}>
+              <Link
+                href="/draw-terms"
+                className="group flex h-full flex-col overflow-hidden rounded-2xl border border-brand-yellow/40 shadow-glowY transition hover:border-brand-yellow/60"
+              >
+                <div className="relative aspect-[16/9] w-full overflow-hidden bg-black">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/media/photos/giveaway.png"
+                    alt="Smiths Detailing members' giveaway, win $1,000 cash or a $2,200 paint correction and ceramic coating"
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                  />
+                </div>
+                <div className="flex flex-1 flex-col bg-gradient-to-br from-brand-yellow/[0.14] to-brand-yellow/[0.02] p-5 sm:p-6">
+                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
+                    Big draw · drawn 14 Sept
+                  </div>
+                  <h3 className="mt-1.5 font-display text-xl font-extrabold leading-tight text-white sm:text-2xl">
+                    Win <span className="text-brand-yellow">$1,000 cash</span> or a{" "}
+                    <span className="text-brand-yellow">$2,200</span> paint correction &amp; coating
+                  </h3>
+                  <p className="mt-2 text-sm leading-relaxed text-white/70">
+                    Every active member is automatically entered. Join now and you are in.
+                  </p>
+                  <div className="mt-auto pt-4">
+                    <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-yellow/80">
+                      Drawn in
+                    </div>
+                    <Countdown target={DRAW_TIME} />
+                    <span className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-brand-yellow group-hover:text-white">
+                      See draw terms
+                      <span className="transition-transform group-hover:translate-x-1">→</span>
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            </Reveal>
+          </div>
         </div>
       </section>
 
