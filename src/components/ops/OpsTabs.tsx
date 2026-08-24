@@ -16,6 +16,7 @@ const TABS = [
   { href: "/ops/stock", label: "Stock" },
   { href: "/ops/crm", label: "CRM" },
   { href: "/ops/waitlist", label: "Waitlist" },
+  { href: "/ops/draw", label: "Draw" },
   { href: "/ops/templates", label: "Templates" },
   { href: "/ops/history", label: "History" },
 ];
