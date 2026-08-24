@@ -180,6 +180,7 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
             </h2>
             <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-white/60">
               Keep it clean and serviced on a schedule, all handled for you, on one simple weekly plan.
+              Plus you go in the draw for the members&apos; prize.
             </p>
             <Link
               href="/membership"
