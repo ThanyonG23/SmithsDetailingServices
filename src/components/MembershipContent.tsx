@@ -63,11 +63,6 @@ const EVERY_6_MONTHS: Group[] = [
   },
 ];
 
-const STEPS: { n: string; title: string; body: string; image?: string }[] = [
-  { n: "1", title: "Join in minutes", body: "Pick your plan and your vehicle online. Sorted in a couple of minutes, no phone calls." },
-  { n: "2", title: "Book your first visit", body: "We message you to lock in your first detail at a time that suits you." },
-  { n: "3", title: "Hand us the keys", body: "We keep it detailed and serviced on a schedule. You never think about car admin again." },
-];
 
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
@@ -215,46 +210,17 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
         </div>
       </section>
 
-      {/* ═══ HOW IT WORKS ═══ */}
-      <section className="border-y border-white/5 bg-white/[0.015] py-16">
-        <div className="mx-auto max-w-4xl px-4">
+      {/* ═══ HOW IT WORKS (video) ═══ */}
+      <section className="border-y border-white/5 bg-white/[0.015] py-16 sm:py-20">
+        <div className="mx-auto max-w-2xl px-4 text-center">
           <Reveal>
-            <div className="text-center">
-              <Eyebrow>How it works</Eyebrow>
-              <h2 className="mt-3 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-                Three steps and you&apos;re done thinking about it
-              </h2>
-            </div>
+            <Eyebrow>Watch</Eyebrow>
+            <h2 className="mt-3 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+              How it works, straight from us
+            </h2>
           </Reveal>
-          <div className="mt-10 grid gap-5 sm:grid-cols-3">
-            {STEPS.map((s, i) => (
-              <Reveal key={s.n} delay={i * 100}>
-                <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
-                  {s.image ? (
-                    <div className="relative aspect-[3/2] w-full overflow-hidden bg-black">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={s.image} alt={s.title} className="h-full w-full object-cover" />
-                    </div>
-                  ) : (
-                    <div className="relative flex aspect-[3/2] w-full items-center justify-center overflow-hidden bg-gradient-to-br from-brand-green/[0.07] to-white/[0.02]">
-                      <span className="font-display text-6xl font-black text-white/10">{s.n}</span>
-                    </div>
-                  )}
-                  <div className="flex flex-1 flex-col p-6">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-green/15 font-display text-base font-black text-brand-green">
-                      {s.n}
-                    </span>
-                    <h3 className="mt-4 font-display text-lg font-extrabold tracking-tight text-white">{s.title}</h3>
-                    <p className="mt-2 text-sm leading-relaxed text-white/60">{s.body}</p>
-                  </div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-
-          {/* explainer video, same section */}
           <Reveal delay={120}>
-            <div className="relative mx-auto mt-14 w-full max-w-[300px]">
+            <div className="relative mx-auto mt-8 w-full max-w-[300px]">
               <div
                 className="pointer-events-none absolute -inset-6 rounded-[2.5rem] opacity-40 blur-2xl"
                 style={{ background: GREEN_GLOW }}
@@ -271,9 +237,6 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
               </div>
             </div>
           </Reveal>
-          <p className="mx-auto mt-4 max-w-md text-center text-sm leading-relaxed text-white/55">
-            A quick look at how it works, straight from us.
-          </p>
         </div>
       </section>
 
