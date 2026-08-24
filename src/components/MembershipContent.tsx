@@ -323,7 +323,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                   <ul className="mt-6 flex flex-col gap-2.5">
                     <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>10% off all our services</li>
                     <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Priority booking</li>
-                    <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">Entry into every members&apos; draw</span></li>
+                    <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">Entry to win $1,000 or a $2,200 detail <span className="text-white/45">· drawn 14 Sept</span></span></li>
                   </ul>
                   <a
                     href="https://buy.stripe.com/8x27sL07CaTX8eI35F6kg0z"
