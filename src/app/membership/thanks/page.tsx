@@ -94,7 +94,8 @@ export default function ThanksPage() {
                 You&apos;re now in the draw
               </div>
               <p className="mt-1.5 text-sm leading-relaxed text-white/80">
-                As a member you&apos;re entered to win <b className="text-white">$1,000 cash</b>, drawn 14 Sept. We&apos;ll be in touch.
+                As a member you&apos;re entered to win <b className="text-white">$1,000 cash</b> or a{" "}
+                <b className="text-white">$2,200 detail</b>, drawn 14 Sept. We&apos;ll be in touch.
               </p>
             </div>
           </div>

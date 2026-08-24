@@ -172,11 +172,26 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
             </h1>
           </Reveal>
           <Reveal delay={300}>
-            <p className="mx-auto mt-5 max-w-lg text-lg leading-relaxed text-white/65">
-              For the people who keep meaning to get their car detailed and serviced but never find the
-              time. Drop it off and we handle both, on a schedule, so it&apos;s always clean, always
-              sorted, and you never think about it again.
+            <p className="mx-auto mt-5 max-w-md text-lg leading-relaxed text-white/70">
+              Your car detailed and serviced on a schedule, all handled for you.
             </p>
+          </Reveal>
+          <Reveal delay={350}>
+            <div className="mx-auto mt-6 flex max-w-xl flex-wrap items-center justify-center gap-2.5">
+              {[
+                "✨ Full detail every 3 months",
+                "🔧 Full service every 6 months",
+                "🎁 Free Cut & Polish to start",
+                "💰 Entry to win $1,000",
+              ].map((p) => (
+                <span
+                  key={p}
+                  className="rounded-full border border-white/12 bg-white/[0.04] px-3.5 py-1.5 text-sm font-semibold text-white/85"
+                >
+                  {p}
+                </span>
+              ))}
+            </div>
           </Reveal>
           <Reveal delay={350}>
             <div className="mt-6 inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-white/70">
@@ -201,6 +216,11 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
       {/* ═══ GIVEAWAY PROMO ═══ */}
       <section className="py-10">
         <div className="mx-auto max-w-2xl px-4">
+          <Reveal>
+            <h2 className="mb-5 text-center font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+              Members&apos; <span className="text-brand-yellow">Draw</span>
+            </h2>
+          </Reveal>
           <Reveal>
             <Link
               href="/draw-terms"
@@ -318,7 +338,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                   <ul className="mt-6 flex flex-col gap-2.5">
                     <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>10% off all our services</li>
                     <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Priority booking</li>
-                    <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">Entry to win $1,000 cash <span className="text-white/45">· drawn 14 Sept</span></span></li>
+                    <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">Entry to win $1,000 cash or $2,200 detail <span className="text-white/45">· drawn 14 Sept</span></span></li>
                   </ul>
                   <a
                     href="https://buy.stripe.com/8x27sL07CaTX8eI35F6kg0z"
