@@ -316,29 +316,37 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
 
           {/* ── MEMBER DRAW PROMO ── */}
           <Reveal delay={80}>
-            <div className="mt-5 overflow-hidden rounded-2xl border border-brand-yellow/40 bg-gradient-to-br from-brand-yellow/[0.13] to-brand-yellow/[0.02] p-5 shadow-glowY sm:p-6">
-              <div className="flex items-start gap-3.5">
-                <span className="text-3xl leading-none">🎁</span>
-                <div className="min-w-0">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
-                    Members&apos; draw · drawn 30 Sept
-                  </div>
-                  <h3 className="mt-1.5 font-display text-lg font-extrabold leading-tight text-white sm:text-xl">
-                    Join now and you&apos;re in the draw to win
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-white/70">
-                    One member wins <b className="text-white">$1,000 cash</b> or a{" "}
-                    <b className="text-white">Paint Correction &amp; Ceramic Coating valued at $2,200</b>. Every active member is automatically entered.
-                  </p>
-                  <Link
-                    href="/draw-terms"
-                    className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-brand-yellow transition hover:text-white"
-                  >
-                    See draw terms →
-                  </Link>
-                </div>
+            <Link
+              href="/draw-terms"
+              className="group mt-5 block overflow-hidden rounded-2xl border border-brand-yellow/40 shadow-glowY transition hover:border-brand-yellow/60"
+            >
+              {/* cover image */}
+              <div className="relative aspect-[16/9] w-full overflow-hidden bg-black">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/media/photos/giveaway.png"
+                  alt="Smiths Detailing members' giveaway — win $1,000 cash or a $2,200 paint correction and ceramic coating"
+                  className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                />
               </div>
-            </div>
+              {/* offer text */}
+              <div className="bg-gradient-to-br from-brand-yellow/[0.14] to-brand-yellow/[0.02] p-5 sm:p-6">
+                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
+                  Members&apos; draw · drawn 30 Sept
+                </div>
+                <h3 className="mt-1.5 font-display text-xl font-extrabold leading-tight text-white sm:text-2xl">
+                  Win <span className="text-brand-yellow">$1,000 cash</span> or a{" "}
+                  <span className="text-brand-yellow">$2,200</span> paint correction &amp; coating
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-white/70">
+                  Join now and you&apos;re automatically entered — every active member goes in the draw.
+                </p>
+                <span className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-brand-yellow group-hover:text-white">
+                  See draw terms
+                  <span className="transition-transform group-hover:translate-x-1">→</span>
+                </span>
+              </div>
+            </Link>
           </Reveal>
         </div>
       </section>
