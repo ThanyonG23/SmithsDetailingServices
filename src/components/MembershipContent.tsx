@@ -277,7 +277,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
       </section>
 
       {/* ═══ THE PLAN ═══ */}
-      <section className="py-20 sm:py-24">
+      <section className="pt-20 pb-6 sm:pt-24">
         <div className="mx-auto max-w-2xl px-4">
           {bonus && (
             <Reveal>
@@ -366,10 +366,23 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
       </section>
 
       {/* ═══ RESERVE ═══ */}
-      <section id="reserve" className="scroll-mt-8 py-16">
+      <section id="reserve" className="scroll-mt-8 pb-16 pt-4">
         <div className="mx-auto max-w-xl px-4">
           <Reveal>
             <MembershipSignup />
+          </Reveal>
+
+          {/* skip the call, go straight to checkout */}
+          <Reveal delay={80}>
+            <div className="mt-6 flex flex-col items-center gap-2.5 border-t border-white/10 pt-6 text-center">
+              <p className="text-sm text-white/55">Don&apos;t need any more info, just want to book?</p>
+              <Link
+                href="/membership/join"
+                className="inline-flex rounded-full border border-brand-green/50 bg-brand-green/[0.08] px-6 py-3 text-sm font-black text-brand-green transition hover:bg-brand-green/15"
+              >
+                Skip the call, join now →
+              </Link>
+            </div>
           </Reveal>
         </div>
       </section>
