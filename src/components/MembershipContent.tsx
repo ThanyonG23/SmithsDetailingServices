@@ -182,7 +182,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                 "✨ Full detail every 3 months",
                 "🔧 Full service every 6 months",
                 "🎁 Free Cut & Polish to start",
-                "💰 Entry to win $1,000",
+                "💰 Entry to member draws",
               ].map((p) => (
                 <span
                   key={p}
