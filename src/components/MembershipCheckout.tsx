@@ -3,8 +3,8 @@ import { MEMBERSHIP_TIERS } from "@/lib/membership-tiers";
 /* Value stack + straight-to-Stripe vehicle picker. Used on the sign-up page
    once the member has been sold on the call. Numbers live here — edit in one place. */
 const VALUE_STACK: { label: string; value: string; highlight?: boolean }[] = [
-  { label: "Full detail, every 3 months", value: "$400 / visit" },
-  { label: "Full service, every 6 months", value: "$220 / visit" },
+  { label: "Full detail, every 3 months", value: "Included" },
+  { label: "Full service, every 6 months", value: "Included" },
   { label: "FREE Cut & Polish to start", value: "$750+", highlight: true },
   { label: "Entry to win $1,000 or a $2,200 detail", value: "Drawn 14 Sept", highlight: true },
   { label: "10% off add-ons & vehicle hire", value: "Ongoing" },
