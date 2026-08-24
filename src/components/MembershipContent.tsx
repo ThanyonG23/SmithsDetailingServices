@@ -8,6 +8,8 @@ import { BUSINESS } from "@/lib/config";
 
 // The member draw: drawn 14 Sep 2026, 12:00pm AEST (UTC+10).
 const DRAW_TIME = "2026-09-14T12:00:00+10:00";
+// The weekly mini draw: drawn Sat 5 Sep 2026, 12:00pm AEST (UTC+10).
+const DRAW_MINI_TIME = "2026-09-05T12:00:00+10:00";
 
 /* Shared body for the membership pages. `bonus` toggles the free
    cut & polish banner, on for /membership (new/cold ad traffic), off for
@@ -213,12 +215,59 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
         </div>
       </section>
 
+      {/* ═══ MINI DRAW (this week) ═══ */}
+      <section className="pt-10 pb-4">
+        <div className="mx-auto max-w-2xl px-4">
+          <Reveal>
+            <div className="text-center">
+              <span className="inline-flex items-center gap-2 rounded-full border border-brand-green/40 bg-brand-green/[0.08] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-green">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-green" />
+                Drawn this Saturday
+              </span>
+              <h2 className="mt-4 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                This week&apos;s <span className="text-brand-yellow">members&apos; draw</span>
+              </h2>
+            </div>
+          </Reveal>
+          <Reveal delay={100}>
+            <div className="mt-6 overflow-hidden rounded-2xl border border-brand-yellow/40 shadow-glowY">
+              <div className="relative aspect-[16/9] w-full overflow-hidden bg-black">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/media/photos/mini-giveaway.png"
+                  alt="Smiths members' mini draw, win $300 cash or a $400+ detail"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <div className="bg-gradient-to-br from-brand-yellow/[0.14] to-brand-yellow/[0.02] p-5 text-center sm:p-6">
+                <p className="mx-auto max-w-md text-sm leading-relaxed text-white/80">
+                  We just launched, so your odds have never been better. Join now and you&apos;re in
+                  this week&apos;s draw, plus the big $1,000 draw on 14 Sept.
+                </p>
+                <div className="mt-4">
+                  <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-yellow/80">
+                    Drawn in
+                  </div>
+                  <Countdown target={DRAW_MINI_TIME} />
+                </div>
+                <a
+                  href="#join"
+                  className="mt-5 inline-flex rounded-full bg-brand-green px-7 py-3.5 font-display text-sm font-black text-brand-ink shadow-[0_10px_40px_rgba(43,255,122,0.25)] transition hover:brightness-110 active:scale-95"
+                >
+                  Join now, get in this week&apos;s draw →
+                </a>
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ═══ GIVEAWAY PROMO ═══ */}
       <section className="py-10">
         <div className="mx-auto max-w-2xl px-4">
           <Reveal>
             <h2 className="mb-5 text-center font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-              Members&apos; <span className="text-brand-yellow">Draw</span>
+              The big <span className="text-brand-yellow">members&apos; draw</span>
             </h2>
           </Reveal>
           <Reveal>
