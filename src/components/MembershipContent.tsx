@@ -4,6 +4,7 @@ import MembershipSignup from "@/components/MembershipSignup";
 import ReviewsSection from "@/components/ReviewsSection";
 import SiteNav from "@/components/SiteNav";
 import Countdown from "@/components/Countdown";
+import MembershipCheckout from "@/components/MembershipCheckout";
 import { BUSINESS } from "@/lib/config";
 
 // The member draw: drawn 14 Sep 2026, 12:00pm AEST (UTC+10).
@@ -296,102 +297,47 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
               </div>
             </Reveal>
           )}
-          <Reveal>
-            <div className="relative overflow-hidden rounded-3xl border border-brand-green/30 bg-gradient-to-b from-brand-green/[0.08] to-transparent p-7 sm:p-10">
-              <div
-                className="pointer-events-none absolute -right-16 -top-16 h-60 w-60 rounded-full opacity-20 blur-[80px]"
-                style={{ background: YELLOW_GLOW }}
-                aria-hidden
-              />
-              <div className="relative text-center">
-                <Eyebrow>The membership</Eyebrow>
-                <h2 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-                  Smiths Membership
-                </h2>
-                <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-white/55">
-                  Everything your car needs, handled on a schedule. You just drop it off.
-                </p>
-                <div className="mt-6 flex items-end justify-center gap-1.5">
-                  <span className="mb-2 text-lg font-bold text-white/50">From</span>
-                  <span className="font-display text-5xl font-black text-white sm:text-6xl">{PRICE}</span>
-                  <span className="mb-2 text-lg font-bold text-white/50">/week</span>
-                </div>
-                <p className="mt-1 text-xs text-white/40">Billed weekly · cancel anytime · larger vehicles slightly more</p>
-
-                <div className="mx-auto mt-5 inline-flex items-center gap-2 rounded-full border border-brand-yellow/45 bg-brand-yellow/[0.10] px-4 py-2 text-[13px] font-bold text-brand-yellow">
-                  🎁 Next <s className="opacity-60">15</s> 10 members get a FREE Cut &amp; Polish valued at $750+
-                </div>
-              </div>
-
-              <div className="mt-8">
-                <div className="rounded-2xl border border-brand-green/20 bg-brand-green/[0.05] px-4 py-3 text-center text-sm text-white/75">
-                  <b className="text-white">Every 3 months:</b> detail + top-up.{" "}
-                  <b className="text-white">Every 6 months:</b> detail + full service.
-                </div>
-
-                <p className="mb-3 mt-6 text-[11px] font-bold uppercase tracking-[0.18em] text-brand-green">
-                  Every visit (every 3 months)
-                </p>
-                <div className="flex flex-col gap-3">
-                  {EVERY_VISIT.map((g) => (
-                    <GroupCard key={g.title} g={g} />
-                  ))}
-                </div>
-
-                <p className="mb-3 mt-6 text-[11px] font-bold uppercase tracking-[0.18em] text-brand-yellow">
-                  Every 6 months, we also add
-                </p>
-                <div className="flex flex-col gap-3">
-                  {EVERY_6_MONTHS.map((g) => (
-                    <GroupCard key={g.title} g={g} />
-                  ))}
-                </div>
-
-                <p className="mt-5 text-center text-sm text-white/55">
-                  Plus <b className="text-white/75">10% off add-ons and vehicle hire</b>, and priority booking, members always come first.
-                </p>
-              </div>
-
-              <a
-                href="#reserve"
-                className="mt-8 flex w-full items-center justify-center rounded-full bg-brand-yellow px-7 py-4 font-display text-base font-black text-brand-ink transition hover:brightness-110 active:scale-95"
-              >
-                Book my call →
-              </a>
-              <p className="mt-3 text-center text-[13px] text-white/45">
-                💯 Backed by the Smiths promise: if you&apos;re not happy, you don&apos;t pay.
-              </p>
+          {/* two tiers, swipe between them */}
+          <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 [scrollbar-width:thin]">
+            {/* Full membership: value stack + pick your vehicle */}
+            <div className="w-[90%] shrink-0 snap-center sm:w-[64%]">
+              <Reveal>
+                <MembershipCheckout />
+              </Reveal>
             </div>
-          </Reveal>
 
-          {/* ── SMITHS MEMBER (lighter tier) ── */}
-          <Reveal delay={80}>
-            <div className="mt-5 rounded-3xl border border-white/12 bg-white/[0.03] p-6 sm:p-7">
-              <div className="flex items-start justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">Or, the lighter way in</div>
-                  <h3 className="mt-1.5 font-display text-2xl font-extrabold tracking-tight text-white">Smiths Member</h3>
-                  <p className="mt-1 text-sm text-white/55">Just want the perks and a shot at the draws? Start here.</p>
+            {/* Smiths Member: $9.99/mo, perks + draw entry */}
+            <div className="w-[90%] shrink-0 snap-center sm:w-[64%]">
+              <Reveal delay={80}>
+                <div className="flex h-full flex-col rounded-3xl border border-white/12 bg-white/[0.03] p-6 sm:p-8">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">The lighter way in</div>
+                      <h3 className="mt-1.5 font-display text-2xl font-extrabold tracking-tight text-white">Smiths Member</h3>
+                      <p className="mt-1 text-sm text-white/55">Just want the perks and a shot at the draws?</p>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <div className="font-display text-3xl font-black leading-none text-white">$9.99</div>
+                      <div className="mt-1 text-xs font-bold text-white/50">/month</div>
+                    </div>
+                  </div>
+                  <ul className="mt-6 flex flex-col gap-2.5">
+                    <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>10% off all our services</li>
+                    <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Priority booking</li>
+                    <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">Entry into every members&apos; draw</span></li>
+                  </ul>
+                  <a
+                    href="https://buy.stripe.com/8x27sL07CaTX8eI35F6kg0z"
+                    className="mt-8 flex w-full items-center justify-center rounded-full bg-brand-green px-6 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95"
+                  >
+                    Join · $9.99/month →
+                  </a>
+                  <p className="mt-2.5 text-center text-xs text-white/40">Perks and draw entry, no detailing done for you. Cancel anytime.</p>
                 </div>
-                <div className="shrink-0 text-right">
-                  <div className="font-display text-3xl font-black leading-none text-white">$9.99</div>
-                  <div className="mt-1 text-xs font-bold text-white/50">/month</div>
-                </div>
-              </div>
-              <ul className="mt-5 flex flex-col gap-2.5">
-                <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>10% off all our services</li>
-                <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Priority booking</li>
-                <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">Entry into every members&apos; draw</span></li>
-              </ul>
-              <a
-                href="https://buy.stripe.com/8x27sL07CaTX8eI35F6kg0z"
-                className="mt-5 flex w-full items-center justify-center rounded-full bg-brand-green px-6 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95"
-              >
-                Join Smiths Member · $9.99/month →
-              </a>
-              <p className="mt-2.5 text-center text-xs text-white/40">Perks and draw entry, no detailing done for you. Cancel anytime.</p>
+              </Reveal>
             </div>
-          </Reveal>
+          </div>
+          <p className="mt-1 text-center text-xs text-white/35">Swipe for the $9.99/month option →</p>
         </div>
       </section>
 
