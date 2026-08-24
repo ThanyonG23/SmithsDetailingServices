@@ -363,6 +363,35 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
               </p>
             </div>
           </Reveal>
+
+          {/* ── SMITHS MEMBER (lighter tier) ── */}
+          <Reveal delay={80}>
+            <div className="mt-5 rounded-3xl border border-white/12 bg-white/[0.03] p-6 sm:p-7">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">Or, the lighter way in</div>
+                  <h3 className="mt-1.5 font-display text-2xl font-extrabold tracking-tight text-white">Smiths Member</h3>
+                  <p className="mt-1 text-sm text-white/55">Just want the perks and a shot at the draws? Start here.</p>
+                </div>
+                <div className="shrink-0 text-right">
+                  <div className="font-display text-3xl font-black leading-none text-white">$9.99</div>
+                  <div className="mt-1 text-xs font-bold text-white/50">/month</div>
+                </div>
+              </div>
+              <ul className="mt-5 flex flex-col gap-2.5">
+                <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>10% off all our services</li>
+                <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Priority booking</li>
+                <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">Entry into every members&apos; draw</span></li>
+              </ul>
+              <a
+                href="https://buy.stripe.com/8x27sL07CaTX8eI35F6kg0z"
+                className="mt-5 flex w-full items-center justify-center rounded-full bg-brand-green px-6 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95"
+              >
+                Join Smiths Member · $9.99/month →
+              </a>
+              <p className="mt-2.5 text-center text-xs text-white/40">Perks and draw entry, no detailing done for you. Cancel anytime.</p>
+            </div>
+          </Reveal>
         </div>
       </section>
 
