@@ -264,6 +264,12 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                     >
                       Join now →
                     </a>
+                    <Link
+                      href="/mini-draw-terms"
+                      className="mt-3 block text-center text-xs font-semibold text-brand-yellow/80 underline underline-offset-4 transition hover:text-white"
+                    >
+                      See draw terms
+                    </Link>
                   </div>
                 </div>
               </div>
