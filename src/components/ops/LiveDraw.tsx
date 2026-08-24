@@ -9,6 +9,20 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 const STORAGE_KEY = "smiths-draw-entrants";
 const PRIZE_KEY = "smiths-draw-prize";
+const DECOY_KEY = "smiths-draw-decoys";
+const BLEND_KEY = "smiths-draw-blend";
+
+/* Filler names blended into the spin so the reel looks full on camera.
+   These are NEVER eligible to win, the winner is only ever a real member. */
+const DEFAULT_DECOYS = [
+  "Jake M.", "Chloe R.", "Liam T.", "Sophie W.", "Ethan B.", "Mia H.",
+  "Noah C.", "Ava P.", "Lucas D.", "Isla G.", "Cooper N.", "Ruby F.",
+  "Riley S.", "Zoe K.", "Hunter L.", "Grace M.", "Max W.", "Ella T.",
+  "Jack R.", "Chelsea B.", "Tyler J.", "Amber D.", "Blake H.", "Holly C.",
+  "Nate P.", "Sienna W.", "Dylan M.", "Layla R.", "Brodie K.", "Tahlia S.",
+  "Jayden F.", "Poppy N.", "Kai L.", "Willow G.", "Marcus T.", "Indi H.",
+  "Reece B.", "Bella D.", "Josh W.", "Harper M.",
+].join("\n");
 
 type Phase = "idle" | "spinning" | "done";
 
@@ -17,6 +31,54 @@ function cryptoIndex(n: number): number {
   const buf = new Uint32Array(1);
   crypto.getRandomValues(buf);
   return buf[0] % n;
+}
+
+// One CSV row into fields, respecting quotes and escaped quotes.
+function parseCSVLine(line: string): string[] {
+  const out: string[] = [];
+  let cur = "";
+  let q = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (q) {
+      if (ch === '"') {
+        if (line[i + 1] === '"') {
+          cur += '"';
+          i++;
+        } else {
+          q = false;
+        }
+      } else cur += ch;
+    } else if (ch === ",") {
+      out.push(cur);
+      cur = "";
+    } else if (ch === '"') {
+      q = true;
+    } else cur += ch;
+  }
+  out.push(cur);
+  return out;
+}
+
+// A Stripe "subscriptions" export -> names of members whose sub is live.
+function parseStripeCSV(text: string): { names: string[]; total: number } {
+  const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
+  if (lines.length < 2) return { names: [], total: 0 };
+  const header = parseCSVLine(lines[0]).map((h) => h.trim().toLowerCase());
+  const iName = header.indexOf("customer name");
+  const iEmail = header.indexOf("customer email");
+  const iStatus = header.indexOf("status");
+  const names: string[] = [];
+  for (let r = 1; r < lines.length; r++) {
+    const f = parseCSVLine(lines[r]);
+    const status = iStatus >= 0 ? (f[iStatus] || "").trim().toLowerCase() : "active";
+    // Only members whose subscription is currently live.
+    if (status && status !== "active" && status !== "trialing") continue;
+    let name = iName >= 0 ? (f[iName] || "").trim() : "";
+    if (!name && iEmail >= 0) name = (f[iEmail] || "").trim().split("@")[0];
+    if (name) names.push(name);
+  }
+  return { names, total: lines.length - 1 };
 }
 
 function parseEntrants(raw: string): string[] {
@@ -37,12 +99,16 @@ export default function LiveDraw() {
   const [raw, setRaw] = useState("");
   const [prize, setPrize] = useState("$300 cash or a $400+ detail");
   const [entrants, setEntrants] = useState<string[]>([]);
+  const [decoyRaw, setDecoyRaw] = useState(DEFAULT_DECOYS);
+  const [decoys, setDecoys] = useState<string[]>(parseEntrants(DEFAULT_DECOYS));
+  const [blend, setBlend] = useState(true);
   const [rows, setRows] = useState<[string, string, string]>(["—", "—", "—"]);
   const [phase, setPhase] = useState<Phase>("idle");
   const [fast, setFast] = useState(false);
   const [winner, setWinner] = useState<string | null>(null);
   const [showSetup, setShowSetup] = useState(true);
   const [copied, setCopied] = useState(false);
+  const [importMsg, setImportMsg] = useState("");
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -52,11 +118,18 @@ export default function LiveDraw() {
     try {
       const savedRaw = localStorage.getItem(STORAGE_KEY);
       const savedPrize = localStorage.getItem(PRIZE_KEY);
+      const savedDecoys = localStorage.getItem(DECOY_KEY);
+      const savedBlend = localStorage.getItem(BLEND_KEY);
       if (savedRaw !== null) {
         setRaw(savedRaw);
         setEntrants(parseEntrants(savedRaw));
       }
       if (savedPrize !== null) setPrize(savedPrize);
+      if (savedDecoys !== null) {
+        setDecoyRaw(savedDecoys);
+        setDecoys(parseEntrants(savedDecoys));
+      }
+      if (savedBlend !== null) setBlend(savedBlend === "1");
     } catch {
       /* ignore */
     }
@@ -75,10 +148,47 @@ export default function LiveDraw() {
     }
   };
 
+  const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = String(reader.result || "");
+      const { names, total } = parseStripeCSV(text);
+      if (names.length === 0) {
+        setImportMsg("No active members found in that file. Check it's the Stripe subscriptions export.");
+        return;
+      }
+      onRawChange(names.join("\n"));
+      setImportMsg(`Imported ${names.length} active member${names.length === 1 ? "" : "s"} from ${total} row${total === 1 ? "" : "s"}.`);
+    };
+    reader.readAsText(file);
+    e.target.value = ""; // let the same file be re-uploaded
+  };
+
   const onPrizeChange = (v: string) => {
     setPrize(v);
     try {
       localStorage.setItem(PRIZE_KEY, v);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const onDecoyChange = (v: string) => {
+    setDecoyRaw(v);
+    setDecoys(parseEntrants(v));
+    try {
+      localStorage.setItem(DECOY_KEY, v);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const onBlendChange = (v: boolean) => {
+    setBlend(v);
+    try {
+      localStorage.setItem(BLEND_KEY, v ? "1" : "0");
     } catch {
       /* ignore */
     }
@@ -145,7 +255,10 @@ export default function LiveDraw() {
   // ── the draw ──
   const draw = useCallback(() => {
     if (entrants.length === 0 || phase === "spinning") return;
-    const rand = () => entrants[cryptoIndex(entrants.length)];
+    // The reel shows the full pool (real + filler) so it looks busy, but the
+    // winner is only ever drawn from real members. Filler names can't win.
+    const pool = blend && decoys.length > 0 ? [...entrants, ...decoys] : entrants;
+    const rand = () => pool[cryptoIndex(pool.length)];
     const winnerName = entrants[cryptoIndex(entrants.length)];
 
     setPhase("spinning");
@@ -153,9 +266,9 @@ export default function LiveDraw() {
     setCopied(false);
     setShowSetup(false);
 
-    const STEPS = entrants.length === 1 ? 12 : 34;
+    const STEPS = entrants.length === 1 ? 20 : 34;
     let step = 0;
-    let delay = 45;
+    let delay = 40;
 
     const tick = () => {
       step++;
@@ -170,11 +283,16 @@ export default function LiveDraw() {
         return;
       }
       setRows([rand(), rand(), rand()]);
-      delay = Math.min(delay * 1.12, 520);
+      // Ramp up fast, then a long slow tail so the suspense builds and you can
+      // read the last few names before it lands.
+      delay = Math.min(delay * 1.18, 750);
       timerRef.current = setTimeout(tick, delay);
     };
     timerRef.current = setTimeout(tick, delay);
-  }, [entrants, phase, burstConfetti]);
+  }, [entrants, decoys, blend, phase, burstConfetti]);
+
+  // What the audience sees as the pool size (real + filler when blending).
+  const poolCount = blend && decoys.length > 0 ? entrants.length + decoys.length : entrants.length;
 
   const reset = () => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -227,8 +345,18 @@ export default function LiveDraw() {
             className="mt-2 w-full rounded-xl border border-white/12 bg-black/40 px-3.5 py-2.5 text-sm text-white outline-none focus:border-brand-green"
           />
           <label className="mt-4 block text-[11px] font-bold uppercase tracking-[0.16em] text-white/40">
-            Active members, one per line
+            Active members
           </label>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-brand-green/40 bg-brand-green/[0.06] px-4 py-2.5 text-sm font-bold text-brand-green transition hover:bg-brand-green/[0.12]">
+              ⬆ Upload Stripe export (CSV)
+              <input type="file" accept=".csv,text/csv" className="hidden" onChange={onFile} />
+            </label>
+            {importMsg && <span className="text-xs text-white/55">{importMsg}</span>}
+          </div>
+          <p className="mt-1.5 text-xs text-white/35">
+            Stripe → Subscriptions → Export. Only members with a live subscription get pulled in. Or type / paste names below, one per line.
+          </p>
           <textarea
             value={raw}
             onChange={(e) => onRawChange(e.target.value)}
@@ -238,7 +366,7 @@ export default function LiveDraw() {
           />
           <div className="mt-2 flex items-center justify-between text-xs">
             <span className={entrants.length > 0 ? "font-bold text-brand-green" : "text-white/40"}>
-              {entrants.length} in the draw
+              {entrants.length} real member{entrants.length === 1 ? "" : "s"}, only these can win
             </span>
             {raw.trim() && (
               <button onClick={() => onRawChange("")} className="text-white/40 underline underline-offset-2 hover:text-white">
@@ -246,11 +374,42 @@ export default function LiveDraw() {
               </button>
             )}
           </div>
+
+          {/* ── filler names, make the reel look busy, never win ── */}
+          <div className="mt-5 border-t border-white/10 pt-4">
+            <label className="flex cursor-pointer items-center justify-between gap-3">
+              <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/40">
+                Blend in filler names so the reel looks full
+              </span>
+              <input
+                type="checkbox"
+                checked={blend}
+                onChange={(e) => onBlendChange(e.target.checked)}
+                className="h-4 w-4 shrink-0 accent-brand-green"
+              />
+            </label>
+            {blend && (
+              <>
+                <textarea
+                  value={decoyRaw}
+                  onChange={(e) => onDecoyChange(e.target.value)}
+                  rows={4}
+                  placeholder={"Jake M.\nChloe R.\n…"}
+                  className="mt-2 w-full resize-y rounded-xl border border-white/12 bg-black/40 px-3.5 py-2.5 text-sm text-white/80 outline-none placeholder:text-white/25 focus:border-brand-green"
+                />
+                <p className="mt-1.5 text-xs leading-relaxed text-white/40">
+                  {decoys.length} filler names blended into the spin. They fill the reel so it looks busy, but
+                  they <b className="text-white/70">can never win</b>. The winner is always one of your{" "}
+                  {entrants.length} real member{entrants.length === 1 ? "" : "s"}.
+                </p>
+              </>
+            )}
+          </div>
         </div>
       ) : (
         <div className="mt-6 flex items-center justify-center gap-3">
           <span className="rounded-full border border-white/12 bg-white/[0.03] px-4 py-1.5 text-sm font-bold text-white/70">
-            {entrants.length} in the draw
+            {poolCount} in the draw
           </span>
           <button
             onClick={() => setShowSetup(true)}
