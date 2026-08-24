@@ -188,7 +188,7 @@ export default function MembershipJoin() {
                 <li className="flex items-start gap-2"><span className="mt-px w-4 shrink-0 text-center text-brand-green">✓</span><span>Full service every 6 months</span></li>
                 <li className="flex items-start gap-2"><span className="mt-px w-4 shrink-0 text-center text-brand-green">✓</span><span>10% off add-ons &amp; vehicle hire</span></li>
                 <li className="flex items-start gap-2"><span className="mt-px w-4 shrink-0 text-center text-brand-green">✓</span><span>Priority booking, cancel anytime</span></li>
-                <li className="flex items-start gap-2"><span className="mt-px w-4 shrink-0 text-center">🎁</span><span className="text-brand-yellow">Free Cut &amp; Polish (next 15 members)</span></li>
+                <li className="flex items-start gap-2"><span className="mt-px w-4 shrink-0 text-center">🎁</span><span className="text-brand-yellow">Free Cut &amp; Polish (next <s className="opacity-60">15</s> 10 members)</span></li>
               </ul>
 
               <button

@@ -19,7 +19,7 @@ const DRAW_TIME = "2026-09-14T12:00:00+10:00";
 const LOGO = BUSINESS.logo; // Smiths Detailing logo
 const HERO_IMG = "/media/photos/cutpolish.jpg";
 const EXPLAINER_VIDEO = "/media/videos/membership-explainer.mp4";
-const SKIP_IMG = "/media/photos/hero-mustang-v2.jpg";
+const SKIP_IMG = "/media/photos/paint-gloss.jpg";
 
 // ── The "from" price (cheapest tier = Single Cab). Change this line only. ──
 const PRICE = "$39";
