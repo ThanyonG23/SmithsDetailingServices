@@ -24,7 +24,7 @@ const TERMS: Term[] = [
   },
   {
     heading: "3. Eligibility cut-off",
-    body: "Entry is based on your Smiths Detailing membership being active (payments up to date) as at 11:59pm AEST on 29 September 2026, the eligibility cut-off.",
+    body: "Entry is based on your Smiths Detailing membership being active (payments up to date) as at 11:59pm AEST on 13 September 2026, the eligibility cut-off.",
   },
   {
     heading: "4. Who can enter",
@@ -45,7 +45,7 @@ const TERMS: Term[] = [
   },
   {
     heading: "7. The draw",
-    body: "The winner will be drawn at random on 30 September 2026 at our Cairns workshop. The draw may be recorded.",
+    body: "The winner will be drawn at random on 14 September 2026 at our Cairns workshop. The draw may be recorded.",
   },
   {
     heading: "8. Notifying the winner",

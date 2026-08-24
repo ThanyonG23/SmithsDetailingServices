@@ -6,8 +6,8 @@ import SiteNav from "@/components/SiteNav";
 import Countdown from "@/components/Countdown";
 import { BUSINESS } from "@/lib/config";
 
-// The member draw: drawn 30 Sep 2026, 12:00pm AEST (UTC+10).
-const DRAW_TIME = "2026-09-30T12:00:00+10:00";
+// The member draw: drawn 14 Sep 2026, 12:00pm AEST (UTC+10).
+const DRAW_TIME = "2026-09-14T12:00:00+10:00";
 
 /* Shared body for the membership pages. `bonus` toggles the free
    cut & polish banner, on for /membership (new/cold ad traffic), off for
@@ -189,7 +189,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
               </div>
               <div className="bg-gradient-to-br from-brand-yellow/[0.14] to-brand-yellow/[0.02] p-5 sm:p-6">
                 <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
-                  Members&apos; draw · drawn 30 Sept
+                  Members&apos; draw · drawn 14 Sept
                 </div>
                 <h3 className="mt-1.5 font-display text-xl font-extrabold leading-tight text-white sm:text-2xl">
                   Win <span className="text-brand-yellow">$1,000 cash</span> or a{" "}
