@@ -305,7 +305,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
               <div className="relative text-center">
                 <Eyebrow>The membership</Eyebrow>
                 <h2 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-                  The Smiths Detailing Membership
+                  Smiths Membership
                 </h2>
                 <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-white/55">
                   Everything your car needs, handled on a schedule. You just drop it off.
