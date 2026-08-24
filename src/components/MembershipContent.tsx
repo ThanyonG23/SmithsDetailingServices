@@ -62,7 +62,7 @@ const EVERY_6_MONTHS: Group[] = [
 const STEPS: { n: string; title: string; body: string; image?: string }[] = [
   { n: "1", title: "Reserve your spot", body: "Takes 30 seconds. No payment and nothing locked in yet, you're just claiming a founding spot.", image: "/media/photos/step-reserve.png" },
   { n: "2", title: "We call you", body: "We confirm your car, your exact weekly price, and book in your first detail.", image: "/media/photos/step-call.png" },
-  { n: "3", title: "Hand us the keys", body: "We keep it detailed and serviced on a schedule. You never think about car admin again." },
+  { n: "3", title: "Hand us the keys", body: "We keep it detailed and serviced on a schedule. You never think about car admin again.", image: "/media/photos/step-keys.png" },
 ];
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
