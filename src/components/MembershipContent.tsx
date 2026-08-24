@@ -27,6 +27,37 @@ const PRICE = "$39";
 const GREEN_GLOW = "radial-gradient(closest-side, #2bff7a, transparent 70%)";
 const YELLOW_GLOW = "radial-gradient(closest-side, #FFE600, transparent 70%)";
 
+const FAQS: { q: string; a: string }[] = [
+  {
+    q: "What exactly do I get?",
+    a: "A full detail every 3 months and a full service every 6 months, so your car stays clean and looked after all year. You also get a free Cut & Polish to start, 10% off any add-on services, priority booking, and entry to the members' draw. One simple weekly payment covers it all.",
+  },
+  {
+    q: "How does payment work?",
+    a: "It's a weekly subscription from $39/week, depending on your vehicle size, plus a one-off first-visit fee that covers your first full detail and Cut & Polish. Secure checkout through Stripe, and you can cancel anytime.",
+  },
+  {
+    q: "Can I cancel?",
+    a: "Yes, anytime. The member price is built around you staying on the plan, so if you cancel before your second visit the first visit is simply charged at our normal going rate. Stay past that and you keep the member pricing for good.",
+  },
+  {
+    q: "What's the difference between the two plans?",
+    a: "The full membership means we actually detail and service your car on a schedule, it's hands-off car care. Smiths Member at $9.99/month is perks only: 10% off, priority booking and draw entry, with no detailing done for you. Most people who want their car handled choose the full membership.",
+  },
+  {
+    q: "How does the $1,000 draw work?",
+    a: "Every active member is automatically entered to win $1,000 cash, drawn 14 September. Nothing extra to do, being a member is your entry. Full details are on the draw terms page.",
+  },
+  {
+    q: "Where are you based?",
+    a: `Our workshop is at ${BUSINESS.address}. You drop the car with us and we handle the rest.`,
+  },
+  {
+    q: "What if I'm not happy?",
+    a: "Simple: if you're not happy with the work, you don't pay. We've got 100+ five-star reviews because we don't hand a car back until it's right.",
+  },
+];
+
 type Group = { icon: string; title: string; items: string[] };
 
 const EVERY_VISIT: Group[] = [
@@ -287,7 +318,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                   <ul className="mt-6 flex flex-col gap-2.5">
                     <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>10% off all our services</li>
                     <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Priority booking</li>
-                    <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">Entry to win $1,000 or a $2,200 detail <span className="text-white/45">· drawn 14 Sept</span></span></li>
+                    <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">Entry to win $1,000 cash <span className="text-white/45">· drawn 14 Sept</span></span></li>
                   </ul>
                   <a
                     href="https://buy.stripe.com/8x27sL07CaTX8eI35F6kg0z"
@@ -304,6 +335,46 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
             <span className="h-1.5 w-6 rounded-full bg-brand-green/70"></span>
             <span className="h-1.5 w-6 rounded-full bg-brand-yellow/70"></span>
           </div>
+        </div>
+      </section>
+
+      {/* ═══ FAQ ═══ */}
+      <section className="px-4 py-16 sm:py-20">
+        <div className="mx-auto max-w-2xl">
+          <Reveal>
+            <div className="text-center">
+              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-green">Questions</div>
+              <h2 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                Everything you might ask
+              </h2>
+            </div>
+          </Reveal>
+          <div className="mt-8 flex flex-col gap-3">
+            {FAQS.map((f) => (
+              <Reveal key={f.q}>
+                <details className="group rounded-2xl border border-white/10 bg-white/[0.02] transition hover:border-white/20 open:border-brand-green/30 open:bg-brand-green/[0.03]">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 font-display text-base font-bold text-white [&::-webkit-details-marker]:hidden">
+                    {f.q}
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-white/20 text-white/60 transition group-open:rotate-45 group-open:border-brand-green/50 group-open:text-brand-green">
+                      <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                        <path d="M12 5v14M5 12h14" />
+                      </svg>
+                    </span>
+                  </summary>
+                  <p className="px-5 pb-5 text-[15px] leading-relaxed text-white/65">{f.a}</p>
+                </details>
+              </Reveal>
+            ))}
+          </div>
+          <Reveal>
+            <p className="mt-8 text-center text-sm text-white/50">
+              Still unsure?{" "}
+              <a href={`sms:${BUSINESS.phoneE164}`} className="font-bold text-brand-green underline underline-offset-4 transition hover:text-white">
+                Text Thanyon
+              </a>{" "}
+              and ask.
+            </p>
+          </Reveal>
         </div>
       </section>
 

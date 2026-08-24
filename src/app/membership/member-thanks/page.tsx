@@ -30,7 +30,7 @@ const PERKS = [
   {
     n: "4",
     title: "You're in the draw",
-    body: "You're entered to win $1,000 cash or a $2,200 detail, drawn 14 Sept.",
+    body: "You're entered to win $1,000 cash, drawn 14 Sept.",
   },
 ];
 
@@ -99,8 +99,7 @@ export default function MemberThanksPage() {
                 You&apos;re in the draw
               </div>
               <p className="mt-1.5 text-sm leading-relaxed text-white/80">
-                Entered to win <b className="text-white">$1,000 cash</b> or a{" "}
-                <b className="text-white">$2,200 detail</b>, drawn 14 Sept.{" "}
+                Entered to win <b className="text-white">$1,000 cash</b>, drawn 14 Sept.{" "}
                 <Link href="/draw-terms" className="text-brand-yellow underline underline-offset-4 transition hover:text-white">
                   See draw terms
                 </Link>
