@@ -19,6 +19,7 @@ const DRAW_TIME = "2026-09-14T12:00:00+10:00";
 const LOGO = BUSINESS.logo; // Smiths Detailing logo
 const HERO_IMG = "/media/photos/cutpolish.jpg";
 const EXPLAINER_VIDEO = "/media/videos/membership-explainer.mp4";
+const SKIP_IMG = "/media/photos/hero-mustang-v2.jpg";
 
 // ── The "from" price (cheapest tier = Single Cab). Change this line only. ──
 const PRICE = "$39";
@@ -371,18 +372,46 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
           <Reveal>
             <MembershipSignup />
           </Reveal>
+        </div>
+      </section>
 
-          {/* skip the call, go straight to checkout */}
-          <Reveal delay={80}>
-            <div className="mt-6 flex flex-col items-center gap-2.5 border-t border-white/10 pt-6 text-center">
-              <p className="text-sm text-white/55">Don&apos;t need any more info, just want to book?</p>
-              <Link
-                href="/membership/join"
-                className="inline-flex rounded-full border border-brand-green/50 bg-brand-green/[0.08] px-6 py-3 text-sm font-black text-brand-green transition hover:bg-brand-green/15"
-              >
-                Skip the call, join now →
-              </Link>
-            </div>
+      {/* ═══ SKIP THE CALL (full-width banner) ═══ */}
+      <section className="relative flex min-h-[58vh] items-center overflow-hidden">
+        <div
+          className="absolute inset-0 bg-cover"
+          style={{ backgroundImage: `url(${SKIP_IMG})`, backgroundPosition: "72% center" }}
+          aria-hidden
+        />
+        <div className="absolute inset-0 bg-[#050506]/82" aria-hidden />
+        <div
+          className="pointer-events-none absolute left-1/2 top-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-[0.16] blur-[120px]"
+          style={{ background: GREEN_GLOW }}
+          aria-hidden
+        />
+        <div className="relative mx-auto w-full max-w-2xl px-5 py-16 text-center">
+          <Reveal>
+            <span className="inline-flex items-center gap-2 rounded-full border border-brand-green/40 bg-brand-green/[0.08] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-green">
+              Ready to go?
+            </span>
+          </Reveal>
+          <Reveal delay={100}>
+            <h2 className="mt-5 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-5xl">
+              Know what you want? <span className="text-brand-green">Skip the call.</span>
+            </h2>
+          </Reveal>
+          <Reveal delay={200}>
+            <p className="mx-auto mt-4 max-w-md text-lg leading-relaxed text-white/70">
+              No forms, no waiting. Pick your vehicle, lock in your founding spot, and you&apos;re straight in the draw.
+            </p>
+          </Reveal>
+          <Reveal delay={300}>
+            <a
+              href="/membership/join"
+              className="mt-8 inline-flex rounded-full bg-brand-green px-8 py-4 font-display text-base font-extrabold text-brand-ink shadow-[0_10px_40px_rgba(43,255,122,0.25)] transition hover:brightness-110 active:scale-95"
+            >
+              Skip the call, join now →
+            </a>
+            <p className="mt-3 text-xs text-white/45">Secure checkout · cancel anytime</p>
           </Reveal>
         </div>
       </section>
