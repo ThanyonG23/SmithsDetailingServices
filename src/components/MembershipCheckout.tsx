@@ -13,7 +13,7 @@ const VALUE_STACK: { label: string; value: string; highlight?: boolean }[] = [
 
 export default function MembershipCheckout() {
   return (
-    <div className="rounded-3xl border border-white/12 bg-white/[0.03] p-6 sm:p-8">
+    <div className="h-full rounded-3xl border border-brand-green/45 bg-gradient-to-b from-brand-green/[0.08] to-white/[0.02] p-6 shadow-[0_14px_60px_-18px_rgba(43,255,122,0.32)] sm:p-8">
       <div className="text-center">
         <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-green">Ready to book?</div>
         <h2 className="mt-2 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">

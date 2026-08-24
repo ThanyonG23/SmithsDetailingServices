@@ -1,6 +1,5 @@
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
-import MembershipSignup from "@/components/MembershipSignup";
 import ReviewsSection from "@/components/ReviewsSection";
 import SiteNav from "@/components/SiteNav";
 import Countdown from "@/components/Countdown";
@@ -65,9 +64,9 @@ const EVERY_6_MONTHS: Group[] = [
 ];
 
 const STEPS: { n: string; title: string; body: string; image?: string }[] = [
-  { n: "1", title: "Reserve your spot", body: "Takes 30 seconds. No payment and nothing locked in yet, you're just claiming a founding spot.", image: "/media/photos/step-reserve.png" },
-  { n: "2", title: "We call you", body: "We confirm your car, your exact weekly price, and book in your first detail.", image: "/media/photos/step-call.png" },
-  { n: "3", title: "Hand us the keys", body: "We keep it detailed and serviced on a schedule. You never think about car admin again.", image: "/media/photos/step-keys.png" },
+  { n: "1", title: "Join in minutes", body: "Pick your plan and your vehicle online. Sorted in a couple of minutes, no phone calls." },
+  { n: "2", title: "Book your first visit", body: "We message you to lock in your first detail at a time that suits you." },
+  { n: "3", title: "Hand us the keys", body: "We keep it detailed and serviced on a schedule. You never think about car admin again." },
 ];
 
 
@@ -106,7 +105,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
   return (
     <main className="min-h-screen bg-[#050506]">
       {/* ═══ NAV ═══ */}
-      <SiteNav cta={{ label: "Book a call", href: "#reserve" }} />
+      <SiteNav cta={{ label: "Join now", href: "#join" }} />
 
       {/* ═══ HERO ═══ */}
       <section className="relative flex min-h-[82vh] items-center overflow-hidden">
@@ -162,12 +161,12 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
           <Reveal delay={400}>
             <div className="mt-8">
               <a
-                href="#reserve"
+                href="#join"
                 className="inline-flex rounded-full bg-brand-green px-8 py-4 font-display text-base font-extrabold text-brand-ink shadow-[0_10px_40px_rgba(43,255,122,0.25)] transition hover:brightness-110 active:scale-95"
               >
-                Book my call →
+                Join now →
               </a>
-              <p className="mt-3 text-xs text-white/40">No payment now · Next <s className="text-white/30">15</s> 10 members get a free Cut &amp; Polish</p>
+              <p className="mt-3 text-xs text-white/40">Next <s className="text-white/30">15</s> 10 members get a free Cut &amp; Polish · cancel anytime</p>
             </div>
           </Reveal>
         </div>
@@ -279,7 +278,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
       </section>
 
       {/* ═══ THE PLAN ═══ */}
-      <section className="pt-20 pb-6 sm:pt-24">
+      <section id="join" className="scroll-mt-16 pt-20 pb-6 sm:pt-24">
         <div className="mx-auto max-w-2xl px-4">
           {bonus && (
             <Reveal>
@@ -309,7 +308,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
             {/* Smiths Member: $9.99/mo, perks + draw entry */}
             <div className="w-[90%] shrink-0 snap-center sm:w-[64%]">
               <Reveal delay={80}>
-                <div className="flex h-full flex-col rounded-3xl border border-white/12 bg-white/[0.03] p-6 sm:p-8">
+                <div className="flex h-full flex-col rounded-3xl border border-brand-yellow/45 bg-gradient-to-b from-brand-yellow/[0.08] to-white/[0.02] p-6 shadow-glowY sm:p-8">
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
                       <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">The lighter way in</div>
@@ -338,15 +337,6 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
             </div>
           </div>
           <p className="mt-1 text-center text-xs text-white/35">Swipe for the $9.99/month option →</p>
-        </div>
-      </section>
-
-      {/* ═══ RESERVE ═══ */}
-      <section id="reserve" className="scroll-mt-8 pb-16 pt-4">
-        <div className="mx-auto max-w-xl px-4">
-          <Reveal>
-            <MembershipSignup />
-          </Reveal>
         </div>
       </section>
 
