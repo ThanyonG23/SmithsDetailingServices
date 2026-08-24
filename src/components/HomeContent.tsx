@@ -168,6 +168,12 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
       <section className="border-y border-white/10 bg-white/[0.02] py-16 sm:py-20">
         <div className="mx-auto max-w-3xl px-4 text-center">
           <Reveal>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/media/photos/giveaway.png"
+              alt="Smiths members' giveaway"
+              className="mx-auto mb-8 w-full max-w-lg rounded-2xl border border-white/10 shadow-[0_20px_60px_-25px_rgba(0,0,0,0.8)]"
+            />
             <h2 className="font-display text-3xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-4xl">
               Does your car need a regular{" "}
               <span className="text-brand-green">service &amp; detail?</span>

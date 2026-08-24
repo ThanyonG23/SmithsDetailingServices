@@ -10,7 +10,6 @@ import { BUSINESS } from "@/lib/config";
 const LINKS = [
   { href: "/detailing", label: "Detailing" },
   { href: "/membership", label: "Membership" },
-  { href: "/hire", label: "Vehicle Hire" },
 ];
 
 export default function SiteNav({ cta }: { cta?: { label: string; href: string } }) {

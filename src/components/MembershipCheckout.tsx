@@ -7,7 +7,7 @@ const VALUE_STACK: { label: string; value: string; highlight?: boolean }[] = [
   { label: "Full service, every 6 months", value: "Included" },
   { label: "FREE Cut & Polish to start", value: "$750+", highlight: true },
   { label: "Entry to win $1,000 or a $2,200 detail", value: "Drawn 14 Sept", highlight: true },
-  { label: "10% off add-ons & vehicle hire", value: "Ongoing" },
+  { label: "10% off all add-on services", value: "Ongoing" },
   { label: "Priority booking, members first", value: "Included" },
 ];
 

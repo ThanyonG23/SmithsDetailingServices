@@ -229,6 +229,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
               <div className="relative overflow-hidden rounded-3xl border border-white/12 bg-black shadow-[0_24px_70px_-24px_rgba(0,0,0,0.85)]">
                 <video
                   src={EXPLAINER_VIDEO}
+                  poster="/media/photos/membership-explainer-poster.jpg"
                   controls
                   playsInline
                   preload="metadata"
@@ -260,28 +261,28 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
             </Reveal>
           )}
           {/* two tiers, swipe between them */}
+          <div className="mb-3 flex items-center justify-between">
+            <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/40">Choose your plan</span>
+            <span className="flex items-center gap-1.5 rounded-full border border-brand-green/40 bg-brand-green/[0.08] px-3 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-brand-green sm:hidden">
+              Swipe <span className="animate-pulse" aria-hidden>→</span>
+            </span>
+          </div>
           <div className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 [scrollbar-width:thin]">
             {/* Full membership: value stack + pick your vehicle */}
-            <div className="w-[90%] shrink-0 snap-center sm:w-[64%]">
+            <div className="w-[84%] shrink-0 snap-center sm:w-[64%]">
               <Reveal>
                 <MembershipCheckout />
               </Reveal>
             </div>
 
             {/* Smiths Member: $9.99/mo, perks + draw entry */}
-            <div className="w-[90%] shrink-0 snap-center sm:w-[64%]">
+            <div className="w-[84%] shrink-0 snap-center sm:w-[64%]">
               <Reveal delay={80}>
                 <div className="flex h-full flex-col rounded-3xl border border-brand-yellow/45 bg-gradient-to-b from-brand-yellow/[0.08] to-white/[0.02] p-6 shadow-glowY sm:p-8">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">The lighter way in</div>
-                      <h3 className="mt-1.5 font-display text-2xl font-extrabold tracking-tight text-white">Smiths Member</h3>
-                      <p className="mt-1 text-sm text-white/55">Just want the perks and a shot at the draws?</p>
-                    </div>
-                    <div className="shrink-0 text-right">
-                      <div className="font-display text-3xl font-black leading-none text-white">$9.99</div>
-                      <div className="mt-1 text-xs font-bold text-white/50">/month</div>
-                    </div>
+                  <div className="min-w-0">
+                    <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">The lighter way in</div>
+                    <h3 className="mt-1.5 font-display text-2xl font-extrabold tracking-tight text-white">Smiths Member</h3>
+                    <p className="mt-1 text-sm text-white/55">Just want the perks and a shot at the draws?</p>
                   </div>
                   <ul className="mt-6 flex flex-col gap-2.5">
                     <li className="flex items-start gap-2.5 text-sm text-white/80"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>10% off all our services</li>
@@ -299,7 +300,10 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
               </Reveal>
             </div>
           </div>
-          <p className="mt-1 text-center text-xs text-white/35">Swipe for the $9.99/month option →</p>
+          <div className="mt-1 flex items-center justify-center gap-2" aria-hidden>
+            <span className="h-1.5 w-6 rounded-full bg-brand-green/70"></span>
+            <span className="h-1.5 w-6 rounded-full bg-brand-yellow/70"></span>
+          </div>
         </div>
       </section>
 

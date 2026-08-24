@@ -42,17 +42,6 @@ const OFFERS: Offer[] = [
     live: true,
     accent: "yellow",
   },
-  {
-    href: "/hire",
-    image: "/media/photos/hand-wax.jpg",
-    icon: "🚗",
-    title: "Vehicle Hire",
-    desc: "Need a set of wheels? Clean, well-maintained vehicles for hire in Cairns, detailed to the standard you know us for.",
-    tag: "Coming soon",
-    cta: "Join the waitlist",
-    live: false,
-    accent: "green",
-  },
 ];
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
@@ -129,16 +118,16 @@ export default function LandingHub() {
           </Reveal>
           <Reveal delay={200}>
             <p className="mt-6 max-w-lg text-lg leading-relaxed text-white/70">
-              Detailing done properly, a membership that keeps your car clean and serviced on a schedule,
-              and vehicle hire on the way. Pick where you&apos;d like to start.
+              Premium detailing, and a membership that keeps your car clean and serviced on a schedule.
+              Pick where you&apos;d like to start.
             </p>
           </Reveal>
         </div>
       </section>
 
-      {/* ═══ 3 OFFERS ═══ */}
+      {/* ═══ OFFERS ═══ */}
       <section className="relative z-10 -mt-10 px-4 pb-8">
-        <div className="mx-auto grid max-w-6xl gap-5 md:grid-cols-3">
+        <div className="mx-auto grid max-w-3xl gap-5 md:grid-cols-2">
           {OFFERS.map((o, i) => (
             <Reveal key={o.title} delay={i * 100}>
               <OfferCard o={o} />
@@ -175,12 +164,11 @@ export default function LandingHub() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={BUSINESS.logo} alt={BUSINESS.name} className="h-11 w-auto" />
               <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/50">
-                Detailing, membership car care and vehicle hire, all in one place in {BUSINESS.suburb}.
+                Premium detailing and membership car care in {BUSINESS.suburb}.
               </p>
               <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm">
                 <Link href="/detailing" className="font-semibold text-white/70 transition hover:text-white">Detailing</Link>
                 <Link href="/membership" className="font-semibold text-white/70 transition hover:text-white">Membership</Link>
-                <Link href="/hire" className="font-semibold text-white/70 transition hover:text-white">Vehicle Hire</Link>
               </div>
             </div>
             <div className="text-sm text-white/60">
