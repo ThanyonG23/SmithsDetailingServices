@@ -4,7 +4,7 @@ import { BUSINESS } from "@/lib/config";
 import { getRole } from "@/lib/ops/auth";
 import OpsTabs from "@/components/ops/OpsTabs";
 
-/* Unlisted, like the team page — nothing links here and it's noindex,
+/* Unlisted, like the team page, nothing links here and it's noindex,
    so the only way in is the direct link + the shared password. */
 export const metadata: Metadata = {
   title: "Daily Ops | Smiths Detailing",

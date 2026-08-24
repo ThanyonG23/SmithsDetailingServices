@@ -1,5 +1,5 @@
 /* Parse a Meta (Facebook) Ads CSV export into per-ad rows.
-   Robust to column order — finds columns by header name. The export is a
+   Robust to column order, finds columns by header name. The export is a
    date-range summary (one row per ad), so each upload replaces the snapshot. */
 
 export interface AdRow {
@@ -63,7 +63,7 @@ export function parseAdsPeriod(text: string): { start: string | null; end: strin
 
 /** Per-day Meta messages, from rows that cover a single day (start == end).
     Works for a "today only" export AND a Day-breakdown export (one row per ad
-    per day) — so one upload can backfill every day. Range summaries are
+    per day), so one upload can backfill every day. Range summaries are
     skipped (their rows span the whole period and can't be attributed daily). */
 export function parseAdsDailyMessages(text: string): { date: string; messages: number }[] {
   const lines = text.replace(/^﻿/, "").split(/\r?\n/).filter((l) => l.trim());
@@ -94,7 +94,7 @@ export function parseAdsCsv(text: string): AdRow[] {
   const exact = (name: string) => hdr.findIndex((h) => h === name);
 
   // Accept both the ad-level ("Ad name") and campaign-level ("Campaign name")
-  // Meta exports — either one uploads fine.
+  // Meta exports, either one uploads fine.
   const iName = has("ad name") >= 0 ? has("ad name") : has("campaign name");
   const iSpend = has("amount spent");
   const iImpr = exact("impressions");

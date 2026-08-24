@@ -88,7 +88,7 @@ function toNum(v: FormDataEntryValue | null): number {
   return Number.isFinite(n) && n > 0 ? n : 0;
 }
 
-/** Read the whole day-log form into a record — shared by the explicit save
+/** Read the whole day-log form into a record, shared by the explicit save
     and the as-you-go auto-save so they can never drift apart. */
 function parseDayForm(formData: FormData) {
   const staff_hours: Record<string, number> = {};
@@ -132,7 +132,7 @@ export async function saveEntry(formData: FormData): Promise<void> {
   redirect(`/ops?date=${encodeURIComponent(entry.log_date)}&saved=1`);
 }
 
-/** Auto-save the day's log as you fill it in — the SAME write as "Save the
+/** Auto-save the day's log as you fill it in, the SAME write as "Save the
     day" but with no redirect, so it fires quietly (debounced) on every change.
     revalidate keeps the router cache fresh so the numbers are still there when
     she switches tabs and comes back. */
@@ -167,7 +167,7 @@ export async function uploadCalendar(formData: FormData): Promise<void> {
     ics = buf.toString("utf8");
   }
 
-  // Keep priced bookings AND $0 member bookings — a Smiths Garage membership
+  // Keep priced bookings AND $0 member bookings, a Smiths Garage membership
   // visit has no per-visit price, so filtering on value alone silently drops
   // every member. Still drop internal/junk events (no value, no car, not a member).
   const bookings = parseBookingsIcs(ics).filter(
@@ -176,7 +176,7 @@ export async function uploadCalendar(formData: FormData): Promise<void> {
   await replaceBookings(bookings);
   await recordBookingsSeen(bookings, cairnsToday());
 
-  // Build/refresh the CRM from the calendar — deduped by phone/email, so it
+  // Build/refresh the CRM from the calendar, deduped by phone/email, so it
   // never doubles up across uploads. Sorted by date so latest details win.
   const custs = parseCustomersIcs(ics).sort((a, b) => a.date.localeCompare(b.date));
   const byKey = new Map<
@@ -217,7 +217,7 @@ export async function uploadCalendar(formData: FormData): Promise<void> {
     if (r.date > e.last_seen) e.last_seen = r.date;
     byKey.set(r.key, e);
   }
-  // Rebuild the CRM fresh from the full calendar each upload — self-cleaning,
+  // Rebuild the CRM fresh from the full calendar each upload, self-cleaning,
   // never doubles up, and clears out any old junk records.
   if (byKey.size) {
     await clearCustomers();
@@ -282,7 +282,7 @@ export async function uploadSales(formData: FormData): Promise<void> {
 }
 
 /* Save the hours each car took TODAY, keyed to the calendar UID + today's
-   date — so a job worked over several days accumulates a running total. */
+   date, so a job worked over several days accumulates a running total. */
 export async function logJobHours(formData: FormData): Promise<void> {
   const today = cairnsToday();
   const entries: { uid: string; date: string; hours: number }[] = [];
@@ -385,7 +385,7 @@ export async function saveInspection(slug: string, items: InspectionItem[]): Pro
   revalidatePath("/ops/inspect");
 }
 
-/** Customer submits which extras they want (public — no auth). */
+/** Customer submits which extras they want (public, no auth). */
 export async function submitInspectionResponse(
   slug: string,
   selectedIds: string[],
@@ -475,8 +475,7 @@ export async function clockOff(uid: string, detailer: string): Promise<void> {
   revalidatePath("/ops");
 }
 
-/* Mark an Instant Quote lead (from the public homepage widget) as actioned —
-   you've called/texted them and either confirmed the real Google
+/* Mark an Instant Quote lead (from the public homepage widget) as actioned,   you've called/texted them and either confirmed the real Google
    Calendar booking or ruled it out. This never touches the calendar itself;
    that stays a manual step, same as every other booking. */
 export async function markQuoteLeadActioned(formData: FormData): Promise<void> {
@@ -515,7 +514,7 @@ export async function setCheckin(formData: FormData): Promise<void> {
   const outcome = String(formData.get("outcome") || "");
   if (uid && ["happy", "unhappy", "rectified"].includes(outcome)) {
     await setFollowupStatus(uid, outcome);
-    await setJobFinished(uid, true); // a check-in means the job's done — stop carry-over
+    await setJobFinished(uid, true); // a check-in means the job's done, stop carry-over
   }
   revalidatePath("/ops");
   redirect("/ops?fuok=1");
@@ -597,7 +596,7 @@ export async function unmarkOrdered(formData: FormData): Promise<void> {
   redirect("/ops/stock?stockok=saved");
 }
 
-/* Smiths master stock list — tidied from the real supplier sheet.
+/* Smiths master stock list, tidied from the real supplier sheet.
    Tuple: [category, item, brand, website, unit, keep-on-hand (min), have (current), notes?] */
 const NC = "https://northernchemicals.com.au/";
 const GT = "https://gtechniq.com.au/";
@@ -667,7 +666,7 @@ export async function saveTemplate(formData: FormData): Promise<void> {
     // one copyable template per vehicle-size variant
     for (const b of blocks) {
       const size = variantLabel(b);
-      const title = family ? (size ? `${family} — ${size}` : family) : size || "Template";
+      const title = family ? (size ? `${family}, ${size}` : family) : size || "Template";
       await upsertTemplate(null, title.slice(0, 120), b);
     }
   }
@@ -682,7 +681,7 @@ export async function removeTemplate(formData: FormData): Promise<void> {
   redirect("/ops/templates?tok=deleted");
 }
 
-/* Smiths standard quote templates — clean, per vehicle size. Price tables and
+/* Smiths standard quote templates, clean, per vehicle size. Price tables and
    body copy now live in src/lib/packages.ts (shared with the public Instant
    Quote widget) so the two surfaces can never quote different prices. */
 const askDetailsBody = `Great! I just need the following please:
@@ -712,23 +711,23 @@ Referral:
 
 📍 BOOKING CONFIRMATION
 
-Thanks so much — your booking is confirmed and locked in!
+Thanks so much, your booking is confirmed and locked in!
 
 We'll also send you a friendly reminder the day before your booking.
 
 A few quick things to note:
 
 • Reschedule or cancel?
-Please give us more than 48 hours' notice — this really hurts our business if you don't.
+Please give us more than 48 hours' notice, this really hurts our business if you don't.
 
 • Extra dirty vehicles
 If your car is extra dirty and takes longer than usual, our team will let you know before starting and there may be a surcharge.
 
 • Pet hair
-Standing up you might not see much, but our team facedown vacuuming see everything. If your car has pet hair we charge a $55 pet hair fee (unless it's bad — we'll let you know beforehand).
+Standing up you might not see much, but our team facedown vacuuming see everything. If your car has pet hair we charge a $55 pet hair fee (unless it's bad, we'll let you know beforehand).
 
 • Seat covers
-If you'd like your seats cleaned, please remove any seat covers beforehand — we won't remove them ourselves.
+If you'd like your seats cleaned, please remove any seat covers beforehand, we won't remove them ourselves.
 
 • Personal belongings
 We'll safely remove and return anything left in the car, but it's faster and smoother if the vehicle is emptied beforehand.
@@ -742,7 +741,7 @@ Correction + Coat: 1-2 days
 
 Any questions at all, feel free to reach out.
 
-Thanks again — we look forward to seeing you!`;
+Thanks again, we look forward to seeing you!`;
 
 const reminderBody = `Hey [Name], this is Thanyon from Smiths Detailing.
 
@@ -754,48 +753,48 @@ const checkinBody = `Good afternoon [Name], Thanyon here from Smiths Detailing S
 
 Just wanted to check in and make sure you were 100% happy with your service yesterday?`;
 
-const checkinNoResponseBody = `Hey [Name], I noticed you didn't respond — I really just want to check in and make sure you were happy with the service.
+const checkinNoResponseBody = `Hey [Name], I noticed you didn't respond, I really just want to check in and make sure you were happy with the service.
 
 We don't ask for reviews, just making sure everything's okay?`;
 
 const checkinHappyBody = `That's amazing to hear! Thank you for choosing Smiths Detailing as your detailer 🙌`;
 
-const checkinUnhappyBody = `I'm so sorry to hear that. Let's get your car booked back in to get that rectified for you — what date works best for you?`;
+const checkinUnhappyBody = `I'm so sorry to hear that. Let's get your car booked back in to get that rectified for you, what date works best for you?`;
 
 const STANDARD_TEMPLATES: { title: string; body: string; sort: number }[] = [
-  { title: "Booking — Ask for details", body: askDetailsBody, sort: 30 },
-  { title: "Booking — Confirmed message", body: confirmedBody, sort: 31 },
-  { title: "Booking — Calendar event (paste into GCal)", body: calendarBody, sort: 32 },
-  { title: "Booking — Friendly reminder", body: reminderBody, sort: 33 },
-  { title: "Check-in — Confirming great service", body: checkinBody, sort: 40 },
-  { title: "Check-in — No response", body: checkinNoResponseBody, sort: 41 },
-  { title: "Check-in — Happy reply", body: checkinHappyBody, sort: 42 },
-  { title: "Check-in — Unhappy reply", body: checkinUnhappyBody, sort: 43 },
-  { title: "Correction — Single Cab ($1,500)", body: correctionBody("Single Cab"), sort: 0 },
-  { title: "Correction — Sedan/Dual Cab ($2,100)", body: correctionBody("Sedan/Dual Cab"), sort: 1 },
-  { title: "Correction — SUV ($2,200)", body: correctionBody("SUV"), sort: 2 },
-  { title: "Correction — 7 Seater ($2,300)", body: correctionBody("7 Seater"), sort: 3 },
-  { title: "Interior Only — Single Cab ($250)", body: interiorBody("Single Cab"), sort: 5 },
-  { title: "Interior Only — Sedan/Dual Cab ($300)", body: interiorBody("Sedan/Dual Cab"), sort: 6 },
-  { title: "Interior Only — SUV ($330)", body: interiorBody("SUV"), sort: 7 },
-  { title: "Interior Only — 7 Seater ($350)", body: interiorBody("7 Seater"), sort: 8 },
-  { title: "Cut & Polish — Single Cab ($850)", body: cutPolishBody("Single Cab"), sort: 10 },
-  { title: "Cut & Polish — Sedan/Dual Cab ($1,000)", body: cutPolishBody("Sedan/Dual Cab"), sort: 11 },
-  { title: "Cut & Polish — SUV ($1,100)", body: cutPolishBody("SUV"), sort: 12 },
-  { title: "Cut & Polish — 7 Seater ($1,200)", body: cutPolishBody("7 Seater"), sort: 13 },
-  { title: "Premium Detail + Polish — Single Cab ($500)", body: premiumPolishBody("Single Cab"), sort: 15 },
-  { title: "Premium Detail + Polish — Sedan/Dual Cab ($600)", body: premiumPolishBody("Sedan/Dual Cab"), sort: 16 },
-  { title: "Premium Detail + Polish — SUV ($650)", body: premiumPolishBody("SUV"), sort: 17 },
-  { title: "Premium Detail + Polish — 7 Seater ($700)", body: premiumPolishBody("7 Seater"), sort: 18 },
-  { title: "Standard Detail — Single Cab ($300)", body: standardBody("Single Cab"), sort: 26 },
-  { title: "Standard Detail — Sedan/Dual Cab ($350)", body: standardBody("Sedan/Dual Cab"), sort: 27 },
-  { title: "Standard Detail — SUV ($380)", body: standardBody("SUV"), sort: 28 },
-  { title: "Standard Detail — 7 Seater ($400)", body: standardBody("7 Seater"), sort: 29 },
-  { title: "Premium Detail — Single Cab ($350)", body: premiumBody("Single Cab"), sort: 20 },
-  { title: "Premium Detail — Sedan/Dual Cab ($400)", body: premiumBody("Sedan/Dual Cab"), sort: 21 },
-  { title: "Premium Detail — SUV ($430)", body: premiumBody("SUV"), sort: 22 },
-  { title: "Premium Detail — 7 Seater ($450)", body: premiumBody("7 Seater"), sort: 23 },
-  { title: "Premium Detail — Larger ($500-550)", body: premiumBodyRaw("500", "4-5 hrs"), sort: 24 },
+  { title: "Booking, Ask for details", body: askDetailsBody, sort: 30 },
+  { title: "Booking, Confirmed message", body: confirmedBody, sort: 31 },
+  { title: "Booking, Calendar event (paste into GCal)", body: calendarBody, sort: 32 },
+  { title: "Booking, Friendly reminder", body: reminderBody, sort: 33 },
+  { title: "Check-in, Confirming great service", body: checkinBody, sort: 40 },
+  { title: "Check-in, No response", body: checkinNoResponseBody, sort: 41 },
+  { title: "Check-in, Happy reply", body: checkinHappyBody, sort: 42 },
+  { title: "Check-in, Unhappy reply", body: checkinUnhappyBody, sort: 43 },
+  { title: "Correction, Single Cab ($1,500)", body: correctionBody("Single Cab"), sort: 0 },
+  { title: "Correction, Sedan/Dual Cab ($2,100)", body: correctionBody("Sedan/Dual Cab"), sort: 1 },
+  { title: "Correction, SUV ($2,200)", body: correctionBody("SUV"), sort: 2 },
+  { title: "Correction, 7 Seater ($2,300)", body: correctionBody("7 Seater"), sort: 3 },
+  { title: "Interior Only, Single Cab ($250)", body: interiorBody("Single Cab"), sort: 5 },
+  { title: "Interior Only, Sedan/Dual Cab ($300)", body: interiorBody("Sedan/Dual Cab"), sort: 6 },
+  { title: "Interior Only, SUV ($330)", body: interiorBody("SUV"), sort: 7 },
+  { title: "Interior Only, 7 Seater ($350)", body: interiorBody("7 Seater"), sort: 8 },
+  { title: "Cut & Polish, Single Cab ($850)", body: cutPolishBody("Single Cab"), sort: 10 },
+  { title: "Cut & Polish, Sedan/Dual Cab ($1,000)", body: cutPolishBody("Sedan/Dual Cab"), sort: 11 },
+  { title: "Cut & Polish, SUV ($1,100)", body: cutPolishBody("SUV"), sort: 12 },
+  { title: "Cut & Polish, 7 Seater ($1,200)", body: cutPolishBody("7 Seater"), sort: 13 },
+  { title: "Premium Detail + Polish, Single Cab ($500)", body: premiumPolishBody("Single Cab"), sort: 15 },
+  { title: "Premium Detail + Polish, Sedan/Dual Cab ($600)", body: premiumPolishBody("Sedan/Dual Cab"), sort: 16 },
+  { title: "Premium Detail + Polish, SUV ($650)", body: premiumPolishBody("SUV"), sort: 17 },
+  { title: "Premium Detail + Polish, 7 Seater ($700)", body: premiumPolishBody("7 Seater"), sort: 18 },
+  { title: "Standard Detail, Single Cab ($300)", body: standardBody("Single Cab"), sort: 26 },
+  { title: "Standard Detail, Sedan/Dual Cab ($350)", body: standardBody("Sedan/Dual Cab"), sort: 27 },
+  { title: "Standard Detail, SUV ($380)", body: standardBody("SUV"), sort: 28 },
+  { title: "Standard Detail, 7 Seater ($400)", body: standardBody("7 Seater"), sort: 29 },
+  { title: "Premium Detail, Single Cab ($350)", body: premiumBody("Single Cab"), sort: 20 },
+  { title: "Premium Detail, Sedan/Dual Cab ($400)", body: premiumBody("Sedan/Dual Cab"), sort: 21 },
+  { title: "Premium Detail, SUV ($430)", body: premiumBody("SUV"), sort: 22 },
+  { title: "Premium Detail, 7 Seater ($450)", body: premiumBody("7 Seater"), sort: 23 },
+  { title: "Premium Detail, Larger ($500-550)", body: premiumBodyRaw("500", "4-5 hrs"), sort: 24 },
 ];
 
 export async function seedTemplates(): Promise<void> {

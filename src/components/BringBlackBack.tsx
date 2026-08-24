@@ -1,7 +1,7 @@
 import { BRING_BLACK_BACK_IMAGE } from "@/lib/config";
 import Reveal from "./Reveal";
 
-/* "Bring Black Back" — trim restoration. A single still that captures the
+/* "Bring Black Back", trim restoration. A single still that captures the
    whole story: one panel, half sun-faded grey, half restored factory black. */
 export default function BringBlackBack({ smsHref }: { smsHref: string }) {
   return (

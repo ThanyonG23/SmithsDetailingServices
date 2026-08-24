@@ -9,7 +9,7 @@ const PACKAGE_IDS: PackageId[] = ["interior", "premium", "cutpolish", "correctio
 
 /* Public, no-auth, read-only: which upcoming days have room for a given
    package/size, so the homepage Instant Quote widget can offer real slots.
-   Returns only dates + slot labels — no customer data. */
+   Returns only dates + slot labels, no customer data. */
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const packageId = searchParams.get("package") as PackageId | null;
@@ -26,6 +26,6 @@ export async function GET(req: Request) {
     const days = await getUpcomingAvailability(packageId, size, 5);
     return NextResponse.json({ days });
   } catch {
-    return NextResponse.json({ error: "Couldn't check availability — try again." }, { status: 502 });
+    return NextResponse.json({ error: "Couldn't check availability, try again." }, { status: 502 });
   }
 }

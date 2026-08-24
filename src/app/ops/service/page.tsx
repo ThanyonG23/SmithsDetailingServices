@@ -57,7 +57,7 @@ export default async function ServiceListPage() {
       <div className="mt-8">
         <div className={`${EYEBROW} mb-3`}>Recent ({jobs.length})</div>
         {jobs.length === 0 ? (
-          <div className={`${CARD} px-4 py-8 text-center text-sm text-white/45`}>No service cards yet — start one above.</div>
+          <div className={`${CARD} px-4 py-8 text-center text-sm text-white/45`}>No service cards yet, start one above.</div>
         ) : (
           <div className="flex flex-col gap-2.5">
             {jobs.map((j) => {
@@ -66,7 +66,7 @@ export default async function ServiceListPage() {
                 <Link key={j.slug} href={`/ops/service/${j.slug}`} className={`${CARD} flex items-center justify-between gap-3 p-4 transition hover:border-white/25`}>
                   <div className="min-w-0">
                     <div className="font-display text-base font-extrabold tracking-tight text-white">
-                      {j.rego || "—"}{j.vehicle && <span className="text-white/50"> · {j.vehicle}</span>}
+                      {j.rego || "-"}{j.vehicle && <span className="text-white/50"> · {j.vehicle}</span>}
                     </div>
                     <div className="mt-0.5 text-xs text-white/45">
                       {j.customer_name || "Walk-in"}{j.odometer && ` · ${j.odometer} km`} · {dayLabel(j.created_at)}

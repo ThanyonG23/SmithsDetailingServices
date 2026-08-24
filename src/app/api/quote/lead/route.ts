@@ -26,7 +26,7 @@ function dayLabel(d: string): string {
 }
 
 /* Emails the new pending lead to the shop inbox so the owner can confirm it and
-   send the calendar invite — same info that lands in /ops, just pushed to
+   send the calendar invite, same info that lands in /ops, just pushed to
    her inbox too instead of only waiting to be checked. Needs RESEND_API_KEY
    set in Vercel; silently skipped (never blocks the customer's request) if
    it's not configured or the send fails for any reason. */
@@ -51,16 +51,16 @@ async function notifyOwner(lead: {
   const text = `New request from the Instant Quote widget on the website.
 
 Name: ${lead.name}
-Phone: ${lead.phone || "—"}
-Email: ${lead.email || "—"}
+Phone: ${lead.phone || "-"}
+Email: ${lead.email || "-"}
 
 Vehicle: ${lead.vehicleText} (${lead.size})
-Package: ${lead.packageTitle} — $${lead.price.toLocaleString("en-AU")}
-Priorities: ${lead.priorities.join(", ") || "—"}
+Package: ${lead.packageTitle}, $${lead.price.toLocaleString("en-AU")}
+Priorities: ${lead.priorities.join(", ") || "-"}
 
-Requested: ${dayLabel(lead.requestedDate)} — ${lead.requestedSlot}
+Requested: ${dayLabel(lead.requestedDate)}, ${lead.requestedSlot}
 ${lead.referralCode ? `Referral: ${lead.referralCode.toUpperCase()}\n` : ""}
-This is a PENDING request, not a confirmed booking — call or text ${
+This is a PENDING request, not a confirmed booking, call or text ${
     lead.phone || lead.email
   } to confirm, then create the Google Calendar event as usual. It's also
 waiting in /ops on the dashboard.`;
@@ -72,17 +72,17 @@ waiting in /ops on the dashboard.`;
       body: JSON.stringify({
         from,
         to,
-        subject: `New Instant Quote request — ${lead.vehicleText} (${lead.packageTitle})`,
+        subject: `New Instant Quote request, ${lead.vehicleText} (${lead.packageTitle})`,
         text,
       }),
     });
   } catch {
-    /* email is a convenience notification — the lead is already saved */
+    /* email is a convenience notification, the lead is already saved */
   }
 }
 
 /* Public, no-auth: creates a PENDING lead from the homepage Instant Quote
-   widget. Never touches the Google Calendar — the owner confirms every booking
+   widget. Never touches the Google Calendar, the owner confirms every booking
    manually via the /ops dashboard, same as the existing text-to-quote flow. */
 export async function POST(req: Request) {
   let body: Record<string, unknown> = {};
@@ -124,7 +124,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Please pick a day and time." }, { status: 400 });
   }
 
-  // Price/title are recomputed server-side from the package tables — never
+  // Price/title are recomputed server-side from the package tables, never
   // trust a price sent by the browser.
   const price = packagePrice(packageId, size);
   const packageTitle = PACKAGE_TITLES[packageId];
@@ -159,6 +159,6 @@ export async function POST(req: Request) {
     });
     return NextResponse.json({ ok: true });
   } catch {
-    return NextResponse.json({ error: "Couldn't save that — try again in a moment." }, { status: 502 });
+    return NextResponse.json({ error: "Couldn't save that, try again in a moment." }, { status: 502 });
   }
 }

@@ -4,7 +4,7 @@ import ReviewsSection from "@/components/ReviewsSection";
 import SiteNav from "@/components/SiteNav";
 import { BUSINESS } from "@/lib/config";
 
-/* Imagery — swap any path to change the photo. */
+/* Imagery, swap any path to change the photo. */
 const HERO_IMG = "/media/photos/hero-mustang-v2.jpg";
 
 type Offer = {
@@ -25,7 +25,7 @@ const OFFERS: Offer[] = [
     image: "/media/photos/paint-gloss.jpg",
     icon: "✨",
     title: "Detailing",
-    desc: "Interior resets, cut & polish, multi-stage paint correction and ceramic coatings — done properly at our Cairns workshop.",
+    desc: "Interior resets, cut & polish, multi-stage paint correction and ceramic coatings, done properly at our Cairns workshop.",
     tag: "100+ 5★ reviews",
     cta: "Explore detailing",
     live: true,
@@ -36,7 +36,7 @@ const OFFERS: Offer[] = [
     image: "/media/photos/cutpolish.jpg",
     icon: "🔑",
     title: "Membership",
-    desc: "Hand us the keys and we keep your car detailed and serviced on a schedule — always clean, always sorted, one weekly payment.",
+    desc: "Hand us the keys and we keep your car detailed and serviced on a schedule, always clean, always sorted, one weekly payment.",
     tag: "From $39 / week",
     cta: "See the membership",
     live: true,
@@ -47,7 +47,7 @@ const OFFERS: Offer[] = [
     image: "/media/photos/hand-wax.jpg",
     icon: "🚗",
     title: "Vehicle Hire",
-    desc: "Need a set of wheels? Clean, well-maintained vehicles for hire in Cairns — detailed to the standard you know us for.",
+    desc: "Need a set of wheels? Clean, well-maintained vehicles for hire in Cairns, detailed to the standard you know us for.",
     tag: "Coming soon",
     cta: "Join the waitlist",
     live: false,
@@ -175,7 +175,7 @@ export default function LandingHub() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={BUSINESS.logo} alt={BUSINESS.name} className="h-11 w-auto" />
               <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/50">
-                Detailing, membership car care and vehicle hire — all in one place in {BUSINESS.suburb}.
+                Detailing, membership car care and vehicle hire, all in one place in {BUSINESS.suburb}.
               </p>
               <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm">
                 <Link href="/detailing" className="font-semibold text-white/70 transition hover:text-white">Detailing</Link>

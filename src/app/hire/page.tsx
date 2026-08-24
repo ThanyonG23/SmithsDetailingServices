@@ -6,10 +6,10 @@ import SiteNav from "@/components/SiteNav";
 import { BUSINESS } from "@/lib/config";
 
 export const metadata: Metadata = {
-  title: "Vehicle Hire — Coming Soon | Smiths, Cairns",
+  title: "Vehicle Hire, Coming Soon | Smiths, Cairns",
   description:
-    "Vehicle hire is coming to Smiths in Cairns — clean, well-maintained vehicles, simple booking. Join the waitlist to be first to know.",
-  robots: { index: false, follow: false }, // coming soon — keep out of search for now
+    "Vehicle hire is coming to Smiths in Cairns, clean, well-maintained vehicles, simple booking. Join the waitlist to be first to know.",
+  robots: { index: false, follow: false }, // coming soon, keep out of search for now
   alternates: { canonical: "/hire" },
 };
 
@@ -21,7 +21,7 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 }
 
 const PERKS: { icon: string; title: string; body: string }[] = [
-  { icon: "✨", title: "Spotless every time", body: "Every vehicle detailed to our standard before you get the keys — because that's what we do." },
+  { icon: "✨", title: "Spotless every time", body: "Every vehicle detailed to our standard before you get the keys, because that's what we do." },
   { icon: "🔧", title: "Properly maintained", body: "Serviced and road-ready, so you drive off with total confidence." },
   { icon: "📍", title: "Local & simple", body: "Right here in Cairns. Easy booking, no airport queues, no fuss." },
 ];
@@ -61,8 +61,7 @@ export default function HirePage() {
           </Reveal>
           <Reveal delay={200}>
             <p className="mx-auto mt-6 max-w-lg text-lg leading-relaxed text-white/65">
-              Need a set of wheels? We&apos;re bringing clean, well-maintained vehicles for hire to Cairns —
-              detailed to the standard you already know us for. Be first in line.
+              Need a set of wheels? We&apos;re bringing clean, well-maintained vehicles for hire to Cairns,              detailed to the standard you already know us for. Be first in line.
             </p>
           </Reveal>
           <Reveal delay={300}>

@@ -36,7 +36,7 @@ const TERMS: { heading: string; body: string; firstVisitPrices?: boolean }[] = [
   },
   {
     heading: "3. Your sign-up fee",
-    body: "The sign-up fee covers your first full detail and first service — and, for founding members, a complimentary Cut & Polish. It is non-refundable once your first visit has been booked or completed.",
+    body: "The sign-up fee covers your first full detail and first service, and, for founding members, a complimentary Cut & Polish. It is non-refundable once your first visit has been booked or completed.",
   },
   {
     heading: "4. Booking & rescheduling",
@@ -48,11 +48,11 @@ const TERMS: { heading: string; body: string; firstVisitPrices?: boolean }[] = [
   },
   {
     heading: "6. Cancelling",
-    body: "Once you've had your second visit there is no lock-in — you can cancel any time. Please give us at least 7 days' notice before your next payment so we can stop your billing. The sign-up fee is non-refundable. Cancelling before your second visit is covered separately below.",
+    body: "Once you've had your second visit there is no lock-in, you can cancel any time. Please give us at least 7 days' notice before your next payment so we can stop your billing. The sign-up fee is non-refundable. Cancelling before your second visit is covered separately below.",
   },
   {
     heading: "7. Cancelling before your second visit",
-    body: "Your founding rate — your first full detail, your first service, and (as a founding member) a complimentary Cut & Polish — is offered on the understanding that you continue your membership. If you cancel before your second scheduled visit, that founding rate no longer applies. Your sign-up fee is non-refundable, and if the standard, non-member value of the work we carried out on your first visit is more than you have already paid, you agree to pay the difference. Cancelling early never results in a refund. Standard non-member value of a first visit (full detail + basic service), by vehicle size:",
+    body: "Your founding rate, your first full detail, your first service, and (as a founding member) a complimentary Cut & Polish, is offered on the understanding that you continue your membership. If you cancel before your second scheduled visit, that founding rate no longer applies. Your sign-up fee is non-refundable, and if the standard, non-member value of the work we carried out on your first visit is more than you have already paid, you agree to pay the difference. Cancelling early never results in a refund. Standard non-member value of a first visit (full detail + basic service), by vehicle size:",
     firstVisitPrices: true,
   },
   {

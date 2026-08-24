@@ -47,15 +47,15 @@ export default async function InspectionBuilderPage({ params }: { params: { slug
             They want <b className="text-brand-green">{chosen.length}</b> of {insp.items.length} extras
             {" · "}
             <b className="text-brand-green">{money(chosenTotal)}</b>
-            {insp.member && <span className="text-brand-green/70"> (member rate — 10% off)</span>}:
+            {insp.member && <span className="text-brand-green/70"> (member rate, 10% off)</span>}:
           </div>
           <ul className="mt-2 list-disc space-y-0.5 pl-5 text-sm text-white/70 marker:text-brand-green">
             {chosen.map((c) => (
               <li key={c.id}>
-                {c.title} — {money(rate(c.price))}
+                {c.title}, {money(rate(c.price))}
               </li>
             ))}
-            {chosen.length === 0 && <li className="list-none text-white/45">— none selected</li>}
+            {chosen.length === 0 && <li className="list-none text-white/45">, none selected</li>}
           </ul>
           {insp.customer_note && (
             <div className="mt-2 rounded-lg border border-white/10 bg-black/25 px-3 py-2 text-sm text-white/70">

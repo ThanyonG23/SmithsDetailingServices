@@ -76,7 +76,7 @@ function Bubbles({ items }: { items: Bubble[] }) {
 }
 
 /* Strip the standalone "Hey!" opener when a quote is shown mid-conversation
-   — the chat already opened with a greeting, so repeating it reads oddly.
+  , the chat already opened with a greeting, so repeating it reads oddly.
    The /ops copy-paste templates (built from the same packages.ts) keep
    "Hey!" since those are sent as a fresh, standalone message. */
 function dropHey(text: string): string {
@@ -89,7 +89,7 @@ export default function QuoteChat() {
   // hydration never sees a document reference.
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  // Lock background scroll while the sheet is open — on mobile, a scrollable
+  // Lock background scroll while the sheet is open, on mobile, a scrollable
   // page behind a `fixed` overlay is a common source of the browser chrome
   // (address bar) resizing mid-interaction, which is what makes a `vh`-sized
   // sheet appear to squish.
@@ -103,7 +103,7 @@ export default function QuoteChat() {
   }, [open]);
   // iOS Safari can be left "stuck" pinch-zoomed in from an earlier focus
   // event, and doesn't reset that on its own between interactions in the
-  // same tab — even once every input is 16px+ so it stops happening again.
+  // same tab, even once every input is 16px+ so it stops happening again.
   // Toggling maximum-scale on/off forces Safari to snap back to 1.0.
   useEffect(() => {
     if (!open) return;
@@ -136,7 +136,7 @@ export default function QuoteChat() {
   const [error, setError] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Keep the newest message pinned to the bottom, text-chat style — bounce
+  // Keep the newest message pinned to the bottom, text-chat style, bounce
   // the view down whenever a message arrives or the "checking…" bubble
   // toggles.
   useEffect(() => {
@@ -189,7 +189,7 @@ export default function QuoteChat() {
     setMessages((m) => [
       ...m,
       { from: "user", text: labels.join(", ") },
-      { from: "bot", text: "Last thing — what type of vehicle is it?" },
+      { from: "bot", text: "Last thing, what type of vehicle is it?" },
     ]);
     setStep("size");
   }
@@ -201,7 +201,7 @@ export default function QuoteChat() {
     setMessages((m) => [
       ...m,
       { from: "user", text: s },
-      // q.body already ends with "Would you like to book this in?" — no
+      // q.body already ends with "Would you like to book this in?", no
       // need for a second bubble repeating it.
       { from: "bot", text: dropHey(q.body), mono: true },
     ]);
@@ -214,7 +214,7 @@ export default function QuoteChat() {
       { from: "user", text: "Not right now" },
       {
         from: "bot",
-        text: `No worries at all! Reach out anytime — call or text ${BUSINESS.phone}. Have a great day 🙂`,
+        text: `No worries at all! Reach out anytime, call or text ${BUSINESS.phone}. Have a great day 🙂`,
       },
     ]);
     setStep("declined");
@@ -232,7 +232,7 @@ export default function QuoteChat() {
       const data = await res.json();
       let days: Slot[] = Array.isArray(data?.days) ? data.days : [];
       if (days.length === 0) {
-        // Nothing free found — offer tomorrow anyway; the owner confirms the
+        // Nothing free found, offer tomorrow anyway; the owner confirms the
         // real time when they call, this is a request, not a lock-in.
         const tomorrow = new Date(Date.now() + 86400000);
         const iso = new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Brisbane" }).format(
@@ -243,12 +243,12 @@ export default function QuoteChat() {
       setSlotDays(days);
       setMessages((m) => [
         ...m,
-        { from: "bot", text: "Great! Here's what we've got coming up — pick a day and time:" },
+        { from: "bot", text: "Great! Here's what we've got coming up, pick a day and time:" },
       ]);
     } catch {
       setMessages((m) => [
         ...m,
-        { from: "bot", text: `Couldn't check the calendar just then — pop your details in and we'll text you a time.` },
+        { from: "bot", text: `Couldn't check the calendar just then, pop your details in and we'll text you a time.` },
       ]);
       setSlotDays([]);
     } finally {
@@ -260,7 +260,7 @@ export default function QuoteChat() {
     setChosen({ date, slot });
     setMessages((m) => [
       ...m,
-      { from: "user", text: `${dayLabel(date)} — ${slot}` },
+      { from: "user", text: `${dayLabel(date)}, ${slot}` },
       { from: "bot", text: "Great! I just need the following please:" },
     ]);
     setStep("contact");
@@ -293,7 +293,7 @@ export default function QuoteChat() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data?.error || "Something went wrong — try again.");
+        setError(data?.error || "Something went wrong, try again.");
         setSending(false);
         return;
       }
@@ -304,12 +304,12 @@ export default function QuoteChat() {
           from: "bot",
           text: `Thanks ${name.split(" ")[0]}! Your ${quote.title} request for your ${vehicleText} on ${dayLabel(
             chosen?.date || ""
-          )} (${chosen?.slot}) is through to the team — we'll confirm shortly.\n\nAny questions, feel free to call or text ${BUSINESS.phone}.`,
+          )} (${chosen?.slot}) is through to the team, we'll confirm shortly.\n\nAny questions, feel free to call or text ${BUSINESS.phone}.`,
         },
       ]);
       setStep("done");
     } catch {
-      setError("Couldn't reach the server — try again in a moment.");
+      setError("Couldn't reach the server, try again in a moment.");
     } finally {
       setSending(false);
     }
@@ -331,7 +331,7 @@ export default function QuoteChat() {
         ⚡ Get an Instant Quote
       </button>
 
-      {/* Rendered via a portal straight onto <body> — this component lives
+      {/* Rendered via a portal straight onto <body>, this component lives
           inside the hero's <Reveal>, which applies a CSS transform for its
           scroll-fade-in. A `position: fixed` descendant of a transformed
           ancestor stops being fixed to the viewport and instead sticks to
@@ -341,11 +341,11 @@ export default function QuoteChat() {
       {mounted &&
         createPortal(
           <>
-            {/* Floating launcher — sticky bottom-right on every scroll position */}
+            {/* Floating launcher, sticky bottom-right on every scroll position */}
             {!open && (
               <button
                 onClick={() => setOpen(true)}
-                aria-label="Open Smiths AI — get a fast, free quote"
+                aria-label="Open Smiths AI, get a fast, free quote"
                 className="fixed bottom-5 right-5 z-50 flex items-center gap-3 rounded-2xl border border-white/10 bg-[#0a0a0c]/95 py-3 pl-3 pr-4 shadow-[0_10px_40px_rgba(0,0,0,0.55)] backdrop-blur-md transition hover:border-brand-green/50 active:scale-95"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -379,7 +379,7 @@ export default function QuoteChat() {
                     </button>
                   </div>
 
-                  {/* transcript — bottom-anchored, text-chat style: short
+                  {/* transcript, bottom-anchored, text-chat style: short
                       conversations hug the bottom instead of floating at
                       the top, and it auto-scrolls down as messages arrive */}
                   <div className="flex flex-1 flex-col justify-end overflow-y-auto px-4 py-5">

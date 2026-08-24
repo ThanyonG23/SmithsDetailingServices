@@ -25,7 +25,7 @@ async function ensureBucket(): Promise<void> {
       body: JSON.stringify({ id: BUCKET, name: BUCKET, public: true, file_size_limit: 10485760 }),
     });
   } catch {
-    /* ignore — likely already exists */
+    /* ignore, likely already exists */
   }
   bucketReady = true;
 }

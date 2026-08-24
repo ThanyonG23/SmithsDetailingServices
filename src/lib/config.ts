@@ -1,5 +1,5 @@
 /* =====================================================================
-   SMITHS DETAILING — BUSINESS CONFIG (SINGLE SOURCE OF TRUTH)
+   SMITHS DETAILING, BUSINESS CONFIG (SINGLE SOURCE OF TRUTH)
    Safe to import on both the server and the client (pure data only).
    Edit prices / packages / extras here and the whole site updates.
    ===================================================================== */
@@ -11,7 +11,7 @@ export const BUSINESS = {
   phoneE164: "+61456186696",
   email: "info@smithsdetailingservices.com.au",
   suburb: "Parramatta Park, Cairns",
-  // All work is done at our location — customers drop off & pick up.
+  // All work is done at our location, customers drop off & pick up.
   address: "209 Bunda Street, Parramatta Park, Cairns QLD",
   tz: "Australia/Brisbane", // Cairns = QLD = UTC+10, no daylight saving
   reviewLink: "https://g.page/r/CVj0x7-guHPPEBM/review",
@@ -19,7 +19,7 @@ export const BUSINESS = {
   logo: "/media/photos/logo.png",
 } as const;
 
-/* "Text to book" link — opens the visitor's messaging app with a pre-filled
+/* "Text to book" link, opens the visitor's messaging app with a pre-filled
    message they can complete with their vehicle + package. The "?&body=" form
    is the cross-platform trick that works on both iPhone and Android. */
 export const TEXT_TO_BOOK_MESSAGE =
@@ -29,7 +29,7 @@ export const TEXT_TO_BOOK_HREF =
   "sms:" + BUSINESS.phoneE164 + "?&body=" + encodeURIComponent(TEXT_TO_BOOK_MESSAGE);
 
 /* Big background photos for the hero and the final CTA band.
-   These are placeholders — for best effect upload your two strongest
+   These are placeholders, for best effect upload your two strongest
    "wow" shots to public/media/photos/ (e.g. hero.jpg + cta.jpg) and
    point these at "/media/photos/hero.jpg" and "/media/photos/cta.jpg". */
 export const HERO_IMAGE = "/media/photos/hero-mustang-v2.jpg";
@@ -52,7 +52,7 @@ export const INTERIOR_BEFORE = "/media/photos/interior-before.jpg";
 export const INTERIOR_AFTER = "/media/photos/interior-after.jpg";
 
 /* ---------------------------------------------------------------- */
-/* SERVICES — the main homepage showcase                            */
+/* SERVICES, the main homepage showcase                            */
 /*                                                                  */
 /* PHOTOS: each service currently uses a placeholder. Drop your own  */
 /* shots into public/media/photos/services/ using the filename in    */
@@ -189,7 +189,7 @@ export const SERVICES: ServiceDef[] = [
 ];
 
 /* ---------------------------------------------------------------- */
-/* REELS — homepage "Watch real results" videos (self-hosted)       */
+/* REELS, homepage "Watch real results" videos (self-hosted)       */
 /* Put your MP4 files in public/media/videos/ with these names       */
 /* (or tell me your filenames and I'll update this list).            */
 /* ---------------------------------------------------------------- */

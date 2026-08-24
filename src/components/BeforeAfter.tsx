@@ -50,7 +50,7 @@ export default function BeforeAfter({
         dragging.current = false;
       }}
     >
-      {/* AFTER — base layer */}
+      {/* AFTER, base layer */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={after}
@@ -58,7 +58,7 @@ export default function BeforeAfter({
         draggable={false}
         className="pointer-events-none absolute inset-0 h-full w-full object-cover"
       />
-      {/* BEFORE — clipped by a wrapper so the inner image can be zoomed
+      {/* BEFORE, clipped by a wrapper so the inner image can be zoomed
           (beforeScale) without shifting the divider edge */}
       <div
         className="pointer-events-none absolute inset-0 overflow-hidden"

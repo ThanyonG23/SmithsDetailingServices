@@ -40,10 +40,10 @@ export default async function ServiceReportPage({ params }: { params: { slug: st
         {/* vehicle summary */}
         <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-4">
           {[
-            { l: "Vehicle", v: job.vehicle || "—" },
-            { l: "Rego", v: job.rego || "—" },
-            { l: "Odometer", v: job.odometer ? `${job.odometer} km` : "—" },
-            { l: "Next service", v: job.next_service || "—" },
+            { l: "Vehicle", v: job.vehicle || "-" },
+            { l: "Rego", v: job.rego || "-" },
+            { l: "Odometer", v: job.odometer ? `${job.odometer} km` : "-" },
+            { l: "Next service", v: job.next_service || "-" },
           ].map((s) => (
             <div key={s.l} className="rounded-2xl border border-white/10 bg-white/[0.02] p-3">
               <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/40">{s.l}</div>
@@ -60,7 +60,7 @@ export default async function ServiceReportPage({ params }: { params: { slug: st
               {flagged.map((it) => (
                 <li key={it.key} className="flex items-start gap-2 text-sm text-white/80">
                   <span className={`mt-1.5 h-2 w-2 shrink-0 rounded-full ${STATE_META[it.state].dot}`} />
-                  <span><b>{it.label}</b>{it.detail && <span className="text-white/60"> — {it.detail}</span>}</span>
+                  <span><b>{it.label}</b>{it.detail && <span className="text-white/60">, {it.detail}</span>}</span>
                 </li>
               ))}
             </ul>
@@ -91,7 +91,7 @@ export default async function ServiceReportPage({ params }: { params: { slug: st
           ))}
           {checked.length === 0 && (
             <div className="rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-8 text-center text-sm text-white/45">
-              This report is being prepared — check back shortly.
+              This report is being prepared, check back shortly.
             </div>
           )}
         </div>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 /* ──────────────────────────────────────────────────────────────────────
-   MEMBERSHIP TIERS — one product card per vehicle size.
+   MEMBERSHIP TIERS, one product card per vehicle size.
    Each has its own Stripe Payment Link (sign-up first-service fee +
    ongoing weekly subscription baked into the link).
    ────────────────────────────────────────────────────────────────────── */
@@ -12,7 +12,7 @@ type Tier = {
   emoji: string;
   desc: string;
   weekly: number; // ongoing $/week
-  first: number; // first-visit (sign-up) price — detail + first service
+  first: number; // first-visit (sign-up) price, detail + first service
   link: string; // Stripe payment link
 };
 
@@ -71,7 +71,7 @@ export default function MembershipJoin() {
     if (!phone.trim()) return setError("Please add a phone number so we can confirm your first visit.");
     if (!agreed) return setError("Please tick the box to confirm you're joining.");
     setBusy(tier.key);
-    // Save their details to the dashboard first (best-effort — never block payment).
+    // Save their details to the dashboard first (best-effort, never block payment).
     try {
       await fetch("/api/waitlist", {
         method: "POST",
@@ -84,7 +84,7 @@ export default function MembershipJoin() {
           membership: true,
           source: "membership-signup",
           interests: ["detailing", "servicing"],
-          message: `Tier: ${tier.key} ($${tier.weekly}/wk, first $${tier.first}) | Rego: ${rego || "—"} | Preferred first visit: ${preferred || "—"} | Agreed to T&Cs: yes`,
+          message: `Tier: ${tier.key} ($${tier.weekly}/wk, first $${tier.first}) | Rego: ${rego || "-"} | Preferred first visit: ${preferred || "-"} | Agreed to T&Cs: yes`,
         }),
       });
     } catch {
@@ -174,7 +174,7 @@ export default function MembershipJoin() {
               key={tier.key}
               className="flex w-[80%] shrink-0 snap-start flex-col rounded-2xl border border-white/12 bg-white/[0.03] p-5 transition hover:border-brand-green/40 sm:w-[47%]"
             >
-              {/* header — fixed height so descriptions of different lengths still line up */}
+              {/* header, fixed height so descriptions of different lengths still line up */}
               <div className="flex min-h-[3.25rem] items-center gap-2.5">
                 <span className="text-3xl leading-none">{tier.emoji}</span>
                 <div className="min-w-0">

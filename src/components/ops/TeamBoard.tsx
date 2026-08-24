@@ -66,7 +66,7 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
         else await clockOn(uid, detailer);
         router.refresh();
       } catch {
-        setErr("Couldn't update the clock — check your connection and try again.");
+        setErr("Couldn't update the clock, check your connection and try again.");
       } finally {
         setBusyUid(null);
       }
@@ -88,7 +88,7 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
         router.refresh();
         setStartFor(null);
       } catch {
-        setErr("Couldn't start the clock — check your connection and try again.");
+        setErr("Couldn't start the clock, check your connection and try again.");
       } finally {
         setBusyUid(null);
       }
@@ -116,7 +116,7 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
         router.refresh();
         setQcFor(null);
       } catch {
-        setErr("Couldn't sign it off — check your connection and try again.");
+        setErr("Couldn't sign it off, check your connection and try again.");
       } finally {
         setQcBusy(null);
       }
@@ -137,7 +137,7 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
         router.refresh();
         setNoteOpen(null);
       } catch {
-        setErr("Couldn't save the note — check your connection and try again.");
+        setErr("Couldn't save the note, check your connection and try again.");
       } finally {
         setNoteBusy(null);
       }
@@ -146,7 +146,7 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
 
   return (
     <div className="mt-6">
-      {/* name selector — always visible so the cars are never hidden behind it */}
+      {/* name selector, always visible so the cars are never hidden behind it */}
       <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-3">
         <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">
           You are
@@ -197,7 +197,7 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
             const left = Math.round((target - liveTotal) * 10) / 10;
             const busy = busyUid === j.uid;
             // Split into items on delimiters OR on a price (e.g. "…: $100 …: +$85"),
-            // then strip any leftover dollar amounts — no pricing on the crew board.
+            // then strip any leftover dollar amounts, no pricing on the crew board.
             const extraItems = (j.extras || "")
               .split(/(?::?\s*\+?\$\s*[\d,]+(?:\.\d{1,2})?)|[\n,;·•|]+/)
               .map((s) =>
@@ -288,7 +288,7 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
                   </div>
                 )}
 
-                {/* running note — what still needs doing / to rectify */}
+                {/* running note, what still needs doing / to rectify */}
                 {noteOpen === j.uid ? (
                   <div className="mt-3">
                     <textarea
@@ -350,22 +350,22 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
                     : busy
                     ? "…"
                     : mine
-                    ? `■ Stop — ${fmtDur(now - mine.start_ms)}`
+                    ? `■ Stop, ${fmtDur(now - mine.start_ms)}`
                     : "▶ Start on this car"}
                 </button>
                 {others.length > 0 && !mine && (
                   <p className="mt-1.5 text-center text-[11px] text-white/35">
-                    {others.map((o) => o.detailer).join(", ")} already on it — you can jump on too.
+                    {others.map((o) => o.detailer).join(", ")} already on it, you can jump on too.
                   </p>
                 )}
 
-                {/* Final check — any staff ticks the QC list and signs off, which
+                {/* Final check, any staff ticks the QC list and signs off, which
                     passes the quality gate AND marks the car done. */}
                 <div className="mt-2.5">
                   {qcFor === j.uid ? (
                     <div className="rounded-xl border border-brand-green/30 bg-brand-green/[0.05] p-3">
                       <div className="text-[10px] font-bold uppercase tracking-wider text-brand-green">
-                        Final check — tick every item, then sign off
+                        Final check, tick every item, then sign off
                       </div>
                       <div className="mt-2.5 flex flex-col gap-2">
                         {QC_CHECKLIST.map((item, i) => (
@@ -395,7 +395,7 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
                             ? "Tap your name first"
                             : !qcTicks.every(Boolean)
                             ? "Tick every item"
-                            : `✓ Sign off & mark done — ${me}`}
+                            : `✓ Sign off & mark done, ${me}`}
                         </button>
                         <button
                           onClick={() => setQcFor(null)}
@@ -505,7 +505,7 @@ export default function TeamBoard({ jobs, staff }: { jobs: TeamJob[]; staff: str
 
       <p className="mt-6 text-center text-[11px] leading-relaxed text-white/30">
         Starting a new car automatically stops your last one. Hours roll straight into the day&apos;s
-        numbers — no guessing.
+        numbers, no guessing.
       </p>
     </div>
   );

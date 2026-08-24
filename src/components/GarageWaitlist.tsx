@@ -50,13 +50,13 @@ export default function GarageWaitlist() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data?.error || "Something went wrong — try again.");
+        setError(data?.error || "Something went wrong, try again.");
         setState("error");
         return;
       }
       setState("done");
     } catch {
-      setError("Couldn't reach us — check your connection and try again.");
+      setError("Couldn't reach us, check your connection and try again.");
       setState("error");
     }
   };
@@ -68,7 +68,7 @@ export default function GarageWaitlist() {
         <h3 className="mt-3 font-display text-2xl font-extrabold text-white">You&apos;re on the list</h3>
         <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-white/70">
           Thanks {name.trim().split(" ")[0]}. We&apos;ll be in touch the moment Smiths Garage opens
-          {membership ? " — and you'll get first dibs on a membership spot" : ""}. Keep an eye on your
+          {membership ? ", and you'll get first dibs on a membership spot" : ""}. Keep an eye on your
           {email.trim() ? " inbox" : " phone"}.
         </p>
       </div>
@@ -85,7 +85,7 @@ export default function GarageWaitlist() {
         Join the waitlist
       </h3>
       <p className="mt-2 text-sm leading-relaxed text-white/60">
-        Be first to know when we open — and lock in early access to the {MEMBERSHIP_NAME}.
+        Be first to know when we open, and lock in early access to the {MEMBERSHIP_NAME}.
       </p>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -147,7 +147,7 @@ export default function GarageWaitlist() {
           ✓
         </span>
         <span className="text-sm">
-          <span className="font-bold text-white">Yes — I want a {MEMBERSHIP_NAME} spot.</span>
+          <span className="font-bold text-white">Yes, I want a {MEMBERSHIP_NAME} spot.</span>
           <span className="block text-white/55">Detailed &amp; serviced every 3 months, priority booking, one monthly payment.</span>
         </span>
       </button>

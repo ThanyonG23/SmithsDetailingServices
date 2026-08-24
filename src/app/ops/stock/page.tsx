@@ -75,7 +75,7 @@ export default async function StockPage({
 
       {dbError && (
         <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
-          Database not connected — connect Postgres and reload.
+          Database not connected, connect Postgres and reload.
         </div>
       )}
       {searchParams?.stockok && (
@@ -273,7 +273,7 @@ export default async function StockPage({
                               <input
                                 name={`web::${it.id}`}
                                 defaultValue={it.website}
-                                placeholder="—"
+                                placeholder="-"
                                 className={`${CELL} w-28`}
                               />
                               {it.website && (
@@ -339,7 +339,7 @@ export default async function StockPage({
                             <input
                               name={`note::${it.id}`}
                               defaultValue={it.notes}
-                              placeholder="—"
+                              placeholder="-"
                               className={`${CELL} w-28`}
                             />
                           </td>
@@ -383,7 +383,7 @@ export default async function StockPage({
             ↻ Reset to master list
           </button>
           <p className="mt-1.5 text-[11px] text-white/30">
-            Replaces every row with the Smiths master list — use during setup only, it wipes the
+            Replaces every row with the Smiths master list, use during setup only, it wipes the
             current counts.
           </p>
         </form>

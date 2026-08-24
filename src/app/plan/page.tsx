@@ -5,11 +5,11 @@ export const metadata: Metadata = {
   title: "The Smiths Detailing Membership | Cairns",
   description:
     "Keep your car detailed and serviced on a schedule with the Smiths Detailing membership. Cairns.",
-  robots: { index: false, follow: false }, // sent direct to customers — not for search
+  robots: { index: false, follow: false }, // sent direct to customers, not for search
   alternates: { canonical: "/plan" },
 };
 
-// Existing detail clients — no free cut & polish banner, so they don't feel
+// Existing detail clients, no free cut & polish banner, so they don't feel
 // they missed out on something they've effectively just had.
 export default function PlanPage() {
   return <MembershipContent bonus={false} />;

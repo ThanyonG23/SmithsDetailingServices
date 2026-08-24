@@ -98,7 +98,7 @@ export default async function DayReportPage({ params }: { params: { date: string
 
       {dbError && (
         <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
-          Database didn&apos;t respond — refresh in a moment.
+          Database didn&apos;t respond, refresh in a moment.
         </div>
       )}
 
@@ -149,7 +149,7 @@ export default async function DayReportPage({ params }: { params: { date: string
               <Stat label="Re-dos" value={String(entry?.redos ?? 0)} tone={(entry?.redos ?? 0) > 0 ? "yellow" : undefined} />
               <Stat
                 label="Rev / hour"
-                value={perHour > 0 ? `${money(perHour)}` : "—"}
+                value={perHour > 0 ? `${money(perHour)}` : "-"}
                 sub="earned ÷ crew hrs"
               />
             </div>
@@ -163,7 +163,7 @@ export default async function DayReportPage({ params }: { params: { date: string
               <Stat label={`Labour @ $${LABOUR_RATE}/hr`} value={money(labour)} />
               <Stat
                 label="Labour % of earned"
-                value={earned > 0 ? `${Math.round((labour / earned) * 100)}%` : "—"}
+                value={earned > 0 ? `${Math.round((labour / earned) * 100)}%` : "-"}
                 tone={earned > 0 && labour / earned > 0.45 ? "yellow" : undefined}
               />
             </div>
@@ -181,7 +181,7 @@ export default async function DayReportPage({ params }: { params: { date: string
                         {c.name}
                       </span>
                       <span className="shrink-0 text-xs font-bold tabular-nums text-brand-green">
-                        {c.hours > 0 ? `${c.hours}h` : "—"}
+                        {c.hours > 0 ? `${c.hours}h` : "-"}
                         {c.shift && (
                           <span className="ml-2 font-semibold text-white/40">
                             {c.shift.start}–{c.shift.end}

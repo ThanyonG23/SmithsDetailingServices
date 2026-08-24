@@ -173,7 +173,7 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
               <span className="text-brand-green">service &amp; detail?</span>
             </h2>
             <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-white/60">
-              Keep it clean and serviced on a schedule — all handled for you, on one simple weekly plan.
+              Keep it clean and serviced on a schedule, all handled for you, on one simple weekly plan.
             </p>
             <Link
               href="/membership"
@@ -304,7 +304,7 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
       </footer>
 
       {/* Floating "Smiths AI" launcher lives inside QuoteChat, rendered
-          above in the hero — it's `fixed`, so it stays bottom-right on
+          above in the hero, it's `fixed`, so it stays bottom-right on
           every scroll position without needing to be re-mounted here. */}
     </main>
   );

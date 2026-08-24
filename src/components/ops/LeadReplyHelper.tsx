@@ -33,7 +33,7 @@ export default function LeadReplyHelper() {
         setRead(d.read || "");
       }
     } catch {
-      setErr("Couldn't reach the AI — check your connection and try again.");
+      setErr("Couldn't reach the AI, check your connection and try again.");
     }
     setLoading(false);
   };
@@ -60,7 +60,7 @@ export default function LeadReplyHelper() {
         value={thread}
         onChange={(e) => setThread(e.target.value)}
         rows={6}
-        placeholder={"Paste the whole conversation here — include names, dates/times if you have them…"}
+        placeholder={"Paste the whole conversation here, include names, dates/times if you have them…"}
         className={`${INPUT} mt-3 resize-y`}
       />
 

@@ -1,5 +1,5 @@
 /* =====================================================================
-   SMITHS DETAILING — PACKAGE / PRICING SOURCE OF TRUTH
+   SMITHS DETAILING, PACKAGE / PRICING SOURCE OF TRUTH
    ---------------------------------------------------------------------
    Shared by the /ops quote-template library (src/app/ops/actions.ts) and
    the public "Instant Quote" widget, so a price can never drift between
@@ -30,7 +30,7 @@ export const PRIORITY_OPTIONS: { id: Priority; label: string }[] = [
 
 /* Which real package best covers a set of ticked priorities. Correction
    already includes ceramic coating, and Premium Detail already includes the
-   exterior wash — there's no standalone "exterior only" or "coating only"
+   exterior wash, there's no standalone "exterior only" or "coating only"
    product, so those fold into the nearest package that covers them. */
 export function resolvePackage(priorities: Priority[]): PackageId {
   const has = (p: Priority) => priorities.includes(p);
@@ -38,7 +38,7 @@ export function resolvePackage(priorities: Priority[]): PackageId {
   if (has("cutpolish")) return "cutpolish";
   if (has("interior") && has("exterior")) return "premium";
   if (has("interior")) return "interior";
-  return "premium"; // exterior-only (or nothing ticked) — closest real product
+  return "premium"; // exterior-only (or nothing ticked), closest real product
 }
 
 const INTERIOR_PRICE: Record<VehicleSize, number> = {
@@ -77,7 +77,7 @@ const STANDARD_PRICE: Record<VehicleSize, number> = {
 };
 
 /* bonus = the other free upgrades' value, total = the price charged today.
-   The FREE interior detail's value is NOT stored here — it's read live from
+   The FREE interior detail's value is NOT stored here, it's read live from
    INTERIOR_PRICE so the "valued at $X" in the quote always matches current
    interior pricing and can never drift. */
 const CORRECTION: Record<VehicleSize, { bonus: number; total: number }> = {
@@ -121,7 +121,7 @@ function greeting(vehicle?: string): string {
 
 export function correctionBody(size: VehicleSize, vehicle?: string): string {
   const { bonus, total } = CORRECTION[size];
-  // Free interior is valued at the real Interior Only price — always in sync.
+  // Free interior is valued at the real Interior Only price, always in sync.
   const interior = INTERIOR_PRICE[size];
   return `Hey! We can definitely take care of ${greeting(vehicle)} with our Exterior Correction Package
 Our Exterior Correction Package Also Includes:
@@ -171,8 +171,7 @@ ${BOOK}`;
 }
 
 /* Low-level renderer, exposed for the one legacy "Larger vehicle" quote
-   (bigger than the 4 standard sizes) that /ops/templates still offers —
-   everything else should go through premiumBody(size, vehicle). */
+   (bigger than the 4 standard sizes) that /ops/templates still offers,   everything else should go through premiumBody(size, vehicle). */
 export function premiumBodyRaw(price: string, hrs: string, vehicle?: string): string {
   return `Hey! We can definitely take care of ${greeting(vehicle)} with our Premium Interior & Exterior Detail
 This package also includes:
@@ -221,7 +220,7 @@ ${GUARANTEE}
 ${BOOK}`;
 }
 
-/* "Premium Detail + Polish" — a mid-tier full detail with a 1-step paint
+/* "Premium Detail + Polish", a mid-tier full detail with a 1-step paint
    enhancement, above Premium Detail and below Cut & Polish. Template-only for
    now (not part of the Instant Quote widget's PackageId ladder). */
 export function premiumPolishBody(size: VehicleSize, vehicle?: string): string {
@@ -246,7 +245,7 @@ ${GUARANTEE}
 ${BOOK}`;
 }
 
-/** "Standard Detail" — a full interior + exterior wash tier below Premium. */
+/** "Standard Detail", a full interior + exterior wash tier below Premium. */
 export function standardBody(size: VehicleSize, vehicle?: string): string {
   const price = STANDARD_PRICE[size];
   return `Hey! We can definitely take care of ${greeting(vehicle)}, here is our Standard Detail Package
@@ -309,16 +308,16 @@ export function priceReferenceForAI(): string {
   // Cheapest → dearest, each with what it's actually for.
   return [
     row("Interior Only", asMap("interior"),
-      "inside only — vacuum, shampoo, extraction, plastics, windows. Dirty/smelly interior, kids or pets, no paint work wanted."),
+      "inside only, vacuum, shampoo, extraction, plastics, windows. Dirty/smelly interior, kids or pets, no paint work wanted."),
     row("Standard Detail", STANDARD_PRICE,
-      "our entry full detail inside AND out — deep interior, plastic rejuv, exterior wash & dry, tyre shine. A solid all-round clean on a budget (no carpet shampoo/extraction or sealant, no polishing)."),
+      "our entry full detail inside AND out, deep interior, plastic rejuv, exterior wash & dry, tyre shine. A solid all-round clean on a budget (no carpet shampoo/extraction or sealant, no polishing)."),
     row("Premium Detail", asMap("premium"),
-      "the step up from Standard — everything in it PLUS carpet shampoo & extraction and a ceramic spray sealant. The best all-round refresh, still no polishing."),
+      "the step up from Standard, everything in it PLUS carpet shampoo & extraction and a ceramic spray sealant. The best all-round refresh, still no polishing."),
     row("Premium Detail + Polish", PREMIUM_POLISH_PRICE,
       "the full detail PLUS a 1-step paint enhancement for extra gloss and to knock back light swirls. The step up when they want the paint to pop but don't need full correction."),
     row("Premium + Cut & Polish", asMap("cutpolish"),
-      "the full detail PLUS a 1-step cut and 1-step polish for heavier swirls, oxidation, dull tired paint — bringing it back without a coating."),
+      "the full detail PLUS a 1-step cut and 1-step polish for heavier swirls, oxidation, dull tired paint, bringing it back without a coating."),
     row("Exterior Correction & Ceramic Coating", asMap("correction"),
-      "the top job — multi-stage paint correction + 9-year manufacturer-guaranteed ceramic coating, and it includes a FREE interior detail + bonus upgrades. For someone who wants the best finish and long-term protection."),
+      "the top job, multi-stage paint correction + 9-year manufacturer-guaranteed ceramic coating, and it includes a FREE interior detail + bonus upgrades. For someone who wants the best finish and long-term protection."),
   ].join("\n\n");
 }

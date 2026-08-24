@@ -124,8 +124,8 @@ export default async function OpsPage({
   };
   let dbError = false;
 
-  // Run-sheet ticks load first on their own budget — the one thing touched all
-  // day — so a slow aggregate below can't wipe them off the screen.
+  // Run-sheet ticks load first on their own budget, the one thing touched all
+  // day, so a slow aggregate below can't wipe them off the screen.
   try {
     checklist = await Promise.race([
       getChecklist(today),
@@ -164,7 +164,7 @@ export default async function OpsPage({
     dbError = true;
   }
 
-  // ── derived (bookings + uploads only — no manual data) ──
+  // ── derived (bookings + uploads only, no manual data) ──
   const { aimRevenue, weeklyTarget, monthlyTarget } = OPS_TARGETS;
   const monthPct = Math.min(100, Math.round((dash.monthRev / monthlyTarget) * 100));
   const weekPct = Math.min(100, Math.round((dash.weekRev / weeklyTarget) * 100));
@@ -201,19 +201,19 @@ export default async function OpsPage({
   // ── alerts (auto only) ──
   const alerts: { tone: "red" | "yellow"; text: string }[] = [];
   if (quoteLeads.length > 0)
-    alerts.push({ tone: "red", text: `${quoteLeads.length} new AI Instant Quote request(s) waiting — confirm or call them back.` });
+    alerts.push({ tone: "red", text: `${quoteLeads.length} new AI Instant Quote request(s) waiting, confirm or call them back.` });
   if (waitlist.length > 0)
-    alerts.push({ tone: "yellow", text: `${waitlist.length} new Smiths Garage waitlist sign-up(s)${waitlistStats.members > 0 ? ` (${waitlistStats.members} want the membership)` : ""} — reach out while they're warm.` });
+    alerts.push({ tone: "yellow", text: `${waitlist.length} new Smiths Garage waitlist sign-up(s)${waitlistStats.members > 0 ? ` (${waitlistStats.members} want the membership)` : ""}, reach out while they're warm.` });
   if (rectifyList.length > 0)
-    alerts.push({ tone: "red", text: `${rectifyList.length} unhappy customer(s) need a rectify job booked — sort it before it becomes a review.` });
+    alerts.push({ tone: "red", text: `${rectifyList.length} unhappy customer(s) need a rectify job booked, sort it before it becomes a review.` });
   if (pendingFollowups > 0)
-    alerts.push({ tone: "yellow", text: `${pendingFollowups} recent customer(s) not checked in yet — send the day-after "how'd it go?" and tick them off.` });
+    alerts.push({ tone: "yellow", text: `${pendingFollowups} recent customer(s) not checked in yet, send the day-after "how'd it go?" and tick them off.` });
   if (reorderCount > 0)
-    alerts.push({ tone: "yellow", text: `${reorderCount} item(s) low on stock — reorder before you run out.` });
+    alerts.push({ tone: "yellow", text: `${reorderCount} item(s) low on stock, reorder before you run out.` });
   if (hasBookings && pipelineCorr === 0)
-    alerts.push({ tone: "red", text: "No corrections booked ahead — push the correction ad or work warm leads before the bay goes quiet." });
+    alerts.push({ tone: "red", text: "No corrections booked ahead, push the correction ad or work warm leads before the bay goes quiet." });
   else if (hasBookings && pipelineCorr <= 2)
-    alerts.push({ tone: "yellow", text: `Only ${pipelineCorr} correction(s) booked ahead — thin pipeline, keep the correction ad feeding it.` });
+    alerts.push({ tone: "yellow", text: `Only ${pipelineCorr} correction(s) booked ahead, thin pipeline, keep the correction ad feeding it.` });
 
   return (
     <main className="mx-auto max-w-none px-4 pb-24 pt-8 sm:px-6 lg:px-8 2xl:max-w-[1760px]">
@@ -238,7 +238,7 @@ export default async function OpsPage({
 
       {dbError && (
         <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
-          <b className="font-bold">Database didn&apos;t respond.</b> It may be waking up — wait a minute and refresh.
+          <b className="font-bold">Database didn&apos;t respond.</b> It may be waking up, wait a minute and refresh.
         </div>
       )}
       {jobsOk && (
@@ -248,7 +248,7 @@ export default async function OpsPage({
         <div className="mt-5 rounded-xl border border-brand-green/40 bg-brand-green/[0.08] px-4 py-2.5 text-sm font-semibold text-brand-green">Check-in saved ✓</div>
       )}
 
-      {/* ── THIS WEEK / MONTH — auto from your uploads ── */}
+      {/* ── THIS WEEK / MONTH, auto from your uploads ── */}
       <section className="mt-7 grid gap-4 xl:grid-cols-3 xl:items-start">
         {/* month hero */}
         <div className={`relative rounded-3xl border p-6 sm:p-7 xl:col-span-2 ${dash.monthRev >= monthlyTarget ? "border-brand-green/40 bg-brand-green/[0.05]" : "border-white/10 bg-white/[0.02]"}`}>
@@ -277,13 +277,13 @@ export default async function OpsPage({
           <Stat label="This week" value={money(dash.weekRev)} sub={`${weekPct}% of ${money(weeklyTarget)}`} tone={dash.weekRev >= weeklyTarget ? "green" : "neutral"} />
           <Stat label="Corrections ahead" value={String(pipelineCorr)} sub={pipelineCorrValue > 0 ? `${money(pipelineCorrValue)} booked` : "keep the pipeline full"} tone={pipelineCorr >= 3 ? "green" : "yellow"} />
           <Stat label="Leads this week" value={String(dash.weekLeads)} sub={`${dash.monthLeads} this month`} />
-          <Stat label="Ad spend" value={hasAds ? money(adSpend) : "—"} sub="last ads upload" />
+          <Stat label="Ad spend" value={hasAds ? money(adSpend) : "-"} sub="last ads upload" />
         </div>
       </section>
       <p className="mt-2 text-[11px] text-white/35">
         Auto-tracked from your uploads{dash.salesLoaded ? ` · sales loaded ${dash.salesLoaded}` : ""}. Drop the day&apos;s
         files on the <Link href="/ops/uploads" className="font-bold text-white/55 underline-offset-2 hover:underline">Uploads</Link> tab
-        and these update — full breakdown on <Link href="/ops/analytics" className="font-bold text-white/55 underline-offset-2 hover:underline">Analytics</Link>.
+        and these update, full breakdown on <Link href="/ops/analytics" className="font-bold text-white/55 underline-offset-2 hover:underline">Analytics</Link>.
       </p>
 
       {/* ── ALERTS ── */}
@@ -411,7 +411,7 @@ export default async function OpsPage({
         <section>
           <SectionTitle eyebrow="What's booked" title="Schedule" />
           {scheduleDays.length === 0 ? (
-            <p className="text-sm text-white/45">Nothing upcoming — upload the latest calendar on the Uploads tab.</p>
+            <p className="text-sm text-white/45">Nothing upcoming, upload the latest calendar on the Uploads tab.</p>
           ) : (
             <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3">
               {scheduleDays.map((d) => {
@@ -456,7 +456,7 @@ export default async function OpsPage({
           )}
         </section>
 
-        {/* today's jobs — hours per car */}
+        {/* today's jobs, hours per car */}
         <section>
           <SectionTitle eyebrow="On the floor today" title="Today's jobs" />
           <div className="mb-3 flex items-center gap-2 rounded-xl border border-white/10 bg-black/20 px-4 py-2.5 text-xs text-white/55">
@@ -469,7 +469,7 @@ export default async function OpsPage({
             </span>
           </div>
           {floorJobs.length === 0 ? (
-            <p className="text-sm text-white/45">No jobs on the calendar for today — upload the latest calendar if that looks wrong.</p>
+            <p className="text-sm text-white/45">No jobs on the calendar for today, upload the latest calendar if that looks wrong.</p>
           ) : (
             <form action={logJobHours} className={`${CARD} p-4`}>
               <div className="flex flex-col gap-2">
@@ -518,7 +518,7 @@ export default async function OpsPage({
                         name={`note::${j.uid}`}
                         defaultValue={j.note}
                         rows={1}
-                        placeholder="Notes for the crew — what's left, anything to rectify…"
+                        placeholder="Notes for the crew, what's left, anything to rectify…"
                         className="mt-1 w-full resize-y rounded-lg border border-white/10 bg-black/30 px-2.5 py-2 text-xs text-white/80 outline-none placeholder:text-white/25 focus:border-brand-green"
                       />
                     </div>
@@ -558,9 +558,9 @@ export default async function OpsPage({
           </div>
         )}
         {dueFollowups.length === 0 ? (
-          <p className="text-sm text-white/45">Nothing due — check-ins show here the day after a car is done.</p>
+          <p className="text-sm text-white/45">Nothing due, check-ins show here the day after a car is done.</p>
         ) : pendingFollowupList.length === 0 ? (
-          <p className="text-sm font-semibold text-brand-green">All recent customers checked in ✓ — nice work.</p>
+          <p className="text-sm font-semibold text-brand-green">All recent customers checked in ✓, nice work.</p>
         ) : (
           <>
             <p className="mb-3 text-xs leading-relaxed text-white/45">

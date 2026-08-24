@@ -23,7 +23,7 @@ export async function OPTIONS() {
 
 /* Drafts a lead follow-up from a pasted conversation thread. Authorised either by
    the owner login (in-app helper) or the extension token (Chrome extension), so the
-   API key can't be abused. Uses the fast/cheap Claude model — a few $0.001 each. */
+   API key can't be abused. Uses the fast/cheap Claude model, a few $0.001 each. */
 export async function POST(req: Request) {
   const envToken = process.env.AI_REPLY_EXT_TOKEN || "";
   const viaToken = !!envToken && (req.headers.get("x-ext-token") || "") === envToken;
@@ -33,7 +33,7 @@ export async function POST(req: Request) {
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) {
     return res(
-      { error: "AI isn't set up yet — add ANTHROPIC_API_KEY in Vercel → Settings → Environment Variables, then redeploy." },
+      { error: "AI isn't set up yet, add ANTHROPIC_API_KEY in Vercel → Settings → Environment Variables, then redeploy." },
       503
     );
   }
@@ -56,7 +56,7 @@ export async function POST(req: Request) {
   let userContent = `Here is the whole conversation with a lead (newest at the bottom, with timestamps where available). Read it carefully, work out where they are and why they haven't booked, then write the single best follow-up to send now.\n\n${thread}`;
   if (note) {
     // A steering note the team typed for THIS reply (e.g. "downsell to a cheaper
-    // package"). It overrides your own read — do what it says, in the Smiths voice.
+    // package"). It overrides your own read, do what it says, in the Smiths voice.
     userContent += `\n\n---\nINSTRUCTION FROM THE SMITHS TEAM for this specific reply. Follow it exactly, while keeping the Smiths voice and all the rules: ${note}`;
   }
 
@@ -76,8 +76,7 @@ export async function POST(req: Request) {
           model,
           max_tokens: 1500,
           // Cache the big static instruction block (voice + prices + examples) so
-          // back-to-back drafts reuse it instead of paying for it every time —
-          // ~90% cheaper input on it when working a queue, and a little faster.
+          // back-to-back drafts reuse it instead of paying for it every time,          // ~90% cheaper input on it when working a queue, and a little faster.
           system: [
             { type: "text", text: buildSystemPrompt(), cache_control: { type: "ephemeral" } },
           ],
@@ -106,7 +105,7 @@ export async function POST(req: Request) {
     else if (!out.raw && alt.raw) out = alt;
   }
   if (!out.raw) {
-    return res({ error: "AI error — " + (out.err || "no reply") }, 502);
+    return res({ error: "AI error, " + (out.err || "no reply") }, 502);
   }
 
   // The model writes the MESSAGE first, then "WHY: …". Split on WHY so the
@@ -133,8 +132,8 @@ export async function POST(req: Request) {
     .replace(/^\s*READ\s*:[^\n]*\n+/i, "") // drop a leaked "READ: …" first line
     .replace(/^\s*(reply|message)\s*:\s*/i, "") // drop a stray leading label
     .trim();
-  // Kill any em/en dashes — the #1 "a bot wrote this" tell.
-  reply = reply.replace(/\s*[—–]\s*/g, ", ").replace(/,\s*,/g, ",").trim();
+  // Kill any em/en dashes, the #1 "a bot wrote this" tell.
+  reply = reply.replace(/\s*[-–]\s*/g, ", ").replace(/,\s*,/g, ",").trim();
   // Safety net: a literal "[Name]" / "[Car]" slot must never reach a customer. Drop the
   // name slot, turn the car slot into "your car", then tidy leftover spacing/punctuation.
   reply = reply

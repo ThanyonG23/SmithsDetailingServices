@@ -147,7 +147,7 @@ export default async function AdsPage({
 
       {dbError && (
         <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
-          Database didn&apos;t respond — refresh in a moment.
+          Database didn&apos;t respond, refresh in a moment.
         </div>
       )}
       {searchParams?.adok && (
@@ -158,8 +158,8 @@ export default async function AdsPage({
       {searchParams?.aderr && (
         <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
           {searchParams.aderr === "noads"
-            ? "Couldn't read any ads in that file — upload the Meta Ads CSV export."
-            : "No file received — pick the ads CSV and try again."}
+            ? "Couldn't read any ads in that file, upload the Meta Ads CSV export."
+            : "No file received, pick the ads CSV and try again."}
         </div>
       )}
 
@@ -176,13 +176,13 @@ export default async function AdsPage({
           />
           <StatTile
             label="Conversion"
-            value={gHasData && gLeads ? `${gConv}%` : "—"}
+            value={gHasData && gLeads ? `${gConv}%` : "-"}
             sub="leads → booked"
             tone={gConv >= 15 ? "green" : gConv > 0 ? "yellow" : "neutral"}
           />
           <StatTile
             label="Cost / booking"
-            value={gCostBooking ? money(gCostBooking) : "—"}
+            value={gCostBooking ? money(gCostBooking) : "-"}
             sub={gLeads ? `${money(gSpend)} spend` : "log ad spend"}
           />
         </div>
@@ -214,10 +214,10 @@ export default async function AdsPage({
                     <td className="whitespace-nowrap px-3 py-2.5 font-semibold text-white/80">
                       {dayLabel(g.date)}
                     </td>
-                    <td className="px-3 py-2.5 text-white/70">{g.messages_meta || "—"}</td>
-                    <td className="px-3 py-2.5 text-white/70">{g.messages || "—"}</td>
-                    <td className="px-3 py-2.5 font-bold text-brand-green">{g.new_bookings || "—"}</td>
-                    <td className="px-3 py-2.5 text-white/60">{g.new_corrections || "—"}</td>
+                    <td className="px-3 py-2.5 text-white/70">{g.messages_meta || "-"}</td>
+                    <td className="px-3 py-2.5 text-white/70">{g.messages || "-"}</td>
+                    <td className="px-3 py-2.5 font-bold text-brand-green">{g.new_bookings || "-"}</td>
+                    <td className="px-3 py-2.5 text-white/60">{g.new_corrections || "-"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -225,7 +225,7 @@ export default async function AdsPage({
           </div>
         ) : (
           <p className="mt-3 text-sm text-white/45">
-            Upload a single-day Meta export + log other leads daily — the conversion trend builds
+            Upload a single-day Meta export + log other leads daily, the conversion trend builds
             from there.
           </p>
         )}
@@ -266,7 +266,7 @@ export default async function AdsPage({
               />
               <StatTile
                 label="Cost / message"
-                value={adCostPerMsg ? money(adCostPerMsg) : "—"}
+                value={adCostPerMsg ? money(adCostPerMsg) : "-"}
                 sub="lower is better"
               />
               <StatTile label="New contacts" value={String(adNewContacts)} sub="new people messaging" />
@@ -295,7 +295,7 @@ export default async function AdsPage({
                       <td className="px-3 py-2.5 text-white/70">{money(a.spend)}</td>
                       <td className="px-3 py-2.5 text-white/70">{a.messages}</td>
                       <td className="px-3 py-2.5 font-bold text-brand-green">
-                        {a.cost_per_message ? money(a.cost_per_message) : "—"}
+                        {a.cost_per_message ? money(a.cost_per_message) : "-"}
                       </td>
                     </tr>
                   ))}
@@ -304,7 +304,7 @@ export default async function AdsPage({
             </div>
           </>
         ) : (
-          <p className="text-sm text-white/45">No ads loaded yet — upload the Meta Ads CSV below.</p>
+          <p className="text-sm text-white/45">No ads loaded yet, upload the Meta Ads CSV below.</p>
         )}
 
         <form
@@ -315,7 +315,7 @@ export default async function AdsPage({
             <div className="text-sm font-bold text-white">Sync ad stats</div>
             <div className="mt-0.5 text-xs text-white/45">
               Drop in the Meta Ads CSV. For daily lead tracking, add a{" "}
-              <b className="text-white/60">Day breakdown</b> in Meta (Breakdown → By Day) — every
+              <b className="text-white/60">Day breakdown</b> in Meta (Breakdown → By Day), every
               day&apos;s messages auto-fill the funnel above in one upload.
             </div>
           </div>

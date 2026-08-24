@@ -79,16 +79,16 @@ export default async function UploadsPage({
     leads = await getLeadAnalytics(weekStart, today, today);
     sales = await getSalesStats(monthStart, today);
   } catch {
-    /* leave null — the flags just won't render */
+    /* leave null, the flags just won't render */
   }
   const money = (n: number) => "$" + Math.round(n).toLocaleString("en-AU");
 
   const errMsg = (code?: string) =>
-    code === "nofile" ? "No file picked — choose the file and try again."
+    code === "nofile" ? "No file picked, choose the file and try again."
       : code === "noics" ? "Couldn't find the Smiths Bookings calendar in that zip."
-      : code === "noads" ? "That didn't look like the ads export — check the file."
-      : code === "noleads" ? "That didn't look like the leads export — check the file."
-      : code === "nosales" ? "That didn't look like the Xero SalesInvoices export — check the file."
+      : code === "noads" ? "That didn't look like the ads export, check the file."
+      : code === "noleads" ? "That didn't look like the leads export, check the file."
+      : code === "nosales" ? "That didn't look like the Xero SalesInvoices export, check the file."
       : undefined;
 
   return (
@@ -98,7 +98,7 @@ export default async function UploadsPage({
         Up<span className="text-brand-green">loads</span>
       </h1>
       <p className="mt-3 text-sm text-white/50">
-        Do these every <b className="text-white/70">morning</b> and <b className="text-white/70">afternoon</b> — drop
+        Do these every <b className="text-white/70">morning</b> and <b className="text-white/70">afternoon</b>, drop
         the file, hit upload. Everything else in the ops manager runs off these three.
       </p>
 
@@ -131,7 +131,7 @@ export default async function UploadsPage({
             </div>
           </div>
 
-          {/* aging strip — turns the big backlog into a chase list */}
+          {/* aging strip, turns the big backlog into a chase list */}
           <div className="mt-3 flex flex-wrap gap-2 text-xs">
             <span className="rounded-full bg-brand-green/15 px-3 py-1 font-semibold text-brand-green">Fresh ≤7d · {leads.fuFresh}</span>
             <span className="rounded-full bg-white/8 px-3 py-1 font-semibold text-white/70">Warm 8–21d · {leads.fuWarm}</span>
@@ -141,12 +141,12 @@ export default async function UploadsPage({
 
           {leads.fuFresh > 0 && (
             <div className="mt-3 rounded-xl border border-brand-green/40 bg-brand-green/[0.07] px-4 py-2.5 text-sm text-brand-green">
-              🟢 <b>{leads.fuFresh} fresh follow-ups</b> to chase today — these convert fastest. Leave the
+              🟢 <b>{leads.fuFresh} fresh follow-ups</b> to chase today, these convert fastest. Leave the
               cold pile; mark those Abused so the backlog reads true.
             </div>
           )}
           <p className="mt-2 text-[11px] text-white/35">
-            Last leads upload: {leads.loadedAt || "—"} · full funnel on the{" "}
+            Last leads upload: {leads.loadedAt || "-"} · full funnel on the{" "}
             <b className="text-white/50">Analytics</b> tab · mark leads &ldquo;Converted&rdquo; / &ldquo;Abused&rdquo; in the
             Leads Centre so this stays accurate.
           </p>
@@ -165,7 +165,7 @@ export default async function UploadsPage({
             </div>
             <div className={`${CARD} p-4`}>
               <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">Avg invoice</div>
-              <div className="mt-1 font-display text-3xl font-extrabold tabular-nums text-white">{sales.invoices ? money(sales.avg) : "—"}</div>
+              <div className="mt-1 font-display text-3xl font-extrabold tabular-nums text-white">{sales.invoices ? money(sales.avg) : "-"}</div>
               <div className="mt-0.5 text-[11px] text-white/45">real, incl. upsells</div>
             </div>
             <div className={`${CARD} p-4`}>
@@ -175,7 +175,7 @@ export default async function UploadsPage({
             </div>
           </div>
           <p className="mt-2 text-[11px] text-white/35">
-            Last Xero upload: {sales.loadedAt || "—"} · real numbers &amp; conversion on the{" "}
+            Last Xero upload: {sales.loadedAt || "-"} · real numbers &amp; conversion on the{" "}
             <b className="text-white/50">Analytics</b> tab.
           </p>
         </section>

@@ -6,10 +6,10 @@ import SiteNav from "@/components/SiteNav";
 import { BUSINESS } from "@/lib/config";
 
 /* Shared body for the membership pages. `bonus` toggles the free
-   cut & polish banner — on for /membership (new/cold ad traffic), off for
+   cut & polish banner, on for /membership (new/cold ad traffic), off for
    /plan (existing detail clients, so they don't feel they missed out).
 
-   Branded as Smiths Detailing (green/black) — the name cold ad traffic
+   Branded as Smiths Detailing (green/black), the name cold ad traffic
    already recognises from 100+ Google reviews. */
 
 const LOGO = BUSINESS.logo; // Smiths Detailing logo
@@ -60,7 +60,7 @@ const EVERY_6_MONTHS: Group[] = [
 ];
 
 const STEPS: { n: string; title: string; body: string }[] = [
-  { n: "1", title: "Reserve your spot", body: "Takes 30 seconds. No payment and nothing locked in yet — you're just claiming a founding spot." },
+  { n: "1", title: "Reserve your spot", body: "Takes 30 seconds. No payment and nothing locked in yet, you're just claiming a founding spot." },
   { n: "2", title: "We call you", body: "We confirm your car, your exact weekly price, and book in your first detail." },
   { n: "3", title: "Hand us the keys", body: "We keep it detailed and serviced on a schedule. You never think about car admin again." },
 ];
@@ -143,7 +143,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
           <Reveal delay={300}>
             <p className="mx-auto mt-5 max-w-lg text-lg leading-relaxed text-white/65">
               For the people who keep meaning to get their car detailed and serviced but never find the
-              time. Drop it off and we handle both, on a schedule — so it&apos;s always clean, always
+              time. Drop it off and we handle both, on a schedule, so it&apos;s always clean, always
               sorted, and you never think about it again.
             </p>
           </Reveal>
@@ -163,6 +163,43 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
               </a>
               <p className="mt-3 text-xs text-white/40">No payment now · Next 15 members get a free Cut &amp; Polish</p>
             </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ═══ GIVEAWAY PROMO ═══ */}
+      <section className="py-10">
+        <div className="mx-auto max-w-2xl px-4">
+          <Reveal>
+            <Link
+              href="/draw-terms"
+              className="group block overflow-hidden rounded-2xl border border-brand-yellow/40 shadow-glowY transition hover:border-brand-yellow/60"
+            >
+              <div className="relative aspect-[16/9] w-full overflow-hidden bg-black">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src="/media/photos/giveaway.png"
+                  alt="Smiths Detailing members' giveaway, win $1,000 cash or a $2,200 paint correction and ceramic coating"
+                  className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                />
+              </div>
+              <div className="bg-gradient-to-br from-brand-yellow/[0.14] to-brand-yellow/[0.02] p-5 sm:p-6">
+                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
+                  Members&apos; draw · drawn 30 Sept
+                </div>
+                <h3 className="mt-1.5 font-display text-xl font-extrabold leading-tight text-white sm:text-2xl">
+                  Win <span className="text-brand-yellow">$1,000 cash</span> or a{" "}
+                  <span className="text-brand-yellow">$2,200</span> paint correction &amp; coating
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-white/70">
+                  Every active member is automatically entered. Join now and you&apos;re in.
+                </p>
+                <span className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-brand-yellow group-hover:text-white">
+                  See draw terms
+                  <span className="transition-transform group-hover:translate-x-1">→</span>
+                </span>
+              </div>
+            </Link>
           </Reveal>
         </div>
       </section>
@@ -191,23 +228,10 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
               </Reveal>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* ═══ EXPLAINER VIDEO ═══ */}
-      <section className="py-16 sm:py-20">
-        <div className="mx-auto max-w-2xl px-4 text-center">
-          <Reveal>
-            <Eyebrow>Watch</Eyebrow>
-            <h2 className="mt-3 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-              How it works, straight from us
-            </h2>
-            <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-white/55">
-              A quick look at how we keep your car detailed and serviced on the one simple plan.
-            </p>
-          </Reveal>
+          {/* explainer video, same section */}
           <Reveal delay={120}>
-            <div className="relative mx-auto mt-8 w-full max-w-[330px]">
+            <div className="relative mx-auto mt-14 w-full max-w-[300px]">
               <div
                 className="pointer-events-none absolute -inset-6 rounded-[2.5rem] opacity-40 blur-2xl"
                 style={{ background: GREEN_GLOW }}
@@ -224,6 +248,9 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
               </div>
             </div>
           </Reveal>
+          <p className="mx-auto mt-4 max-w-md text-center text-sm leading-relaxed text-white/55">
+            A quick look at how it works, straight from us.
+          </p>
         </div>
       </section>
 
@@ -298,7 +325,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                 </div>
 
                 <p className="mt-5 text-center text-sm text-white/55">
-                  Plus <b className="text-white/75">10% off add-ons and vehicle hire</b>, and priority booking — members always come first.
+                  Plus <b className="text-white/75">10% off add-ons and vehicle hire</b>, and priority booking, members always come first.
                 </p>
               </div>
 
@@ -313,55 +340,20 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
               </p>
             </div>
           </Reveal>
-
-          {/* ── MEMBER DRAW PROMO ── */}
-          <Reveal delay={80}>
-            <Link
-              href="/draw-terms"
-              className="group mt-5 block overflow-hidden rounded-2xl border border-brand-yellow/40 shadow-glowY transition hover:border-brand-yellow/60"
-            >
-              {/* cover image */}
-              <div className="relative aspect-[16/9] w-full overflow-hidden bg-black">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/media/photos/giveaway.png"
-                  alt="Smiths Detailing members' giveaway — win $1,000 cash or a $2,200 paint correction and ceramic coating"
-                  className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
-                />
-              </div>
-              {/* offer text */}
-              <div className="bg-gradient-to-br from-brand-yellow/[0.14] to-brand-yellow/[0.02] p-5 sm:p-6">
-                <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
-                  Members&apos; draw · drawn 30 Sept
-                </div>
-                <h3 className="mt-1.5 font-display text-xl font-extrabold leading-tight text-white sm:text-2xl">
-                  Win <span className="text-brand-yellow">$1,000 cash</span> or a{" "}
-                  <span className="text-brand-yellow">$2,200</span> paint correction &amp; coating
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-white/70">
-                  Join now and you&apos;re automatically entered — every active member goes in the draw.
-                </p>
-                <span className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-brand-yellow group-hover:text-white">
-                  See draw terms
-                  <span className="transition-transform group-hover:translate-x-1">→</span>
-                </span>
-              </div>
-            </Link>
-          </Reveal>
         </div>
       </section>
 
+      {/* ═══ REVIEWS ═══ */}
+      <ReviewsSection />
+
       {/* ═══ RESERVE ═══ */}
-      <section id="reserve" className="scroll-mt-8 pb-16">
+      <section id="reserve" className="scroll-mt-8 py-16">
         <div className="mx-auto max-w-xl px-4">
           <Reveal>
             <MembershipSignup />
           </Reveal>
         </div>
       </section>
-
-      {/* ═══ REVIEWS ═══ */}
-      <ReviewsSection />
 
       {/* ═══ FOOTER ═══ */}
       <footer className="border-t border-white/10">

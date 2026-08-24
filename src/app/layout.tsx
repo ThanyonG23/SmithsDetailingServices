@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     siteName: "Smiths Detailing Services",
     type: "website",
     images: [
-      { url: "/og.jpg", width: 1200, height: 630, alt: "Smiths Detailing Services — Cairns" },
+      { url: "/og.jpg", width: 1200, height: 630, alt: "Smiths Detailing Services, Cairns" },
     ],
   },
   twitter: {

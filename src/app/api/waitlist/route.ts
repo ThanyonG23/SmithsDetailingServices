@@ -23,11 +23,11 @@ async function notifyOwner(w: {
   const text = `New Smiths Garage waitlist sign-up.
 
 Name: ${w.name}
-Phone: ${w.phone || "—"}
-Email: ${w.email || "—"}
-Vehicle: ${w.vehicle || "—"}
+Phone: ${w.phone || "-"}
+Email: ${w.email || "-"}
+Vehicle: ${w.vehicle || "-"}
 
-Interested in: ${w.interests.join(", ") || "—"}
+Interested in: ${w.interests.join(", ") || "-"}
 Wants the ${MEMBERSHIP_NAME}: ${w.membership ? "YES" : "no"}
 ${w.message ? `\nMessage: ${w.message}\n` : ""}
 It's also waiting in /ops on the dashboard.`;
@@ -39,12 +39,12 @@ It's also waiting in /ops on the dashboard.`;
       body: JSON.stringify({
         from,
         to,
-        subject: `Smiths Garage waitlist — ${w.name}${w.membership ? " (wants membership)" : ""}`,
+        subject: `Smiths Garage waitlist, ${w.name}${w.membership ? " (wants membership)" : ""}`,
         text,
       }),
     });
   } catch {
-    /* email is a convenience — the sign-up is already saved */
+    /* email is a convenience, the sign-up is already saved */
   }
 }
 
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
   const membership = body.membership === true || body.membership === "true";
   const SOURCES = ["garage-waitlist", "membership-page", "membership-signup"];
   const source = SOURCES.includes(String(body.source)) ? String(body.source) : "garage-waitlist";
-  // Only keep interests we recognise — never trust arbitrary strings from the browser.
+  // Only keep interests we recognise, never trust arbitrary strings from the browser.
   const interests = Array.isArray(body.interests)
     ? body.interests.map((p) => String(p)).filter((p) => GARAGE_SERVICE_IDS.includes(p)).slice(0, 12)
     : [];
@@ -86,6 +86,6 @@ export async function POST(req: Request) {
     await notifyOwner({ name, email, phone, vehicle, interests, membership, message });
     return NextResponse.json({ ok: true });
   } catch {
-    return NextResponse.json({ error: "Couldn't save that — try again in a moment." }, { status: 502 });
+    return NextResponse.json({ error: "Couldn't save that, try again in a moment." }, { status: 502 });
   }
 }

@@ -5,7 +5,7 @@ import { BUSINESS } from "@/lib/config";
 export const metadata: Metadata = {
   title: "Member Draw · Terms & Conditions | Smiths Detailing",
   description: "Terms & conditions for the Smiths Detailing member draw.",
-  robots: { index: false, follow: false }, // draft — not linked or indexed yet
+  robots: { index: false, follow: false }, // draft, not linked or indexed yet
   alternates: { canonical: "/draw-terms" },
 };
 
@@ -24,14 +24,14 @@ const TERMS: Term[] = [
   },
   {
     heading: "3. Eligibility cut-off",
-    body: "Entry is based on your Smiths Detailing membership being active (payments up to date) as at 11:59pm AEST on 29 September 2026 — the eligibility cut-off.",
+    body: "Entry is based on your Smiths Detailing membership being active (payments up to date) as at 11:59pm AEST on 29 September 2026, the eligibility cut-off.",
   },
   {
     heading: "4. Who can enter",
     body: "Entry is open to individuals who are 18 or older, are Australian residents, and hold an active Smiths Detailing membership in good standing (payments up to date) as at the eligibility cut-off in clause 3. Employees of Smiths and their immediate families are not eligible.",
   },
   {
-    heading: "5. How to enter — it's free and automatic",
+    heading: "5. How to enter, it's free and automatic",
     body: "Every eligible member is automatically entered. There is nothing extra to buy or do, and no additional cost beyond your normal membership. One (1) entry per member.",
   },
   {
@@ -77,7 +77,7 @@ export default function DrawTermsPage() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={LOGO} alt="Smiths Detailing" className="mx-auto w-full max-w-[220px]" />
           <h1 className="mt-6 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-            Member Draw — Terms &amp; Conditions
+            Member Draw, Terms &amp; Conditions
           </h1>
           <p className="mt-2 text-sm text-white/40">Smiths Detailing Member Draw · Cairns</p>
         </div>

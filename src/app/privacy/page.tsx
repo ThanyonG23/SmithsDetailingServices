@@ -57,7 +57,7 @@ export default function PrivacyPage() {
       <LegalSection heading="4. Text messages">
         <p>
           Our website&apos;s main contact button opens your own messaging app with a pre-filled
-          message. Nothing is sent until you press send — we only receive your number and message
+          message. Nothing is sent until you press send, we only receive your number and message
           once you choose to send it.
         </p>
         <p>
@@ -70,7 +70,7 @@ export default function PrivacyPage() {
       <LegalSection heading="5. Photos of your vehicle">
         <p>
           We may photograph or film your vehicle and share the results on our website and social
-          media. If you&apos;d rather we didn&apos;t, just tell us and we won&apos;t — or we&apos;ll
+          media. If you&apos;d rather we didn&apos;t, just tell us and we won&apos;t, or we&apos;ll
           take it down if it&apos;s already up.
         </p>
       </LegalSection>
@@ -125,7 +125,7 @@ export default function PrivacyPage() {
       <LegalSection heading="10. Complaints">
         <p>
           If you&apos;re unhappy with how we&apos;ve handled your information, please contact us
-          first — we&apos;d like the chance to fix it. If you&apos;re still not satisfied, you can
+          first, we&apos;d like the chance to fix it. If you&apos;re still not satisfied, you can
           contact the Office of the Australian Information Commissioner (OAIC) at oaic.gov.au.
         </p>
       </LegalSection>

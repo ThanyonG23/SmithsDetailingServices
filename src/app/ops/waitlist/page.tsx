@@ -113,7 +113,7 @@ export default async function WaitlistPage() {
 
       {dbError && (
         <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-          Couldn&apos;t load the waitlist just now — refresh in a moment.
+          Couldn&apos;t load the waitlist just now, refresh in a moment.
         </div>
       )}
 
@@ -133,7 +133,7 @@ export default async function WaitlistPage() {
 
       {newOnes.length > 0 && (
         <section className="mb-8">
-          <div className={`${EYEBROW} mb-3`}>New — reach out ({newOnes.length})</div>
+          <div className={`${EYEBROW} mb-3`}>New, reach out ({newOnes.length})</div>
           <div className="flex flex-col gap-3">
             {newOnes.map((w) => <Row key={w.id} w={w} />)}
           </div>

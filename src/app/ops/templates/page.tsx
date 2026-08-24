@@ -47,7 +47,7 @@ export default async function TemplatesPage({
     { key: "booking", title: "Booking messages", emoji: "💬", match: /^booking/i },
     { key: "checkin", title: "Customer check-ins", emoji: "🤝", match: /^check-?in/i },
   ];
-  // NOTE: only serializable fields go into the group objects — the `match`
+  // NOTE: only serializable fields go into the group objects, the `match`
   // RegExp must NOT be spread in, or passing groups to the client component
   // throws "server-side exception" (RegExp can't cross the RSC boundary).
   const groups: TemplateGroup[] = defs.map((d) => ({
@@ -72,12 +72,12 @@ export default async function TemplatesPage({
         Temp<span className="text-brand-green">lates</span>
       </h1>
       <p className="mt-3 text-sm text-white/50">
-        The packages every GM sends — tap Copy, paste into the chat, done.
+        The packages every GM sends, tap Copy, paste into the chat, done.
       </p>
 
       {dbError && (
         <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
-          Database didn&apos;t respond — refresh in a moment.
+          Database didn&apos;t respond, refresh in a moment.
         </div>
       )}
       {searchParams?.tok && (
@@ -108,7 +108,7 @@ export default async function TemplatesPage({
         <TemplateGroups groups={shownGroups} />
       ) : (
         <p className="mt-6 text-sm text-white/45">
-          No templates yet — load the standard set above, or paste your packages in below.
+          No templates yet, load the standard set above, or paste your packages in below.
         </p>
       )}
 
@@ -118,13 +118,13 @@ export default async function TemplatesPage({
         <p className="mb-2 text-xs text-white/45">
           Put the <b className="text-white/60">package name</b> in the title, then paste the whole
           family in the body. Vehicle sizes separated by a blank gap auto-split into one copyable
-          template each (e.g. &ldquo;Premium Detail — SUV&rdquo;).
+          template each (e.g. &ldquo;Premium Detail, SUV&rdquo;).
         </p>
         <input name="title" placeholder="Package name (e.g. Premium Detail)" className={INPUT} />
         <textarea
           name="body"
           rows={6}
-          placeholder="Paste the full package — all vehicle sizes — here…"
+          placeholder="Paste the full package, all vehicle sizes, here…"
           className={`${INPUT} mt-2 resize-y`}
         />
         <button className="mt-3 rounded-full bg-brand-green px-5 py-2 text-xs font-black text-[#04130a] transition hover:brightness-110 active:scale-95">

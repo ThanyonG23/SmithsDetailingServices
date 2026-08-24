@@ -105,7 +105,7 @@ export default async function ScoreboardPage() {
 
   // The crew work cars TOGETHER, so we score the team, not individuals. Cars
   // done + how many beat the clock + team hours vs target. The crew roll is each
-  // person's OWN clock hours (that part is individual) — shown as contribution,
+  // person's OWN clock hours (that part is individual), shown as contribution,
   // never ranked.
   const carsDone = completed.length;
   let teamBeat = 0;
@@ -133,7 +133,7 @@ export default async function ScoreboardPage() {
       <p className="mt-3 text-sm text-white/50">
         Two targets, two jobs: <span className="text-white/70">revenue is the shop&apos;s goal</span>{" "}
         (booking the work is on the owner), and <span className="text-brand-green">the clock is yours</span>{" "}
-        — get every car done at or under its target hours.
+       , get every car done at or under its target hours.
         {role === "crew" && " Nice work out there. 🙌"}
       </p>
 
@@ -145,7 +145,7 @@ export default async function ScoreboardPage() {
 
       {dbError && (
         <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
-          Numbers didn&apos;t load — refresh in a moment.
+          Numbers didn&apos;t load, refresh in a moment.
         </div>
       )}
 
@@ -247,7 +247,7 @@ export default async function ScoreboardPage() {
                 ))}
               </div>
               <p className="mt-2.5 text-[11px] text-white/35">
-                We win as a team — every car beaten together.
+                We win as a team, every car beaten together.
               </p>
             </div>
           )}
@@ -259,7 +259,7 @@ export default async function ScoreboardPage() {
         <div className={EYEBROW}>Completed this week · actual vs target</div>
         {completed.length === 0 ? (
           <p className="mt-3 text-sm text-white/40">
-            No cars marked done yet this week — as jobs get ticked Done, they land here with who
+            No cars marked done yet this week, as jobs get ticked Done, they land here with who
             worked them and whether they beat the clock.
           </p>
         ) : (
@@ -332,7 +332,7 @@ export default async function ScoreboardPage() {
       <section className="mt-8">
         <div className={EYEBROW}>Beat the clock · your target per car</div>
         <p className="mt-2 text-sm text-white/50">
-          This is your number. Get each car done at or under its target hours — that&apos;s what
+          This is your number. Get each car done at or under its target hours, that&apos;s what
           you control, and it&apos;s what the bonus will be built on.
         </p>
         <div className={`${CARD} mt-3 overflow-hidden`}>
@@ -393,7 +393,7 @@ export default async function ScoreboardPage() {
               </div>
               <p className="mt-1 text-sm text-white/60">
                 The crew pool so far this week, split between the detailers. It grows when the team
-                hits its targets — cars done inside the clock and good days on the board. Keep it
+                hits its targets, cars done inside the clock and good days on the board. Keep it
                 climbing.
               </p>
             </>

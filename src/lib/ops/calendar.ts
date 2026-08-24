@@ -1,5 +1,5 @@
 /* =====================================================================
-   OPS — Google Calendar (.ics) parser
+   OPS, Google Calendar (.ics) parser
    ---------------------------------------------------------------------
    Thanyon uploads the "Smiths Bookings" calendar export (.zip or .ics);
    this pulls each booking's date + dollar value out of the event.
@@ -9,7 +9,7 @@
    ===================================================================== */
 
 export interface Booking {
-  uid: string; // stable calendar event id — hours are keyed to this
+  uid: string; // stable calendar event id, hours are keyed to this
   booking_date: string; // YYYY-MM-DD
   value: number;
   is_correction: boolean;
@@ -26,7 +26,7 @@ const clean = (t: string) =>
 
 /* Return the Cairns (Australia/Brisbane, UTC+10, no DST) calendar date for
    an event's DTSTART. Google stores timed events in UTC ("...T210000Z"), so
-   a 7am Cairns job is 21:00 UTC the DAY BEFORE — take the UTC date and it
+   a 7am Cairns job is 21:00 UTC the DAY BEFORE, take the UTC date and it
    reads a day early. Convert UTC → +10 first. TZID-local and all-day DATE
    values are already local, so use them as-is. */
 function brisbaneDate(e: string): string | null {
@@ -130,10 +130,10 @@ export function parseCustomersIcs(rawInput: string): CustomerRecord[] {
     )
       continue;
 
-    // name — also handle the "SMITHS BOOKING — service — Name" export style
+    // name, also handle the "SMITHS BOOKING, service, Name" export style
     let name: string;
     if (/^\s*smiths\s+(booking|detailing)/i.test(summary)) {
-      const parts = summary.split(/\s*[—–]\s*|\s+-\s+/);
+      const parts = summary.split(/\s*[-–]\s*|\s+-\s+/);
       name = (parts[parts.length - 1] || "").trim();
     } else {
       name = (summary.split(":")[0] || "").trim();
@@ -168,7 +168,7 @@ export function parseBookingsIcs(rawInput: string): Booking[] {
     const tot = num((blob.match(/Total:\s*\$?\s*([0-9,]+(?:\.[0-9]{1,2})?)/i) || [])[1]);
     const quo = num((blob.match(/Quote:\s*\$?\s*([0-9,]+(?:\.[0-9]{1,2})?)/i) || [])[1]);
     // Upsells are written as "+ $400" lines. When a Quote exists, make sure the
-    // value includes every extra — some are typed BELOW the "Total:" line and
+    // value includes every extra, some are typed BELOW the "Total:" line and
     // would otherwise be dropped. Require the "$" so a phone "+61…" isn't summed.
     const extrasSum = [...blob.matchAll(/\+\s*\$\s*([0-9,]+(?:\.[0-9]{1,2})?)/g)]
       .map((m) => num(m[1]))
@@ -205,7 +205,7 @@ export function parseBookingsIcs(rawInput: string): Booking[] {
       uid: (uidRaw.trim() || `${booking_date}|${value}|${summary.slice(0, 24)}`).slice(0, 200),
       booking_date,
       value,
-      // Only trust the job TITLE for the package type — descriptions often
+      // Only trust the job TITLE for the package type, descriptions often
       // mention "coating/correction" in upsell notes and cause false hits.
       // Value ≥ $1,500 is a safe correction signal for the current pricing.
       is_correction: value >= 1500 || /correction|coating|ceramic/i.test(summary),

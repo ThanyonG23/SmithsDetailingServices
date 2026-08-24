@@ -1,7 +1,7 @@
 import { ACTIVE_TEAM } from "@/lib/referrals";
 
 /* =====================================================================
-   DAILY OPS — targets & roster
+   DAILY OPS, targets & roster
    ---------------------------------------------------------------------
    Cost model: owner + 2 detailers + 1 videographer/social (3 wages @ $32/hr).
    Lower payroll than the old 4-wage team → lower break-even; 2 detailers (vs 3)
@@ -23,7 +23,7 @@ export const OPS_TARGETS = {
 };
 
 /** Target LABOUR hours per job (total person-hours on the car). This is the
-    CREW's KPI — "beat the clock" — and unlike a daily revenue target it's fully
+    CREW's KPI, "beat the clock", and unlike a daily revenue target it's fully
     in their control (booking enough jobs is the owner's job, not theirs). Also
     the cycle-time lever. Calibrate these from real per-car data once the team
     clock is reliable; start firm-but-fair. */
@@ -110,7 +110,7 @@ export function adLabel(adId: string): string {
   return AD_LABELS[adId] || `Ad …${adId.slice(-6)}`;
 }
 
-/** Common upsell extras for the inspection portal — Thanyon taps one to prefill
+/** Common upsell extras for the inspection portal, Thanyon taps one to prefill
     the title + a starting price (you can adjust). Edit these as pricing changes. */
 export const EXTRA_PRESETS: { title: string; price: number; description: string }[] = [
   { title: "Headlight Restoration", price: 120, description: "Sand back and re-clear cloudy, yellowed headlights so they look new and light the road properly." },
@@ -129,16 +129,16 @@ export const EXTRA_PRESETS: { title: string; price: number; description: string 
     board before it's marked done. Keep in sync with the Quality Check training
     module. This is the last line before the "not happy = don't pay" guarantee. */
 export const QC_CHECKLIST: string[] = [
-  "Paint checked under lights — no missed swirls or holograms",
+  "Paint checked under lights, no missed swirls or holograms",
   "Glass streak-free, inside and out",
   "No product residue in trim, badges or shuts",
   "Wheels, tyres & arches clean and dressed",
-  "Interior — vents dusted, seats & mats done",
-  "Final walk with fresh eyes — would you pay for this?",
+  "Interior, vents dusted, seats & mats done",
+  "Final walk with fresh eyes, would you pay for this?",
 ];
 
 /** Crew performance bonus. Built into the team scoreboard but OFF until you're
-    ready — flip `live` to true and the crew sees their live pot. `rate` = the
+    ready, flip `live` to true and the crew sees their live pot. `rate` = the
     share of revenue-above-break-even that goes into the crew pool (start small,
     scale to ~10% once a real P&L confirms break-even). See the parked design. */
 export const BONUS = {
@@ -149,7 +149,7 @@ export const BONUS = {
 /** Hourly labour rate used to cost the day's crew hours (detailers). */
 export const LABOUR_RATE = 32;
 
-/** Salaried staff are a FIXED daily cost, NOT hourly — costing a manager at the
+/** Salaried staff are a FIXED daily cost, NOT hourly, costing a manager at the
     detailer hourly rate badly understates their wage. Daily cost = annual salary
     / work days per year. Currently empty: the team is owner + 2 detailers + a
     videographer, all costed hourly, and the owner draws profit rather than a
@@ -165,7 +165,7 @@ export function dailySalaryCost(name: string): number {
   return annual > 0 ? Math.round(annual / SALARY_WORK_DAYS) : 0;
 }
 
-/** The floor lead — first on the Team board and the only one who can clock any
+/** The floor lead, first on the Team board and the only one who can clock any
     detailer on/off a car when they forget. That's you. Deliberately NOT in
     OPS_STAFF, so your day isn't costed as a $32/hr detailer wage (you draw
     profit, not a wage). */
@@ -176,16 +176,16 @@ export const OPS_LEAD = "Thanyon";
 export const OPS_STAFF: string[] = [...ACTIVE_TEAM.map((m) => m.name)];
 
 /** The full Team-board roster: the lead first (so isLead === staff[0] is you),
-    then the costed detailers. Used by the Team board only — costing/history
+    then the costed detailers. Used by the Team board only, costing/history
     read OPS_STAFF, so the lead never lands in a labour-cost total. */
 export const OPS_BOARD: string[] = [OPS_LEAD, ...OPS_STAFF];
 
-/** The owner's daily run sheet — the tickable checklist on the dashboard.
+/** The owner's daily run sheet, the tickable checklist on the dashboard.
     Keys are stable (don't rename) so saved ticks keep matching. */
 export const RUN_SHEET: { key: string; label: string; phase: "Open" | "During" | "Close" }[] = [
   { key: "open", label: "Open up", phase: "Open" },
-  { key: "setup", label: "Set up detailers — assign cars & brief", phase: "Open" },
-  { key: "board", label: "Check the board — sort anything red first", phase: "Open" },
+  { key: "setup", label: "Set up detailers, assign cars & brief", phase: "Open" },
+  { key: "board", label: "Check the board, sort anything red first", phase: "Open" },
   { key: "detail", label: "Help detail / run the floor", phase: "During" },
   { key: "lead_answer", label: "Answer leads fast (minutes, not hours)", phase: "During" },
   { key: "lead_follow", label: "Follow up quoted-not-booked leads", phase: "During" },
@@ -194,13 +194,13 @@ export const RUN_SHEET: { key: string; label: string; phase: "Open" | "During" |
   { key: "checkins", label: "Customer check-ins (Happy / Not happy)", phase: "Close" },
   { key: "log", label: "Log the day on the board", phase: "Close" },
   { key: "cal", label: "Upload Google calendar (end of day)", phase: "Close" },
-  { key: "ads", label: "Upload ad data — Ads tab (end of day)", phase: "Close" },
-  { key: "stock", label: "Update stocktake — order anything low", phase: "Close" },
+  { key: "ads", label: "Upload ad data, Ads tab (end of day)", phase: "Close" },
+  { key: "stock", label: "Update stocktake, order anything low", phase: "Close" },
   { key: "tomorrow", label: "Fill tomorrow, then set the crew", phase: "Close" },
   { key: "lockup", label: "Lock up", phase: "Close" },
 ];
 
-/** Today's date in Cairns (Australia/Brisbane — no daylight saving),
+/** Today's date in Cairns (Australia/Brisbane, no daylight saving),
     as YYYY-MM-DD, so a log opened late at night still lands on the
     right day regardless of where the server is. */
 export function cairnsToday(): string {

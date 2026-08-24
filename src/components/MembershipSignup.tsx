@@ -32,13 +32,13 @@ export default function MembershipSignup() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data?.error || "Something went wrong — try again.");
+        setError(data?.error || "Something went wrong, try again.");
         setState("error");
         return;
       }
       setState("done");
     } catch {
-      setError("Couldn't reach us — check your connection and try again.");
+      setError("Couldn't reach us, check your connection and try again.");
       setState("error");
     }
   };
@@ -49,7 +49,7 @@ export default function MembershipSignup() {
         <div className="text-4xl">🎉</div>
         <h3 className="mt-3 font-display text-2xl font-extrabold text-white">Your founding spot is reserved</h3>
         <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-white/70">
-          Thanks {name.trim().split(" ")[0]} — we&apos;ll call you shortly to lock in your price and book
+          Thanks {name.trim().split(" ")[0]}, we&apos;ll call you shortly to lock in your price and book
           your first visit. Keep an eye on your {email.trim() ? "inbox" : "phone"}.
         </p>
       </div>

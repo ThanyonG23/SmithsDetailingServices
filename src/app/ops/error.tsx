@@ -1,6 +1,6 @@
 "use client";
 
-/* Graceful fallback for any uncaught error under /ops — instead of the raw
+/* Graceful fallback for any uncaught error under /ops, instead of the raw
    "Application error" screen, the team gets a friendly message + one-tap retry.
    The real error (with this digest) is in the Vercel function logs. */
 export default function OpsError({
@@ -17,7 +17,7 @@ export default function OpsError({
         That page hit a snag
       </h1>
       <p className="mt-2 text-sm text-white/55">
-        Something didn&apos;t load right — usually a brief database hiccup. Tap to try again.
+        Something didn&apos;t load right, usually a brief database hiccup. Tap to try again.
       </p>
       <button
         onClick={reset}

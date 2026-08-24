@@ -100,7 +100,7 @@ export default async function HistoryPage() {
   for (const r of recent) {
     const w = mondayOf(r.log_date);
     const e = wk.get(w) || blank(w);
-    e.rev += r.completed_revenue || 0; // earned — matches the dashboard's profitability gauge
+    e.rev += r.completed_revenue || 0; // earned, matches the dashboard's profitability gauge
     e.redos += r.redos || 0;
     e.jobs += r.jobs_completed || 0;
     e.days += 1;
@@ -157,7 +157,7 @@ export default async function HistoryPage() {
   if (tm.leads > 0) {
     insights.push({
       tone: tm.conv >= 15 ? "green" : "yellow",
-      text: `Conversion ${tm.conv}% this month — ${tm.bookings} booked from ${tm.leads} leads.`,
+      text: `Conversion ${tm.conv}% this month, ${tm.bookings} booked from ${tm.leads} leads.`,
     });
   }
   if (lm.corr > 0) {
@@ -173,7 +173,7 @@ export default async function HistoryPage() {
   if (tm.redos > 0) {
     insights.push({
       tone: tm.redos > 8 ? "yellow" : "green",
-      text: `${tm.redos} re-do${tm.redos === 1 ? "" : "s"} this month${tm.redos > 8 ? " — watch quality" : " — quality holding"}.`,
+      text: `${tm.redos} re-do${tm.redos === 1 ? "" : "s"} this month${tm.redos > 8 ? ", watch quality" : ", quality holding"}.`,
     });
   }
 
@@ -186,17 +186,17 @@ export default async function HistoryPage() {
       <h1 className="mt-3 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
         Hist<span className="text-brand-green">ory</span>
       </h1>
-      <p className="mt-3 text-sm text-white/50">Look back, spot the pattern — what&apos;s working and what&apos;s not.</p>
+      <p className="mt-3 text-sm text-white/50">Look back, spot the pattern, what&apos;s working and what&apos;s not.</p>
 
       {dbError && (
         <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
-          Database didn&apos;t respond — refresh in a moment.
+          Database didn&apos;t respond, refresh in a moment.
         </div>
       )}
 
       {thin && !dbError && (
         <div className="mt-6 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3 text-sm text-white/50">
-          Not much logged yet — this fills in as you log each day. Come back in a week and the
+          Not much logged yet, this fills in as you log each day. Come back in a week and the
           trends light up.
         </div>
       )}
@@ -209,7 +209,7 @@ export default async function HistoryPage() {
             { label: "Revenue", now: money(tm.rev), c: pct(tm.rev, lm.rev), show: lm.rev > 0 },
             { label: "Corrections", now: String(tm.corr), c: pct(tm.corr, lm.corr), show: lm.corr > 0 },
             { label: "Leads", now: String(tm.leads), c: pct(tm.leads, lm.leads), show: lm.leads > 0 },
-            { label: "Conversion", now: tm.leads ? `${tm.conv}%` : "—", c: pct(tm.conv, lm.conv), show: lm.leads > 0 },
+            { label: "Conversion", now: tm.leads ? `${tm.conv}%` : "-", c: pct(tm.conv, lm.conv), show: lm.leads > 0 },
           ].map((m) => (
             <div key={m.label} className={`${CARD} p-4`}>
               <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/40">
@@ -289,11 +289,11 @@ export default async function HistoryPage() {
                         })}
                       </td>
                       <td className="px-3 py-2.5 font-bold text-brand-green">{money(w.rev)}</td>
-                      <td className="px-3 py-2.5 text-white/70">{w.corr || "—"}</td>
-                      <td className="px-3 py-2.5 text-white/70">{w.leads || "—"}</td>
-                      <td className="px-3 py-2.5 text-white/60">{w.leads ? `${conv}%` : "—"}</td>
+                      <td className="px-3 py-2.5 text-white/70">{w.corr || "-"}</td>
+                      <td className="px-3 py-2.5 text-white/70">{w.leads || "-"}</td>
+                      <td className="px-3 py-2.5 text-white/60">{w.leads ? `${conv}%` : "-"}</td>
                       <td className={`px-3 py-2.5 ${w.redos > 4 ? "text-brand-yellow" : "text-white/50"}`}>
-                        {w.redos || "—"}
+                        {w.redos || "-"}
                       </td>
                     </tr>
                   );
@@ -367,7 +367,7 @@ export default async function HistoryPage() {
                     />
                   </div>
                   <span className="w-16 shrink-0 text-right text-xs font-semibold tabular-nums text-white/60">
-                    {w.n ? money(w.avg) : "—"}
+                    {w.n ? money(w.avg) : "-"}
                   </span>
                 </div>
               ))}

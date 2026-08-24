@@ -7,10 +7,10 @@ import type { Template } from "@/lib/ops/db";
 
 export type TemplateGroup = { key: string; title: string; emoji: string; items: Template[] };
 
-/** Pull the "size" out of a template title: "Premium Detail — SUV ($430)" → "SUV ($430)". */
+/** Pull the "size" out of a template title: "Premium Detail, SUV ($430)" → "SUV ($430)". */
 function sizeLabel(title: string): string {
-  const parts = (title || "").split(/\s[—–-]\s/);
-  return ((parts.length > 1 ? parts.slice(1).join(" — ") : title) || "Template").trim();
+  const parts = (title || "").split(/\s[-–-]\s/);
+  return ((parts.length > 1 ? parts.slice(1).join(", ") : title) || "Template").trim();
 }
 
 export default function TemplateGroups({ groups }: { groups: TemplateGroup[] }) {

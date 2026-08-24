@@ -5,7 +5,7 @@ import { normName } from "./sales";
 import { freshChecklist, type ServiceChecklistItem } from "./service";
 
 /* =====================================================================
-   DAILY OPS — data layer (Supabase / any Postgres via the `postgres` client)
+   DAILY OPS, data layer (Supabase / any Postgres via the `postgres` client)
    - daily_log : one row per day, what the owner logs
    - bookings  : parsed from the uploaded Google Calendar (full snapshot)
    Tables + newer columns are created lazily on first use.
@@ -46,7 +46,7 @@ const sql = postgres(connectionString, {
   // Vercel Fluid Compute runs several requests in ONE instance, so max:1 meant
   // the whole crew fought over a single connection and some requests deadlocked
   // to the timeout. Each request still loads its queries SEQUENTIALLY (never
-  // Promise.all — that deadlocks the pooler), so a bigger pool only ever serves
+  // Promise.all, that deadlocks the pooler), so a bigger pool only ever serves
   // one query per connection at a time: concurrent *requests* each get their own.
   max: 8,
   idle_timeout: 20, // recycle idle connections (serverless-friendly)
@@ -116,9 +116,9 @@ async function runEnsure(): Promise<void> {
   await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS uid text NOT NULL DEFAULT '';`;
   await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS extras text NOT NULL DEFAULT '';`;
   await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS car text NOT NULL DEFAULT '';`;
-  // Where the lead came from (the calendar "Referral:" field) — for conversion attribution.
+  // Where the lead came from (the calendar "Referral:" field), for conversion attribution.
   await sql`ALTER TABLE bookings ADD COLUMN IF NOT EXISTS source text NOT NULL DEFAULT '';`;
-  // Meta Leads Centre snapshot (uploaded from leads.csv) — ad_id + stage per lead.
+  // Meta Leads Centre snapshot (uploaded from leads.csv), ad_id + stage per lead.
   await sql`
     CREATE TABLE IF NOT EXISTS meta_leads (
       id            serial       PRIMARY KEY,
@@ -149,7 +149,7 @@ async function runEnsure(): Promise<void> {
     );`;
   // Member inspections give the customer a discount on every upsell.
   await sql`ALTER TABLE inspections ADD COLUMN IF NOT EXISTS member boolean NOT NULL DEFAULT false;`;
-  // Real sales from Xero (SalesInvoices export) — one row per invoice, the
+  // Real sales from Xero (SalesInvoices export), one row per invoice, the
   // source of truth for revenue (vs the calendar price estimate).
   await sql`
     CREATE TABLE IF NOT EXISTS sales (
@@ -308,7 +308,7 @@ async function runEnsure(): Promise<void> {
       AND NOT EXISTS (SELECT 1 FROM job_day_hours)
     ON CONFLICT (uid, work_date) DO NOTHING;
   `;
-  // Instant Quote leads — from the public homepage AI widget. Always a
+  // Instant Quote leads, from the public homepage AI widget. Always a
   // "pending" request for the owner to confirm; never writes the calendar
   // directly, same human-in-the-loop model as every other booking.
   await sql`
@@ -330,7 +330,7 @@ async function runEnsure(): Promise<void> {
       status         text          NOT NULL DEFAULT 'pending'
     );
   `;
-  // Smiths Garage "coming soon" waitlist — from the public /garage page. Anyone
+  // Smiths Garage "coming soon" waitlist, from the public /garage page. Anyone
   // who wants first dibs on the new services or the Maintenance Membership.
   // Lives in the same Supabase DB the ops manager reads, so a sign-up shows up
   // on the dashboard automatically. `interests` = which services they ticked;
@@ -350,7 +350,7 @@ async function runEnsure(): Promise<void> {
       status      text         NOT NULL DEFAULT 'pending'
     );
   `;
-  // Smiths Garage service job card — one row per service, filled out on the
+  // Smiths Garage service job card, one row per service, filled out on the
   // phone as the work is done. checklist = the JSONB service/inspection sheet
   // (per-item state, detail, photos). slug = the public /s/<slug> customer report.
   await sql`
@@ -372,7 +372,7 @@ async function runEnsure(): Promise<void> {
     );
   `;
 
-  // Indexes — keep queries fast as the tables grow. Wrapped so a failed
+  // Indexes, keep queries fast as the tables grow. Wrapped so a failed
   // index can NEVER block a write (they're an optimisation, not required).
   try {
     await sql`CREATE INDEX IF NOT EXISTS idx_bookings_date ON bookings(booking_date);`;
@@ -387,7 +387,7 @@ async function runEnsure(): Promise<void> {
     await sql`CREATE INDEX IF NOT EXISTS idx_waitlist_status ON waitlist(status, created_at DESC);`;
     await sql`CREATE INDEX IF NOT EXISTS idx_service_jobs_created ON service_jobs(created_at DESC);`;
   } catch {
-    /* indexes are an optimisation — never let them break a write */
+    /* indexes are an optimisation, never let them break a write */
   }
 }
 
@@ -450,7 +450,7 @@ export async function teamDiagnostics(): Promise<Record<string, string>> {
   return out;
 }
 
-/** Self-test the checklist read/write path — used by /api/health?deep=checklist. */
+/** Self-test the checklist read/write path, used by /api/health?deep=checklist. */
 export async function checklistSelfTest(): Promise<Record<string, string>> {
   const out: Record<string, string> = {};
   const D = "2000-01-02";
@@ -569,7 +569,7 @@ export async function replaceBookings(list: Booking[]): Promise<void> {
   });
 }
 
-/** Record the first day each booking (UID) appears — for new-bookings/day.
+/** Record the first day each booking (UID) appears, for new-bookings/day.
     ON CONFLICT DO NOTHING keeps the ORIGINAL first-seen date on re-uploads. */
 export async function recordBookingsSeen(list: Booking[], today: string): Promise<void> {
   await ensureTable();
@@ -699,7 +699,7 @@ const JOB_HOURS_SELECT = (date: string) => sql`
 `;
 
 export async function getJobsForDate(date: string): Promise<JobWithHours[]> {
-  await ensureTable(); // JOB_HOURS_SELECT reads p.cancelled — make sure it exists
+  await ensureTable(); // JOB_HOURS_SELECT reads p.cancelled, make sure it exists
   const rows = await sql`
     ${JOB_HOURS_SELECT(date)}
     FROM bookings b
@@ -710,11 +710,11 @@ export async function getJobsForDate(date: string): Promise<JobWithHours[]> {
   return rows as unknown as JobWithHours[];
 }
 
-/** Every job from an earlier day that hasn't been ticked done — so nothing
+/** Every job from an earlier day that hasn't been ticked done, so nothing
     leaves the floor on its own; only marking it done removes it. Bounded to a
     recent window so a forgotten job can't linger forever. */
 export async function getCarryoverJobs(today: string, sinceISO: string): Promise<JobWithHours[]> {
-  await ensureTable(); // JOB_HOURS_SELECT reads p.cancelled — make sure it exists
+  await ensureTable(); // JOB_HOURS_SELECT reads p.cancelled, make sure it exists
   const rows = await sql`
     ${JOB_HOURS_SELECT(today)}
     FROM bookings b
@@ -744,7 +744,7 @@ export async function setJobDayHours(
   }
 }
 
-/** Cars that had hours logged on a specific day — for the day report. */
+/** Cars that had hours logged on a specific day, for the day report. */
 export async function getJobHoursForDate(
   date: string
 ): Promise<{ uid: string; summary: string; value: number; is_correction: boolean; hours: number }[]> {
@@ -780,7 +780,7 @@ export async function setJobFinished(uid: string, finished: boolean): Promise<vo
 }
 
 /** Final quality-check sign-off: records who signed the car off and marks it
-    done. Any staff can do it — passing QC is what completes the car. */
+    done. Any staff can do it, passing QC is what completes the car. */
 export async function signOffJob(uid: string, name: string): Promise<void> {
   await ensureTable();
   if (!uid) return;
@@ -862,7 +862,7 @@ export async function getBookingsDump(
 }
 
 /** Jobs marked done since a date, with total hours + who worked them and for how
-    long — the completed-jobs feed on the scoreboard (actual vs target). */
+    long, the completed-jobs feed on the scoreboard (actual vs target). */
 export interface CompletedJob {
   uid: string;
   summary: string;
@@ -937,10 +937,10 @@ export async function getCancellationStats(
 
 /** One row per day across a range, merging the daily log (earned/collected/ad
     spend/jobs/leads), bookings (count/corrections/booked value) and cancellations
-    — the single source for the Analytics tab. */
+   , the single source for the Analytics tab. */
 export interface AnalyticsDay {
   date: string;
-  earned: number; // completed_revenue — work done that day (the scoreboard number)
+  earned: number; // completed_revenue, work done that day (the scoreboard number)
   collected: number; // cash actually taken
   ad_spend: number;
   jobs_completed: number;
@@ -1079,8 +1079,7 @@ export interface TeamJob {
 }
 
 /** Today's floor for the detailers: today's cars + any car still open from an
-    earlier day, EXCLUDING anything the owner has marked done. A car stays here —
-    and keeps accumulating time — until it's finished. */
+    earlier day, EXCLUDING anything the owner has marked done. A car stays here,    and keeps accumulating time, until it's finished. */
 export async function getTeamDay(date: string, sinceISO: string): Promise<TeamJob[]> {
   const jobs = await sql`
     SELECT b.uid, b.summary, b.value::float8 AS value, b.is_correction,
@@ -1257,7 +1256,7 @@ export async function getReorderCount(): Promise<number> {
   return (rows[0] as { n: number } | undefined)?.n ?? 0;
 }
 
-/** Trivial DB touch — used by /api/health to keep the connection + the
+/** Trivial DB touch, used by /api/health to keep the connection + the
     Supabase project awake so it never pauses on idle. 6s cap so it returns
     fast (503) instead of hanging when the DB is unreachable. */
 export async function pingDb(): Promise<boolean> {
@@ -1304,7 +1303,7 @@ export async function getAds(): Promise<AdRow[]> {
 
 /* ---- customers (CRM, auto-built from the calendar) ----------------- */
 
-/** Where bookings (conversions) come from — grouped by the normalised source,
+/** Where bookings (conversions) come from, grouped by the normalised source,
     with count, corrections, and revenue. The heart of ad/channel attribution. */
 export interface SourceRow {
   source: string;
@@ -1337,7 +1336,7 @@ export async function getSourceBreakdown(
 export interface LeadStats {
   total: number;
   newThisWeek: number;
-  backlog: number; // warm, not yet converted, not junk — the "work these" pile
+  backlog: number; // warm, not yet converted, not junk, the "work these" pile
   convertedThisWeek: number;
   loadedAt: string | null;
 }
@@ -1558,7 +1557,7 @@ export interface SalesStats {
   byService: { service: string; revenue: number; count: number }[];
 }
 
-/** Merge Xero invoices in by invoice number — so multiple exports (the 500-row
+/** Merge Xero invoices in by invoice number, so multiple exports (the 500-row
     cap forces splitting) accumulate, and re-uploading updates existing rows. */
 export async function upsertSales(
   list: {
@@ -1645,7 +1644,7 @@ export async function getSalesStats(fromISO: string, toISO: string): Promise<Sal
   }
 }
 
-/** Lean dashboard headline numbers — real revenue (Xero) + leads (Meta) for
+/** Lean dashboard headline numbers, real revenue (Xero) + leads (Meta) for
     this week and month, in two queries. Auto-tracked from the uploads so the
     day never needs manual logging. */
 export interface DashSummary {
@@ -1712,8 +1711,7 @@ export interface LeadSaleMatch {
   byAd: { ad_id: string; leads: number; matched: number; revenue: number }[];
 }
 
-/** Cross-match Meta leads to real Xero invoices by normalised customer name —
-    a "confirmed paid" floor on conversion (Messenger leads have no email, and
+/** Cross-match Meta leads to real Xero invoices by normalised customer name,    a "confirmed paid" floor on conversion (Messenger leads have no email, and
     names differ, so this UNDER-counts). */
 export async function getLeadSaleMatch(): Promise<LeadSaleMatch> {
   const empty: LeadSaleMatch = { realLeads: 0, matchedLeads: 0, matchedRevenue: 0, matchRate: 0, byAd: [] };
@@ -1796,10 +1794,10 @@ export interface LeadAnalytics {
   working: number; // still in play (intake + qualified + follow-ups)
   conversionRate: number; // converted ÷ real, 0-100
   // follow-up backlog aged by how long since the lead came in
-  fuFresh: number; // ≤ 7 days — chase now
+  fuFresh: number; // ≤ 7 days, chase now
   fuWarm: number; // 8-21 days
   fuStale: number; // 22-60 days
-  fuCold: number; // 60+ days — likely dead
+  fuCold: number; // 60+ days, likely dead
   // selected period (by lead created_date)
   newInPeriod: number;
   convertedInPeriod: number;
@@ -1915,7 +1913,7 @@ export async function getLeadAnalytics(
   }
 }
 
-/** Diagnostic snapshot of the meta_leads table — to confirm an upload landed. */
+/** Diagnostic snapshot of the meta_leads table, to confirm an upload landed. */
 export async function leadDiagnostics(): Promise<unknown> {
   try {
     const c = await sql`

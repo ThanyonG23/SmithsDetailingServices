@@ -173,7 +173,7 @@ export default async function AnalyticsPage({
         Analy<span className="text-brand-green">tics</span>
       </h1>
       <p className="mt-3 text-sm text-white/50">
-        Every number that matters — are we making enough per day to stay ahead.
+        Every number that matters, are we making enough per day to stay ahead.
       </p>
 
       {/* range toggle */}
@@ -195,7 +195,7 @@ export default async function AnalyticsPage({
 
       {dbError && (
         <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
-          Database didn&apos;t respond — refresh in a moment.
+          Database didn&apos;t respond, refresh in a moment.
         </div>
       )}
 
@@ -205,11 +205,11 @@ export default async function AnalyticsPage({
           <SectionTitle eyebrow="Real money · from your Xero invoices" title="Actual revenue" />
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             <Tile label="Revenue (real)" value={money(sales.revenue)} sub={`${sales.invoices} invoices`} tone="green" />
-            <Tile label="Avg invoice" value={sales.invoices ? money(sales.avg) : "—"} sub="incl. upsells" />
+            <Tile label="Avg invoice" value={sales.invoices ? money(sales.avg) : "-"} sub="incl. upsells" />
             <Tile label="All-time loaded" value={money(sales.allTimeRevenue)} sub={`${sales.allTimeInvoices} invoices`} />
             <Tile
               label="Per day"
-              value={sales.invoices ? money(sales.revenue / Math.max(1, opDays)) : "—"}
+              value={sales.invoices ? money(sales.revenue / Math.max(1, opDays)) : "-"}
               sub={`aim ${money(aimRevenue)}`}
               tone={sales.revenue / Math.max(1, opDays) >= aimRevenue ? "green" : "neutral"}
             />
@@ -256,7 +256,7 @@ export default async function AnalyticsPage({
                 <b className="text-brand-green">{money(saleMatch.matchedRevenue)}</b>.
               </div>
               <p className="mt-1.5 text-[11px] leading-relaxed text-white/40">
-                This is a <b className="text-white/60">floor</b>, not the exact rate — your Messenger leads carry no email, so this
+                This is a <b className="text-white/60">floor</b>, not the exact rate, your Messenger leads carry no email, so this
                 matches on name only and under-counts (nicknames, business names, different spelling). Treat it as &ldquo;at least this
                 many provably paid.&rdquo;
               </p>
@@ -278,7 +278,7 @@ export default async function AnalyticsPage({
             </div>
           )}
           <p className="mt-2 text-[11px] text-white/35">
-            This is real invoiced money from Xero — the section below (&ldquo;Revenue&rdquo;) is the estimate you log day-to-day.
+            This is real invoiced money from Xero, the section below (&ldquo;Revenue&rdquo;) is the estimate you log day-to-day.
           </p>
         </>
       )}
@@ -307,7 +307,7 @@ export default async function AnalyticsPage({
         <Tile label="Booked in" value={money(totalBooked)} sub={`${totalBookings} bookings`} />
         <Tile
           label="Best day"
-          value={best && best.earned > 0 ? money(best.earned) : "—"}
+          value={best && best.earned > 0 ? money(best.earned) : "-"}
           sub={best && best.earned > 0 ? dayLabel(best.date) : "no data yet"}
         />
       </div>
@@ -339,7 +339,7 @@ export default async function AnalyticsPage({
               Earned per day
             </span>
             <span className="text-[10px] font-semibold text-brand-green">
-              — aim {money(aimRevenue)}
+             , aim {money(aimRevenue)}
             </span>
           </div>
           <div className="relative flex h-32 items-end gap-1 overflow-x-auto">
@@ -385,12 +385,12 @@ export default async function AnalyticsPage({
         <Tile label="Bookings" value={String(totalBookings)} sub="jobs on the calendar" />
         <Tile
           label="Cost / lead"
-          value={totalLeads > 0 ? money(costPerLead) : "—"}
+          value={totalLeads > 0 ? money(costPerLead) : "-"}
           sub="ad spend ÷ leads"
         />
         <Tile
           label="Cost / booking"
-          value={totalBookings > 0 ? money(costPerBooking) : "—"}
+          value={totalBookings > 0 ? money(costPerBooking) : "-"}
           sub="ad spend ÷ bookings"
         />
         <Tile
@@ -416,7 +416,7 @@ export default async function AnalyticsPage({
             <Tile label="In follow-up" value={String(leads.followUp)} sub="not yet won or lost" />
           </div>
 
-          {/* funnel — where every lead sits right now */}
+          {/* funnel, where every lead sits right now */}
           <div className={`${CARD} mt-3 p-4`}>
             <div className="mb-2.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">
               Where every lead sits right now
@@ -444,18 +444,18 @@ export default async function AnalyticsPage({
             </div>
           </div>
 
-          {/* follow-up backlog aged — which to chase, which are dead */}
+          {/* follow-up backlog aged, which to chase, which are dead */}
           <div className="mb-1 mt-4 text-[11px] font-bold uppercase tracking-[0.16em] text-white/40">
             Follow-up backlog · by age
           </div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Tile label="Fresh · ≤7 days" value={String(leads.fuFresh)} sub="chase now — hottest" tone={leads.fuFresh > 0 ? "green" : "neutral"} />
+            <Tile label="Fresh · ≤7 days" value={String(leads.fuFresh)} sub="chase now, hottest" tone={leads.fuFresh > 0 ? "green" : "neutral"} />
             <Tile label="Warm · 8–21 days" value={String(leads.fuWarm)} sub="still workable" />
             <Tile label="Stale · 22–60 days" value={String(leads.fuStale)} sub="last-ditch effort" />
-            <Tile label="Cold · 60+ days" value={String(leads.fuCold)} sub="likely dead — mark abused" tone={leads.fuCold > 0 ? "red" : "neutral"} />
+            <Tile label="Cold · 60+ days" value={String(leads.fuCold)} sub="likely dead, mark abused" tone={leads.fuCold > 0 ? "red" : "neutral"} />
           </div>
           <p className="mt-2 text-xs leading-relaxed text-white/40">
-            Work the <b className="text-white/60">fresh</b> pile first — those convert fastest. The{" "}
+            Work the <b className="text-white/60">fresh</b> pile first, those convert fastest. The{" "}
             <b className="text-white/60">cold</b> pile is why the raw follow-up number looks huge; mark
             those Abused in the Leads Centre so the real backlog reads true.
           </p>
@@ -487,7 +487,7 @@ export default async function AnalyticsPage({
             </div>
           )}
 
-          {/* attribution — which ads / sources bring leads that convert */}
+          {/* attribution, which ads / sources bring leads that convert */}
           {leads.byAd.length > 0 && (
             <div className="mt-4 grid gap-3 xl:grid-cols-2">
               <div className={`${CARD} overflow-hidden`}>
@@ -554,7 +554,7 @@ export default async function AnalyticsPage({
       </div>
 
       <p className="mt-10 rounded-xl border border-white/10 bg-white/[0.02] px-4 py-3 text-xs leading-relaxed text-white/40">
-        Labour cost and profit aren&apos;t shown yet — the crew clock and Xero P&amp;L need to be
+        Labour cost and profit aren&apos;t shown yet, the crew clock and Xero P&amp;L need to be
         clean first so they don&apos;t mislead. They join here once month-2 gives a real P&amp;L.
       </p>
 

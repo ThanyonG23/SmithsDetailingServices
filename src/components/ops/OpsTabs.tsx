@@ -24,7 +24,7 @@ export default function OpsTabs({ role }: { role?: "owner" | "crew" | null }) {
   const path = usePathname() || "";
   if (path.endsWith("/login")) return null; // no tabs on the login screen
 
-  // Detailers (crew) get their Team board + the read-only Scoreboard — never the
+  // Detailers (crew) get their Team board + the read-only Scoreboard, never the
   // rest of ops (numbers, CRM, costs).
   const tabs =
     role === "crew"

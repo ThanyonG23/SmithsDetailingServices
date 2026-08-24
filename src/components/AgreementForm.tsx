@@ -4,8 +4,7 @@ import { useState } from "react";
 import { BUSINESS } from "@/lib/config";
 import { AGREEMENT_VERSION } from "@/lib/agreement";
 
-/* Acceptance is captured by sending it from the detailer's own phone —
-   their name, the agreement version and a timestamp, off their own number
+/* Acceptance is captured by sending it from the detailer's own phone,   their name, the agreement version and a timestamp, off their own number
    or email address. No database to set up, and the record lands in
    Thanyon's inbox where he can keep it with their employment file. */
 
@@ -29,7 +28,7 @@ export default function AgreementForm() {
   const [agreed, setAgreed] = useState(false);
 
   const ready = name.trim().length > 1 && agreed;
-  const subject = `Content & Referral Agreement accepted — ${name.trim() || "…"}`;
+  const subject = `Content & Referral Agreement accepted, ${name.trim() || "…"}`;
 
   const mailHref = ready
     ? `mailto:${BUSINESS.email}?subject=${encodeURIComponent(

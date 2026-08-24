@@ -6,10 +6,10 @@ import { GARAGE_SERVICES, MEMBERSHIP_NAME, MEMBERSHIP_PERKS } from "@/lib/garage
 import { BUSINESS } from "@/lib/config";
 
 export const metadata: Metadata = {
-  title: "Smiths Garage — Coming Soon | Cairns",
+  title: "Smiths Garage, Coming Soon | Cairns",
   description:
-    "Smiths Detailing is becoming Smiths Garage — detailing, paint correction, servicing, touch-up paint, headlight restoration and parts, all under one roof in Cairns. Join the waitlist.",
-  // Soft launch — keep it out of search until the public rebrand goes live.
+    "Smiths Detailing is becoming Smiths Garage, detailing, paint correction, servicing, touch-up paint, headlight restoration and parts, all under one roof in Cairns. Join the waitlist.",
+  // Soft launch, keep it out of search until the public rebrand goes live.
   robots: { index: false, follow: false },
   alternates: { canonical: "/garage" },
 };
@@ -64,7 +64,7 @@ export default function GaragePage() {
 
           <Reveal delay={100}>
             {/* the logo is the wordmark; keep a real h1 for SEO/screen readers */}
-            <h1 className="sr-only">Smiths Garage — Cairns</h1>
+            <h1 className="sr-only">Smiths Garage, Cairns</h1>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={LOGO}
@@ -76,7 +76,7 @@ export default function GaragePage() {
           <Reveal delay={200}>
             <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-white/70">
               The detailing you know us for is growing up. Everything your car needs to look sharp
-              and run right — <span className="text-white">under one roof.</span>
+              and run right, <span className="text-white">under one roof.</span>
             </p>
           </Reveal>
 
@@ -126,7 +126,7 @@ export default function GaragePage() {
               <span className="text-brand-purple-soft"> whole car.</span>
             </h2>
             <p className="mt-5 max-w-lg text-base leading-relaxed text-white/60">
-              The same standard we&apos;ve built our name on — now covering how it runs, not just how
+              The same standard we&apos;ve built our name on, now covering how it runs, not just how
               it looks.
             </p>
           </Reveal>
@@ -166,7 +166,7 @@ export default function GaragePage() {
                 </h2>
                 <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-white/70 sm:text-base">
                   Stop thinking about your car. On the membership it&apos;s detailed and serviced on a
-                  schedule — always clean, always roadworthy — for one simple monthly payment.
+                  schedule, always clean, always roadworthy, for one simple monthly payment.
                 </p>
               </Reveal>
 
@@ -217,7 +217,7 @@ export default function GaragePage() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={LOGO} alt="Smiths Garage" className="h-14 w-auto mix-blend-screen" />
               <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/50">
-                Detailing, correction, servicing and more — coming soon to {BUSINESS.suburb}.
+                Detailing, correction, servicing and more, coming soon to {BUSINESS.suburb}.
               </p>
             </div>
             <div className="text-sm text-white/60">

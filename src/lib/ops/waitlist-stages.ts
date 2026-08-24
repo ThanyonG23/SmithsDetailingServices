@@ -1,4 +1,4 @@
-/* Waitlist pipeline stages — a plain module (no "use client") so both the
+/* Waitlist pipeline stages, a plain module (no "use client") so both the
    server page and the client controls can import it. */
 
 export const WAITLIST_STAGES: { value: string; label: string }[] = [

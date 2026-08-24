@@ -6,7 +6,7 @@ import { AGREEMENT, AGREEMENT_VERSION } from "@/lib/agreement";
 import AgreementForm from "@/components/AgreementForm";
 
 /* ---------------------------------------------------------------------
-   INTERNAL STAFF PAGE — unlisted.
+   INTERNAL STAFF PAGE, unlisted.
    Nothing on the site links here, and it's set to noindex, so the only
    way in is the direct link. Deliberately not added to robots.txt: that
    file is public and would advertise the path.
@@ -48,7 +48,7 @@ function P({ children }: { children: React.ReactNode }) {
   return <p className="max-w-xl text-[15px] leading-relaxed text-white/65">{children}</p>;
 }
 
-/** Checkbox list — plain inputs, so they tick on any phone without JS. */
+/** Checkbox list, plain inputs, so they tick on any phone without JS. */
 function Ticks({ id, items }: { id: string; items: React.ReactNode[] }) {
   return (
     <ul className="flex flex-col gap-3">
@@ -238,7 +238,7 @@ export default function SocialSetupPage() {
           </Station>
 
           {/* ── 02 ── */}
-          <Station n="02" title="Facebook — make a Page, not a new profile">
+          <Station n="02" title="Facebook, make a Page, not a new profile">
             <P>
               Log in with the personal Facebook you already have, and create a Page from it.
               Do <b className="text-white">not</b> create a second personal profile &mdash;
@@ -272,7 +272,7 @@ export default function SocialSetupPage() {
           </Station>
 
           {/* ── 03 ── */}
-          <Station n="03" title="Instagram — switch it to Professional">
+          <Station n="03" title="Instagram, switch it to Professional">
             <P>
               A personal account can&apos;t show you your numbers and can&apos;t be linked to
               the shop, so switch it over as soon as you&apos;ve made it.
@@ -296,7 +296,7 @@ export default function SocialSetupPage() {
           </Station>
 
           {/* ── 04 ── */}
-          <Station n="04" title="TikTok — Business account, same handle">
+          <Station n="04" title="TikTok, Business account, same handle">
             <Ticks
               id="tt"
               items={[

@@ -47,11 +47,11 @@ export default function InspectionView({
       const res = await submitInspectionResponse(slug, [...picked], note);
       if (res.ok) setState("done");
       else {
-        setErr("Couldn't send — please try again.");
+        setErr("Couldn't send, please try again.");
         setState("idle");
       }
     } catch {
-      setErr("Couldn't send — please try again.");
+      setErr("Couldn't send, please try again.");
       setState("idle");
     }
   }
@@ -61,7 +61,7 @@ export default function InspectionView({
     return (
       <div className="mt-8 text-center">
         <div className="text-5xl">✅</div>
-        <h1 className="mt-4 font-display text-2xl font-extrabold text-white">Sent — thank you!</h1>
+        <h1 className="mt-4 font-display text-2xl font-extrabold text-white">Sent, thank you!</h1>
         <p className="mt-2 text-sm text-white/55">
           We&apos;ve got your choices and we&apos;ll get onto them. We&apos;ll be in touch to confirm.
         </p>
@@ -99,7 +99,7 @@ export default function InspectionView({
       </h1>
       <p className="mt-3 text-sm text-white/55">
         While your car&apos;s with us we spotted a few things we can sort. Tick the ones you want and
-        send it back — no pressure, only what you&apos;re happy with.
+        send it back, no pressure, only what you&apos;re happy with.
       </p>
 
       {member && (

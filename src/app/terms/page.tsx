@@ -132,7 +132,7 @@ export default function TermsPage() {
         <p>
           We often photograph and film the vehicles we work on and share them on our website and
           social media. If you&apos;d prefer we didn&apos;t use images of your vehicle, just tell us
-          — before or after the job — and we&apos;ll leave it out or remove it.
+         , before or after the job, and we&apos;ll leave it out or remove it.
         </p>
       </LegalSection>
 

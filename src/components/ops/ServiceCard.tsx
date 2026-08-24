@@ -92,7 +92,7 @@ export default function ServiceCard({ initial }: { initial: ServiceJob }) {
       const item = job.checklist.find((i) => i.key === key);
       patchItem(key, { photos: [...(item?.photos || []), ...urls] }, true);
     } catch {
-      /* ignore — a failed photo shouldn't lose the card */
+      /* ignore, a failed photo shouldn't lose the card */
     } finally {
       setUploading(null);
     }
@@ -197,7 +197,7 @@ export default function ServiceCard({ initial }: { initial: ServiceJob }) {
       {/* notes */}
       <div className={`${CARD} p-4`}>
         <label className={LABEL}>Notes for the customer report</label>
-        <textarea className={`${INPUT} min-h-[80px] resize-y`} value={job.notes} onChange={(e) => patchField("notes", e.target.value)} placeholder="Anything worth noting — recommendations, work done, follow-ups…" />
+        <textarea className={`${INPUT} min-h-[80px] resize-y`} value={job.notes} onChange={(e) => patchField("notes", e.target.value)} placeholder="Anything worth noting, recommendations, work done, follow-ups…" />
       </div>
 
       {/* complete */}
@@ -207,7 +207,7 @@ export default function ServiceCard({ initial }: { initial: ServiceJob }) {
           completed ? "border border-white/15 text-white/70 hover:text-white" : "bg-brand-green text-[#04130a] hover:brightness-110"
         }`}
       >
-        {completed ? "✓ Completed — tap to reopen" : "Mark service complete"}
+        {completed ? "✓ Completed, tap to reopen" : "Mark service complete"}
       </button>
       <p className="text-center text-[11px] text-white/35">Everything saves automatically as you go. Copy the link up top to send the customer their report.</p>
     </div>

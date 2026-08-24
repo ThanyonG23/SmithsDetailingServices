@@ -6,7 +6,7 @@ import { BUSINESS } from "@/lib/config";
 export const metadata: Metadata = {
   title: "Join · The Smiths Detailing Membership",
   description: "Set up your Smiths Detailing membership.",
-  robots: { index: false, follow: false }, // sent by hand after a call — never for search
+  robots: { index: false, follow: false }, // sent by hand after a call, never for search
   alternates: { canonical: "/membership/join" },
 };
 

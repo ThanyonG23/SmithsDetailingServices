@@ -37,7 +37,7 @@ function write(code: string): void {
     };
     window.localStorage.setItem(REF_STORAGE_KEY, JSON.stringify(value));
   } catch {
-    /* private browsing — the link still works for this visit */
+    /* private browsing, the link still works for this visit */
   }
 }
 

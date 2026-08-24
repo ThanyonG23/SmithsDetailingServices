@@ -62,12 +62,12 @@ export default async function InspectPage() {
       </h1>
       <p className="mt-3 max-w-2xl text-sm text-white/50">
         Clean the car, inspect it, then build the customer a photo report of the extras you&apos;d
-        recommend. Send them the link — they tick what they want and send it back.
+        recommend. Send them the link, they tick what they want and send it back.
       </p>
 
       {dbError && (
         <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
-          Database didn&apos;t respond — refresh in a moment.
+          Database didn&apos;t respond, refresh in a moment.
         </div>
       )}
 
@@ -76,7 +76,7 @@ export default async function InspectPage() {
         <div className={EYEBROW}>Cars in today · start an inspection</div>
         {floor.length === 0 ? (
           <p className="mt-3 text-sm text-white/45">
-            No cars on the calendar for today — upload the latest calendar if that looks wrong.
+            No cars on the calendar for today, upload the latest calendar if that looks wrong.
           </p>
         ) : (
           <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -98,7 +98,7 @@ export default async function InspectPage() {
                       className="mt-3 inline-flex rounded-full border border-brand-green/40 bg-brand-green/[0.08] px-4 py-2 text-xs font-black text-brand-green transition hover:bg-brand-green/15"
                     >
                       {existing.status === "responded"
-                        ? "✓ Replied — open"
+                        ? "✓ Replied, open"
                         : `Open inspection (${existing.items.length})`}
                     </Link>
                   ) : (
@@ -129,7 +129,7 @@ export default async function InspectPage() {
       <section className="mt-10">
         <div className={EYEBROW}>Recent inspections</div>
         {inspections.length === 0 ? (
-          <p className="mt-3 text-sm text-white/45">None yet — start one above.</p>
+          <p className="mt-3 text-sm text-white/45">None yet, start one above.</p>
         ) : (
           <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {inspections.map((insp) => {

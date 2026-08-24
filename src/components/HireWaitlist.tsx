@@ -34,13 +34,13 @@ export default function HireWaitlist() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data?.error || "Something went wrong — try again.");
+        setError(data?.error || "Something went wrong, try again.");
         setState("error");
         return;
       }
       setState("done");
     } catch {
-      setError("Couldn't reach us — check your connection and try again.");
+      setError("Couldn't reach us, check your connection and try again.");
       setState("error");
     }
   };
@@ -51,7 +51,7 @@ export default function HireWaitlist() {
         <div className="text-4xl">🎉</div>
         <h3 className="mt-3 font-display text-2xl font-extrabold text-white">You&apos;re on the list</h3>
         <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-white/70">
-          Thanks {name.trim().split(" ")[0]} — you&apos;ll be first to know the moment our vehicles are
+          Thanks {name.trim().split(" ")[0]}, you&apos;ll be first to know the moment our vehicles are
           ready for hire. Keep an eye on your {email.trim() ? "inbox" : "phone"}.
         </p>
       </div>

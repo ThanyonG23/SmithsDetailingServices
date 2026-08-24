@@ -1,5 +1,5 @@
 /* =====================================================================
-   BOOKING AVAILABILITY — shared day-capacity logic
+   BOOKING AVAILABILITY, shared day-capacity logic
    ---------------------------------------------------------------------
    Same "a full day ≈ 2 correction-equivalents" model the /ops dashboard's
    Schedule panel already uses for real bookings from the calendar upload.
@@ -28,7 +28,7 @@ export function roomOnDay(bookings: Booking[], date: string): number {
   return DAY_CAPACITY - used;
 }
 
-/** Fixed daily drop-off slots — no per-booking time-of-day is captured from
+/** Fixed daily drop-off slots, no per-booking time-of-day is captured from
     the calendar upload today, only the date, so we offer the business's
     standard slots on any day that has capacity. */
 export const SLOTS = ["7:00am", "11:30am"];
@@ -59,7 +59,7 @@ function cairnsMinutesNow(): number {
 }
 
 /** For "today" (dayIndex 0), drop any slot that's already passed (or is
-    less than an hour away — not realistically bookable). Every later day
+    less than an hour away, not realistically bookable). Every later day
     offers the full set. Without this, a customer checking the widget in
     the afternoon would still see "7:00am today" as an option. */
 function slotsFor(dayIndex: number): string[] {
@@ -71,8 +71,7 @@ function slotsFor(dayIndex: number): string[] {
 /** Next `wantDays` upcoming days that have room for the given package/size
     AND at least one bookable slot, searched over a bounded window so it can
     never loop forever if the calendar hasn't been uploaded in a while.
-    NOTE: this only knows what's booked as of the last /ops calendar upload —
-    if today's real bookings haven't been uploaded yet, today can still look
+    NOTE: this only knows what's booked as of the last /ops calendar upload,    if today's real bookings haven't been uploaded yet, today can still look
     more open here than it actually is. */
 export async function getUpcomingAvailability(
   packageId: PackageId,

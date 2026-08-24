@@ -23,7 +23,7 @@ export default function TrainingIndex() {
         Train<span className="text-brand-green">ing</span>
       </h1>
       <p className="mt-3 text-sm text-white/50">
-        Every process at Smiths, in one place — how we do the work, to the standard we do it. Work
+        Every process at Smiths, in one place, how we do the work, to the standard we do it. Work
         through your modules and check back whenever you need a refresher.
       </p>
 

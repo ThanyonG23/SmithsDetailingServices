@@ -50,7 +50,7 @@ export default async function TeamPage() {
 
       {dbError && (
         <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
-          Database didn&apos;t respond — wait a moment and refresh.
+          Database didn&apos;t respond, wait a moment and refresh.
         </div>
       )}
 

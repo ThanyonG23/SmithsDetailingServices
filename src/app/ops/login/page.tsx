@@ -40,7 +40,7 @@ export default function OpsLoginPage({
 
           {failed && (
             <p className="mt-3 text-sm font-semibold text-red-400">
-              Wrong password — try again.
+              Wrong password, try again.
             </p>
           )}
 

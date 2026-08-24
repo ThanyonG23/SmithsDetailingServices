@@ -1,5 +1,5 @@
 /* =====================================================================
-   SMITHS GARAGE — service job card
+   SMITHS GARAGE, service job card
    ---------------------------------------------------------------------
    A plain module (no server code) shared by the DB layer, the ops
    builder and the public customer report. Defines the service/inspection
@@ -47,7 +47,7 @@ export function freshChecklist(): ServiceChecklistItem[] {
 }
 
 export const STATE_META: Record<ServiceItemState, { label: string; badge: string; dot: string }> = {
-  pending: { label: "—", badge: "bg-white/8 text-white/45", dot: "bg-white/25" },
+  pending: { label: "-", badge: "bg-white/8 text-white/45", dot: "bg-white/25" },
   ok: { label: "OK", badge: "bg-brand-green/15 text-brand-green", dot: "bg-brand-green" },
   attention: { label: "Soon", badge: "bg-brand-yellow/15 text-brand-yellow", dot: "bg-brand-yellow" },
   urgent: { label: "Now", badge: "bg-red-500/15 text-red-300", dot: "bg-red-400" },

@@ -70,7 +70,7 @@ export default function InspectionBuilder({
     try {
       await saveInspection(slug, next);
     } catch {
-      setErr("Couldn't save — check your connection.");
+      setErr("Couldn't save, check your connection.");
     }
   }
 
@@ -87,8 +87,8 @@ export default function InspectionBuilder({
     } catch (e) {
       setErr(
         e instanceof Error && e.message.includes("storage-not-configured")
-          ? "Photo storage isn't set up yet — add SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel."
-          : "Photo upload failed — try again."
+          ? "Photo storage isn't set up yet, add SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY in Vercel."
+          : "Photo upload failed, try again."
       );
     } finally {
       setBusy(false);
@@ -185,7 +185,7 @@ export default function InspectionBuilder({
         </div>
         <p className="mt-2 text-[11px] text-white/40">
           {status === "responded"
-            ? "The customer has already replied — see their picks on the Inspect page."
+            ? "The customer has already replied, see their picks on the Inspect page."
             : "Send this to the customer once you've added the extras below. Add photos and they'll tick what they want."}
         </p>
       </div>

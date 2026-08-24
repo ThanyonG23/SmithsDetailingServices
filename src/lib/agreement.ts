@@ -25,7 +25,7 @@ export const AGREEMENT: Clause[] = [
     points: [
       "Your account carries the Smiths Detailing name, so what you post reflects on the whole business and everyone who works here.",
       "Post your own work, or work you took part in. Don't post someone else's results as your own, and don't repost other detailers' content as if we did it.",
-      "Don't quote prices, promise a turnaround time, or guarantee a result on a specific car. Send those enquiries to the shop — it's how we avoid promising something we can't deliver.",
+      "Don't quote prices, promise a turnaround time, or guarantee a result on a specific car. Send those enquiries to the shop, it's how we avoid promising something we can't deliver.",
       "Keep it clean. No content that would embarrass a customer, another staff member, or the business.",
       "You don't have to put your own face on it. If you'd rather not use a personal photo, ask for a copy of our logo and use that as your profile picture instead.",
     ],
@@ -48,7 +48,7 @@ export const AGREEMENT: Clause[] = [
   {
     heading: "Respect for the business",
     points: [
-      "Don't publicly run down Smiths Detailing, our customers, or the people you work with — not on your account, not in comments, not in DMs.",
+      "Don't publicly run down Smiths Detailing, our customers, or the people you work with, not on your account, not in comments, not in DMs.",
       "Take disagreements to Thanyon directly rather than to your followers.",
       "This clause is about public commentary only. Nothing here stops you raising a concern or a complaint, reporting a safety or pay issue to a regulator or union, or exercising any right you have under the Fair Work Act. You will never be penalised for doing any of those things.",
     ],
@@ -74,7 +74,7 @@ export const AGREEMENT: Clause[] = [
     heading: "Use of your content",
     points: [
       "You give Smiths Detailing permission to re-post and advertise with any content you make of Smiths work, including after you stop working here.",
-      "We may put ad spend behind your posts. That's good for you while you're here — it puts your referral link in front of far more people.",
+      "We may put ad spend behind your posts. That's good for you while you're here, it puts your referral link in front of far more people.",
       "You keep your account and your login. We're not asking for it.",
     ],
   },
@@ -89,7 +89,7 @@ export const AGREEMENT: Clause[] = [
   {
     heading: "The rest",
     points: [
-      "This sits alongside your employment agreement and your award entitlements — it doesn't replace or reduce either of them.",
+      "This sits alongside your employment agreement and your award entitlements, it doesn't replace or reduce either of them.",
       "We may change or end this program, with reasonable notice. Commission already earned is still paid.",
       "Taking part is voluntary. You won't be disadvantaged in your job if you'd rather not.",
     ],

@@ -41,12 +41,12 @@ export default async function CrmPage({ searchParams }: { searchParams: { q?: st
         C<span className="text-brand-green">RM</span>
       </h1>
       <p className="mt-3 text-sm text-white/50">
-        Every customer — built automatically from the calendar. Tap a number to call, email to write.
+        Every customer, built automatically from the calendar. Tap a number to call, email to write.
       </p>
 
       {dbError && (
         <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
-          Database didn&apos;t respond — refresh in a moment.
+          Database didn&apos;t respond, refresh in a moment.
         </div>
       )}
 
@@ -99,7 +99,7 @@ export default async function CrmPage({ searchParams }: { searchParams: { q?: st
         <p className="mt-4 text-sm text-white/45">
           {q
             ? "No customers match that search."
-            : "No customers yet — upload the calendar on the Dashboard to build the list."}
+            : "No customers yet, upload the calendar on the Dashboard to build the list."}
         </p>
       ) : (
         <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
@@ -107,7 +107,7 @@ export default async function CrmPage({ searchParams }: { searchParams: { q?: st
             <div key={c.dedupe_key} className={`${CARD} p-3.5`}>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
-                  <div className="truncate font-semibold text-white/90">{c.name || "—"}</div>
+                  <div className="truncate font-semibold text-white/90">{c.name || "-"}</div>
                   {c.car && <div className="truncate text-xs text-white/45">{c.car}</div>}
                 </div>
                 <div className="shrink-0 text-right">

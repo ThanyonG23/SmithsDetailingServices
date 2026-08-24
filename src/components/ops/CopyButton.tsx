@@ -13,7 +13,7 @@ export default function CopyButton({ text, label = "Copy" }: { text: string; lab
           setDone(true);
           setTimeout(() => setDone(false), 1500);
         } catch {
-          /* clipboard blocked — ignore */
+          /* clipboard blocked, ignore */
         }
       }}
       className={`shrink-0 rounded-full border px-3 py-1.5 text-[11px] font-bold transition ${

@@ -6,7 +6,7 @@ import { TEAM, getTeamMember } from "@/lib/referrals";
 import { BUSINESS } from "@/lib/config";
 
 /* A detailer's link. Deliberately identical to the homepage from the
-   customer's side — no banner, nothing to explain or worry about. The only
+   customer's side, no banner, nothing to explain or worry about. The only
    difference is that the quote button pre-fills their text with the
    detailer's code, which is rendered into the HTML here on the server so
    it works the instant the page appears. */

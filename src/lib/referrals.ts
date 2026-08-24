@@ -11,7 +11,7 @@
 
        Hey Smiths! I'd like a free quote. (Ref: JAKE)
 
-   So the code arrives in your inbox on the customer's own text — no
+   So the code arrives in your inbox on the customer's own text, no
    tracking pixels, no cookies to trust, no extra software. Copy it into
    the calendar booking as `Source: JAKE` and that becomes your
    commission ledger at the end of the month.
@@ -22,18 +22,17 @@
 import { BUSINESS, TEXT_TO_BOOK_MESSAGE } from "./config";
 
 export interface TeamMember {
-  /** Lowercase, no spaces — this becomes the URL: /r/jake */
+  /** Lowercase, no spaces, this becomes the URL: /r/jake */
   code: string;
   /** First name, shown on their landing page */
   name: string;
   /** Their Instagram/TikTok handle without the @ (optional) */
   handle?: string;
-  /** Their personal OneDrive folder for raw clips. These are edit links —
-      treat them like passwords. Re-share the folder in OneDrive to kill an
+  /** Their personal OneDrive folder for raw clips. These are edit links,      treat them like passwords. Re-share the folder in OneDrive to kill an
       old link and generate a new one. */
   footageUrl?: string;
   /** Set true once they've left. Their old links stay alive so posts still
-      out in the world keep converting — you just stop paying commission.
+      out in the world keep converting, you just stop paying commission.
       NEVER delete a code and NEVER reassign it to someone else, or your
       commission history stops being auditable. */
   retired?: boolean;

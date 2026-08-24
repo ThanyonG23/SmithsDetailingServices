@@ -1,5 +1,5 @@
 /* =====================================================================
-   META LEADS CENTRE — parse the exported leads.csv
+   META LEADS CENTRE, parse the exported leads.csv
    ---------------------------------------------------------------------
    Each lead carries its ad_id (in the Labels column) and its Stage
    (Intake / Qualified / Converted / Follow Up / Abused). We pull those

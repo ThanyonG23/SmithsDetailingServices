@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createHmac, timingSafeEqual } from "crypto";
 
 /* =====================================================================
-   DAILY OPS — auth (two roles)
+   DAILY OPS, auth (two roles)
    ---------------------------------------------------------------------
    Two passwords, two levels of access:
      • OPS_PASSWORD       → "owner": full ops (dashboard, numbers, CRM…)
@@ -13,9 +13,9 @@ import { createHmac, timingSafeEqual } from "crypto";
    stored, and the cookie can't be forged without the secret.
 
    Set in Vercel:
-     OPS_PASSWORD       — the owner/manager password (you, Thanyon)
-     OPS_CREW_PASSWORD  — the detailers' password (Team board only)
-     OPS_SECRET         — any long random string (signs the cookie)
+     OPS_PASSWORD      , the owner/manager password (you, Thanyon)
+     OPS_CREW_PASSWORD , the detailers' password (Team board only)
+     OPS_SECRET        , any long random string (signs the cookie)
    ===================================================================== */
 
 export const OPS_COOKIE = "ops_session";

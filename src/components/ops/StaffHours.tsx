@@ -92,7 +92,7 @@ export default function StaffHours({
                   active ? "bg-brand-green/15 text-brand-green" : "bg-white/5 text-white/35"
                 }`}
               >
-                {active ? `${h}h` : "—"}
+                {active ? `${h}h` : "-"}
               </span>
             </div>
 
@@ -122,7 +122,7 @@ export default function StaffHours({
               name={`notes_${name}`}
               rows={2}
               defaultValue={initial?.[name]?.notes ?? ""}
-              placeholder={`Notes on ${name} — attitude, quality, anything to remember…`}
+              placeholder={`Notes on ${name}, attitude, quality, anything to remember…`}
               className="mt-2.5 w-full resize-none rounded-lg border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-white outline-none transition placeholder:text-white/20 focus:border-brand-green"
             />
           </div>

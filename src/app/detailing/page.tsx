@@ -12,7 +12,7 @@ export const metadata: Metadata = {
       "Deep interior cleans, cut & polish, paint correction and ceramic coatings in Cairns. Text us for a free quote. If you're not happy, you don't pay.",
     url: "/detailing",
     type: "website",
-    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "Smiths Detailing — Cairns" }],
+    images: [{ url: "/og.jpg", width: 1200, height: 630, alt: "Smiths Detailing, Cairns" }],
   },
 };
 
