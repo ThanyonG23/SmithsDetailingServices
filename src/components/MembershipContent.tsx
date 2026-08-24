@@ -4,6 +4,7 @@ import MembershipSignup from "@/components/MembershipSignup";
 import ReviewsSection from "@/components/ReviewsSection";
 import SiteNav from "@/components/SiteNav";
 import Countdown from "@/components/Countdown";
+import { MEMBERSHIP_TIERS } from "@/lib/membership-tiers";
 import { BUSINESS } from "@/lib/config";
 
 // The member draw: drawn 14 Sep 2026, 12:00pm AEST (UTC+10).
@@ -115,7 +116,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
   return (
     <main className="min-h-screen bg-[#050506]">
       {/* ═══ NAV ═══ */}
-      <SiteNav cta={{ label: "Reserve Spot", href: "#reserve" }} />
+      <SiteNav cta={{ label: "Book a call", href: "#reserve" }} />
 
       {/* ═══ HERO ═══ */}
       <section className="relative flex min-h-[82vh] items-center overflow-hidden">
@@ -174,7 +175,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                 href="#reserve"
                 className="inline-flex rounded-full bg-brand-green px-8 py-4 font-display text-base font-extrabold text-brand-ink shadow-[0_10px_40px_rgba(43,255,122,0.25)] transition hover:brightness-110 active:scale-95"
               >
-                Reserve my spot →
+                Book my call →
               </a>
               <p className="mt-3 text-xs text-white/40">No payment now · Next <s className="text-white/30">15</s> 10 members get a free Cut &amp; Polish</p>
             </div>
@@ -366,7 +367,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                 href="#reserve"
                 className="mt-8 flex w-full items-center justify-center rounded-full bg-brand-yellow px-7 py-4 font-display text-base font-black text-brand-ink transition hover:brightness-110 active:scale-95"
               >
-                Reserve my spot →
+                Book my call →
               </a>
               <p className="mt-3 text-center text-[13px] text-white/45">
                 💯 Backed by the Smiths promise: if you&apos;re not happy, you don&apos;t pay.
@@ -392,7 +393,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
           style={{ backgroundImage: `url(${SKIP_IMG})`, backgroundPosition: "72% center" }}
           aria-hidden
         />
-        <div className="absolute inset-0 bg-[#050506]/82" aria-hidden />
+        <div className="absolute inset-0 bg-[#050506]/90" aria-hidden />
         <div
           className="pointer-events-none absolute left-1/2 top-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 rounded-full opacity-[0.16] blur-[120px]"
           style={{ background: GREEN_GLOW }}
@@ -426,19 +427,30 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                 Over <b className="text-white">$1,370 of detailing</b> on your first visit alone, plus a shot at <b className="text-white">$2,200</b>.
               </div>
 
-              <div className="mt-6 text-center">
-                <div className="flex items-end justify-center gap-1.5">
-                  <span className="mb-1 text-sm font-bold text-white/50">From</span>
-                  <span className="font-display text-4xl font-black text-white sm:text-5xl">$39</span>
-                  <span className="mb-1 text-sm font-bold text-white/50">/week</span>
+              <div className="mt-6">
+                <div className="text-center">
+                  <div className="flex items-end justify-center gap-1.5">
+                    <span className="mb-1 text-sm font-bold text-white/50">From</span>
+                    <span className="font-display text-4xl font-black text-white sm:text-5xl">$39</span>
+                    <span className="mb-1 text-sm font-bold text-white/50">/week</span>
+                  </div>
+                  <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.16em] text-white/40">
+                    Pick your vehicle, join now
+                  </p>
                 </div>
-                <a
-                  href="/membership/join"
-                  className="mt-4 flex w-full items-center justify-center rounded-full bg-brand-green px-8 py-4 font-display text-base font-extrabold text-brand-ink shadow-[0_10px_40px_rgba(43,255,122,0.25)] transition hover:brightness-110 active:scale-95"
-                >
-                  Skip the call, join now →
-                </a>
-                <p className="mt-3 text-xs text-white/45">Secure checkout · cancel anytime</p>
+                <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+                  {MEMBERSHIP_TIERS.map((t) => (
+                    <a
+                      key={t.key}
+                      href={t.link}
+                      className="flex items-center justify-between gap-2 rounded-full bg-brand-green px-5 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95"
+                    >
+                      <span className="flex items-center gap-2"><span className="text-base leading-none">{t.emoji}</span>{t.key}</span>
+                      <span aria-hidden>→</span>
+                    </a>
+                  ))}
+                </div>
+                <p className="mt-3 text-center text-xs text-white/45">Straight to secure checkout · cancel anytime</p>
               </div>
             </div>
           </Reveal>

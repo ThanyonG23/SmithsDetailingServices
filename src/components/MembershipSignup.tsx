@@ -47,7 +47,7 @@ export default function MembershipSignup() {
     return (
       <div className="rounded-3xl border border-brand-green/40 bg-brand-green/[0.08] p-8 text-center">
         <div className="text-4xl">🎉</div>
-        <h3 className="mt-3 font-display text-2xl font-extrabold text-white">Your founding spot is reserved</h3>
+        <h3 className="mt-3 font-display text-2xl font-extrabold text-white">Your call is booked</h3>
         <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-white/70">
           Thanks {name.trim().split(" ")[0]}, we&apos;ll call you shortly to lock in your price and book
           your first visit. Keep an eye on your {email.trim() ? "inbox" : "phone"}.
@@ -62,7 +62,7 @@ export default function MembershipSignup() {
 
   return (
     <div className="rounded-3xl border border-white/12 bg-white/[0.03] p-6 sm:p-8">
-      <h3 className="font-display text-2xl font-extrabold tracking-tight text-white">Reserve your founding spot</h3>
+      <h3 className="font-display text-2xl font-extrabold tracking-tight text-white">Book your call</h3>
       <p className="mt-2 text-sm leading-relaxed text-white/60">
         Leave your details and we&apos;ll call you to lock in your price and first visit. No payment now.
       </p>
@@ -94,7 +94,7 @@ export default function MembershipSignup() {
         disabled={state === "sending"}
         className="mt-6 w-full rounded-full bg-brand-green px-6 py-4 font-display text-base font-extrabold text-brand-ink transition hover:brightness-110 disabled:opacity-60"
       >
-        {state === "sending" ? "Reserving…" : "Reserve my spot →"}
+        {state === "sending" ? "Booking…" : "Book my call →"}
       </button>
       <p className="mt-3 text-center text-xs text-white/35">No payment now. We&apos;ll confirm everything with you first.</p>
     </div>
