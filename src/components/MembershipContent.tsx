@@ -6,8 +6,8 @@ import SiteNav from "@/components/SiteNav";
 import Countdown from "@/components/Countdown";
 import { BUSINESS } from "@/lib/config";
 
-// Entry cut-off for the member draw: 29 Sep 2026, 11:59:59pm AEST (UTC+10).
-const DRAW_CUTOFF = "2026-09-29T23:59:59+10:00";
+// The member draw: drawn 30 Sep 2026, 12:00pm AEST (UTC+10).
+const DRAW_TIME = "2026-09-30T12:00:00+10:00";
 
 /* Shared body for the membership pages. `bonus` toggles the free
    cut & polish banner, on for /membership (new/cold ad traffic), off for
@@ -200,9 +200,9 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                 </p>
                 <div className="mt-4">
                   <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-yellow/80">
-                    Entries close in
+                    Drawn in
                   </div>
-                  <Countdown target={DRAW_CUTOFF} />
+                  <Countdown target={DRAW_TIME} />
                 </div>
                 <span className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-brand-yellow group-hover:text-white">
                   See draw terms
