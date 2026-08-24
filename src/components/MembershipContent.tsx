@@ -59,8 +59,8 @@ const EVERY_6_MONTHS: Group[] = [
   },
 ];
 
-const STEPS: { n: string; title: string; body: string }[] = [
-  { n: "1", title: "Reserve your spot", body: "Takes 30 seconds. No payment and nothing locked in yet, you're just claiming a founding spot." },
+const STEPS: { n: string; title: string; body: string; image?: string }[] = [
+  { n: "1", title: "Reserve your spot", body: "Takes 30 seconds. No payment and nothing locked in yet, you're just claiming a founding spot.", image: "/media/photos/step-reserve.png" },
   { n: "2", title: "We call you", body: "We confirm your car, your exact weekly price, and book in your first detail." },
   { n: "3", title: "Hand us the keys", body: "We keep it detailed and serviced on a schedule. You never think about car admin again." },
 ];
@@ -218,12 +218,24 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
           <div className="mt-10 grid gap-5 sm:grid-cols-3">
             {STEPS.map((s, i) => (
               <Reveal key={s.n} delay={i * 100}>
-                <div className="h-full rounded-2xl border border-white/10 bg-white/[0.02] p-6">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-green/15 font-display text-base font-black text-brand-green">
-                    {s.n}
-                  </span>
-                  <h3 className="mt-4 font-display text-lg font-extrabold tracking-tight text-white">{s.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-white/60">{s.body}</p>
+                <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
+                  {s.image ? (
+                    <div className="relative aspect-[3/2] w-full overflow-hidden bg-black">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={s.image} alt={s.title} className="h-full w-full object-cover" />
+                    </div>
+                  ) : (
+                    <div className="relative flex aspect-[3/2] w-full items-center justify-center overflow-hidden bg-gradient-to-br from-brand-green/[0.07] to-white/[0.02]">
+                      <span className="font-display text-6xl font-black text-white/10">{s.n}</span>
+                    </div>
+                  )}
+                  <div className="flex flex-1 flex-col p-6">
+                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-green/15 font-display text-base font-black text-brand-green">
+                      {s.n}
+                    </span>
+                    <h3 className="mt-4 font-display text-lg font-extrabold tracking-tight text-white">{s.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-white/60">{s.body}</p>
+                  </div>
                 </div>
               </Reveal>
             ))}
