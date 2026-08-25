@@ -95,10 +95,11 @@ export default function PrivacyPage() {
 
       <LegalSection heading="7. Cookies and analytics">
         <p>
-          We use Google Ads (gtag.js) to understand how people arrive at our site and to measure the
-          performance of our advertising. This may set cookies and share limited data with Google so we
-          can track conversions and show relevant ads. Our host may also keep standard server logs (such
-          as IP addresses) for security and reliability. You can opt out of personalised Google ads at{" "}
+          We use Google Ads (gtag.js) and the Meta (Facebook) pixel to understand how people arrive at
+          our site and to measure the performance of our advertising. These may set cookies and share
+          limited data with Google and Meta so we can track conversions and show relevant ads. Our host
+          may also keep standard server logs (such as IP addresses) for security and reliability. You can
+          opt out of personalised Google ads at{" "}
           <a
             href="https://adssettings.google.com"
             target="_blank"

@@ -6,6 +6,8 @@ import RefTracker from "@/components/RefTracker";
 
 // Google Ads tag (gtag.js), remarketing + conversion tracking.
 const GOOGLE_ADS_ID = "AW-16675588467";
+// Meta (Facebook) pixel, "Smiths Detailing Website" dataset.
+const META_PIXEL_ID = "1772212636658432";
 
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 const display = Sora({
@@ -83,6 +85,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', '${GOOGLE_ADS_ID}');`}
+        </Script>
+
+        {/* Meta (Facebook) pixel */}
+        <Script id="meta-pixel" strategy="afterInteractive">
+          {`!function(f,b,e,v,n,t,s)
+{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+n.queue=[];t=b.createElement(e);t.async=!0;
+t.src=v;s=b.getElementsByTagName(e)[0];
+s.parentNode.insertBefore(t,s)}(window, document,'script',
+'https://connect.facebook.net/en_US/fbevents.js');
+fbq('init', '${META_PIXEL_ID}');
+fbq('track', 'PageView');`}
         </Script>
       </body>
     </html>

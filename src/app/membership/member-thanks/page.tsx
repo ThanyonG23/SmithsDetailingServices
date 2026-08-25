@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BUSINESS } from "@/lib/config";
+import MetaPixelEvent from "@/components/MetaPixelEvent";
 
 export const metadata: Metadata = {
   title: "You're a Smiths Member",
@@ -37,6 +38,7 @@ const PERKS = [
 export default function MemberThanksPage() {
   return (
     <main className="min-h-screen bg-[#050506]">
+      <MetaPixelEvent event="Purchase" />
       <div className="relative">
         <div
           className="pointer-events-none absolute left-1/2 top-16 h-[460px] w-[460px] -translate-x-1/2 rounded-full opacity-[0.18] blur-[130px]"
