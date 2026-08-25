@@ -95,9 +95,19 @@ export default function PrivacyPage() {
 
       <LegalSection heading="7. Cookies and analytics">
         <p>
-          This website doesn&apos;t use advertising or tracking cookies, and we don&apos;t run
-          analytics that profile you. Our host may keep standard server logs (such as IP addresses)
-          for security and reliability. If we add analytics later, we&apos;ll update this page.
+          We use Google Ads (gtag.js) to understand how people arrive at our site and to measure the
+          performance of our advertising. This may set cookies and share limited data with Google so we
+          can track conversions and show relevant ads. Our host may also keep standard server logs (such
+          as IP addresses) for security and reliability. You can opt out of personalised Google ads at{" "}
+          <a
+            href="https://adssettings.google.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-brand-green underline underline-offset-2 hover:text-white"
+          >
+            adssettings.google.com
+          </a>
+          , and control cookies through your browser settings.
         </p>
       </LegalSection>
 

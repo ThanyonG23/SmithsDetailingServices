@@ -1,7 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Sora } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import RefTracker from "@/components/RefTracker";
+
+// Google Ads tag (gtag.js), remarketing + conversion tracking.
+const GOOGLE_ADS_ID = "AW-16675588467";
 
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 const display = Sora({
@@ -68,6 +72,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             Quote" button, including on repeat visits. */}
         <RefTracker />
         <div className="page-clip">{children}</div>
+
+        {/* Google Ads tag (gtag.js) */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GOOGLE_ADS_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="gtag-init" strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${GOOGLE_ADS_ID}');`}
+        </Script>
       </body>
     </html>
   );
