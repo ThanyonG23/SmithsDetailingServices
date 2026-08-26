@@ -135,7 +135,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
   return (
     <main className="min-h-screen bg-[#050506]">
       {/* ═══ NAV ═══ */}
-      <SiteNav cta={{ label: "Join now", href: "#join" }} />
+      <SiteNav cta={{ label: "Join now", href: "#join" }} accent="purple" />
 
       {/* ═══ HERO = MEMBERS' DRAWS ═══ */}
       <section className="relative overflow-hidden">

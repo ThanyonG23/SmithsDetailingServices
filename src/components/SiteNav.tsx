@@ -12,9 +12,16 @@ const LINKS = [
   { href: "/membership", label: "Membership" },
 ];
 
-export default function SiteNav({ cta }: { cta?: { label: string; href: string } }) {
+export default function SiteNav({
+  cta,
+  accent = "green",
+}: {
+  cta?: { label: string; href: string };
+  accent?: "green" | "purple";
+}) {
   const [open, setOpen] = useState(false);
   const button = cta ?? { label: "Call us", href: `tel:${BUSINESS.phoneE164}` };
+  const btnColor = accent === "purple" ? "bg-brand-purple text-white" : "bg-brand-green text-brand-ink";
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/5 bg-black/60 backdrop-blur-md">
@@ -39,7 +46,7 @@ export default function SiteNav({ cta }: { cta?: { label: string; href: string }
           </a>
           <a
             href={button.href}
-            className="hidden rounded-full bg-brand-green px-4 py-2 text-xs font-black text-brand-ink transition hover:brightness-110 sm:inline-flex"
+            className={`hidden rounded-full ${btnColor} px-4 py-2 text-xs font-black transition hover:brightness-110 sm:inline-flex`}
           >
             {button.label}
           </a>
@@ -80,7 +87,7 @@ export default function SiteNav({ cta }: { cta?: { label: string; href: string }
           <a
             href={button.href}
             onClick={() => setOpen(false)}
-            className="mt-1 rounded-full bg-brand-green px-4 py-2.5 text-center text-sm font-black text-brand-ink"
+            className={`mt-1 rounded-full ${btnColor} px-4 py-2.5 text-center text-sm font-black`}
           >
             {button.label}
           </a>
