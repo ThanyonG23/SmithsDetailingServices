@@ -15,10 +15,11 @@ export default function MembershipCheckout() {
   return (
     <div className="h-full rounded-3xl border border-brand-green/45 bg-gradient-to-b from-brand-green/[0.08] to-white/[0.02] p-6 shadow-[0_14px_60px_-18px_rgba(43,255,122,0.32)] sm:p-8">
       <div className="text-center">
-        <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-green">Ready to book?</div>
+        <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-green">The full membership</div>
         <h2 className="mt-2 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-          Here&apos;s everything you get
+          Detail &amp; Vehicle Service
         </h2>
+        <p className="mt-1.5 text-sm text-white/55">Your car detailed and serviced on a schedule, all handled for you.</p>
       </div>
 
       <ul className="mt-6 flex flex-col divide-y divide-white/10">

@@ -19,8 +19,6 @@ const DRAW_MINI_TIME = "2026-09-05T12:00:00+10:00";
    already recognises from 100+ Google reviews. */
 
 const LOGO = BUSINESS.logo; // Smiths Detailing logo
-const HERO_IMG = "/media/photos/cutpolish.jpg";
-const EXPLAINER_VIDEO = "/media/videos/membership-explainer.mp4";
 
 // ── The "from" price (cheapest tier = Single Cab). Change this line only. ──
 const PRICE = "$39";
@@ -98,9 +96,6 @@ const EVERY_6_MONTHS: Group[] = [
 
 
 
-function Eyebrow({ children }: { children: React.ReactNode }) {
-  return <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">{children}</div>;
-}
 
 function Stars() {
   return (
@@ -135,102 +130,45 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
       {/* ═══ NAV ═══ */}
       <SiteNav cta={{ label: "Join now", href: "#join" }} />
 
-      {/* ═══ HERO ═══ */}
-      <section className="relative flex min-h-[82vh] items-center overflow-hidden">
-        {/* full-bleed photo + darkening overlay for legible centered text */}
+      {/* ═══ HERO = MEMBERS' DRAWS ═══ */}
+      <section className="relative overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover"
-          style={{ backgroundImage: `url(${HERO_IMG})`, backgroundPosition: "72% center" }}
-          aria-hidden
-        />
-        <div className="absolute inset-0 bg-[#050506]/80" aria-hidden />
-        <div
-          className="pointer-events-none absolute left-1/2 top-[22%] h-[520px] w-[520px] -translate-x-1/2 rounded-full opacity-[0.20] blur-[120px]"
-          style={{ background: GREEN_GLOW }}
-          aria-hidden
-        />
-        <div
-          className="pointer-events-none absolute left-1/2 top-[44%] h-[320px] w-[320px] -translate-x-1/2 rounded-full opacity-[0.10] blur-[100px]"
+          className="pointer-events-none absolute left-1/2 top-[6%] h-[520px] w-[520px] -translate-x-1/2 rounded-full opacity-[0.18] blur-[120px]"
           style={{ background: YELLOW_GLOW }}
           aria-hidden
         />
-        <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#050506] to-transparent" aria-hidden />
+        <div
+          className="pointer-events-none absolute left-1/2 top-[40%] h-[360px] w-[360px] -translate-x-1/2 rounded-full opacity-[0.10] blur-[100px]"
+          style={{ background: GREEN_GLOW }}
+          aria-hidden
+        />
 
-        <div className="relative mx-auto w-full max-w-3xl px-5 py-14 text-center">
+        <div className="relative mx-auto max-w-5xl px-4 pb-8 pt-12 sm:pt-16">
           <Reveal>
-            <span className="inline-flex items-center gap-2 rounded-full border border-brand-green/40 bg-brand-green/[0.08] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-green">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-green" />
-              Founding members · Cairns · 10 spots left
-            </span>
+            <div className="text-center">
+              <span className="inline-flex items-center gap-2 rounded-full border border-brand-green/40 bg-brand-green/[0.08] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-green">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-green" />
+                Founding members · we just launched
+              </span>
+            </div>
           </Reveal>
           <Reveal delay={100}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={LOGO} alt="Smiths Detailing" className="mx-auto mt-7 w-full max-w-xs sm:max-w-sm" />
+            <img src={LOGO} alt="Smiths Detailing" className="mx-auto mt-6 w-full max-w-[210px] sm:max-w-xs" />
           </Reveal>
           <Reveal delay={200}>
-            <h1 className="mt-6 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-6xl">
-              Hand us the keys.
-              <span className="text-brand-green"> Never think about your car again.</span>
-            </h1>
-          </Reveal>
-          <Reveal delay={300}>
-            <p className="mx-auto mt-5 max-w-md text-lg leading-relaxed text-white/70">
-              Your car detailed and serviced on a schedule, all handled for you.
-            </p>
-          </Reveal>
-          <Reveal delay={350}>
-            <div className="mx-auto mt-6 flex max-w-xl flex-wrap items-center justify-center gap-2.5">
-              {[
-                "✨ Full detail every 3 months",
-                "🔧 Full service every 6 months",
-                "🎁 Free Cut & Polish to start",
-                "💰 Entry to member draws",
-              ].map((p) => (
-                <span
-                  key={p}
-                  className="rounded-full border border-white/12 bg-white/[0.04] px-3.5 py-1.5 text-sm font-semibold text-white/85"
-                >
-                  {p}
-                </span>
-              ))}
-            </div>
-          </Reveal>
-          <Reveal delay={350}>
-            <div className="mt-6 inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-white/70">
-              <Stars />
-              <span><b className="font-bold text-white">100+</b> 5-star Google reviews</span>
-            </div>
-          </Reveal>
-          <Reveal delay={400}>
-            <div className="mt-8">
-              <a
-                href="#join"
-                className="inline-flex rounded-full bg-brand-green px-8 py-4 font-display text-base font-extrabold text-brand-ink shadow-[0_10px_40px_rgba(43,255,122,0.25)] transition hover:brightness-110 active:scale-95"
-              >
-                Join now →
-              </a>
-              <p className="mt-3 text-xs text-white/40">Next <s className="text-white/30">15</s> 10 members get a free Cut &amp; Polish · cancel anytime</p>
-            </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ═══ MEMBERS' DRAWS (mini + big, side by side on desktop) ═══ */}
-      <section className="py-12">
-        <div className="mx-auto max-w-5xl px-4">
-          <Reveal>
-            <div className="text-center">
+            <div className="mt-6 text-center">
               <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-green">Members&apos; draws</div>
-              <h2 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+              <h1 className="mt-2 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-6xl">
                 Join now, you&apos;re in <span className="text-brand-yellow">both draws</span>
-              </h2>
-              <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-white/60">
+              </h1>
+              <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-white/65 sm:text-lg">
                 We just launched, so your odds have never been better. Every member goes in every draw, automatically.
               </p>
             </div>
           </Reveal>
 
-          <div className="mt-8 grid gap-6 md:grid-cols-2">
+          <div className="mt-9 grid gap-6 md:grid-cols-2">
             {/* mini draw */}
             <Reveal>
               <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-brand-yellow/40 shadow-glowY">
@@ -314,34 +252,18 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
               </Link>
             </Reveal>
           </div>
-        </div>
-      </section>
 
-      {/* ═══ HOW IT WORKS (video) ═══ */}
-      <section className="border-y border-white/5 bg-white/[0.015] py-16 sm:py-20">
-        <div className="mx-auto max-w-2xl px-4 text-center">
           <Reveal>
-            <Eyebrow>Watch</Eyebrow>
-            <h2 className="mt-3 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-              How it works, straight from us
-            </h2>
-          </Reveal>
-          <Reveal delay={120}>
-            <div className="relative mx-auto mt-8 w-full max-w-[300px]">
-              <div
-                className="pointer-events-none absolute -inset-6 rounded-[2.5rem] opacity-40 blur-2xl"
-                style={{ background: GREEN_GLOW }}
-                aria-hidden
-              />
-              <div className="relative overflow-hidden rounded-3xl border border-white/12 bg-black shadow-[0_24px_70px_-24px_rgba(0,0,0,0.85)]">
-                <video
-                  src={EXPLAINER_VIDEO}
-                  poster="/media/photos/membership-explainer-poster.jpg"
-                  controls
-                  playsInline
-                  preload="metadata"
-                  className="aspect-[9/16] w-full bg-black object-cover"
-                />
+            <div className="mt-9 flex flex-col items-center gap-4">
+              <a
+                href="#join"
+                className="inline-flex rounded-full bg-brand-green px-8 py-4 font-display text-base font-extrabold text-brand-ink shadow-[0_10px_40px_rgba(43,255,122,0.25)] transition hover:brightness-110 active:scale-95"
+              >
+                Join now →
+              </a>
+              <div className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-white/70">
+                <Stars />
+                <span><b className="font-bold text-white">100+</b> 5-star reviews · cancel anytime</span>
               </div>
             </div>
           </Reveal>
