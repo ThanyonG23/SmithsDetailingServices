@@ -325,7 +325,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                 <a href="/membership/join" className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-green px-6 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95">
                   Choose your vehicle →
                 </a>
-                <p className="mt-2.5 text-center text-xs text-white/40">Pick your vehicle at checkout. Cancel anytime.</p>
+                <p className="mt-2.5 flex min-h-[2.5rem] items-start justify-center text-center text-xs text-white/40">Pick your vehicle at checkout. Cancel anytime.</p>
               </div>
             </Reveal>
 
@@ -348,7 +348,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                 <a href="https://buy.stripe.com/8x27sL07CaTX8eI35F6kg0z" className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-yellow px-6 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95">
                   Join · $9.99/month →
                 </a>
-                <p className="mt-2.5 text-center text-xs text-white/40">Perks and draws, no detailing done for you. Cancel anytime.</p>
+                <p className="mt-2.5 flex min-h-[2.5rem] items-start justify-center text-center text-xs text-white/40">Perks and draws, no detailing done for you. Cancel anytime.</p>
               </div>
             </Reveal>
 
@@ -372,7 +372,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                 <a href="https://buy.stripe.com/5kQaEX6w0bY19iM9u36kg0A" className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-yellow px-6 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95">
                   Get the pass · $24.99 →
                 </a>
-                <p className="mt-2.5 text-center text-xs text-white/40">One-off. Nothing renews.</p>
+                <p className="mt-2.5 flex min-h-[2.5rem] items-start justify-center text-center text-xs text-white/40">One-off. Nothing renews.</p>
               </div>
             </Reveal>
           </div>
