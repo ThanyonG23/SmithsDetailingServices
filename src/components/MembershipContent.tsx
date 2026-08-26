@@ -24,6 +24,7 @@ const PRICE = "$39";
 
 // Purple glow used behind the hero (brand purple #7c2ff5).
 const GREEN_GLOW = "radial-gradient(closest-side, #7c2ff5, transparent 70%)";
+const VSL_VIDEO = "/media/videos/vsl-membership.mp4";
 const YELLOW_GLOW = "radial-gradient(closest-side, #FFE600, transparent 70%)";
 
 const FAQS: { q: string; a: string }[] = [
@@ -273,6 +274,55 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                 <span><b className="font-bold text-white">100+</b> 5-star reviews · cancel anytime</span>
               </div>
             </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ═══ WHAT IS IT (VSL + explainer) ═══ */}
+      <section className="border-y border-white/5 bg-white/[0.015] py-14 sm:py-16">
+        <div className="mx-auto max-w-3xl px-4">
+          <Reveal>
+            <div className="text-center">
+              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">60 seconds</div>
+              <h2 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                What is Smiths Membership?
+              </h2>
+            </div>
+          </Reveal>
+          <Reveal delay={100}>
+            <div className="relative mx-auto mt-7 max-w-2xl">
+              <div
+                className="pointer-events-none absolute -inset-4 rounded-[2rem] opacity-40 blur-2xl"
+                style={{ background: GREEN_GLOW }}
+                aria-hidden
+              />
+              <div className="relative overflow-hidden rounded-2xl border border-brand-purple/40 bg-black shadow-[0_24px_70px_-24px_rgba(0,0,0,0.85)]">
+                <video
+                  src={VSL_VIDEO}
+                  poster="/media/photos/vsl-membership-poster.jpg"
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="aspect-video w-full bg-black"
+                />
+              </div>
+            </div>
+          </Reveal>
+          <Reveal delay={150}>
+            <ul className="mx-auto mt-7 flex max-w-xl flex-col gap-3">
+              <li className="flex items-start gap-3 text-sm leading-relaxed text-white/75">
+                <span className="mt-0.5 shrink-0 text-lg leading-none">✨</span>
+                <span><b className="font-bold text-white">Hands-off car care.</b> We detail and service your car on a schedule, so you never have to organise a thing again.</span>
+              </li>
+              <li className="flex items-start gap-3 text-sm leading-relaxed text-white/75">
+                <span className="mt-0.5 shrink-0 text-lg leading-none">🎁</span>
+                <span><b className="font-bold text-white">Or just come for the draws.</b> Two lighter options give you 10% off, priority booking and entry to every members&apos; giveaway, no detailing needed.</span>
+              </li>
+              <li className="flex items-start gap-3 text-sm leading-relaxed text-white/75">
+                <span className="mt-0.5 shrink-0 text-lg leading-none">💰</span>
+                <span><b className="font-bold text-white">Join from $1</b> and you&apos;re instantly in the draw. We just launched, so your odds will never be as good as they are right now.</span>
+              </li>
+            </ul>
           </Reveal>
         </div>
       </section>
