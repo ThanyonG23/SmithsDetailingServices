@@ -42,7 +42,11 @@ const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "What's the difference between the two plans?",
-    a: "The full membership means we actually detail and service your car on a schedule, it's hands-off car care. Smiths Member at $9.99/month is perks only: 10% off, priority booking and draw entry, with no detailing done for you. Most people who want their car handled choose the full membership.",
+    a: "Detail & Vehicle Service is the full membership: we actually detail and service your car on a schedule, it's hands-off car care, from $39/week. Smiths Member is the lighter, cheaper way in at $9.99/month. Most people who want their car handled choose Detail & Vehicle Service.",
+  },
+  {
+    q: "What is the $9.99/month Smiths Member plan?",
+    a: "It's the cheapest way to become a member without booking in a detail. For $9.99/month you get 10% off all our services, priority booking, and entry to every members' draw. We don't detail your car on this plan, it's the perks and the draws only. Great if you just want to be in the giveaways and save on the odd detail.",
   },
   {
     q: "How does the $1,000 draw work?",
