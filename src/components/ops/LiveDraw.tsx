@@ -106,7 +106,8 @@ export default function LiveDraw() {
   const [phase, setPhase] = useState<Phase>("idle");
   const [fast, setFast] = useState(false);
   const [winner, setWinner] = useState<string | null>(null);
-  const [showSetup, setShowSetup] = useState(true);
+  const [presenting, setPresenting] = useState(false);
+  const [isFull, setIsFull] = useState(false);
   const [copied, setCopied] = useState(false);
   const [importMsg, setImportMsg] = useState("");
 
@@ -264,7 +265,6 @@ export default function LiveDraw() {
     setPhase("spinning");
     setWinner(null);
     setCopied(false);
-    setShowSetup(false);
 
     const STEPS = entrants.length === 1 ? 20 : 34;
     let step = 0;
@@ -320,133 +320,57 @@ export default function LiveDraw() {
     );
   };
 
+  // ── presentation (clean) mode ──
+  useEffect(() => {
+    const onFs = () => setIsFull(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", onFs);
+    return () => document.removeEventListener("fullscreenchange", onFs);
+  }, []);
+
+  const toggleFull = () => {
+    if (document.fullscreenElement) {
+      document.exitFullscreen?.().catch(() => {});
+    } else {
+      document.documentElement.requestFullscreen?.().catch(() => {});
+    }
+  };
+
+  const getReady = () => {
+    if (entrants.length === 0) return;
+    reset();
+    setPresenting(true);
+  };
+
+  const exitStage = () => {
+    if (document.fullscreenElement) document.exitFullscreen?.().catch(() => {});
+    setPresenting(false);
+    reset();
+  };
+
   const canDraw = entrants.length > 0 && phase !== "spinning";
 
-  return (
-    <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
-      <div className="text-center">
-        <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">Smiths members</div>
-        <h1 className="mt-2 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-          Live <span className="text-brand-green">Draw</span>
-        </h1>
-        <p className="mt-2 text-sm text-white/45">
-          Paste your active members, hit draw, let it roll. Random and provably fair.
-        </p>
-      </div>
-
-      {/* ── setup ── */}
-      {showSetup ? (
-        <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.02] p-4 sm:p-5">
-          <label className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/40">What they&apos;re winning</label>
-          <input
-            value={prize}
-            onChange={(e) => onPrizeChange(e.target.value)}
-            placeholder="$300 cash or a $400+ detail"
-            className="mt-2 w-full rounded-xl border border-white/12 bg-black/40 px-3.5 py-2.5 text-sm text-white outline-none focus:border-brand-green"
-          />
-          <label className="mt-4 block text-[11px] font-bold uppercase tracking-[0.16em] text-white/40">
-            Active members
-          </label>
-          <div className="mt-2 flex flex-wrap items-center gap-2">
-            <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-brand-green/40 bg-brand-green/[0.06] px-4 py-2.5 text-sm font-bold text-brand-green transition hover:bg-brand-green/[0.12]">
-              ⬆ Upload Stripe export (CSV)
-              <input type="file" accept=".csv,text/csv" className="hidden" onChange={onFile} />
-            </label>
-            {importMsg && <span className="text-xs text-white/55">{importMsg}</span>}
-          </div>
-          <p className="mt-1.5 text-xs text-white/35">
-            Stripe → Subscriptions → Export. Only members with a live subscription get pulled in. Or type / paste names below, one per line.
-          </p>
-          <textarea
-            value={raw}
-            onChange={(e) => onRawChange(e.target.value)}
-            rows={7}
-            placeholder={"Sarah Lee\nBen Carter\nMick Dunn\n…"}
-            className="mt-2 w-full resize-y rounded-xl border border-white/12 bg-black/40 px-3.5 py-2.5 text-sm text-white outline-none placeholder:text-white/25 focus:border-brand-green"
-          />
-          <div className="mt-2 flex items-center justify-between text-xs">
-            <span className={entrants.length > 0 ? "font-bold text-brand-green" : "text-white/40"}>
-              {entrants.length} real member{entrants.length === 1 ? "" : "s"}, only these can win
-            </span>
-            {raw.trim() && (
-              <button onClick={() => onRawChange("")} className="text-white/40 underline underline-offset-2 hover:text-white">
-                Clear
-              </button>
-            )}
-          </div>
-
-          {/* ── filler names, make the reel look busy, never win ── */}
-          <div className="mt-5 border-t border-white/10 pt-4">
-            <label className="flex cursor-pointer items-center justify-between gap-3">
-              <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/40">
-                Blend in filler names so the reel looks full
-              </span>
-              <input
-                type="checkbox"
-                checked={blend}
-                onChange={(e) => onBlendChange(e.target.checked)}
-                className="h-4 w-4 shrink-0 accent-brand-green"
-              />
-            </label>
-            {blend && (
-              <>
-                <textarea
-                  value={decoyRaw}
-                  onChange={(e) => onDecoyChange(e.target.value)}
-                  rows={4}
-                  placeholder={"Jake M.\nChloe R.\n…"}
-                  className="mt-2 w-full resize-y rounded-xl border border-white/12 bg-black/40 px-3.5 py-2.5 text-sm text-white/80 outline-none placeholder:text-white/25 focus:border-brand-green"
-                />
-                <p className="mt-1.5 text-xs leading-relaxed text-white/40">
-                  {decoys.length} filler names blended into the spin. They fill the reel so it looks busy, but
-                  they <b className="text-white/70">can never win</b>. The winner is always one of your{" "}
-                  {entrants.length} real member{entrants.length === 1 ? "" : "s"}.
-                </p>
-              </>
-            )}
-          </div>
-        </div>
-      ) : (
-        <div className="mt-6 flex items-center justify-center gap-3">
-          <span className="rounded-full border border-white/12 bg-white/[0.03] px-4 py-1.5 text-sm font-bold text-white/70">
-            {poolCount} in the draw
-          </span>
-          <button
-            onClick={() => setShowSetup(true)}
-            className="text-sm text-white/45 underline underline-offset-4 hover:text-white"
-          >
-            Edit list
-          </button>
-        </div>
-      )}
-
-      {/* ── prize banner ── */}
+  // ── the slot machine + controls, shared by the stage ──
+  const Machine = (
+    <>
+      {/* prize banner */}
       {prize.trim() && (
-        <div className="mt-6 text-center">
+        <div className="text-center">
           <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow/80">Drawing for</div>
-          <div className="mt-1 font-display text-xl font-extrabold text-white sm:text-2xl">{prize}</div>
+          <div className="mt-1 font-display text-2xl font-extrabold text-white sm:text-3xl">{prize}</div>
         </div>
       )}
 
-      {/* ── the machine ── */}
-      <div className="relative mt-5">
-        <canvas
-          ref={canvasRef}
-          className="pointer-events-none absolute inset-0 z-20 h-full w-full"
-          aria-hidden
-        />
+      <div className="relative mt-6">
+        <canvas ref={canvasRef} className="pointer-events-none absolute inset-0 z-20 h-full w-full" aria-hidden />
 
         <div className="relative overflow-hidden rounded-3xl border border-brand-yellow/40 bg-gradient-to-b from-brand-yellow/[0.10] to-black/40 p-4 shadow-[0_0_60px_-15px_rgba(255,230,0,0.4)] sm:p-6">
-          {/* payline markers */}
           <span className="pointer-events-none absolute left-3 top-1/2 z-10 -translate-y-1/2 text-2xl text-brand-green">▶</span>
           <span className="pointer-events-none absolute right-3 top-1/2 z-10 -translate-y-1/2 text-2xl text-brand-green">◀</span>
 
-          <div className="relative mx-auto flex h-[280px] max-w-md flex-col items-center justify-center gap-1 sm:h-[320px]">
-            {/* top row */}
+          <div className="relative mx-auto flex h-[300px] max-w-md flex-col items-center justify-center gap-1 sm:h-[340px]">
             <div className={`h-14 w-full truncate text-center font-display text-2xl font-bold text-white/30 transition ${fast ? "blur-[2px]" : ""}`}>
               {rows[0]}
             </div>
-            {/* middle payline */}
             <div className="relative w-full">
               <div className="absolute inset-x-2 -top-1 h-px bg-brand-green/50" aria-hidden />
               <div className="absolute inset-x-2 -bottom-1 h-px bg-brand-green/50" aria-hidden />
@@ -459,24 +383,21 @@ export default function LiveDraw() {
                 <span className="truncate">{rows[1]}</span>
               </div>
             </div>
-            {/* bottom row */}
             <div className={`h-14 w-full truncate text-center font-display text-2xl font-bold text-white/30 transition ${fast ? "blur-[2px]" : ""}`}>
               {rows[2]}
             </div>
           </div>
         </div>
 
-        {/* winner banner */}
         {phase === "done" && winner && (
           <div className="mt-5 rounded-2xl border border-brand-green/50 bg-brand-green/[0.08] p-5 text-center shadow-[0_0_50px_-18px_rgba(43,255,122,0.7)]">
             <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-green">🎉 Winner</div>
-            <div className="mt-2 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">{winner}</div>
+            <div className="mt-2 font-display text-3xl font-extrabold tracking-tight text-white sm:text-5xl">{winner}</div>
             {prize.trim() && <div className="mt-1 text-sm text-white/60">wins {prize}</div>}
           </div>
         )}
       </div>
 
-      {/* ── controls ── */}
       <div className="mt-6 flex flex-col items-center gap-3">
         {phase !== "done" ? (
           <button
@@ -484,35 +405,157 @@ export default function LiveDraw() {
             disabled={!canDraw}
             className="w-full max-w-sm rounded-full bg-brand-green px-8 py-4 font-display text-lg font-black text-[#04130a] shadow-[0_12px_45px_rgba(43,255,122,0.3)] transition hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            {phase === "spinning" ? "Rolling…" : entrants.length === 0 ? "Add members to draw" : "DRAW WINNER"}
+            {phase === "spinning" ? "Rolling…" : "DRAW WINNER"}
           </button>
         ) : (
           <div className="flex w-full max-w-md flex-wrap justify-center gap-2.5">
-            <button
-              onClick={reset}
-              className="flex-1 rounded-full bg-brand-green px-5 py-3 font-display text-sm font-black text-[#04130a] transition hover:brightness-110 active:scale-95"
-            >
+            <button onClick={reset} className="flex-1 rounded-full bg-brand-green px-5 py-3 font-display text-sm font-black text-[#04130a] transition hover:brightness-110 active:scale-95">
               Draw again
             </button>
-            <button
-              onClick={removeWinnerAndNext}
-              className="flex-1 rounded-full border border-white/15 px-5 py-3 font-display text-sm font-bold text-white/80 transition hover:border-brand-green hover:text-brand-green"
-            >
+            <button onClick={removeWinnerAndNext} className="flex-1 rounded-full border border-white/15 px-5 py-3 font-display text-sm font-bold text-white/80 transition hover:border-brand-green hover:text-brand-green">
               Remove winner, draw next
             </button>
-            <button
-              onClick={copyWinner}
-              className="rounded-full border border-white/15 px-5 py-3 font-display text-sm font-bold text-white/60 transition hover:border-white/35 hover:text-white"
-            >
+            <button onClick={copyWinner} className="rounded-full border border-white/15 px-5 py-3 font-display text-sm font-bold text-white/60 transition hover:border-white/35 hover:text-white">
               {copied ? "Copied ✓" : "Copy name"}
             </button>
           </div>
         )}
       </div>
+    </>
+  );
 
-      <p className="mt-10 text-center text-[11px] text-white/25">
-        Winner picked with the browser&apos;s cryptographic random generator. Refreshing keeps your pasted list.
-      </p>
+  // ═══ STAGE (clean, share-safe) ═══
+  if (presenting) {
+    return (
+      <main className="min-h-screen bg-[#050506]">
+        <div className="mx-auto flex min-h-screen max-w-3xl flex-col px-4 py-6">
+          <div className="flex items-center justify-between">
+            <button
+              onClick={exitStage}
+              className="rounded-full border border-white/15 px-4 py-2 text-xs font-bold text-white/60 transition hover:border-white/35 hover:text-white"
+            >
+              ← Exit
+            </button>
+            <span className="rounded-full border border-white/12 bg-white/[0.03] px-4 py-1.5 text-sm font-bold text-white/70">
+              {poolCount} in the draw
+            </span>
+            <button
+              onClick={toggleFull}
+              className="rounded-full border border-white/15 px-4 py-2 text-xs font-bold text-white/60 transition hover:border-white/35 hover:text-white"
+            >
+              {isFull ? "Exit full screen" : "⛶ Full screen"}
+            </button>
+          </div>
+
+          <div className="flex flex-1 flex-col justify-center py-8">{Machine}</div>
+
+          <p className="text-center text-[11px] text-white/25">
+            Winner picked with the browser&apos;s cryptographic random generator.
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  // ═══ SETUP (private, only you see this) ═══
+  return (
+    <main className="mx-auto max-w-3xl px-4 pb-24 pt-8">
+      <div className="text-center">
+        <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">Smiths members</div>
+        <h1 className="mt-2 font-display text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+          Live <span className="text-brand-green">Draw</span>
+        </h1>
+        <p className="mt-2 text-sm text-white/45">
+          Load your members here in private, then hit Get ready for a clean draw screen you can share.
+        </p>
+      </div>
+
+      {/* ── setup ── */}
+      <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.02] p-4 sm:p-5">
+        <label className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/40">What they&apos;re winning</label>
+        <input
+          value={prize}
+          onChange={(e) => onPrizeChange(e.target.value)}
+          placeholder="$300 cash or a $400+ detail"
+          className="mt-2 w-full rounded-xl border border-white/12 bg-black/40 px-3.5 py-2.5 text-sm text-white outline-none focus:border-brand-green"
+        />
+        <label className="mt-4 block text-[11px] font-bold uppercase tracking-[0.16em] text-white/40">
+          Active members
+        </label>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-brand-green/40 bg-brand-green/[0.06] px-4 py-2.5 text-sm font-bold text-brand-green transition hover:bg-brand-green/[0.12]">
+            ⬆ Upload Stripe export (CSV)
+            <input type="file" accept=".csv,text/csv" className="hidden" onChange={onFile} />
+          </label>
+          {importMsg && <span className="text-xs text-white/55">{importMsg}</span>}
+        </div>
+        <p className="mt-1.5 text-xs text-white/35">
+          Stripe → Subscriptions → Export. Only members with a live subscription get pulled in. Or type / paste names below, one per line.
+        </p>
+        <textarea
+          value={raw}
+          onChange={(e) => onRawChange(e.target.value)}
+          rows={7}
+          placeholder={"Sarah Lee\nBen Carter\nMick Dunn\n…"}
+          className="mt-2 w-full resize-y rounded-xl border border-white/12 bg-black/40 px-3.5 py-2.5 text-sm text-white outline-none placeholder:text-white/25 focus:border-brand-green"
+        />
+        <div className="mt-2 flex items-center justify-between text-xs">
+          <span className={entrants.length > 0 ? "font-bold text-brand-green" : "text-white/40"}>
+            {entrants.length} real member{entrants.length === 1 ? "" : "s"}, only these can win
+          </span>
+          {raw.trim() && (
+            <button onClick={() => onRawChange("")} className="text-white/40 underline underline-offset-2 hover:text-white">
+              Clear
+            </button>
+          )}
+        </div>
+
+        {/* ── filler names, make the reel look busy, never win ── */}
+        <div className="mt-5 border-t border-white/10 pt-4">
+          <label className="flex cursor-pointer items-center justify-between gap-3">
+            <span className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/40">
+              Blend in filler names so the reel looks full
+            </span>
+            <input
+              type="checkbox"
+              checked={blend}
+              onChange={(e) => onBlendChange(e.target.checked)}
+              className="h-4 w-4 shrink-0 accent-brand-green"
+            />
+          </label>
+          {blend && (
+            <>
+              <textarea
+                value={decoyRaw}
+                onChange={(e) => onDecoyChange(e.target.value)}
+                rows={4}
+                placeholder={"Jake M.\nChloe R.\n…"}
+                className="mt-2 w-full resize-y rounded-xl border border-white/12 bg-black/40 px-3.5 py-2.5 text-sm text-white/80 outline-none placeholder:text-white/25 focus:border-brand-green"
+              />
+              <p className="mt-1.5 text-xs leading-relaxed text-white/40">
+                {decoys.length} filler names blended into the spin. They fill the reel so it looks busy, but
+                they <b className="text-white/70">can never win</b>. The winner is always one of your{" "}
+                {entrants.length} real member{entrants.length === 1 ? "" : "s"}.
+              </p>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* ── get ready ── */}
+      <div className="mt-6 flex flex-col items-center gap-2">
+        <button
+          onClick={getReady}
+          disabled={entrants.length === 0}
+          className="w-full max-w-sm rounded-full bg-brand-green px-8 py-4 font-display text-lg font-black text-[#04130a] shadow-[0_12px_45px_rgba(43,255,122,0.3)] transition hover:brightness-110 active:scale-95 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          {entrants.length === 0 ? "Add members first" : "Get ready →"}
+        </button>
+        <p className="max-w-sm text-center text-xs leading-relaxed text-white/40">
+          Opens a clean draw screen with the machine only. Your member list and filler names stay hidden, safe to
+          screen-share or stream.
+        </p>
+      </div>
     </main>
   );
 }
