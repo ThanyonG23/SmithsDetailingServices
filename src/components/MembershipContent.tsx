@@ -192,11 +192,11 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                   <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
                     Mini draw · drawn 5 Sept
                   </div>
-                  <h3 className="mt-1.5 font-display text-xl font-extrabold leading-tight text-white sm:text-2xl">
+                  <h3 className="mt-1.5 min-h-[3.25rem] font-display text-xl font-extrabold leading-tight text-white sm:min-h-[3.75rem] sm:text-2xl">
                     Win <span className="text-brand-yellow">$300 cash</span> or a{" "}
                     <span className="text-brand-yellow">$400+</span> detail
                   </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-white/70">
+                  <p className="mt-2 min-h-[2.5rem] text-sm leading-relaxed text-white/70">
                     Our first mini draw. A brand new member pool means the best odds you will ever get.
                   </p>
                   <div className="mt-auto pt-4">
@@ -233,11 +233,11 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                   <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
                     Big draw · drawn 14 Sept
                   </div>
-                  <h3 className="mt-1.5 font-display text-xl font-extrabold leading-tight text-white sm:text-2xl">
+                  <h3 className="mt-1.5 min-h-[3.25rem] font-display text-xl font-extrabold leading-tight text-white sm:min-h-[3.75rem] sm:text-2xl">
                     Win <span className="text-brand-yellow">$1,000 cash</span> or a{" "}
                     <span className="text-brand-yellow">$2,200</span> paint correction &amp; coating
                   </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-white/70">
+                  <p className="mt-2 min-h-[2.5rem] text-sm leading-relaxed text-white/70">
                     Every active member is automatically entered. Join now and you are in.
                   </p>
                   <div className="mt-auto pt-4">
@@ -245,9 +245,8 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                       Drawn in
                     </div>
                     <Countdown target={DRAW_TIME} />
-                    <span className="mt-4 inline-flex items-center gap-1 text-sm font-bold text-brand-yellow group-hover:text-white">
+                    <span className="mt-3 block text-center text-xs font-semibold text-brand-yellow/80 underline underline-offset-4 transition group-hover:text-white">
                       See draw terms
-                      <span className="transition-transform group-hover:translate-x-1">→</span>
                     </span>
                   </div>
                 </div>
