@@ -49,6 +49,10 @@ const FAQS: { q: string; a: string }[] = [
     a: "It's the cheapest way to become a member without booking in a detail. For $9.99/month you get 10% off all our services, priority booking, and entry to every members' draw. We don't detail your car on this plan, it's the perks and the draws only. Great if you just want to be in the giveaways and save on the odd detail.",
   },
   {
+    q: "Can I do a one-off instead of a subscription?",
+    a: "Yes. The 30-day Member Pass is $24.99 once, no subscription and nothing renews. It gives you the same 10% off, priority booking, and entry to every draw for 30 days from your purchase. There's a link for it under the Smiths Member plan. Handy if you'd rather not have a recurring payment.",
+  },
+  {
     q: "How does the $1,000 draw work?",
     a: "Every active member is automatically entered to win $1,000 cash, drawn 14 September. Nothing extra to do, being a member is your entry. Full details are on the draw terms page.",
   },
@@ -329,6 +333,15 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                     Join · $9.99/month →
                   </a>
                   <p className="mt-2.5 text-center text-xs text-white/40">Perks and draw entry, no detailing done for you. Cancel anytime.</p>
+                  <div className="mt-4 border-t border-white/10 pt-4 text-center">
+                    <a
+                      href="https://buy.stripe.com/5kQaEX6w0bY19iM9u36kg0A"
+                      className="text-xs font-bold text-brand-yellow/90 underline underline-offset-4 transition hover:text-white"
+                    >
+                      Prefer to pay once? Get a 30-day pass for $24.99 →
+                    </a>
+                    <p className="mt-1.5 text-[11px] text-white/35">Same perks + draws for 30 days. No subscription.</p>
+                  </div>
                 </div>
               </Reveal>
             </div>
