@@ -204,12 +204,6 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                       Drawn in
                     </div>
                     <Countdown target={DRAW_MINI_TIME} />
-                    <a
-                      href="#join"
-                      className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-brand-purple px-6 py-3 font-display text-sm font-black text-white shadow-[0_10px_40px_rgba(124,47,245,0.3)] transition hover:brightness-110 active:scale-95"
-                    >
-                      Join now →
-                    </a>
                     <Link
                       href="/mini-draw-terms"
                       className="mt-3 block text-center text-xs font-semibold text-brand-yellow/80 underline underline-offset-4 transition hover:text-white"
