@@ -37,7 +37,7 @@ const OFFERS: Offer[] = [
     icon: "🔑",
     title: "Membership",
     desc: "Hand us the keys and we keep your car detailed and serviced on a schedule, always clean, always sorted, one weekly payment.",
-    tag: "From $9.99 / month",
+    tag: "First month $1",
     cta: "See the membership",
     live: true,
     accent: "yellow",

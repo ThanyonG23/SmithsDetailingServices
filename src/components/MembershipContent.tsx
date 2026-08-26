@@ -44,8 +44,8 @@ const FAQS: { q: string; a: string }[] = [
     a: "There are three. Detail & Vehicle Service is the full membership: we actually detail and service your car on a schedule, it's hands-off car care, from $39/week. Smiths Member ($9.99/month) is the lighter, cheaper way in, perks and draws only, no detailing. The 30-Day Pass ($24.99 once) is the same perks and draws but paid one-off with no subscription. Most people who want their car handled choose Detail & Vehicle Service.",
   },
   {
-    q: "What is the $9.99/month Smiths Member plan?",
-    a: "It's the cheapest way to become a member without booking in a detail. For $9.99/month you get 10% off all our services, priority booking, and entry to every members' draw. We don't detail your car on this plan, it's the perks and the draws only. Great if you just want to be in the giveaways and save on the odd detail.",
+    q: "What is the Smiths Member plan?",
+    a: "It's the cheapest way to become a member without booking in a detail. For a limited time your first month is just $1, then it's $9.99/month, and you can cancel anytime. You get 10% off all our services, priority booking, and entry to every members' draw. We don't detail your car on this plan, it's the perks and the draws only. Great if you just want to be in the giveaways and save on the odd detail.",
   },
   {
     q: "Can I do a one-off instead of a subscription?",
@@ -322,12 +322,18 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
             <Reveal delay={80}>
               <div className="flex h-full flex-col rounded-3xl border border-brand-yellow/45 bg-gradient-to-b from-brand-yellow/[0.08] to-white/[0.02] p-6 shadow-glowY">
                 <div>
-                  <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">The lighter way in</div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">The lighter way in</div>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-brand-yellow/15 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.14em] text-brand-yellow">
+                      <span className="h-1 w-1 animate-pulse rounded-full bg-brand-yellow" />Limited time
+                    </span>
+                  </div>
                   <h3 className="mt-1.5 font-display text-xl font-extrabold tracking-tight text-white">Smiths Member</h3>
                   <div className="mt-3 flex items-end gap-1.5">
-                    <span className="font-display text-3xl font-black text-white">$9.99</span>
-                    <span className="mb-1 text-xs font-bold text-white/50">/month</span>
+                    <span className="font-display text-3xl font-black text-white">$1</span>
+                    <span className="mb-1 text-xs font-bold text-white/50">first month</span>
                   </div>
+                  <div className="mt-0.5 text-xs text-white/45">then $9.99/month · cancel anytime</div>
                 </div>
                 <ul className="mt-5 flex flex-1 flex-col gap-2.5 text-sm text-white/80">
                   <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">✓</span>10% off all our services</li>
@@ -335,9 +341,9 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                   <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">Entry to every draw</span></li>
                 </ul>
                 <a href="https://buy.stripe.com/8x27sL07CaTX8eI35F6kg0z" className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-yellow px-6 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95">
-                  Join · $9.99/month →
+                  Join for $1 →
                 </a>
-                <p className="mt-2.5 flex min-h-[2.5rem] items-start justify-center text-center text-xs text-white/40">Perks and draws, no detailing done for you. Cancel anytime.</p>
+                <p className="mt-2.5 flex min-h-[2.5rem] items-start justify-center text-center text-xs text-white/40">First month $1, then $9.99/month. Cancel anytime.</p>
               </div>
             </Reveal>
 
