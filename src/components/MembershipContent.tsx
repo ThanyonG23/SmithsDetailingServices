@@ -22,8 +22,8 @@ const LOGO = BUSINESS.logo; // Smiths Detailing logo
 // ── The "from" price (cheapest tier = Single Cab). Change this line only. ──
 const PRICE = "$39";
 
-// Green glow used behind the hero + plan card (brand green #2bff7a).
-const GREEN_GLOW = "radial-gradient(closest-side, #2bff7a, transparent 70%)";
+// Purple glow used behind the hero (brand purple #7c2ff5).
+const GREEN_GLOW = "radial-gradient(closest-side, #7c2ff5, transparent 70%)";
 const YELLOW_GLOW = "radial-gradient(closest-side, #FFE600, transparent 70%)";
 
 const FAQS: { q: string; a: string }[] = [
@@ -106,7 +106,7 @@ const EVERY_6_MONTHS: Group[] = [
 
 function Stars() {
   return (
-    <span className="text-brand-green" aria-label="5 out of 5 stars">
+    <span className="text-brand-purple-soft" aria-label="5 out of 5 stars">
       ★★★★★
     </span>
   );
@@ -122,7 +122,7 @@ function GroupCard({ g }: { g: Group }) {
       <ul className="mt-3 grid gap-x-4 gap-y-2 sm:grid-cols-2">
         {g.items.map((item) => (
           <li key={item} className="flex items-start gap-2 text-sm text-white/75">
-            <span className="mt-0.5 shrink-0 text-brand-green">✓</span>
+            <span className="mt-0.5 shrink-0 text-brand-purple-soft">✓</span>
             <span>{item}</span>
           </li>
         ))}
@@ -153,8 +153,8 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
         <div className="relative mx-auto max-w-5xl px-4 pb-8 pt-12 sm:pt-16">
           <Reveal>
             <div className="text-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-brand-green/40 bg-brand-green/[0.08] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-green">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-green" />
+              <span className="inline-flex items-center gap-2 rounded-full border border-brand-purple/40 bg-brand-purple/[0.08] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-purple-soft">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-purple-soft" />
                 Founding members · we just launched
               </span>
             </div>
@@ -165,7 +165,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
           </Reveal>
           <Reveal delay={200}>
             <div className="mt-6 text-center">
-              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-green">Members&apos; draws</div>
+              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">Members&apos; draws</div>
               <h1 className="mt-2 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-6xl">
                 Join now, you&apos;re in <span className="text-brand-yellow">both draws</span>
               </h1>
@@ -205,7 +205,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                     <Countdown target={DRAW_MINI_TIME} />
                     <a
                       href="#join"
-                      className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-brand-green px-6 py-3 font-display text-sm font-black text-brand-ink shadow-[0_10px_40px_rgba(43,255,122,0.25)] transition hover:brightness-110 active:scale-95"
+                      className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-brand-purple px-6 py-3 font-display text-sm font-black text-white shadow-[0_10px_40px_rgba(124,47,245,0.3)] transition hover:brightness-110 active:scale-95"
                     >
                       Join now →
                     </a>
@@ -264,7 +264,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
             <div className="mt-9 flex flex-col items-center gap-4">
               <a
                 href="#join"
-                className="inline-flex rounded-full bg-brand-green px-8 py-4 font-display text-base font-extrabold text-brand-ink shadow-[0_10px_40px_rgba(43,255,122,0.25)] transition hover:brightness-110 active:scale-95"
+                className="inline-flex rounded-full bg-brand-purple px-8 py-4 font-display text-base font-extrabold text-white shadow-[0_10px_40px_rgba(124,47,245,0.3)] transition hover:brightness-110 active:scale-95"
               >
                 Join now →
               </a>
@@ -373,7 +373,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
         <div className="mx-auto max-w-2xl">
           <Reveal>
             <div className="text-center">
-              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-green">Questions</div>
+              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">Questions</div>
               <h2 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
                 Everything you might ask
               </h2>
@@ -382,10 +382,10 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
           <div className="mt-8 flex flex-col gap-3">
             {FAQS.map((f) => (
               <Reveal key={f.q}>
-                <details className="group rounded-2xl border border-white/10 bg-white/[0.02] transition hover:border-white/20 open:border-brand-green/30 open:bg-brand-green/[0.03]">
+                <details className="group rounded-2xl border border-white/10 bg-white/[0.02] transition hover:border-white/20 open:border-brand-purple/30 open:bg-brand-purple/[0.03]">
                   <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 font-display text-base font-bold text-white [&::-webkit-details-marker]:hidden">
                     {f.q}
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-white/20 text-white/60 transition group-open:rotate-45 group-open:border-brand-green/50 group-open:text-brand-green">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-white/20 text-white/60 transition group-open:rotate-45 group-open:border-brand-purple/50 group-open:text-brand-purple-soft">
                       <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
                         <path d="M12 5v14M5 12h14" />
                       </svg>
@@ -399,7 +399,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
           <Reveal>
             <p className="mt-8 text-center text-sm text-white/50">
               Still unsure?{" "}
-              <a href={`sms:${BUSINESS.phoneE164}`} className="font-bold text-brand-green underline underline-offset-4 transition hover:text-white">
+              <a href={`sms:${BUSINESS.phoneE164}`} className="font-bold text-brand-purple-soft underline underline-offset-4 transition hover:text-white">
                 Text Thanyon
               </a>{" "}
               and ask.
@@ -418,7 +418,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
           <img src={LOGO} alt="Smiths Detailing" className="mx-auto h-12 w-auto" />
           <p className="mx-auto mt-4 max-w-xs text-sm leading-relaxed text-white/50">{BUSINESS.address}</p>
           <p className="mt-3 text-sm">
-            <a href={`tel:${BUSINESS.phoneE164}`} className="font-bold text-white transition hover:text-brand-green">
+            <a href={`tel:${BUSINESS.phoneE164}`} className="font-bold text-white transition hover:text-brand-purple-soft">
               {BUSINESS.phone}
             </a>
           </p>
