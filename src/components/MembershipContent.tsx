@@ -40,8 +40,8 @@ const FAQS: { q: string; a: string }[] = [
     a: "Yes, anytime. The member price is built around you staying on the plan, so if you cancel before your second visit the first visit is simply charged at our normal going rate. Stay past that and you keep the member pricing for good.",
   },
   {
-    q: "What's the difference between the two plans?",
-    a: "Detail & Vehicle Service is the full membership: we actually detail and service your car on a schedule, it's hands-off car care, from $39/week. Smiths Member is the lighter, cheaper way in at $9.99/month. Most people who want their car handled choose Detail & Vehicle Service.",
+    q: "What's the difference between the plans?",
+    a: "There are three. Detail & Vehicle Service is the full membership: we actually detail and service your car on a schedule, it's hands-off car care, from $39/week. Smiths Member ($9.99/month) is the lighter, cheaper way in, perks and draws only, no detailing. The 30-Day Pass ($24.99 once) is the same perks and draws but paid one-off with no subscription. Most people who want their car handled choose Detail & Vehicle Service.",
   },
   {
     q: "What is the $9.99/month Smiths Member plan?",
@@ -280,33 +280,17 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
       {/* ═══ THE PLAN ═══ */}
       <section id="join" className="scroll-mt-16 pt-20 pb-6 sm:pt-24">
         <div className="mx-auto max-w-6xl px-4">
-          {bonus && (
-            <Reveal>
-              <div className="mb-6 flex items-center gap-3 rounded-2xl border border-brand-yellow/45 bg-gradient-to-r from-brand-yellow/[0.14] to-brand-yellow/[0.03] px-5 py-4 shadow-glowY">
-                <span className="text-2xl leading-none">🎁</span>
-                <div className="min-w-0">
-                  <div className="font-display text-[15px] font-extrabold leading-tight text-white sm:text-lg">
-                    BONUS: Get a free Cut &amp; Polish <span className="whitespace-nowrap text-brand-yellow">valued at $750+</span>
-                  </div>
-                  <div className="mt-1 flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.18em] text-brand-yellow/80">
-                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-yellow"></span>
-                    Next <s className="opacity-60">15</s> 10 members only
-                  </div>
-                </div>
-              </div>
-            </Reveal>
-          )}
           <div className="mb-6 text-center">
             <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/40">Choose your plan</span>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-3">
-            {/* Card 1: Detail & Vehicle Service (full membership) */}
+            {/* Card 1: Detail & Vehicle Service (full membership) — purple */}
             <Reveal>
-              <div className="relative flex h-full flex-col rounded-3xl border border-brand-green/45 bg-gradient-to-b from-brand-green/[0.08] to-white/[0.02] p-6 shadow-[0_14px_60px_-18px_rgba(43,255,122,0.32)]">
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand-green px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-brand-ink">Most popular</span>
+              <div className="relative flex h-full flex-col rounded-3xl border border-brand-purple/50 bg-gradient-to-b from-brand-purple/[0.16] to-white/[0.02] p-6 shadow-[0_14px_60px_-18px_rgba(124,47,245,0.5)]">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand-purple px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-white">Most popular</span>
                 <div>
-                  <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-green">The full membership</div>
+                  <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-purple-soft">The full membership</div>
                   <h3 className="mt-1.5 font-display text-xl font-extrabold tracking-tight text-white">Detail &amp; Vehicle Service</h3>
                   <div className="mt-3 flex items-end gap-1.5">
                     <span className="mb-1 text-xs font-bold text-white/50">From</span>
@@ -314,15 +298,20 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                     <span className="mb-1 text-xs font-bold text-white/50">/week</span>
                   </div>
                 </div>
+                {bonus && (
+                  <div className="mt-4 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-3 py-2.5 text-center">
+                    <div className="text-[11px] font-black uppercase tracking-wide text-brand-yellow">🎁 Free Cut &amp; Polish to start</div>
+                    <div className="mt-0.5 text-[11px] text-white/60">Valued at $750+ · next <s className="opacity-60">15</s> 10 members</div>
+                  </div>
+                )}
                 <ul className="mt-5 flex flex-1 flex-col gap-2.5 text-sm text-white/80">
-                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Full detail every 3 months</li>
-                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Full service every 6 months</li>
-                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Free Cut &amp; Polish to start</li>
-                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>10% off add-on services</li>
-                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Priority booking</li>
+                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-purple-soft">✓</span>Full detail every 3 months</li>
+                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-purple-soft">✓</span>Full service every 6 months</li>
+                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-purple-soft">✓</span>10% off add-on services</li>
+                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-purple-soft">✓</span>Priority booking</li>
                   <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">Entry to every draw</span></li>
                 </ul>
-                <a href="/membership/join" className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-green px-6 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95">
+                <a href="/membership/join" className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-purple px-6 py-3.5 font-display text-sm font-black text-white transition hover:brightness-110 active:scale-95">
                   Choose your vehicle →
                 </a>
                 <p className="mt-2.5 flex min-h-[2.5rem] items-start justify-center text-center text-xs text-white/40">Pick your vehicle at checkout. Cancel anytime.</p>
@@ -341,8 +330,8 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                   </div>
                 </div>
                 <ul className="mt-5 flex flex-1 flex-col gap-2.5 text-sm text-white/80">
-                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>10% off all our services</li>
-                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Priority booking</li>
+                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">✓</span>10% off all our services</li>
+                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">✓</span>Priority booking</li>
                   <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">Entry to every draw</span></li>
                 </ul>
                 <a href="https://buy.stripe.com/8x27sL07CaTX8eI35F6kg0z" className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-yellow px-6 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95">
@@ -352,11 +341,11 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
               </div>
             </Reveal>
 
-            {/* Card 3: 30-Day Pass $24.99 one-off */}
+            {/* Card 3: 30-Day Pass $24.99 one-off — black/neutral */}
             <Reveal delay={160}>
-              <div className="flex h-full flex-col rounded-3xl border border-brand-yellow/45 bg-gradient-to-b from-brand-yellow/[0.08] to-white/[0.02] p-6 shadow-glowY">
+              <div className="flex h-full flex-col rounded-3xl border border-white/25 bg-gradient-to-b from-white/[0.07] to-white/[0.01] p-6 shadow-[0_14px_50px_-22px_rgba(255,255,255,0.28)]">
                 <div>
-                  <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">No subscription</div>
+                  <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/45">No subscription</div>
                   <h3 className="mt-1.5 font-display text-xl font-extrabold tracking-tight text-white">30-Day Pass</h3>
                   <div className="mt-3 flex items-end gap-1.5">
                     <span className="font-display text-3xl font-black text-white">$24.99</span>
@@ -364,12 +353,12 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                   </div>
                 </div>
                 <ul className="mt-5 flex flex-1 flex-col gap-2.5 text-sm text-white/80">
-                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>10% off all our services</li>
-                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Priority booking</li>
+                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-white/70">✓</span>10% off all our services</li>
+                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-white/70">✓</span>Priority booking</li>
                   <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">Entry to every draw</span></li>
-                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Valid 30 days, no renewal</li>
+                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-white/70">✓</span>Valid 30 days, no renewal</li>
                 </ul>
-                <a href="https://buy.stripe.com/5kQaEX6w0bY19iM9u36kg0A" className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-yellow px-6 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95">
+                <a href="https://buy.stripe.com/5kQaEX6w0bY19iM9u36kg0A" className="mt-6 flex w-full items-center justify-center rounded-full bg-white px-6 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-95 active:scale-95">
                   Get the pass · $24.99 →
                 </a>
                 <p className="mt-2.5 flex min-h-[2.5rem] items-start justify-center text-center text-xs text-white/40">One-off. Nothing renews.</p>
