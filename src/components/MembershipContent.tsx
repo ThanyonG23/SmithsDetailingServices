@@ -394,8 +394,8 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                 <div>
                   <div className="flex items-center justify-between gap-2">
                     <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/45">No subscription</div>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.14em] text-white/70">
-                      <span className="h-1 w-1 animate-pulse rounded-full bg-white/70" />Limited time
+                    <span className="inline-flex items-center gap-1 rounded-full bg-brand-purple/20 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.14em] text-brand-purple-soft">
+                      <span className="h-1 w-1 animate-pulse rounded-full bg-brand-purple-soft" />Limited time
                     </span>
                   </div>
                   <h3 className="mt-1.5 font-display text-xl font-extrabold tracking-tight text-white">30-Day Pass</h3>
