@@ -179,7 +179,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
           <div className="mt-9 grid gap-6 md:grid-cols-2">
             {/* mini draw */}
             <Reveal>
-              <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-brand-yellow/40 shadow-glowY">
+              <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-brand-purple/40 shadow-[0_0_0_1px_rgba(124,47,245,0.2),0_0_55px_rgba(124,47,245,0.32)]">
                 <div className="relative aspect-[16/9] w-full overflow-hidden bg-black">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -188,25 +188,25 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                     className="h-full w-full object-cover"
                   />
                 </div>
-                <div className="flex flex-1 flex-col bg-gradient-to-br from-brand-yellow/[0.14] to-brand-yellow/[0.02] p-5 sm:p-6">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
+                <div className="flex flex-1 flex-col bg-gradient-to-br from-brand-purple/[0.16] to-brand-purple/[0.02] p-5 sm:p-6">
+                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-purple-soft">
                     Mini draw · drawn 5 Sept
                   </div>
                   <h3 className="mt-1.5 min-h-[3.25rem] font-display text-xl font-extrabold leading-tight text-white sm:min-h-[3.75rem] sm:text-2xl">
-                    Win <span className="text-brand-yellow">$300 cash</span> or a{" "}
-                    <span className="text-brand-yellow">$400+</span> detail
+                    Win <span className="text-brand-purple-soft">$300 cash</span> or a{" "}
+                    <span className="text-brand-purple-soft">$400+</span> detail
                   </h3>
                   <p className="mt-2 min-h-[2.5rem] text-sm leading-relaxed text-white/70">
                     Our first mini draw. A brand new member pool means the best odds you will ever get.
                   </p>
                   <div className="mt-auto pt-4">
-                    <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-yellow/80">
+                    <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-purple-soft">
                       Drawn in
                     </div>
-                    <Countdown target={DRAW_MINI_TIME} />
+                    <Countdown target={DRAW_MINI_TIME} accent="purple" />
                     <Link
                       href="/mini-draw-terms"
-                      className="mt-3 block text-center text-xs font-semibold text-brand-yellow/80 underline underline-offset-4 transition hover:text-white"
+                      className="mt-3 block text-center text-xs font-semibold text-brand-purple-soft underline underline-offset-4 transition hover:text-white"
                     >
                       See draw terms
                     </Link>
@@ -217,7 +217,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
 
             {/* big draw */}
             <Reveal delay={100}>
-              <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-brand-yellow/40 shadow-glowY">
+              <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-brand-purple/40 shadow-[0_0_0_1px_rgba(124,47,245,0.2),0_0_55px_rgba(124,47,245,0.32)]">
                 <div className="relative aspect-[16/9] w-full overflow-hidden bg-black">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
@@ -226,25 +226,25 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                     className="h-full w-full object-cover"
                   />
                 </div>
-                <div className="flex flex-1 flex-col bg-gradient-to-br from-brand-yellow/[0.14] to-brand-yellow/[0.02] p-5 sm:p-6">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-yellow">
+                <div className="flex flex-1 flex-col bg-gradient-to-br from-brand-purple/[0.16] to-brand-purple/[0.02] p-5 sm:p-6">
+                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-purple-soft">
                     Big draw · drawn 14 Sept
                   </div>
                   <h3 className="mt-1.5 min-h-[3.25rem] font-display text-xl font-extrabold leading-tight text-white sm:min-h-[3.75rem] sm:text-2xl">
-                    Win <span className="text-brand-yellow">$1,000 cash</span> or a{" "}
-                    <span className="text-brand-yellow">$2,200</span> paint correction &amp; coating
+                    Win <span className="text-brand-purple-soft">$1,000 cash</span> or a{" "}
+                    <span className="text-brand-purple-soft">$2,200</span> paint correction &amp; coating
                   </h3>
                   <p className="mt-2 min-h-[2.5rem] text-sm leading-relaxed text-white/70">
                     Every active member is automatically entered. Join now and you are in.
                   </p>
                   <div className="mt-auto pt-4">
-                    <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-yellow/80">
+                    <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-purple-soft">
                       Drawn in
                     </div>
-                    <Countdown target={DRAW_TIME} />
+                    <Countdown target={DRAW_TIME} accent="purple" />
                     <Link
                       href="/draw-terms"
-                      className="mt-3 block text-center text-xs font-semibold text-brand-yellow/80 underline underline-offset-4 transition hover:text-white"
+                      className="mt-3 block text-center text-xs font-semibold text-brand-purple-soft underline underline-offset-4 transition hover:text-white"
                     >
                       See draw terms
                     </Link>

@@ -4,7 +4,15 @@ import { useEffect, useState } from "react";
 
 /* Live countdown to a target ISO datetime (e.g. the draw's entry cut-off).
    Renders "--" until mounted to avoid a hydration mismatch, then ticks every second. */
-export default function Countdown({ target }: { target: string }) {
+export default function Countdown({
+  target,
+  accent = "yellow",
+}: {
+  target: string;
+  accent?: "yellow" | "purple";
+}) {
+  const borderCls = accent === "purple" ? "border-brand-purple/30" : "border-brand-yellow/30";
+  const textCls = accent === "purple" ? "text-brand-purple-soft" : "text-brand-yellow";
   const targetMs = new Date(target).getTime();
   const [now, setNow] = useState<number | null>(null);
 
@@ -27,9 +35,9 @@ export default function Countdown({ target }: { target: string }) {
       {units.map((u) => (
         <div
           key={u.label}
-          className="flex min-w-[50px] flex-col items-center rounded-lg border border-brand-yellow/30 bg-black/40 px-2 py-1.5"
+          className={`flex min-w-[50px] flex-col items-center rounded-lg border ${borderCls} bg-black/40 px-2 py-1.5`}
         >
-          <span className="font-display text-lg font-black tabular-nums text-brand-yellow">
+          <span className={`font-display text-lg font-black tabular-nums ${textCls}`}>
             {now === null ? "--" : String(u.v).padStart(2, "0")}
           </span>
           <span className="text-[9px] font-bold uppercase tracking-wider text-white/45">{u.label}</span>
