@@ -387,7 +387,7 @@ export default function MembershipContent() {
               <div className="flex h-full flex-col rounded-3xl border border-white/25 bg-gradient-to-b from-white/[0.07] to-white/[0.01] p-6 shadow-[0_14px_50px_-22px_rgba(255,255,255,0.28)]">
                 <div>
                   <div className="flex items-center justify-between gap-2">
-                    <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/45">No subscription</div>
+                    <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-green">No subscription</div>
                     <span className="inline-flex items-center gap-1 rounded-full bg-brand-purple/20 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.14em] text-brand-purple-soft">
                       <span className="h-1 w-1 animate-pulse rounded-full bg-brand-purple-soft" />Limited time
                     </span>
