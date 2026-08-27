@@ -255,13 +255,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
           </div>
 
           <Reveal>
-            <div className="mt-9 flex flex-col items-center gap-4">
-              <a
-                href="#join"
-                className="inline-flex rounded-full bg-brand-purple px-8 py-4 font-display text-base font-extrabold text-white shadow-[0_10px_40px_rgba(124,47,245,0.3)] transition hover:brightness-110 active:scale-95"
-              >
-                Join now →
-              </a>
+            <div className="mt-9 flex justify-center">
               <div className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-white/70">
                 <Stars />
                 <span><b className="font-bold text-white">100+</b> 5-star reviews · cancel anytime</span>
