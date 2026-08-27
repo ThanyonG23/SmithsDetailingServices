@@ -95,11 +95,12 @@ export default function PrivacyPage() {
 
       <LegalSection heading="7. Cookies and analytics">
         <p>
-          We use Google Ads (gtag.js) and the Meta (Facebook) pixel to understand how people arrive at
-          our site and to measure the performance of our advertising. These may set cookies and share
-          limited data with Google and Meta so we can track conversions and show relevant ads. Our host
-          may also keep standard server logs (such as IP addresses) for security and reliability. You can
-          opt out of personalised Google ads at{" "}
+          We use Google Ads (gtag.js), the Meta (Facebook) pixel, and Microsoft Clarity to understand how
+          people arrive at and use our site and to measure the performance of our advertising. Microsoft
+          Clarity records anonymised, masked usage (such as clicks and scrolling) to help us improve the
+          site. These may set cookies and share limited data with Google, Meta and Microsoft so we can
+          track conversions and show relevant ads. Our host may also keep standard server logs (such as IP
+          addresses) for security and reliability. You can opt out of personalised Google ads at{" "}
           <a
             href="https://adssettings.google.com"
             target="_blank"

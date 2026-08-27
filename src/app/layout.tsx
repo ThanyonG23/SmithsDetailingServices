@@ -8,6 +8,8 @@ import RefTracker from "@/components/RefTracker";
 const GOOGLE_ADS_ID = "AW-16675588467";
 // Meta (Facebook) pixel, "Smiths Detailing Website" dataset.
 const META_PIXEL_ID = "1772212636658432";
+// Microsoft Clarity, heatmaps + session recordings.
+const CLARITY_ID = "y8nw99ksgn";
 
 const sans = Inter({ subsets: ["latin"], variable: "--font-sans", display: "swap" });
 const display = Sora({
@@ -99,6 +101,15 @@ s.parentNode.insertBefore(t,s)}(window, document,'script',
 'https://connect.facebook.net/en_US/fbevents.js');
 fbq('init', '${META_PIXEL_ID}');
 fbq('track', 'PageView');`}
+        </Script>
+
+        {/* Microsoft Clarity */}
+        <Script id="ms-clarity" strategy="afterInteractive">
+          {`(function(c,l,a,r,i,t,y){
+c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+})(window, document, "clarity", "script", "${CLARITY_ID}");`}
         </Script>
       </body>
     </html>
