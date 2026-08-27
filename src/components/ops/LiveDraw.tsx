@@ -303,9 +303,6 @@ export default function LiveDraw() {
     timerRef.current = setTimeout(tick, delay);
   }, [entrants, decoys, blend, phase, burstConfetti]);
 
-  // What the audience sees as the pool size (real + filler when blending).
-  const poolCount = blend && decoys.length > 0 ? entrants.length + decoys.length : entrants.length;
-
   const reset = () => {
     if (timerRef.current) clearTimeout(timerRef.current);
     setPhase("idle");
@@ -464,9 +461,6 @@ export default function LiveDraw() {
             >
               ← Exit
             </button>
-            <span className="rounded-full border border-brand-purple/40 bg-brand-purple/[0.12] px-4 py-1.5 text-sm font-bold text-brand-purple-soft">
-              {poolCount} in the draw
-            </span>
             <button
               onClick={toggleFull}
               className="rounded-full border border-white/15 px-4 py-2 text-xs font-bold text-white/60 transition hover:border-white/35 hover:text-white"
