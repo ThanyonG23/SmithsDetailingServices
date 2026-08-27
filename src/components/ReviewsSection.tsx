@@ -47,7 +47,11 @@ function Stars({ className = "" }: { className?: string }) {
   );
 }
 
-export default function ReviewsSection() {
+export default function ReviewsSection({ accent }: { accent?: "purple" }) {
+  const cardCls =
+    accent === "purple"
+      ? "border border-brand-purple/45 shadow-[0_0_30px_-8px_rgba(124,47,245,0.5)]"
+      : "card-edge";
   return (
     <section className="mx-auto max-w-6xl px-4 py-20">
       <Reveal>
@@ -72,7 +76,7 @@ export default function ReviewsSection() {
           {REVIEWS.map((r, i) => (
             <div
               key={r.name + i}
-              className="card-edge flex w-80 flex-none snap-start flex-col rounded-2xl bg-white/[0.02] p-5"
+              className={`${cardCls} flex w-80 flex-none snap-start flex-col rounded-2xl bg-white/[0.02] p-5`}
             >
               <div className="flex items-center gap-3">
                 <span
