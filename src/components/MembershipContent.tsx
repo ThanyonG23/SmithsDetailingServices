@@ -168,7 +168,7 @@ export default function MembershipContent() {
             <div className="mt-6 text-center">
               <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">Members&apos; draws</div>
               <h1 className="mt-2 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-6xl">
-                Join now, you&apos;re in <span className="text-brand-yellow">both draws</span>
+                Join now, you&apos;re in <span className="text-brand-purple-soft">both draws</span>
               </h1>
               <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-white/65 sm:text-lg">
                 We just launched, so your odds have never been better. Every member goes in every draw, automatically.
@@ -315,7 +315,7 @@ export default function MembershipContent() {
       </section>
 
       {/* ═══ THE PLAN ═══ */}
-      <section id="join" className="scroll-mt-16 pt-20 pb-6 sm:pt-24">
+      <section id="join" className="scroll-mt-16 pt-10 pb-6 sm:pt-12">
         <div className="mx-auto max-w-6xl px-4">
           <div className="mb-6 text-center">
             <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-brand-purple-soft">Choose your plan</span>
