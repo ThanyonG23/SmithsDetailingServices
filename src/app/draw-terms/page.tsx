@@ -73,7 +73,13 @@ export default function DrawTermsPage() {
   return (
     <main className="min-h-screen bg-[#050506]">
       <div className="mx-auto max-w-2xl px-5 py-14 sm:py-20">
-        <div className="text-center">
+        <Link
+          href="/membership"
+          className="inline-flex items-center gap-1.5 text-sm font-semibold text-white/50 transition hover:text-white"
+        >
+          ← Back to membership
+        </Link>
+        <div className="mt-8 text-center">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={LOGO} alt="Smiths Detailing" className="mx-auto w-full max-w-[220px]" />
           <h1 className="mt-6 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
