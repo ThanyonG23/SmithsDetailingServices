@@ -335,7 +335,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                   </div>
                   <h3 className="mt-1.5 font-display text-xl font-extrabold tracking-tight text-white">Smiths Member</h3>
                   <div className="mt-3 flex items-end gap-2">
-                    <span className="mb-1.5 font-display text-xl font-bold text-white/30 line-through">$9.99</span>
+                    <span className="mb-1.5 font-display text-xl font-bold text-red-400 line-through">$9.99</span>
                     <span className="font-display text-4xl font-black text-white">$1</span>
                     <span className="mb-1.5 text-xs font-bold text-white/50">first month</span>
                   </div>
@@ -400,7 +400,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                   </div>
                   <h3 className="mt-1.5 font-display text-xl font-extrabold tracking-tight text-white">30-Day Pass</h3>
                   <div className="mt-3 flex items-end gap-2">
-                    <span className="mb-1.5 font-display text-xl font-bold text-white/30 line-through">$24.99</span>
+                    <span className="mb-1.5 font-display text-xl font-bold text-red-400 line-through">$24.99</span>
                     <span className="font-display text-4xl font-black text-white">$9.99</span>
                     <span className="mb-1.5 text-xs font-bold text-white/50">once</span>
                   </div>
