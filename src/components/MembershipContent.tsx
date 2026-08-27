@@ -413,7 +413,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
 
       {/* ═══ FAQ ═══ */}
       <section className="px-4 py-16 sm:py-20">
-        <div className="mx-auto max-w-2xl">
+        <div className="mx-auto max-w-4xl">
           <Reveal>
             <div className="text-center">
               <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">Questions</div>
@@ -422,7 +422,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
               </h2>
             </div>
           </Reveal>
-          <div className="mt-8 flex flex-col gap-3">
+          <div className="mt-8 grid items-start gap-3 sm:grid-cols-2">
             {FAQS.map((f) => (
               <Reveal key={f.q}>
                 <details className="group rounded-2xl border border-brand-purple/20 bg-white/[0.02] transition hover:border-brand-purple/40 open:border-brand-purple/50 open:bg-brand-purple/[0.05]">

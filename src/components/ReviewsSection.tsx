@@ -50,12 +50,13 @@ function Stars({ className = "" }: { className?: string }) {
 export default function ReviewsSection({ accent }: { accent?: "purple" }) {
   const cardCls =
     accent === "purple"
-      ? "border border-brand-purple/45 shadow-[0_0_30px_-8px_rgba(124,47,245,0.5)]"
+      ? "border border-brand-purple/45 shadow-[0_0_80px_6px_rgba(124,47,245,0.28)]"
       : "card-edge";
+  const eyebrowCls = accent === "purple" ? "text-brand-purple-soft" : "text-white/40";
   return (
     <section className="mx-auto max-w-6xl px-4 py-20">
       <Reveal>
-        <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/40">
+        <div className={`text-[11px] font-bold uppercase tracking-[0.22em] ${eyebrowCls}`}>
           Don&apos;t take our word for it
         </div>
         <div className="mt-4 flex flex-wrap items-end gap-x-6 gap-y-3">
@@ -72,7 +73,7 @@ export default function ReviewsSection({ accent }: { accent?: "purple" }) {
 
       {/* review cards */}
       <Reveal delay={120}>
-        <div className="-mx-4 mt-8 flex snap-x gap-4 overflow-x-auto px-4 pb-3">
+        <div className="-mx-4 mt-4 flex snap-x gap-4 overflow-x-auto px-4 py-10">
           {REVIEWS.map((r, i) => (
             <div
               key={r.name + i}
