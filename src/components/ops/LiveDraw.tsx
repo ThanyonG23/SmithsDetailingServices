@@ -111,7 +111,7 @@ export default function LiveDraw() {
   const [isFull, setIsFull] = useState(false);
   const [copied, setCopied] = useState(false);
   const [importMsg, setImportMsg] = useState("");
-  const [poster, setPoster] = useState<string | null>(null);
+  const [poster, setPoster] = useState<string | null>("/media/photos/mini-giveaway.png");
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -480,19 +480,16 @@ export default function LiveDraw() {
             </div>
           </div>
 
-          {/* poster */}
-          {poster && (
-            <div className="mx-auto mt-5 w-full max-w-md overflow-hidden rounded-2xl border border-brand-purple/40 shadow-[0_0_50px_-16px_rgba(124,47,245,0.6)]">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={poster} alt="Prize" className="w-full object-cover" />
-            </div>
-          )}
-
-          <div className="flex flex-1 flex-col justify-center py-6">{Machine}</div>
-
-          <p className="text-center text-[11px] text-white/25">
-            Winner picked at random with the browser&apos;s cryptographic generator.
-          </p>
+          {/* poster (left) + draw (right) */}
+          <div className="flex flex-1 flex-col items-center justify-center gap-6 py-6 lg:flex-row lg:items-center lg:gap-8">
+            {poster && (
+              <div className="w-full max-w-md shrink-0 overflow-hidden rounded-2xl border border-brand-purple/40 shadow-[0_0_55px_-16px_rgba(124,47,245,0.6)] lg:w-[42%]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={poster} alt="Prize" className="w-full object-cover" />
+              </div>
+            )}
+            <div className="w-full lg:flex-1">{Machine}</div>
+          </div>
         </div>
       </main>
     );
