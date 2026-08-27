@@ -217,16 +217,13 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
 
             {/* big draw */}
             <Reveal delay={100}>
-              <Link
-                href="/draw-terms"
-                className="group flex h-full flex-col overflow-hidden rounded-2xl border border-brand-yellow/40 shadow-glowY transition hover:border-brand-yellow/60"
-              >
+              <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-brand-yellow/40 shadow-glowY">
                 <div className="relative aspect-[16/9] w-full overflow-hidden bg-black">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src="/media/photos/giveaway.png"
                     alt="Smiths Detailing members' giveaway, win $1,000 cash or a $2,200 paint correction and ceramic coating"
-                    className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.03]"
+                    className="h-full w-full object-cover"
                   />
                 </div>
                 <div className="flex flex-1 flex-col bg-gradient-to-br from-brand-yellow/[0.14] to-brand-yellow/[0.02] p-5 sm:p-6">
@@ -245,12 +242,15 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                       Drawn in
                     </div>
                     <Countdown target={DRAW_TIME} />
-                    <span className="mt-3 block text-center text-xs font-semibold text-brand-yellow/80 underline underline-offset-4 transition group-hover:text-white">
+                    <Link
+                      href="/draw-terms"
+                      className="mt-3 block text-center text-xs font-semibold text-brand-yellow/80 underline underline-offset-4 transition hover:text-white"
+                    >
                       See draw terms
-                    </span>
+                    </Link>
                   </div>
                 </div>
-              </Link>
+              </div>
             </Reveal>
           </div>
 
