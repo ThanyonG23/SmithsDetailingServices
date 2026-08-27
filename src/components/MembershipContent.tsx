@@ -42,7 +42,7 @@ const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "What's the difference between the plans?",
-    a: "There are three. Detail & Vehicle Service is the full membership: we actually detail and service your car on a schedule, it's hands-off car care, from $39/week. Smiths Member ($9.99/month) is the lighter, cheaper way in, perks and draws only, no detailing. The 30-Day Pass ($24.99 once) is the same perks and draws but paid one-off with no subscription. Most people who want their car handled choose Detail & Vehicle Service.",
+    a: "There are three. Detail & Vehicle Service is the full membership: we actually detail and service your car on a schedule, it's hands-off car care, from $39/week. Smiths Member ($1 first month, then $9.99/month) is the lighter, cheaper way in, perks and draws only, no detailing. The 30-Day Pass ($9.99 once, usually $24.99) is the same perks and draws but paid one-off with no subscription. Most people who want their car handled choose Detail & Vehicle Service.",
   },
   {
     q: "What is the Smiths Member plan?",
@@ -50,7 +50,7 @@ const FAQS: { q: string; a: string }[] = [
   },
   {
     q: "Can I do a one-off instead of a subscription?",
-    a: "Yes. The 30-day Member Pass is $24.99 once, no subscription and nothing renews. It gives you the same 10% off, priority booking, and entry to every draw for 30 days from your purchase. There's a link for it under the Smiths Member plan. Handy if you'd rather not have a recurring payment.",
+    a: "Yes. The 30-day Member Pass is $9.99 once (usually $24.99, limited time), no subscription and nothing renews. It gives you the same 10% off, priority booking, and entry to every draw for 30 days from your purchase. Handy if you'd rather not have a recurring payment.",
   },
   {
     q: "How does the $1,000 draw work?",
@@ -334,11 +334,15 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                     </span>
                   </div>
                   <h3 className="mt-1.5 font-display text-xl font-extrabold tracking-tight text-white">Smiths Member</h3>
-                  <div className="mt-3 flex items-end gap-1.5">
-                    <span className="font-display text-3xl font-black text-white">$1</span>
-                    <span className="mb-1 text-xs font-bold text-white/50">first month</span>
+                  <div className="mt-3 flex items-end gap-2">
+                    <span className="mb-1.5 font-display text-xl font-bold text-white/30 line-through">$9.99</span>
+                    <span className="font-display text-4xl font-black text-white">$1</span>
+                    <span className="mb-1.5 text-xs font-bold text-white/50">first month</span>
                   </div>
-                  <div className="mt-0.5 text-xs text-white/45">then $9.99/month · cancel anytime</div>
+                  <div className="mt-1.5 inline-flex items-center rounded-full bg-brand-purple/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-brand-purple-soft">
+                    First month 90% off
+                  </div>
+                  <div className="mt-1.5 text-xs text-white/45">then $9.99/month · cancel anytime</div>
                 </div>
                 <ul className="mt-5 flex flex-1 flex-col gap-2.5 text-sm text-white/80">
                   <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-purple-soft">✓</span>10% off all our services</li>
@@ -388,11 +392,17 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
             <Reveal delay={160}>
               <div className="flex h-full flex-col rounded-3xl border border-white/25 bg-gradient-to-b from-white/[0.07] to-white/[0.01] p-6 shadow-[0_14px_50px_-22px_rgba(255,255,255,0.28)]">
                 <div>
-                  <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/45">No subscription</div>
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-white/45">No subscription</div>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.14em] text-white/70">
+                      <span className="h-1 w-1 animate-pulse rounded-full bg-white/70" />Limited time
+                    </span>
+                  </div>
                   <h3 className="mt-1.5 font-display text-xl font-extrabold tracking-tight text-white">30-Day Pass</h3>
-                  <div className="mt-3 flex items-end gap-1.5">
-                    <span className="font-display text-3xl font-black text-white">$24.99</span>
-                    <span className="mb-1 text-xs font-bold text-white/50">once</span>
+                  <div className="mt-3 flex items-end gap-2">
+                    <span className="mb-1.5 font-display text-xl font-bold text-white/30 line-through">$24.99</span>
+                    <span className="font-display text-4xl font-black text-white">$9.99</span>
+                    <span className="mb-1.5 text-xs font-bold text-white/50">once</span>
                   </div>
                 </div>
                 <ul className="mt-5 flex flex-1 flex-col gap-2.5 text-sm text-white/80">
@@ -402,7 +412,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                   <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-white/70">✓</span>Valid 30 days, no renewal</li>
                 </ul>
                 <a href="https://buy.stripe.com/5kQaEX6w0bY19iM9u36kg0A" className="mt-6 flex w-full items-center justify-center rounded-full bg-white px-6 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-95 active:scale-95">
-                  Get the pass · $24.99 →
+                  Get the pass · $9.99 →
                 </a>
                 <p className="mt-2.5 flex min-h-[2.5rem] items-start justify-center text-center text-xs text-white/40">One-off. Nothing renews.</p>
               </div>
