@@ -115,6 +115,7 @@ export default function LiveDraw() {
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const stageRef = useRef<HTMLElement | null>(null);
 
   // ── load / persist ──
   useEffect(() => {
@@ -342,7 +343,10 @@ export default function LiveDraw() {
     if (document.fullscreenElement) {
       document.exitFullscreen?.().catch(() => {});
     } else {
-      document.documentElement.requestFullscreen?.().catch(() => {});
+      // Fullscreen the stage element only, so the ops nav (and anything
+      // outside the stage) is not shown while recording.
+      const el = stageRef.current ?? document.documentElement;
+      el.requestFullscreen?.().catch(() => {});
     }
   };
 
@@ -438,7 +442,7 @@ export default function LiveDraw() {
   // ═══ STAGE (clean, share-safe, on-brand) ═══
   if (presenting) {
     return (
-      <main className="relative min-h-screen overflow-hidden bg-[#08060f]">
+      <main ref={stageRef} className="relative min-h-screen overflow-hidden bg-[#08060f]">
         {/* branded background glows */}
         <div
           className="pointer-events-none fixed inset-x-0 top-0 h-[60vh]"
