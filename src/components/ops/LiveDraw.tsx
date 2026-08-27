@@ -451,7 +451,7 @@ export default function LiveDraw() {
           aria-hidden
         />
 
-        <div className="relative mx-auto flex min-h-screen max-w-4xl flex-col px-4 py-5">
+        <div className="relative mx-auto flex min-h-screen max-w-6xl flex-col px-4 py-5">
           {/* top bar */}
           <div className="flex items-center justify-between">
             <button
@@ -483,7 +483,7 @@ export default function LiveDraw() {
           {/* poster (left) + draw (right) */}
           <div className="flex flex-1 flex-col items-center justify-center gap-6 py-6 lg:flex-row lg:items-center lg:gap-8">
             {poster && (
-              <div className="w-full max-w-md shrink-0 overflow-hidden rounded-2xl border border-brand-purple/40 shadow-[0_0_55px_-16px_rgba(124,47,245,0.6)] lg:w-[42%]">
+              <div className="w-full max-w-2xl shrink-0 overflow-hidden rounded-2xl border border-brand-purple/40 shadow-[0_0_55px_-16px_rgba(124,47,245,0.6)] lg:w-1/2 lg:max-w-none">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={poster} alt="Prize" className="w-full object-cover" />
               </div>
