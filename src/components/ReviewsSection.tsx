@@ -54,7 +54,7 @@ export default function ReviewsSection({ accent }: { accent?: "purple" }) {
       : "card-edge";
   const eyebrowCls = accent === "purple" ? "text-brand-purple-soft" : "text-white/40";
   return (
-    <section className="mx-auto max-w-6xl px-4 py-20">
+    <section className="mx-auto max-w-6xl px-4 py-12">
       <Reveal>
         <div className={`text-[11px] font-bold uppercase tracking-[0.22em] ${eyebrowCls}`}>
           Don&apos;t take our word for it

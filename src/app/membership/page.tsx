@@ -9,7 +9,6 @@ export const metadata: Metadata = {
   alternates: { canonical: "/membership" },
 };
 
-// New / cold audience, show the free cut & polish bonus.
 export default function MembershipPage() {
-  return <MembershipContent bonus />;
+  return <MembershipContent />;
 }

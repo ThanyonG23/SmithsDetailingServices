@@ -36,7 +36,7 @@ const TERMS: { heading: string; body: string; firstVisitPrices?: boolean }[] = [
   },
   {
     heading: "3. Your sign-up fee",
-    body: "The sign-up fee covers your first full detail and first service, and, for founding members, a complimentary Cut & Polish. It is non-refundable once your first visit has been booked or completed.",
+    body: "The sign-up fee covers your first full detail and first service. It is non-refundable once your first visit has been booked or completed.",
   },
   {
     heading: "4. Booking & rescheduling",

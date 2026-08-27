@@ -63,7 +63,7 @@ export default function JoinPage() {
                 Join today, you&apos;re in the draw
               </div>
               <p className="text-sm leading-relaxed text-white/80">
-                Win <b className="text-white">$1,000 cash</b> or a <b className="text-white">$2,200 detail</b>, drawn 14 Sept. Plus a free Cut &amp; Polish for the next 10 founding members.
+                Win <b className="text-white">$1,000 cash</b> or a <b className="text-white">$2,200 detail</b>, drawn 14 Sept. Every member is automatically entered.
               </p>
               <div className="mt-1.5">
                 <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-yellow/80">Drawn in</div>

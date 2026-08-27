@@ -26,7 +26,7 @@ const STEPS = [
   {
     n: "3",
     title: "First visit is the big one",
-    body: "Full detail & service plus your free Cut & Polish to start. Then we keep your car clean and serviced on schedule, no thinking required.",
+    body: "Full detail & service to start. Then we keep your car clean and serviced on schedule, no thinking required.",
   },
 ];
 

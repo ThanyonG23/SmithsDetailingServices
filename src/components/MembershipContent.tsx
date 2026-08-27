@@ -30,11 +30,11 @@ const YELLOW_GLOW = "radial-gradient(closest-side, #FFE600, transparent 70%)";
 const FAQS: { q: string; a: string }[] = [
   {
     q: "What exactly do I get?",
-    a: "A full detail every 3 months and a full service every 6 months, so your car stays clean and looked after all year. You also get a free Cut & Polish to start, 10% off any add-on services, priority booking, and entry to the members' draw. One simple weekly payment covers it all.",
+    a: "A full detail every 3 months and a full service every 6 months, so your car stays clean and looked after all year. You also get 10% off any add-on services, priority booking, and entry to the members' draw. One simple weekly payment covers it all.",
   },
   {
     q: "How does payment work?",
-    a: "It's a weekly subscription from $39/week, depending on your vehicle size, plus a one-off first-visit fee that covers your first full detail and Cut & Polish. Secure checkout through Stripe, and you can cancel anytime.",
+    a: "It's a weekly subscription from $39/week, depending on your vehicle size, plus a one-off first-visit fee that covers your first full detail and service. Secure checkout through Stripe, and you can cancel anytime.",
   },
   {
     q: "Can I cancel?",
@@ -132,7 +132,7 @@ function GroupCard({ g }: { g: Group }) {
   );
 }
 
-export default function MembershipContent({ bonus = false }: { bonus?: boolean }) {
+export default function MembershipContent() {
   return (
     <main className="min-h-screen bg-[#050506]">
       {/* ═══ NAV ═══ */}
@@ -368,12 +368,6 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
                     <span className="mb-1 text-xs font-bold text-white/50">/week</span>
                   </div>
                 </div>
-                {bonus && (
-                  <div className="mt-4 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-3 py-2.5 text-center">
-                    <div className="text-[11px] font-black uppercase tracking-wide text-brand-yellow">🎁 Free Cut &amp; Polish to start</div>
-                    <div className="mt-0.5 text-[11px] text-white/60">Valued at $750+ · next <s className="opacity-60">15</s> 10 members</div>
-                  </div>
-                )}
                 <ul className="mt-5 flex flex-1 flex-col gap-2.5 text-sm text-white/80">
                   <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">✓</span>Full detail every 3 months</li>
                   <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">✓</span>Full service every 6 months</li>
@@ -422,7 +416,7 @@ export default function MembershipContent({ bonus = false }: { bonus?: boolean }
       </section>
 
       {/* ═══ FAQ ═══ */}
-      <section className="px-4 py-16 sm:py-20">
+      <section className="px-4 pt-16 pb-6 sm:pt-20 sm:pb-8">
         <div className="mx-auto max-w-4xl">
           <Reveal>
             <div className="text-center">

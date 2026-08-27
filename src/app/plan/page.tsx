@@ -9,8 +9,6 @@ export const metadata: Metadata = {
   alternates: { canonical: "/plan" },
 };
 
-// Existing detail clients, no free cut & polish banner, so they don't feel
-// they missed out on something they've effectively just had.
 export default function PlanPage() {
-  return <MembershipContent bonus={false} />;
+  return <MembershipContent />;
 }
