@@ -1,7 +1,7 @@
 "use server";
 
 import { requireOwner } from "@/lib/ops/auth";
-import { sendSMS } from "@/lib/ops/telstra-sms";
+import { sendSMS, listVirtualNumbers, setReplyCallback, inboundUrl } from "@/lib/ops/telstra-sms";
 import {
   getRecipients,
   listUnsubscribes,
@@ -83,4 +83,43 @@ export async function optInManual(phone: string): Promise<{ ok: boolean }> {
   requireOwner();
   await removeUnsubscribe(normalisePhone(phone));
   return { ok: true };
+}
+
+// Is STOP wired up? Shows each virtual number and whether its reply-callback
+// points at this site's inbound endpoint (which records opt-outs).
+export async function smsConfig(): Promise<{
+  ok: boolean;
+  inbound: string;
+  numbers: { number: string; replyCallbackUrl: string; connected: boolean }[];
+  error?: string;
+}> {
+  requireOwner();
+  const inbound = inboundUrl();
+  try {
+    const vns = await listVirtualNumbers();
+    return {
+      ok: true,
+      inbound,
+      numbers: vns.map((v) => ({ ...v, connected: v.replyCallbackUrl === inbound })),
+    };
+  } catch (e) {
+    return { ok: false, inbound, numbers: [], error: e instanceof Error ? e.message : "error" };
+  }
+}
+
+// Point every virtual number's STOP replies at this site.
+export async function fixReplyCallback(): Promise<{ ok: boolean; fixed: number; error?: string }> {
+  requireOwner();
+  const inbound = inboundUrl();
+  try {
+    const vns = await listVirtualNumbers();
+    let fixed = 0;
+    for (const v of vns) {
+      const r = await setReplyCallback(v.number, inbound);
+      if (r.ok) fixed++;
+    }
+    return { ok: fixed > 0, fixed };
+  } catch (e) {
+    return { ok: false, fixed: 0, error: e instanceof Error ? e.message : "error" };
+  }
 }

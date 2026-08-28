@@ -15,7 +15,7 @@ const AUTH_URL = "https://products.api.telstra.com/v2/oauth/token";
 const SEND_URL = "https://products.api.telstra.com/messaging/v3/messages";
 const VN_URL = "https://products.api.telstra.com/messaging/v3/virtual-numbers";
 
-const STOP_FOOTER = " Reply STOP to opt out.";
+const STOP_FOOTER = "\n\nReply STOP to opt out.";
 
 async function getAccessToken(): Promise<string> {
   if (cachedToken && Date.now() < cachedToken.expires) return cachedToken.token;
@@ -74,6 +74,43 @@ async function getVirtualNumber(token: string): Promise<string> {
     if (vn) return (cachedVirtualNumber = vn);
   }
   throw new Error("Could not get or assign Telstra virtual number");
+}
+
+export function inboundUrl(): string {
+  return `${process.env.NEXT_PUBLIC_SITE_URL || "https://smithsdetailingservices.com.au"}/api/telstra/inbound`;
+}
+
+// List the account's virtual numbers with their current reply-callback, so we
+// can see whether STOP replies are wired to this site's inbound endpoint.
+export async function listVirtualNumbers(): Promise<{ number: string; replyCallbackUrl: string }[]> {
+  const token = await getAccessToken();
+  const res = await fetch(`${VN_URL}?limit=50&offset=0`, {
+    headers: { Authorization: `Bearer ${token}`, Accept: "application/json", "content-language": "en-au" },
+  });
+  if (!res.ok) throw new Error(`VN list failed: ${res.status} ${await res.text()}`);
+  const data = await res.json();
+  const list = data.virtualNumbers || data.virtual_numbers || data.items || [];
+  return (Array.isArray(list) ? list : []).map((v: Record<string, unknown>) => ({
+    number: String(v.virtualNumber || v.virtual_number || v.number || ""),
+    replyCallbackUrl: String(v.replyCallbackUrl || v.reply_callback_url || ""),
+  }));
+}
+
+// Point a virtual number's inbound replies at this site so STOP works.
+export async function setReplyCallback(virtualNumber: string, url: string): Promise<{ ok: boolean; error?: string }> {
+  const token = await getAccessToken();
+  const res = await fetch(`${VN_URL}/${encodeURIComponent(virtualNumber)}`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/json",
+      "Content-Type": "application/json",
+      "content-language": "en-au",
+    },
+    body: JSON.stringify({ replyCallbackUrl: url, tags: ["smiths-crm"] }),
+  });
+  if (res.ok) return { ok: true };
+  return { ok: false, error: `${res.status}: ${(await res.text()).slice(0, 200)}` };
 }
 
 export type SendResult = { success: boolean; messageId?: string; error?: string; blocked?: "opted_out" };

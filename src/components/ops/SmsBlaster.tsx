@@ -1,19 +1,21 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   sendTestSms,
   sendSmsBatch,
   optOutManual,
   optInManual,
+  smsConfig,
+  fixReplyCallback,
   type loadSmsData,
 } from "@/app/ops/sms/actions";
 
 type Data = Awaited<ReturnType<typeof loadSmsData>>;
 
 const BATCH = 15; // sends per request, keeps each call well under the timeout
-const FOOTER_LEN = 23; // " Reply STOP to opt out."
-const SINGLE_LIMIT = 160 - FOOTER_LEN; // 137 chars before it splits / truncates
+const FOOTER_LEN = 24; // "\n\nReply STOP to opt out."
+const SINGLE_LIMIT = 160 - FOOTER_LEN; // chars before it splits / truncates
 
 export default function SmsBlaster({ initial }: { initial: Data }) {
   const [body, setBody] = useState("");
@@ -24,13 +26,27 @@ export default function SmsBlaster({ initial }: { initial: Data }) {
   const [finished, setFinished] = useState(false);
   const [unsubInput, setUnsubInput] = useState("");
   const [unsubs, setUnsubs] = useState(initial.unsubs);
+  const [cfg, setCfg] = useState<Awaited<ReturnType<typeof smsConfig>> | null>(null);
+  const [fixing, setFixing] = useState(false);
+
+  useEffect(() => {
+    smsConfig().then(setCfg).catch(() => setCfg(null));
+  }, []);
+
+  async function fixStop() {
+    setFixing(true);
+    await fixReplyCallback();
+    setCfg(await smsConfig());
+    setFixing(false);
+  }
+  const stopConnected = !!cfg?.ok && cfg.numbers.length > 0 && cfg.numbers.every((n) => n.connected);
 
   const { recipients, stats } = initial;
   const overLimit = body.length > SINGLE_LIMIT;
   const hasSender = /smith/i.test(body);
   const remaining = SINGLE_LIMIT - body.length;
 
-  const preview = useMemo(() => (body.trim() ? `${body.trim()} Reply STOP to opt out.` : ""), [body]);
+  const preview = useMemo(() => (body.trim() ? `${body.trim()}\n\nReply STOP to opt out.` : ""), [body]);
 
   async function runTest() {
     setTestMsg(null);
@@ -99,6 +115,42 @@ export default function SmsBlaster({ initial }: { initial: Data }) {
           </div>
         ))}
       </div>
+
+      {/* reply-STOP health check */}
+      {cfg && (
+        <div className={`${CARD} mt-4 p-4 sm:p-5`}>
+          <div className="flex items-center justify-between gap-3">
+            <div className="text-[11px] font-bold uppercase tracking-[0.16em] text-white/40">Reply STOP setup</div>
+            {stopConnected ? (
+              <span className="text-xs font-black text-brand-green">✓ Connected</span>
+            ) : (
+              <button
+                onClick={fixStop}
+                disabled={fixing || !cfg.ok}
+                className="rounded-full border border-brand-green/40 bg-brand-green/[0.08] px-4 py-1.5 text-xs font-bold text-brand-green transition hover:bg-brand-green/[0.16] disabled:opacity-40"
+              >
+                {fixing ? "Fixing…" : "Point STOP replies here"}
+              </button>
+            )}
+          </div>
+          {!cfg.ok ? (
+            <p className="mt-2 text-xs text-brand-yellow">Couldn&apos;t check: {cfg.error}. Add the Telstra keys and redeploy.</p>
+          ) : stopConnected ? (
+            <p className="mt-2 text-xs text-white/50">When someone replies STOP they&apos;re added to the opt-out list automatically.</p>
+          ) : (
+            <p className="mt-2 text-xs text-brand-yellow">
+              STOP replies aren&apos;t reaching this site yet, so opt-outs won&apos;t record. Tap the button to fix it, then send yourself a test and reply STOP to confirm.
+            </p>
+          )}
+          {cfg.numbers.length > 0 && (
+            <ul className="mt-2 flex flex-col gap-1 text-[11px] tabular-nums text-white/40">
+              {cfg.numbers.map((n) => (
+                <li key={n.number}>{n.number} {n.connected ? "✓ replies come here" : "→ not pointing here"}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )}
 
       {/* compose */}
       <div className={`${CARD} mt-5 p-4 sm:p-5`}>
