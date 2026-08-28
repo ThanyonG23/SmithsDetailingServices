@@ -124,7 +124,7 @@ export default function SmsBlaster({ initial }: { initial: Data }) {
         {preview && (
           <div className="mt-3 rounded-xl border border-white/10 bg-black/30 p-3">
             <div className="text-[10px] font-bold uppercase tracking-wider text-white/40">Preview</div>
-            <div className="mt-1 text-sm text-white/80">{preview}</div>
+            <div className="mt-1 whitespace-pre-line text-sm text-white/80">{preview}</div>
           </div>
         )}
       </div>
