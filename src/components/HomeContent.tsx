@@ -8,7 +8,6 @@ import ServiceShowcase from "@/components/ServiceShowcase";
 import BringBlackBack from "@/components/BringBlackBack";
 import Gallery from "@/components/Gallery";
 import Reveal from "@/components/Reveal";
-import QuoteChat from "@/components/QuoteChat";
 
 function TextCta({ href, className = "" }: { href: string; className?: string }) {
   return (
@@ -96,7 +95,6 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
           <Reveal delay={300}>
             <div className="mt-9 flex flex-wrap items-center gap-3">
               <TextCta href={smsHref} />
-              <QuoteChat />
               <a
                 href={`tel:${BUSINESS.phoneE164}`}
                 className="rounded-full border border-white/20 px-7 py-4 text-sm font-bold text-white transition hover:border-white/40"
@@ -310,9 +308,17 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
         </div>
       </footer>
 
-      {/* Floating "Smiths AI" launcher lives inside QuoteChat, rendered
-          above in the hero, it's `fixed`, so it stays bottom-right on
-          every scroll position without needing to be re-mounted here. */}
+      {/* Floating "Text for a free quote" sticky, stays bottom-right on every
+          scroll position. */}
+      <a
+        href={smsHref}
+        className="fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 rounded-full bg-brand-green px-5 py-3.5 font-display text-sm font-black text-brand-ink shadow-[0_10px_30px_rgba(43,255,122,0.35)] transition hover:brightness-110 active:scale-95"
+      >
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+        </svg>
+        Text for a free quote
+      </a>
     </main>
   );
 }
