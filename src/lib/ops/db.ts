@@ -40,7 +40,7 @@ const connectionString =
   process.env.DATABASE_URL ||
   "";
 
-const sql = postgres(connectionString, {
+export const sql = postgres(connectionString, {
   ssl: "require",
   prepare: false,
   // Vercel Fluid Compute runs several requests in ONE instance, so max:1 meant
