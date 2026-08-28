@@ -108,6 +108,18 @@ export default function InspectionView({
         </div>
       )}
 
+      {!member && (
+        <a
+          href="/membership"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-brand-green/30 bg-brand-green/[0.06] px-4 py-2.5 text-sm font-semibold text-white/85 transition hover:bg-brand-green/[0.12]"
+        >
+          <span>🎁 <b className="text-brand-green">Members get 10% off.</b> Not a member? Join for as little as $1.</span>
+          <span className="shrink-0 font-black text-brand-green">Join →</span>
+        </a>
+      )}
+
       <div className="mt-6 flex flex-col gap-3">
         {items.map((it) => {
           const on = picked.has(it.id);
@@ -170,6 +182,23 @@ export default function InspectionView({
       />
 
       {err && <div className="mt-3 text-sm font-semibold text-red-300">{err}</div>}
+
+      {!member && total > 0 && (
+        <a
+          href="/membership"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-5 block rounded-2xl border border-brand-green/40 bg-brand-green/[0.07] p-4 text-center transition hover:bg-brand-green/[0.12]"
+        >
+          <div className="text-sm leading-relaxed text-white/85">
+            Join as a member today and you&apos;d save{" "}
+            <b className="text-brand-green">{money(total * (1 - MEMBER_RATE))}</b> on this (10% off), plus go in every members&apos; draw.
+          </div>
+          <div className="mt-1.5 text-xs font-black uppercase tracking-wide text-brand-green">
+            Join for as little as $1 →
+          </div>
+        </a>
+      )}
 
       {/* sticky-ish action bar */}
       <div className="mt-5 flex items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
