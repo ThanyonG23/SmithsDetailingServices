@@ -20,7 +20,7 @@ const HERO = "/media/photos/clubhouse.jpg";
 const PRICE = "$49"; // placeholder monthly price — easy to change
 
 const STACK: { icon: string; title: string; desc: string; value: string; hero?: boolean }[] = [
-  { icon: "🔧", title: "DIY Detailing Bay", desc: "Bring your car in and detail it yourself with our pro equipment and products. Book a bay anytime.", value: "$150 / session", hero: true },
+  { icon: "🔧", title: "Unlimited DIY Detailing Bay", desc: "Bring your car in as often as you like and detail it yourself with our pro equipment and products. No booking fees, no per-session cost, ever.", value: "Unlimited", hero: true },
   { icon: "🥃", title: "The Clubhouse", desc: "The members' lounge, TVs, pool, cars and community. A place to actually hang out.", value: "Members only", hero: true },
   { icon: "🎁", title: "Every members' draw", desc: "Automatically entered to win cash, details and prizes, every draw we run.", value: "$1,000s in prizes" },
   { icon: "✨", title: "10% off all detailing", desc: "Member rate on every service, every time.", value: "Save $100s" },
@@ -123,8 +123,9 @@ export default function ClubhousePage() {
               Detail your own car, like a pro
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-white/65">
-              No driveway? No gear? No worries. Book a bay and use our professional equipment and products on your own
-              car, wash, interior, polish, the lot. Learn from us, do it yourself, and take pride in it.
+              No driveway? No gear? No worries. As a member you can book a bay <b className="text-white">as often as you like, no extra cost</b>,
+              and use our professional equipment and products on your own car, wash, interior, polish, the lot. Learn from us,
+              do it yourself, and take pride in it.
             </p>
           </Reveal>
           <Reveal delay={120}>
