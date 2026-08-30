@@ -16,7 +16,7 @@ export const BUSINESS = {
   tz: "Australia/Brisbane", // Cairns = QLD = UTC+10, no daylight saving
   reviewLink: "https://g.page/r/CVj0x7-guHPPEBM/review",
   instagram: "https://www.instagram.com/",
-  logo: "/media/photos/logo.png",
+  logo: "/media/photos/smiths-garage-logo.png",
 } as const;
 
 /* "Text to book" link, opens the visitor's messaging app with a pre-filled
