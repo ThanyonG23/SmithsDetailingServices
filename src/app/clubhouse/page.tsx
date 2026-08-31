@@ -3,6 +3,7 @@ import Link from "next/link";
 import Reveal from "@/components/Reveal";
 import SiteNav from "@/components/SiteNav";
 import ReviewsSection from "@/components/ReviewsSection";
+import ClubhouseWaitlist from "@/components/ClubhouseWaitlist";
 import { BUSINESS } from "@/lib/config";
 
 /* DRAFT — Smiths Garage clubhouse / Garage Club membership value-stack page.
@@ -65,9 +66,9 @@ export default function ClubhousePage() {
             </p>
           </Reveal>
           <Reveal delay={400}>
-            <a href="#join" className="mt-8 inline-flex rounded-full bg-brand-purple px-8 py-4 font-display text-base font-extrabold text-white shadow-[0_10px_40px_rgba(124,47,245,0.35)] transition hover:brightness-110 active:scale-95">
-              Join the club →
-            </a>
+            <span className="mt-8 inline-flex items-center gap-2.5 rounded-full border border-brand-purple/50 bg-brand-purple/[0.12] px-8 py-4 font-display text-base font-black uppercase tracking-[0.16em] text-brand-purple-soft">
+              <span className="h-2 w-2 animate-pulse rounded-full bg-brand-purple-soft" />Coming soon
+            </span>
           </Reveal>
         </div>
       </section>
@@ -105,10 +106,16 @@ export default function ClubhousePage() {
                   <span className="mb-2 text-sm font-bold text-white/50">/month</span>
                 </div>
                 <div className="mt-1 text-xs text-white/45">Founding members lock this in. Cancel anytime.</div>
-                <a href="#" className="mt-5 inline-flex rounded-full bg-brand-purple px-8 py-3.5 font-display text-sm font-black text-white transition hover:brightness-110 active:scale-95">
-                  Become a founding member →
-                </a>
+                <span className="mt-5 inline-flex items-center gap-2 rounded-full border border-brand-purple/50 bg-brand-purple/[0.12] px-8 py-3.5 font-display text-sm font-black uppercase tracking-[0.16em] text-brand-purple-soft">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-purple-soft" />Coming soon
+                </span>
               </div>
+            </div>
+          </Reveal>
+
+          <Reveal delay={150}>
+            <div className="mt-6">
+              <ClubhouseWaitlist />
             </div>
           </Reveal>
         </div>
