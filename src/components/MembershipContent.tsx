@@ -486,6 +486,31 @@ export default function MembershipContent() {
       {/* ═══ REVIEWS ═══ */}
       <ReviewsSection accent="purple" />
 
+      {/* ═══ BUSINESS OWNER CTA ═══ */}
+      <section className="px-4 pb-14 pt-4 sm:pb-16">
+        <div className="mx-auto max-w-3xl">
+          <Reveal>
+            <div className="flex flex-col items-center gap-4 rounded-2xl border border-brand-purple/25 bg-gradient-to-br from-brand-purple/[0.12] to-white/[0.02] px-6 py-8 text-center sm:flex-row sm:justify-between sm:text-left">
+              <div>
+                <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-purple-soft">Own a business?</div>
+                <h3 className="mt-1.5 font-display text-xl font-extrabold tracking-tight text-white sm:text-2xl">
+                  Get in front of our members
+                </h3>
+                <p className="mt-1 text-sm leading-relaxed text-white/60">
+                  Feature in a giveaway or offer a member discount. Real local exposure, no ad spend.
+                </p>
+              </div>
+              <Link
+                href="/partners"
+                className="shrink-0 rounded-full bg-brand-purple px-7 py-3 font-display text-sm font-black uppercase tracking-[0.12em] text-white transition hover:brightness-110 active:scale-95"
+              >
+                Click here
+              </Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ═══ FOOTER ═══ */}
       <footer className="border-t border-white/10">
         <div className="mx-auto max-w-5xl px-4 py-12 text-center">
