@@ -314,6 +314,42 @@ export default function MembershipContent() {
         </div>
       </section>
 
+      {/* ═══ WINNERS ═══ */}
+      <section className="py-14 sm:py-16">
+        <div className="mx-auto max-w-3xl px-4">
+          <Reveal>
+            <div className="text-center">
+              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">Real winners</div>
+              <h2 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                We actually pay out
+              </h2>
+              <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-white/60">
+                Every draw is real and every winner gets the call. Here&apos;s the moment we told our latest member they&apos;d won.
+              </p>
+            </div>
+          </Reveal>
+          <Reveal delay={100}>
+            <div className="relative mx-auto mt-7 max-w-[300px]">
+              <div
+                className="pointer-events-none absolute -inset-4 rounded-[2rem] opacity-40 blur-2xl"
+                style={{ background: GREEN_GLOW }}
+                aria-hidden
+              />
+              <div className="relative overflow-hidden rounded-2xl border border-brand-purple/40 bg-black shadow-[0_24px_70px_-24px_rgba(0,0,0,0.85)]">
+                <video
+                  src="/media/videos/winner-mini-draw.mp4"
+                  poster="/media/photos/winner-poster.jpg"
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="aspect-[9/16] w-full bg-black"
+                />
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ═══ THE PLAN ═══ */}
       <section id="join" className="scroll-mt-16 pt-10 pb-6 sm:pt-12">
         <div className="mx-auto max-w-6xl px-4">
