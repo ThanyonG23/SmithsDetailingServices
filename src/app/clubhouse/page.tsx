@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/clubhouse" },
 };
 
-const LOGO = BUSINESS.logo;
+const LOGO = "/media/photos/smiths-garage-logo.png";
 const HERO = "/media/photos/clubhouse.jpg";
 const PRICE = "$49"; // placeholder monthly price — easy to change
 

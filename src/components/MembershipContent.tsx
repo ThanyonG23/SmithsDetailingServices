@@ -7,8 +7,8 @@ import { BUSINESS } from "@/lib/config";
 
 // The member draw: drawn 14 Sep 2026, 12:00pm AEST (UTC+10).
 const DRAW_TIME = "2026-09-14T12:00:00+10:00";
-// The weekly mini draw: drawn Sat 5 Sep 2026, 12:00pm AEST (UTC+10).
-const DRAW_MINI_TIME = "2026-09-05T12:00:00+10:00";
+// The weekly mini draw: drawn Sun 21 Sep 2026, 12:00pm AEST (UTC+10).
+const DRAW_MINI_TIME = "2026-09-21T12:00:00+10:00";
 
 /* Shared body for the membership pages. `bonus` toggles the free
    cut & polish banner, on for /membership (new/cold ad traffic), off for
@@ -190,14 +190,14 @@ export default function MembershipContent() {
                 </div>
                 <div className="flex flex-1 flex-col bg-gradient-to-br from-brand-purple/[0.16] to-brand-purple/[0.02] p-5 sm:p-6">
                   <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-purple-soft">
-                    Mini draw · drawn 5 Sept
+                    Mini draw · drawn 21 Sept
                   </div>
                   <h3 className="mt-1.5 min-h-[3.25rem] font-display text-xl font-extrabold leading-tight text-white sm:min-h-[3.75rem] sm:text-2xl">
                     Win <span className="text-brand-purple-soft">$300 cash</span> or a{" "}
                     <span className="text-brand-purple-soft">$400+</span> detail
                   </h3>
                   <p className="mt-2 min-h-[2.5rem] text-sm leading-relaxed text-white/70">
-                    Our first mini draw. A brand new member pool means the best odds you will ever get.
+                    A small member pool right now means the best odds you will ever get. Join and you&apos;re in.
                   </p>
                   <div className="mt-auto pt-4">
                     <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-purple-soft">
