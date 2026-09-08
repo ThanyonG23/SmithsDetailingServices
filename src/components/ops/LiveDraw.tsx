@@ -111,7 +111,7 @@ export default function LiveDraw() {
   const [isFull, setIsFull] = useState(false);
   const [copied, setCopied] = useState(false);
   const [importMsg, setImportMsg] = useState("");
-  const [poster, setPoster] = useState<string | null>("/media/photos/mini-giveaway.png");
+  const [poster, setPoster] = useState<string | null>("/media/photos/mini-giveaway.jpg");
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);

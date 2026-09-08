@@ -168,7 +168,7 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
           <Reveal>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/media/photos/giveaway.png"
+              src="/media/photos/giveaway.jpg"
               alt="Smiths members' giveaway"
               className="mx-auto mb-8 w-full max-w-lg rounded-2xl border border-white/10 shadow-[0_20px_60px_-25px_rgba(0,0,0,0.8)]"
             />

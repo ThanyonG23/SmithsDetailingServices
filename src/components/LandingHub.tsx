@@ -33,7 +33,7 @@ const OFFERS: Offer[] = [
   },
   {
     href: "/membership",
-    image: "/media/photos/giveaway.png",
+    image: "/media/photos/giveaway.jpg",
     icon: "🔑",
     title: "Membership",
     desc: "Hand us the keys and we keep your car detailed and serviced on a schedule, always clean, always sorted, one weekly payment.",

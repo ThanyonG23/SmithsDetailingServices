@@ -175,7 +175,7 @@ export default function MembershipContent() {
                 <div className="relative aspect-[16/9] w-full overflow-hidden bg-black">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/media/photos/mini-giveaway.png"
+                    src="/media/photos/mini-giveaway.jpg"
                     alt="Smiths members' mini draw, win $300 cash or a $400+ detail"
                     className="h-full w-full object-cover"
                   />
@@ -213,7 +213,7 @@ export default function MembershipContent() {
                 <div className="relative aspect-[16/9] w-full overflow-hidden bg-black">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/media/photos/giveaway.png"
+                    src="/media/photos/giveaway.jpg"
                     alt="Smiths Detailing members' giveaway, win $1,000 cash or a $2,200 paint correction and ceramic coating"
                     className="h-full w-full object-cover"
                   />

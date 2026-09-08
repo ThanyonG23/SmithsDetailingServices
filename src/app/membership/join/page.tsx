@@ -54,7 +54,7 @@ export default function JoinPage() {
           <div className="mt-7 overflow-hidden rounded-2xl border border-brand-yellow/40 bg-gradient-to-br from-brand-yellow/[0.12] to-brand-yellow/[0.02] shadow-glowY">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="/media/photos/giveaway.png"
+              src="/media/photos/giveaway.jpg"
               alt="Members' giveaway"
               className="aspect-[16/9] w-full object-cover"
             />
