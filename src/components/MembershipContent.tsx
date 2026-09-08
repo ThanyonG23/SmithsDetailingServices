@@ -152,14 +152,6 @@ export default function MembershipContent() {
         />
 
         <div className="relative mx-auto max-w-5xl px-4 pb-8 pt-12 sm:pt-16">
-          <Reveal>
-            <div className="text-center">
-              <span className="inline-flex items-center gap-2 rounded-full border border-brand-purple/40 bg-brand-purple/[0.08] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-purple-soft">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-purple-soft" />
-                Founding members · we just launched
-              </span>
-            </div>
-          </Reveal>
           <Reveal delay={100}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={LOGO} alt="Smiths Detailing" className="mx-auto mt-6 w-full max-w-[210px] sm:max-w-xs" />
