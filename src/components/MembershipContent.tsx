@@ -368,7 +368,7 @@ export default function MembershipContent() {
                 Member discounts at local businesses
               </h2>
               <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-white/60">
-                We&apos;re bringing local businesses on board so your membership saves you money all over Cairns. Here&apos;s the first.
+                We&apos;re bringing local businesses on board so your membership saves you money all over Cairns.
               </p>
             </div>
           </Reveal>
