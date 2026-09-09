@@ -302,22 +302,29 @@ export default function MembershipContent() {
             </div>
           </Reveal>
           <Reveal delay={100}>
-            <div className="relative mx-auto mt-7 max-w-[300px]">
-              <div
-                className="pointer-events-none absolute -inset-4 rounded-[2rem] opacity-40 blur-2xl"
-                style={{ background: GREEN_GLOW }}
-                aria-hidden
-              />
-              <div className="relative overflow-hidden rounded-2xl border border-brand-purple/40 bg-black shadow-[0_24px_70px_-24px_rgba(0,0,0,0.85)]">
-                <video
-                  src="/media/videos/winner-mini-draw.mp4"
-                  poster="/media/photos/winner-poster.jpg"
-                  controls
-                  playsInline
-                  preload="metadata"
-                  className="aspect-[9/16] w-full bg-black"
-                />
-              </div>
+            <div className="mx-auto mt-7 grid max-w-xl gap-5 sm:grid-cols-2">
+              {[
+                { src: "/media/videos/winner-mini-draw.mp4", poster: "/media/photos/winner-poster.jpg" },
+                { src: "/media/videos/winner-2.mp4", poster: "/media/photos/winner-2-poster.jpg" },
+              ].map((v) => (
+                <div key={v.src} className="relative mx-auto w-full max-w-[300px]">
+                  <div
+                    className="pointer-events-none absolute -inset-4 rounded-[2rem] opacity-40 blur-2xl"
+                    style={{ background: GREEN_GLOW }}
+                    aria-hidden
+                  />
+                  <div className="relative overflow-hidden rounded-2xl border border-brand-purple/40 bg-black shadow-[0_24px_70px_-24px_rgba(0,0,0,0.85)]">
+                    <video
+                      src={v.src}
+                      poster={v.poster}
+                      controls
+                      playsInline
+                      preload="metadata"
+                      className="aspect-[9/16] w-full bg-black"
+                    />
+                  </div>
+                </div>
+              ))}
             </div>
           </Reveal>
         </div>
