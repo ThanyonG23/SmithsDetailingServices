@@ -361,8 +361,8 @@ export default function MembershipContent() {
         <div className="mx-auto max-w-4xl">
           <Reveal>
             <div className="text-center">
-              <div className="inline-flex items-center gap-1.5 rounded-full border border-brand-yellow/40 bg-brand-yellow/10 px-3.5 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-brand-yellow">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-yellow" />Coming soon
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-brand-purple/40 bg-brand-purple/[0.12] px-3.5 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-brand-purple-soft">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-purple-soft" />Coming soon
               </div>
               <h2 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
                 Member discounts at local businesses
