@@ -11,14 +11,17 @@ import { BUSINESS } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "Smiths Garage · The Garage Club",
-  description: "The members' garage club, draft.",
+  description: "Early access to the Smiths Garage members' club. Join now while we build it and lock in the founding rate.",
   robots: { index: false, follow: false },
   alternates: { canonical: "/clubhouse" },
 };
 
 const LOGO = "/media/photos/smiths-garage-logo.png";
 const HERO = "/media/photos/clubhouse.jpg";
-const PRICE = "$49"; // placeholder monthly price — easy to change
+const PRICE = "$34.99"; // founding early-access monthly price
+const FUTURE_PRICE = "$49"; // the rate it rises to once fully open
+// TODO: swap "#join-form" for the $34.99/mo Stripe payment link. Falls back to the waitlist form for now.
+const JOIN_URL = "#join-form";
 
 const STACK: { icon: string; title: string; desc: string; value: string; hero?: boolean }[] = [
   { icon: "🔧", title: "Unlimited DIY Detailing Bay", desc: "Bring your car in as often as you like and detail it yourself with our pro equipment and products. No booking fees, no per-session cost, ever.", value: "Unlimited", hero: true },
@@ -48,7 +51,7 @@ export default function ClubhousePage() {
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full border border-brand-purple/40 bg-brand-purple/[0.12] px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-brand-purple-soft">
               <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-purple-soft" />
-              Founding members · Cairns
+              Now building · early access
             </span>
           </Reveal>
           <Reveal delay={100}>
@@ -62,13 +65,31 @@ export default function ClubhousePage() {
           </Reveal>
           <Reveal delay={300}>
             <p className="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-white/70">
-              Not a detailer. A club. Detail your own car with our gear, hang out in the lounge, and go in every members&apos; draw.
+              Not a detailer. A club. Detail your own car with our gear, hang out in the lounge, and go in every members&apos; draw. We&apos;re building it now, get in early.
             </p>
           </Reveal>
           <Reveal delay={400}>
-            <span className="mt-8 inline-flex items-center gap-2.5 rounded-full border border-brand-purple/50 bg-brand-purple/[0.12] px-8 py-4 font-display text-base font-black uppercase tracking-[0.16em] text-brand-purple-soft">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-brand-purple-soft" />Coming soon
-            </span>
+            <a href={JOIN_URL} className="mt-8 inline-flex items-center gap-2.5 rounded-full bg-brand-purple px-8 py-4 font-display text-base font-black uppercase tracking-[0.14em] text-white transition hover:brightness-110 active:scale-95">
+              Get early access, {PRICE}/mo
+            </a>
+            <div className="mt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-white/45">Founding rate · locks in forever</div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ═══ EARLY ACCESS ═══ */}
+      <section className="border-b border-white/5 px-4 py-12 sm:py-14">
+        <div className="mx-auto max-w-2xl text-center">
+          <Reveal>
+            <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">Get in early</div>
+            <h2 className="mt-2 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+              We&apos;re building it. Join now and grow with it.
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-white/65">
+              The Garage Club is being built right now. Founding members get in today at{" "}
+              <b className="text-white">{PRICE}/month</b>, lock that rate in for good, and unlock everything, the bays, the
+              lounge, the draws, as each piece opens. Get in before it goes to {FUTURE_PRICE}.
+            </p>
           </Reveal>
         </div>
       </section>
@@ -101,20 +122,25 @@ export default function ClubhousePage() {
               </ul>
               <div className="border-t border-brand-purple/30 bg-brand-purple/[0.10] px-5 py-6 text-center sm:px-7">
                 <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/50">Over $2,000 of value a year</div>
-                <div className="mt-2 flex items-end justify-center gap-1.5">
+                <div className="mt-2 flex items-end justify-center gap-2">
+                  <span className="mb-2 font-display text-xl font-bold text-white/40 line-through">{FUTURE_PRICE}</span>
                   <span className="font-display text-5xl font-black text-white sm:text-6xl">{PRICE}</span>
                   <span className="mb-2 text-sm font-bold text-white/50">/month</span>
                 </div>
-                <div className="mt-1 text-xs text-white/45">Founding members lock this in. Cancel anytime.</div>
-                <span className="mt-5 inline-flex items-center gap-2 rounded-full border border-brand-purple/50 bg-brand-purple/[0.12] px-8 py-3.5 font-display text-sm font-black uppercase tracking-[0.16em] text-brand-purple-soft">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-purple-soft" />Coming soon
-                </span>
+                <div className="mt-1.5 inline-flex items-center rounded-full bg-brand-purple/20 px-3 py-0.5 text-[10px] font-black uppercase tracking-wider text-brand-purple-soft">
+                  Founding rate · locks in forever
+                </div>
+                <div className="mt-2 text-xs text-white/45">Everything unlocks as we build. Cancel anytime.</div>
+                <a href={JOIN_URL} className="mt-5 inline-flex items-center gap-2 rounded-full bg-brand-purple px-8 py-3.5 font-display text-sm font-black uppercase tracking-[0.14em] text-white transition hover:brightness-110 active:scale-95">
+                  Get early access →
+                </a>
               </div>
             </div>
           </Reveal>
 
           <Reveal delay={150}>
-            <div className="mt-6">
+            <div id="join-form" className="mt-8 scroll-mt-20">
+              <div className="mb-3 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">Not ready to commit? Get on the founding list</div>
               <ClubhouseWaitlist />
             </div>
           </Reveal>
