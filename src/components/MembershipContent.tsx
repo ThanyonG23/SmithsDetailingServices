@@ -176,7 +176,7 @@ export default function MembershipContent() {
                   alt="Mini draw, win a standard detail, drawn tonight at 7:30pm"
                   className="aspect-[16/9] w-full object-contain"
                 />
-                <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-brand-purple px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-white">
+                <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-brand-purple px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-white">
                   <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />Drawn tonight
                 </span>
               </div>
@@ -190,6 +190,9 @@ export default function MembershipContent() {
                   <a href="#join" className="rounded-full bg-brand-yellow px-7 py-2.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95">
                     Join for $1 →
                   </a>
+                  <Link href="/detail-draw-terms" className="text-[11px] font-semibold text-white/50 underline underline-offset-4 transition hover:text-white">
+                    What&apos;s a standard detail &amp; draw terms
+                  </Link>
                 </div>
               </div>
             </div>
