@@ -174,10 +174,10 @@ export default function MembershipContent() {
                 <img
                   src="/media/photos/tonight-draw.jpg"
                   alt="Mini draw, win a standard detail, drawn tonight at 7:30pm"
-                  className="aspect-[16/9] w-full object-cover sm:aspect-[21/9]"
+                  className="aspect-[16/9] w-full object-contain"
                 />
-                <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-brand-yellow px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-brand-ink">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-ink" />Drawn tonight
+                <span className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-brand-purple px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-white">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />Drawn tonight
                 </span>
               </div>
               <div className="flex flex-col items-center gap-4 bg-gradient-to-br from-brand-yellow/[0.12] to-brand-yellow/[0.02] p-5 sm:flex-row sm:justify-between">
