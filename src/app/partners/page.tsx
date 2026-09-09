@@ -13,14 +13,19 @@ export const metadata: Metadata = {
 
 const LOGO = BUSINESS.logo;
 
-const OPTIONS: { icon: string; title: string; tag: string; summary: string; give: string; get: string }[] = [
+const OPTIONS: { icon: string; title: string; tag: string; summary: string; give: string; get: string[] }[] = [
   {
     icon: "🏷️",
     title: "Give members a discount",
     tag: "Costs you nothing to join",
     summary: "Offer Smiths members something like 10% off. This is the easy one, and how most partners start.",
     give: "A member discount, that you only ever pay when one of our members actually buys from you. A customer you wouldn't have had otherwise.",
-    get: "New local customers, free promotion to our members and audience, and members choosing you over the business next door. Our team also comes out regularly to shoot content with your business and promote it across our socials.",
+    get: [
+      "New local customers you wouldn't have had",
+      "Free promotion to our members and audience",
+      "Members choosing you over the business next door",
+      "Our team comes out regularly to shoot content with your business, promoted across our socials",
+    ],
   },
   {
     icon: "🎁",
@@ -28,7 +33,11 @@ const OPTIONS: { icon: string; title: string; tag: string; summary: string; give
     tag: "Best for spare capacity",
     summary: "Put up an experience or product as a prize in one of our members' draws.",
     give: "One prize for a single draw, an experience, a service or a product. Perfect if you've got spare seats, a quiet night, or capacity to fill.",
-    get: "Your business featured across every piece of that giveaway's content and the winner reveal, plus a batch of content you can reuse. Our team also comes out regularly to shoot content with your business and promote it across our socials.",
+    get: [
+      "Featured across every piece of that giveaway's content and the winner reveal",
+      "A batch of content you can reuse",
+      "Our team comes out regularly to shoot content with your business, promoted across our socials",
+    ],
   },
 ];
 
@@ -115,7 +124,14 @@ export default function PartnersPage() {
                     </div>
                     <div>
                       <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-purple-soft">You get</div>
-                      <div className="mt-1 text-sm leading-relaxed text-white/80">{o.get}</div>
+                      <ul className="mt-2 flex flex-col gap-1.5">
+                        {o.get.map((g) => (
+                          <li key={g} className="flex items-start gap-2 text-sm leading-relaxed text-white/80">
+                            <span className="mt-0.5 shrink-0 text-brand-purple-soft">✓</span>
+                            <span>{g}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
                 </div>
