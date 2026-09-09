@@ -103,7 +103,23 @@ export default function ClubhousePage() {
             </div>
           </Reveal>
 
-          <Reveal delay={100}>
+          <Reveal delay={80}>
+            <div className="relative mx-auto mt-8 max-w-[300px]">
+              <div className="pointer-events-none absolute -inset-4 rounded-[2rem] opacity-40 blur-2xl" style={{ background: GLOW }} aria-hidden />
+              <div className="relative overflow-hidden rounded-2xl border border-brand-purple/40 bg-black shadow-[0_24px_70px_-24px_rgba(0,0,0,0.85)]">
+                <video
+                  src="/media/videos/clubhouse-intro.mp4"
+                  poster="/media/photos/clubhouse-intro-poster.jpg"
+                  controls
+                  playsInline
+                  preload="metadata"
+                  className="aspect-[9/16] w-full bg-black"
+                />
+              </div>
+            </div>
+          </Reveal>
+
+          <Reveal delay={140}>
             <div className="mt-8 overflow-hidden rounded-3xl border border-brand-purple/40 bg-gradient-to-b from-brand-purple/[0.10] to-white/[0.02] shadow-[0_0_70px_-20px_rgba(124,47,245,0.6)]">
               <ul className="flex flex-col divide-y divide-white/8">
                 {STACK.map((s) => (
