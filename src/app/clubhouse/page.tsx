@@ -3,16 +3,13 @@ import Link from "next/link";
 import Reveal from "@/components/Reveal";
 import SiteNav from "@/components/SiteNav";
 import ReviewsSection from "@/components/ReviewsSection";
-import ClubhouseWaitlist from "@/components/ClubhouseWaitlist";
 import { BUSINESS } from "@/lib/config";
 
-/* DRAFT — Smiths Garage clubhouse / Garage Club membership value-stack page.
-   Not linked from anywhere and noindexed. Change PRICE / value numbers freely. */
+/* Smiths Garage clubhouse / Garage Club early-access membership page. */
 
 export const metadata: Metadata = {
   title: "Smiths Garage · The Garage Club",
-  description: "Early access to the Smiths Garage members' club. Join now while we build it and lock in the founding rate.",
-  robots: { index: false, follow: false },
+  description: "Early access to the Smiths Garage members' club. Detail your own car in our bays, hang out, and go in every draw.",
   alternates: { canonical: "/clubhouse" },
 };
 
@@ -96,9 +93,9 @@ export default function ClubhousePage() {
         <div className="mx-auto max-w-3xl">
           <Reveal>
             <div className="text-center">
-              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">Everything you get</div>
+              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">30 Seconds</div>
               <h2 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-                One membership. The whole garage.
+                The Idea
               </h2>
             </div>
           </Reveal>
@@ -119,6 +116,15 @@ export default function ClubhousePage() {
             </div>
           </Reveal>
 
+          <Reveal delay={120}>
+            <div className="mt-12 text-center">
+              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">Everything you get</div>
+              <h2 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                One membership. The whole garage.
+              </h2>
+            </div>
+          </Reveal>
+
           <Reveal delay={140}>
             <div className="mt-8 overflow-hidden rounded-3xl border border-brand-purple/40 bg-gradient-to-b from-brand-purple/[0.10] to-white/[0.02] shadow-[0_0_70px_-20px_rgba(124,47,245,0.6)]">
               <ul className="flex flex-col divide-y divide-white/8">
@@ -134,6 +140,9 @@ export default function ClubhousePage() {
                 ))}
               </ul>
               <div className="border-t border-brand-purple/30 bg-brand-purple/[0.10] px-5 py-6 text-center sm:px-7">
+                <div className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-brand-yellow/40 bg-brand-yellow/10 px-3.5 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-brand-yellow">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-yellow" />Only 10 spots left
+                </div>
                 <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/50">Over $2,000 of value a year</div>
                 <div className="mt-2 flex items-end justify-center gap-1.5">
                   <span className="font-display text-5xl font-black text-white sm:text-6xl">{PRICE}</span>
@@ -147,13 +156,6 @@ export default function ClubhousePage() {
                   Get early access →
                 </a>
               </div>
-            </div>
-          </Reveal>
-
-          <Reveal delay={150}>
-            <div id="join-form" className="mt-8 scroll-mt-20">
-              <div className="mb-3 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">Not ready to commit? Get on the founding list</div>
-              <ClubhouseWaitlist />
             </div>
           </Reveal>
         </div>
