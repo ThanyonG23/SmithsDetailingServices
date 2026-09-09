@@ -13,21 +13,22 @@ export const metadata: Metadata = {
 
 const LOGO = BUSINESS.logo;
 
-const STACK: { icon: string; title: string; desc: string }[] = [
+const OPTIONS: { icon: string; title: string; tag: string; summary: string; give: string; get: string }[] = [
+  {
+    icon: "🏷️",
+    title: "Give members a discount",
+    tag: "Costs you nothing to join",
+    summary: "Offer Smiths members something like 10% off. This is the easy one, and how most partners start.",
+    give: "A member discount, that you only ever pay when one of our members actually buys from you. A customer you wouldn't have had otherwise.",
+    get: "New local customers, free promotion to our members and audience, and members choosing you over the business next door.",
+  },
   {
     icon: "🎁",
     title: "Be a giveaway prize",
-    desc: "We feature your business as an experience our members win, and promote it across our socials and paid ads the whole way through. You get real exposure and a batch of content you can reuse.",
-  },
-  {
-    icon: "🏷️",
-    title: "Offer a member perk",
-    desc: "List a member discount, like 10% off for Smiths members, and put your business in front of a growing base of local customers who are already spending.",
-  },
-  {
-    icon: "🤝",
-    title: "Grow together, locally",
-    desc: "This is Cairns businesses backing each other. We cross-promote our partners, and our members get a genuine reason to choose you first.",
+    tag: "Best for spare capacity",
+    summary: "Put up an experience or product as a prize in one of our members' draws.",
+    give: "One prize for a single draw, an experience, a service or a product. Perfect if you've got spare seats, a quiet night, or capacity to fill.",
+    get: "Your business featured across every piece of that giveaway's content and the winner reveal, plus a batch of content you can reuse.",
   },
 ];
 
@@ -88,17 +89,35 @@ export default function PartnersPage() {
             <div className="text-center">
               <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">Two ways to partner</div>
               <h2 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-                Real exposure, no ad spend
+                What you give, what you get
               </h2>
+              <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-white/60">
+                No fee, no lock-in, no risk. Pick one or do both.
+              </p>
             </div>
           </Reveal>
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
-            {STACK.map((s, i) => (
-              <Reveal key={s.title} delay={i * 90}>
-                <div className="flex h-full flex-col rounded-2xl border border-brand-purple/25 bg-gradient-to-b from-brand-purple/[0.08] to-white/[0.02] p-5">
-                  <span className="text-2xl leading-none">{s.icon}</span>
-                  <h3 className="mt-3 font-display text-lg font-extrabold tracking-tight text-white">{s.title}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-white/60">{s.desc}</p>
+          <div className="mt-8 grid gap-5 sm:grid-cols-2">
+            {OPTIONS.map((o, i) => (
+              <Reveal key={o.title} delay={i * 90}>
+                <div className="flex h-full flex-col rounded-3xl border border-brand-purple/30 bg-gradient-to-b from-brand-purple/[0.10] to-white/[0.02] p-6 shadow-[0_0_60px_-24px_rgba(124,47,245,0.6)]">
+                  <div className="flex items-center gap-3">
+                    <span className="text-3xl leading-none">{o.icon}</span>
+                    <span className="rounded-full bg-brand-purple/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-brand-purple-soft">
+                      {o.tag}
+                    </span>
+                  </div>
+                  <h3 className="mt-4 font-display text-xl font-extrabold tracking-tight text-white sm:text-2xl">{o.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-white/60">{o.summary}</p>
+                  <div className="mt-5 flex flex-col gap-4 border-t border-white/10 pt-5">
+                    <div>
+                      <div className="text-[10px] font-black uppercase tracking-[0.16em] text-white/40">You give</div>
+                      <div className="mt-1 text-sm leading-relaxed text-white/80">{o.give}</div>
+                    </div>
+                    <div>
+                      <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-purple-soft">You get</div>
+                      <div className="mt-1 text-sm leading-relaxed text-white/80">{o.get}</div>
+                    </div>
+                  </div>
                 </div>
               </Reveal>
             ))}
