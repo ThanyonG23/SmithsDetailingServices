@@ -187,7 +187,7 @@ export default function MembershipContent() {
                 </div>
                 <div className="flex shrink-0 flex-col items-center gap-2.5">
                   <Countdown target={DRAW_TONIGHT_TIME} accent="yellow" />
-                  <a href="#join" className="rounded-full bg-brand-yellow px-7 py-2.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95">
+                  <a href="https://buy.stripe.com/8x27sL07CaTX8eI35F6kg0z" className="rounded-full bg-brand-yellow px-7 py-2.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95">
                     Join for $1 →
                   </a>
                   <Link href="/detail-draw-terms" className="text-[11px] font-semibold text-white/50 underline underline-offset-4 transition hover:text-white">
