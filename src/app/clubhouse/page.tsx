@@ -18,20 +18,17 @@ export const metadata: Metadata = {
 
 const LOGO = "/media/photos/smiths-garage-logo.png";
 const HERO = "/media/photos/clubhouse.jpg";
-const PRICE = "$34.99"; // founding early-access monthly price
-const FUTURE_PRICE = "$49"; // the rate it rises to once fully open
-// TODO: swap "#join-form" for the $34.99/mo Stripe payment link. Falls back to the waitlist form for now.
-const JOIN_URL = "#join-form";
+const PRICE = "$34.99"; // early-access monthly price
+const JOIN_URL = "https://buy.stripe.com/00wbJ13jOaTXdz2bCb6kg0C";
 
 const STACK: { icon: string; title: string; desc: string; value: string; hero?: boolean }[] = [
   { icon: "🔧", title: "Unlimited DIY Detailing Bay", desc: "Bring your car in as often as you like and detail it yourself with our pro equipment and products. No booking fees, no per-session cost, ever.", value: "Unlimited", hero: true },
-  { icon: "🥃", title: "The Clubhouse", desc: "The members' lounge, TVs, pool, cars and community. A place to actually hang out.", value: "Members only", hero: true },
+  { icon: "🥃", title: "The Clubhouse", desc: "The members' lounge, TVs, pool, cars and community. A place to actually hang out.", value: "Coming soon", hero: true },
   { icon: "🎁", title: "Every members' draw", desc: "Automatically entered to win cash, details and prizes, every draw we run.", value: "$1,000s in prizes" },
   { icon: "✨", title: "10% off all detailing", desc: "Member rate on every service, every time.", value: "Save $100s" },
-  { icon: "🛒", title: "Member product pricing", desc: "Member-only pricing on the Smiths Garage product range.", value: "Ongoing" },
   { icon: "🎓", title: "Detailing induction & masterclass", desc: "Learn to detail properly, so you get the most out of the bay.", value: "$99 value" },
   { icon: "⚡", title: "Priority booking", desc: "Members get seen first when we're busy.", value: "Included" },
-  { icon: "🎉", title: "Member events & nights", desc: "Meet-ups, live nights and members-only events at the clubhouse.", value: "Included" },
+  { icon: "🎉", title: "Member events & nights", desc: "Meet-ups, live nights and members-only events at the clubhouse.", value: "Coming soon" },
 ];
 
 const GLOW = "radial-gradient(closest-side, #7c2ff5, transparent 70%)";
@@ -72,7 +69,7 @@ export default function ClubhousePage() {
             <a href={JOIN_URL} className="mt-8 inline-flex items-center gap-2.5 rounded-full bg-brand-purple px-8 py-4 font-display text-base font-black uppercase tracking-[0.14em] text-white transition hover:brightness-110 active:scale-95">
               Get early access, {PRICE}/mo
             </a>
-            <div className="mt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-white/45">Founding rate · locks in forever</div>
+            <div className="mt-3 text-[11px] font-bold uppercase tracking-[0.18em] text-white/45">{PRICE}/month · cancel anytime</div>
           </Reveal>
         </div>
       </section>
@@ -86,9 +83,9 @@ export default function ClubhousePage() {
               We&apos;re building it. Join now and grow with it.
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-white/65">
-              The Garage Club is being built right now. Founding members get in today at{" "}
-              <b className="text-white">{PRICE}/month</b>, lock that rate in for good, and unlock everything, the bays, the
-              lounge, the draws, as each piece opens. Get in before it goes to {FUTURE_PRICE}.
+              The Garage Club is being built right now. Get in early for{" "}
+              <b className="text-white">{PRICE}/month</b> and unlock everything, the bays, the lounge, the draws, as each
+              piece opens. Cancel anytime.
             </p>
           </Reveal>
         </div>
@@ -122,15 +119,14 @@ export default function ClubhousePage() {
               </ul>
               <div className="border-t border-brand-purple/30 bg-brand-purple/[0.10] px-5 py-6 text-center sm:px-7">
                 <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-white/50">Over $2,000 of value a year</div>
-                <div className="mt-2 flex items-end justify-center gap-2">
-                  <span className="mb-2 font-display text-xl font-bold text-white/40 line-through">{FUTURE_PRICE}</span>
+                <div className="mt-2 flex items-end justify-center gap-1.5">
                   <span className="font-display text-5xl font-black text-white sm:text-6xl">{PRICE}</span>
                   <span className="mb-2 text-sm font-bold text-white/50">/month</span>
                 </div>
                 <div className="mt-1.5 inline-flex items-center rounded-full bg-brand-purple/20 px-3 py-0.5 text-[10px] font-black uppercase tracking-wider text-brand-purple-soft">
-                  Founding rate · locks in forever
+                  Early access · cancel anytime
                 </div>
-                <div className="mt-2 text-xs text-white/45">Everything unlocks as we build. Cancel anytime.</div>
+                <div className="mt-2 text-xs text-white/45">Everything unlocks as we build it out.</div>
                 <a href={JOIN_URL} className="mt-5 inline-flex items-center gap-2 rounded-full bg-brand-purple px-8 py-3.5 font-display text-sm font-black uppercase tracking-[0.14em] text-white transition hover:brightness-110 active:scale-95">
                   Get early access →
                 </a>
