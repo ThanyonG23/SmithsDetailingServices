@@ -21,6 +21,15 @@ const config: Config = {
         glowY: "0 0 0 1px rgba(255,230,0,.18), 0 0 26px rgba(255,230,0,.22)",
         glowG: "0 0 0 1px rgba(43,255,122,.16), 0 0 26px rgba(43,255,122,.20)",
       },
+      keyframes: {
+        marquee: {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+      },
+      animation: {
+        marquee: "marquee 22s linear infinite",
+      },
     },
   },
   plugins: [],

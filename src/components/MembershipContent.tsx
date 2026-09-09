@@ -356,6 +356,42 @@ export default function MembershipContent() {
         </div>
       </section>
 
+      {/* ═══ PARTNER DISCOUNTS (coming soon) ═══ */}
+      <section className="px-4 pt-14 sm:pt-16">
+        <div className="mx-auto max-w-4xl">
+          <Reveal>
+            <div className="text-center">
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-brand-yellow/40 bg-brand-yellow/10 px-3.5 py-1 text-[11px] font-black uppercase tracking-[0.14em] text-brand-yellow">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-yellow" />Coming soon
+              </div>
+              <h2 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                Member discounts at local businesses
+              </h2>
+              <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-white/60">
+                We&apos;re bringing local businesses on board so your membership saves you money all over Cairns. Here&apos;s the first.
+              </p>
+            </div>
+          </Reveal>
+          <Reveal delay={100}>
+            <div className="relative mt-8 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
+              <div className="flex w-max animate-marquee items-center gap-5">
+                {Array.from({ length: 2 }).flatMap((_, dup) =>
+                  Array.from({ length: 6 }).map((__, i) => (
+                    <div
+                      key={`${dup}-${i}`}
+                      className="flex h-20 w-40 shrink-0 items-center justify-center rounded-2xl border border-brand-purple/20 bg-white/[0.03] px-5"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={LOGO} alt="Smiths Detailing, featured partner" className="max-h-9 w-auto opacity-85" />
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ═══ FAQ ═══ */}
       <section className="px-4 pt-16 pb-6 sm:pt-20 sm:pb-8">
         <div className="mx-auto max-w-4xl">
