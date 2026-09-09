@@ -3,7 +3,12 @@ import Link from "next/link";
 import Reveal from "@/components/Reveal";
 import SiteNav from "@/components/SiteNav";
 import ReviewsSection from "@/components/ReviewsSection";
+import DrawCard from "@/components/DrawCard";
 import { BUSINESS } from "@/lib/config";
+
+// Draw times (kept in sync with the membership page).
+const DRAW_TIME = "2026-09-14T12:00:00+10:00";
+const DRAW_MINI_TIME = "2026-09-21T12:00:00+10:00";
 
 /* Smiths Garage clubhouse / Garage Club early-access membership page. */
 
@@ -202,16 +207,25 @@ export default function ClubhousePage() {
             </div>
           </Reveal>
           <Reveal delay={100}>
-            <div className="mt-7 grid gap-5 sm:grid-cols-2">
-              {[
-                { src: "/media/photos/giveaway.jpg", alt: "Win $1,000 cash or a $2,200 paint correction and ceramic coating" },
-                { src: "/media/photos/mini-giveaway.jpg", alt: "Win $300 cash or a $400 detail" },
-              ].map((p) => (
-                <div key={p.src} className="overflow-hidden rounded-2xl border border-brand-purple/40 shadow-[0_0_0_1px_rgba(124,47,245,0.2),0_0_45px_rgba(124,47,245,0.28)]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={p.src} alt={p.alt} className="aspect-[16/9] w-full object-cover" />
-                </div>
-              ))}
+            <div className="mt-7 grid gap-6 sm:grid-cols-2">
+              <DrawCard
+                poster="/media/photos/giveaway.jpg"
+                alt="Smiths members' giveaway, win $1,000 cash or a $2,200 paint correction and ceramic coating"
+                label="Big draw · drawn 14 Sept"
+                title={<>Win <span className="text-brand-purple-soft">$1,000 cash</span> or a <span className="text-brand-purple-soft">$2,200</span> paint correction &amp; coating</>}
+                blurb="Every active member is automatically entered. Join now and you are in."
+                target={DRAW_TIME}
+                termsHref="/draw-terms"
+              />
+              <DrawCard
+                poster="/media/photos/mini-giveaway.jpg"
+                alt="Smiths members' mini draw, win $300 cash or a $400+ detail"
+                label="Mini draw · drawn 21 Sept"
+                title={<>Win <span className="text-brand-purple-soft">$300 cash</span> or a <span className="text-brand-purple-soft">$400+</span> detail</>}
+                blurb="A small member pool right now means the best odds you will ever get. Join and you're in."
+                target={DRAW_MINI_TIME}
+                termsHref="/mini-draw-terms"
+              />
             </div>
           </Reveal>
         </div>

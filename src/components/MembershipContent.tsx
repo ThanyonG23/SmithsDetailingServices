@@ -3,6 +3,7 @@ import Reveal from "@/components/Reveal";
 import ReviewsSection from "@/components/ReviewsSection";
 import SiteNav from "@/components/SiteNav";
 import Countdown from "@/components/Countdown";
+import DrawCard from "@/components/DrawCard";
 import { BUSINESS } from "@/lib/config";
 
 // The member draw: drawn 14 Sep 2026, 12:00pm AEST (UTC+10).
@@ -201,78 +202,28 @@ export default function MembershipContent() {
           <div className="mt-9 grid gap-6 md:grid-cols-2">
             {/* mini draw */}
             <Reveal>
-              <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-brand-purple/40 shadow-[0_0_0_1px_rgba(124,47,245,0.2),0_0_55px_rgba(124,47,245,0.32)]">
-                <div className="relative aspect-[16/9] w-full overflow-hidden bg-black">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/media/photos/mini-giveaway.jpg"
-                    alt="Smiths members' mini draw, win $300 cash or a $400+ detail"
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                <div className="flex flex-1 flex-col bg-gradient-to-br from-brand-purple/[0.16] to-brand-purple/[0.02] p-5 sm:p-6">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-purple-soft">
-                    Mini draw · drawn 21 Sept
-                  </div>
-                  <h3 className="mt-1.5 min-h-[3.25rem] font-display text-xl font-extrabold leading-tight text-white sm:min-h-[3.75rem] sm:text-2xl">
-                    Win <span className="text-brand-purple-soft">$300 cash</span> or a{" "}
-                    <span className="text-brand-purple-soft">$400+</span> detail
-                  </h3>
-                  <p className="mt-2 min-h-[2.5rem] text-sm leading-relaxed text-white/70">
-                    A small member pool right now means the best odds you will ever get. Join and you&apos;re in.
-                  </p>
-                  <div className="mt-auto pt-4">
-                    <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-purple-soft">
-                      Drawn in
-                    </div>
-                    <Countdown target={DRAW_MINI_TIME} accent="purple" />
-                    <Link
-                      href="/mini-draw-terms"
-                      className="mt-3 block text-center text-xs font-semibold text-brand-purple-soft underline underline-offset-4 transition hover:text-white"
-                    >
-                      See draw terms
-                    </Link>
-                  </div>
-                </div>
-              </div>
+              <DrawCard
+                poster="/media/photos/mini-giveaway.jpg"
+                alt="Smiths members' mini draw, win $300 cash or a $400+ detail"
+                label="Mini draw · drawn 21 Sept"
+                title={<>Win <span className="text-brand-purple-soft">$300 cash</span> or a <span className="text-brand-purple-soft">$400+</span> detail</>}
+                blurb="A small member pool right now means the best odds you will ever get. Join and you're in."
+                target={DRAW_MINI_TIME}
+                termsHref="/mini-draw-terms"
+              />
             </Reveal>
 
             {/* big draw */}
             <Reveal delay={100}>
-              <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-brand-purple/40 shadow-[0_0_0_1px_rgba(124,47,245,0.2),0_0_55px_rgba(124,47,245,0.32)]">
-                <div className="relative aspect-[16/9] w-full overflow-hidden bg-black">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src="/media/photos/giveaway.jpg"
-                    alt="Smiths Detailing members' giveaway, win $1,000 cash or a $2,200 paint correction and ceramic coating"
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                <div className="flex flex-1 flex-col bg-gradient-to-br from-brand-purple/[0.16] to-brand-purple/[0.02] p-5 sm:p-6">
-                  <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-purple-soft">
-                    Big draw · drawn 14 Sept
-                  </div>
-                  <h3 className="mt-1.5 min-h-[3.25rem] font-display text-xl font-extrabold leading-tight text-white sm:min-h-[3.75rem] sm:text-2xl">
-                    Win <span className="text-brand-purple-soft">$1,000 cash</span> or a{" "}
-                    <span className="text-brand-purple-soft">$2,200</span> paint correction &amp; coating
-                  </h3>
-                  <p className="mt-2 min-h-[2.5rem] text-sm leading-relaxed text-white/70">
-                    Every active member is automatically entered. Join now and you are in.
-                  </p>
-                  <div className="mt-auto pt-4">
-                    <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-purple-soft">
-                      Drawn in
-                    </div>
-                    <Countdown target={DRAW_TIME} accent="purple" />
-                    <Link
-                      href="/draw-terms"
-                      className="mt-3 block text-center text-xs font-semibold text-brand-purple-soft underline underline-offset-4 transition hover:text-white"
-                    >
-                      See draw terms
-                    </Link>
-                  </div>
-                </div>
-              </div>
+              <DrawCard
+                poster="/media/photos/giveaway.jpg"
+                alt="Smiths Detailing members' giveaway, win $1,000 cash or a $2,200 paint correction and ceramic coating"
+                label="Big draw · drawn 14 Sept"
+                title={<>Win <span className="text-brand-purple-soft">$1,000 cash</span> or a <span className="text-brand-purple-soft">$2,200</span> paint correction &amp; coating</>}
+                blurb="Every active member is automatically entered. Join now and you are in."
+                target={DRAW_TIME}
+                termsHref="/draw-terms"
+              />
             </Reveal>
           </div>
 
