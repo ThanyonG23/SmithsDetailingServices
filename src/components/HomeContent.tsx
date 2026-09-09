@@ -190,37 +190,6 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
         </div>
       </section>
 
-      {/* ═══════════════════ CLUBHOUSE ═══════════════════ */}
-      <section className="border-b border-white/10 bg-white/[0.02] py-16 sm:py-20">
-        <div className="mx-auto max-w-3xl px-4 text-center">
-          <Reveal>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/media/photos/clubhouse.jpg"
-              alt="Smiths Garage clubhouse"
-              className="mx-auto mb-8 w-full max-w-lg rounded-2xl border border-brand-purple/30 shadow-[0_20px_60px_-25px_rgba(124,47,245,0.6)]"
-            />
-            <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">
-              Now building · early access
-            </div>
-            <h2 className="mt-2 font-display text-3xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-4xl">
-              Detail your own car at{" "}
-              <span className="text-brand-purple-soft">the Garage Club</span>
-            </h2>
-            <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-white/60">
-              Our members&apos; garage. Use our bays and pro gear to detail your own car, hang out, and go in every draw.
-              Get in early while we build it.
-            </p>
-            <Link
-              href="/clubhouse"
-              className="mt-7 inline-flex items-center justify-center rounded-full bg-brand-purple px-8 py-4 text-sm font-black text-white transition hover:brightness-110 active:scale-95"
-            >
-              Get early access →
-            </Link>
-          </Reveal>
-        </div>
-      </section>
-
       {/* ═══════════════════ REELS ═══════════════════ */}
       <section className="mx-auto max-w-6xl px-4 py-20">
         <Reveal>

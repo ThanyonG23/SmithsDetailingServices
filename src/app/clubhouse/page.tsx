@@ -15,6 +15,7 @@ const DRAW_MINI_TIME = "2026-09-21T12:00:00+10:00";
 export const metadata: Metadata = {
   title: "Smiths Garage · The Garage Club",
   description: "Early access to the Smiths Garage members' club. Detail your own car in our bays, hang out, and go in every draw.",
+  robots: { index: false, follow: false },
   alternates: { canonical: "/clubhouse" },
 };
 
