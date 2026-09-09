@@ -29,40 +29,36 @@ const YELLOW_GLOW = "radial-gradient(closest-side, #FFE600, transparent 70%)";
 
 const FAQS: { q: string; a: string }[] = [
   {
-    q: "What exactly do I get?",
-    a: "A full detail every 3 months and a full service every 6 months, so your car stays clean and looked after all year. You also get 10% off any add-on services, priority booking, and entry to the members' draw. One simple weekly payment covers it all.",
+    q: "How do I go in the draws?",
+    a: "Become a member and you're automatically entered into every members' draw, cash and prizes. There's nothing else to do, being a member is your entry.",
   },
   {
-    q: "How does payment work?",
-    a: "It's a weekly subscription from $39/week, depending on your vehicle size, plus a one-off first-visit fee that covers your first full detail and service. Secure checkout through Stripe, and you can cancel anytime.",
+    q: "How much is it?",
+    a: "Two easy ways in. Smiths Member is $1 for your first month, then $9.99/month, cancel anytime. Or grab the 30-Day Pass for $9.99 once (usually $24.99), no subscription, nothing renews. Both put you in every draw.",
   },
   {
-    q: "Can I cancel?",
-    a: "Yes, anytime. The member price is built around you staying on the plan, so if you cancel before your second visit the first visit is simply charged at our normal going rate. Stay past that and you keep the member pricing for good.",
+    q: "Can I cancel anytime?",
+    a: "Yes. Cancel in a couple of taps whenever you like, no lock-in and no hoops. You stay in the draws for whatever you've paid for.",
   },
   {
-    q: "What's the difference between the plans?",
-    a: "There are three. Detail & Vehicle Service is the full membership: we actually detail and service your car on a schedule, it's hands-off car care, from $39/week. Smiths Member ($1 first month, then $9.99/month) is the lighter, cheaper way in, perks and draws only, no detailing. The 30-Day Pass ($9.99 once, usually $24.99) is the same perks and draws but paid one-off with no subscription. Most people who want their car handled choose Detail & Vehicle Service.",
+    q: "Are the draws actually real?",
+    a: "100%. Every draw is real, we do them live, film them, and call the winner. Have a look at our winners section above, that's a real member we called.",
   },
   {
-    q: "What is the Smiths Member plan?",
-    a: "It's the cheapest way to become a member without booking in a detail. For a limited time your first month is just $1, then it's $9.99/month, and you can cancel anytime. You get 10% off all our services, priority booking, and entry to every members' draw. We don't detail your car on this plan, it's the perks and the draws only. Great if you just want to be in the giveaways and save on the odd detail.",
+    q: "How does the draw work?",
+    a: "Every active member goes in automatically. Winners are drawn at random on the draw date, and where a draw offers a choice, like cash or a detail, the winner picks. Full details are on the draw terms page linked under each draw.",
   },
   {
-    q: "Can I do a one-off instead of a subscription?",
-    a: "Yes. The 30-day Member Pass is $9.99 once (usually $24.99, limited time), no subscription and nothing renews. It gives you the same 10% off, priority booking, and entry to every draw for 30 days from your purchase. Handy if you'd rather not have a recurring payment.",
+    q: "What else do I get as a member?",
+    a: "On top of every draw entry, you get 10% off all our detailing services and priority booking. The draws are the main event, the perks are a bonus.",
   },
   {
-    q: "How does the $1,000 draw work?",
-    a: "Every active member is automatically entered to win $1,000 cash, drawn 14 September. Nothing extra to do, being a member is your entry. Full details are on the draw terms page.",
+    q: "Do I have to be local?",
+    a: "You can join and go in the draws from anywhere in Australia. The 10% off and priority booking are for our Cairns detailing, so those perks suit local members best.",
   },
   {
-    q: "Where are you based?",
-    a: `Our workshop is at ${BUSINESS.address}. You drop the car with us and we handle the rest.`,
-  },
-  {
-    q: "What if I'm not happy?",
-    a: "Simple: if you're not happy with the work, you don't pay. We've got 100+ five-star reviews because we don't hand a car back until it's right.",
+    q: "What if I win?",
+    a: "We call you, and you choose your prize where the draw gives you the option. Easy. We announce winners on our socials too.",
   },
 ];
 
@@ -257,55 +253,6 @@ export default function MembershipContent() {
         </div>
       </section>
 
-      {/* ═══ WHAT IS IT (VSL + explainer) ═══ */}
-      <section className="border-y border-white/5 bg-white/[0.015] py-14 sm:py-16">
-        <div className="mx-auto max-w-3xl px-4">
-          <Reveal>
-            <div className="text-center">
-              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">30 Seconds</div>
-              <h2 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-                What is Smiths Membership?
-              </h2>
-            </div>
-          </Reveal>
-          <Reveal delay={100}>
-            <div className="relative mx-auto mt-7 max-w-2xl">
-              <div
-                className="pointer-events-none absolute -inset-4 rounded-[2rem] opacity-40 blur-2xl"
-                style={{ background: GREEN_GLOW }}
-                aria-hidden
-              />
-              <div className="relative overflow-hidden rounded-2xl border border-brand-purple/40 bg-black shadow-[0_24px_70px_-24px_rgba(0,0,0,0.85)]">
-                <video
-                  src={VSL_VIDEO}
-                  poster="/media/photos/vsl-membership-poster.jpg"
-                  controls
-                  playsInline
-                  preload="metadata"
-                  className="aspect-video w-full bg-black"
-                />
-              </div>
-            </div>
-          </Reveal>
-          <Reveal delay={150}>
-            <ul className="mx-auto mt-7 flex max-w-xl flex-col gap-3">
-              <li className="flex items-start gap-3 text-sm leading-relaxed text-white/75">
-                <span className="mt-0.5 shrink-0 text-lg leading-none">✨</span>
-                <span><b className="font-bold text-white">Hands-off car care.</b> We detail and service your car on a schedule, so you never have to organise a thing again.</span>
-              </li>
-              <li className="flex items-start gap-3 text-sm leading-relaxed text-white/75">
-                <span className="mt-0.5 shrink-0 text-lg leading-none">🎁</span>
-                <span><b className="font-bold text-white">Or just come for the draws.</b> Two lighter options give you 10% off, priority booking and entry to every members&apos; giveaway, no detailing needed.</span>
-              </li>
-              <li className="flex items-start gap-3 text-sm leading-relaxed text-white/75">
-                <span className="mt-0.5 shrink-0 text-lg leading-none">💰</span>
-                <span><b className="font-bold text-white">Join from $1</b> and you&apos;re instantly in the draw. We just launched, so your odds will never be as good as they are right now.</span>
-              </li>
-            </ul>
-          </Reveal>
-        </div>
-      </section>
-
       {/* ═══ WINNERS ═══ */}
       <section className="py-14 sm:py-16">
         <div className="mx-auto max-w-3xl px-4">
@@ -344,12 +291,12 @@ export default function MembershipContent() {
 
       {/* ═══ THE PLAN ═══ */}
       <section id="join" className="scroll-mt-16 pt-10 pb-6 sm:pt-12">
-        <div className="mx-auto max-w-6xl px-4">
+        <div className="mx-auto max-w-3xl px-4">
           <div className="mb-6 text-center">
             <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-brand-purple-soft">Choose your plan</span>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2">
             {/* Card 1: Smiths Member $1 first month — purple — Most popular */}
             <Reveal>
               <div className="relative flex h-full flex-col rounded-3xl border border-brand-purple/50 bg-gradient-to-b from-brand-purple/[0.16] to-white/[0.02] p-6 shadow-[0_14px_60px_-18px_rgba(124,47,245,0.5)]">
@@ -384,34 +331,8 @@ export default function MembershipContent() {
               </div>
             </Reveal>
 
-            {/* Card 2: Detail & Vehicle Service (full membership) — yellow */}
+            {/* Card 2: 30-Day Pass $24.99 one-off — black/neutral */}
             <Reveal delay={80}>
-              <div className="flex h-full flex-col rounded-3xl border border-brand-yellow/45 bg-gradient-to-b from-brand-yellow/[0.08] to-white/[0.02] p-6 shadow-glowY">
-                <div>
-                  <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-yellow">The full membership</div>
-                  <h3 className="mt-1.5 font-display text-xl font-extrabold tracking-tight text-white">Detail &amp; Vehicle Service</h3>
-                  <div className="mt-3 flex items-end gap-1.5">
-                    <span className="mb-1 text-xs font-bold text-white/50">From</span>
-                    <span className="font-display text-3xl font-black text-white">$39</span>
-                    <span className="mb-1 text-xs font-bold text-white/50">/week</span>
-                  </div>
-                </div>
-                <ul className="mt-5 flex flex-1 flex-col gap-2.5 text-sm text-white/80">
-                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">✓</span>Full detail every 3 months</li>
-                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">✓</span>Full service every 6 months</li>
-                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">✓</span>10% off add-on services</li>
-                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">✓</span>Priority booking</li>
-                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">Entry to every draw</span></li>
-                </ul>
-                <a href="/membership/join" className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-yellow px-6 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95">
-                  Choose your vehicle →
-                </a>
-                <p className="mt-2.5 flex min-h-[2.5rem] items-start justify-center text-center text-xs text-white/40">Pick your vehicle at checkout. Cancel anytime.</p>
-              </div>
-            </Reveal>
-
-            {/* Card 3: 30-Day Pass $24.99 one-off — black/neutral */}
-            <Reveal delay={160}>
               <div className="flex h-full flex-col rounded-3xl border border-white/25 bg-gradient-to-b from-white/[0.07] to-white/[0.01] p-6 shadow-[0_14px_50px_-22px_rgba(255,255,255,0.28)]">
                 <div>
                   <div className="flex items-center justify-between gap-2">
