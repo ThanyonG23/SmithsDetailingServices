@@ -20,7 +20,7 @@ const OPTIONS: { icon: string; title: string; tag: string; summary: string; give
     tag: "Costs you nothing to join",
     summary: "Offer Smiths members something like 10% off. This is the easy one, and how most partners start.",
     give: "A member discount, that you only ever pay when one of our members actually buys from you. A customer you wouldn't have had otherwise.",
-    get: "New local customers, free promotion to our members and audience, and members choosing you over the business next door.",
+    get: "New local customers, free promotion to our members and audience, and members choosing you over the business next door. Our team also comes out regularly to shoot content with your business and promote it across our socials.",
   },
   {
     icon: "🎁",
@@ -28,7 +28,7 @@ const OPTIONS: { icon: string; title: string; tag: string; summary: string; give
     tag: "Best for spare capacity",
     summary: "Put up an experience or product as a prize in one of our members' draws.",
     give: "One prize for a single draw, an experience, a service or a product. Perfect if you've got spare seats, a quiet night, or capacity to fill.",
-    get: "Your business featured across every piece of that giveaway's content and the winner reveal, plus a batch of content you can reuse.",
+    get: "Your business featured across every piece of that giveaway's content and the winner reveal, plus a batch of content you can reuse. Our team also comes out regularly to shoot content with your business and promote it across our socials.",
   },
 ];
 
