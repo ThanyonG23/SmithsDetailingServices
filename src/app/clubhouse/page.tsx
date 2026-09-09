@@ -161,6 +161,62 @@ export default function ClubhousePage() {
         </div>
       </section>
 
+      {/* ═══ RECENT WINNERS ═══ */}
+      <section className="border-t border-white/5 px-4 py-14 sm:py-16">
+        <div className="mx-auto max-w-xl">
+          <Reveal>
+            <div className="text-center">
+              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">Real winners</div>
+              <h2 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                Recent winners from member draws
+              </h2>
+            </div>
+          </Reveal>
+          <Reveal delay={100}>
+            <div className="mt-7 grid gap-5 sm:grid-cols-2">
+              {[
+                { src: "/media/videos/winner-mini-draw.mp4", poster: "/media/photos/winner-poster.jpg" },
+                { src: "/media/videos/winner-2.mp4", poster: "/media/photos/winner-2-poster.jpg" },
+              ].map((v) => (
+                <div key={v.src} className="relative mx-auto w-full max-w-[300px]">
+                  <div className="pointer-events-none absolute -inset-4 rounded-[2rem] opacity-40 blur-2xl" style={{ background: GLOW }} aria-hidden />
+                  <div className="relative overflow-hidden rounded-2xl border border-brand-purple/40 bg-black shadow-[0_24px_70px_-24px_rgba(0,0,0,0.85)]">
+                    <video src={v.src} poster={v.poster} controls playsInline preload="metadata" className="aspect-[9/16] w-full bg-black" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ═══ UPCOMING DRAWS ═══ */}
+      <section className="border-t border-white/5 px-4 py-14 sm:py-16">
+        <div className="mx-auto max-w-3xl">
+          <Reveal>
+            <div className="text-center">
+              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">You&apos;re in every one</div>
+              <h2 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                Upcoming draws
+              </h2>
+            </div>
+          </Reveal>
+          <Reveal delay={100}>
+            <div className="mt-7 grid gap-5 sm:grid-cols-2">
+              {[
+                { src: "/media/photos/giveaway.jpg", alt: "Win $1,000 cash or a $2,200 paint correction and ceramic coating" },
+                { src: "/media/photos/mini-giveaway.jpg", alt: "Win $300 cash or a $400 detail" },
+              ].map((p) => (
+                <div key={p.src} className="overflow-hidden rounded-2xl border border-brand-purple/40 shadow-[0_0_0_1px_rgba(124,47,245,0.2),0_0_45px_rgba(124,47,245,0.28)]">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={p.src} alt={p.alt} className="aspect-[16/9] w-full object-cover" />
+                </div>
+              ))}
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ═══ THE DIY BAY ═══ */}
       <section className="border-y border-white/5 bg-white/[0.015] px-4 py-16 sm:py-20">
         <div className="mx-auto max-w-3xl text-center">
