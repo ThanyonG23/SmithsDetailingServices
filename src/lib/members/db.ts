@@ -1,5 +1,5 @@
 import { sql } from "@/lib/ops/db";
-import { createHash, randomBytes } from "crypto";
+import { createHash, randomBytes, scryptSync, timingSafeEqual } from "crypto";
 
 /* Member portal storage: a cache of member status (synced from Stripe) and
    the one-time magic-link login tokens. Reads run sequentially, the pooler
@@ -21,6 +21,7 @@ function ensure(): Promise<void> {
           created_at timestamptz DEFAULT now(),
           updated_at timestamptz DEFAULT now()
         )`;
+      await sql`ALTER TABLE members ADD COLUMN IF NOT EXISTS password_hash text`;
       await sql`
         CREATE TABLE IF NOT EXISTS member_tokens (
           token_hash text PRIMARY KEY,
@@ -45,7 +46,29 @@ export type Member = {
   plan: string;
   status: string;
   current_period_end: string | null;
+  password_hash: string | null;
 };
+
+// ── Password hashing (scrypt, salt:hash hex) ──
+export function hashPassword(pw: string): string {
+  const salt = randomBytes(16).toString("hex");
+  const hash = scryptSync(pw, salt, 64).toString("hex");
+  return `${salt}:${hash}`;
+}
+
+export function verifyPassword(pw: string, stored: string | null): boolean {
+  if (!stored) return false;
+  const [salt, hash] = stored.split(":");
+  if (!salt || !hash) return false;
+  const expected = Buffer.from(hash, "hex");
+  const test = scryptSync(pw, salt, 64);
+  return expected.length === test.length && timingSafeEqual(expected, test);
+}
+
+export async function setMemberPassword(email: string, passwordHash: string): Promise<void> {
+  await ensure();
+  await sql`UPDATE members SET password_hash = ${passwordHash}, updated_at = now() WHERE email = ${email.toLowerCase().trim()}`;
+}
 
 export async function upsertMember(m: Partial<Member> & { email: string }): Promise<void> {
   await ensure();
@@ -66,7 +89,7 @@ export async function upsertMember(m: Partial<Member> & { email: string }): Prom
 export async function getMember(email: string): Promise<Member | null> {
   await ensure();
   const rows = await sql`
-    SELECT email, name, stripe_customer_id, stripe_subscription_id, plan, status, current_period_end
+    SELECT email, name, stripe_customer_id, stripe_subscription_id, plan, status, current_period_end, password_hash
     FROM members WHERE email = ${email.toLowerCase().trim()} LIMIT 1`;
   return (rows[0] as Member) ?? null;
 }

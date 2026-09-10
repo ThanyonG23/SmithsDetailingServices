@@ -6,6 +6,7 @@ import { getMember, upsertMember } from "@/lib/members/db";
 import { findMembership, findMembershipByCustomer } from "@/lib/members/stripe";
 import { openDraws, PARTNERS } from "@/lib/members/portal";
 import LoginForm from "@/components/account/LoginForm";
+import SetPasswordCard from "@/components/account/SetPasswordCard";
 
 export const dynamic = "force-dynamic";
 
@@ -135,6 +136,9 @@ export default async function AccountPage({ searchParams }: { searchParams: { e?
           )}
         </div>
       </section>
+
+      {/* Password */}
+      <SetPasswordCard hasPassword={!!cached?.password_hash} />
 
       {/* My draws */}
       <section className="mt-6">

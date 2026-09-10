@@ -1,7 +1,16 @@
 "use server";
 
-import { createLoginToken, upsertMember } from "@/lib/members/db";
+import { cookies } from "next/headers";
+import {
+  createLoginToken,
+  upsertMember,
+  getMember,
+  verifyPassword,
+  hashPassword,
+  setMemberPassword,
+} from "@/lib/members/db";
 import { findMembership } from "@/lib/members/stripe";
+import { MEMBER_COOKIE, memberCookieValue, getSessionEmail } from "@/lib/members/session";
 
 const EMAIL_RE = /^[\w.+-]+@[\w-]+\.[a-z]{2,}(?:\.[a-z]{2,})?$/i;
 
@@ -59,4 +68,47 @@ export async function requestMagicLink(email: string): Promise<{ ok: boolean; er
 
   // Generic response either way, so membership status isn't leaked.
   return { ok: true };
+}
+
+const SESSION_COOKIE = {
+  httpOnly: true,
+  secure: true,
+  sameSite: "lax" as const,
+  path: "/",
+  maxAge: 60 * 60 * 24 * 30,
+};
+
+/** Email + password sign-in. Members must have set a password first (via the
+    magic-link entry). */
+export async function loginWithPassword(email: string, password: string): Promise<{ ok: boolean; error?: string }> {
+  const clean = String(email || "").trim().toLowerCase();
+  if (!EMAIL_RE.test(clean)) return { ok: false, error: "Enter a valid email." };
+  if (!password) return { ok: false, error: "Enter your password." };
+  try {
+    const member = await getMember(clean);
+    if (!member || !member.password_hash) {
+      return { ok: false, error: 'No password set for this email yet. Use "Email me a link" below, then set one.' };
+    }
+    if (!verifyPassword(password, member.password_hash)) {
+      return { ok: false, error: "Wrong email or password." };
+    }
+    cookies().set(MEMBER_COOKIE, memberCookieValue(clean), SESSION_COOKIE);
+    return { ok: true };
+  } catch {
+    return { ok: false, error: "Something went wrong, try again." };
+  }
+}
+
+/** Set or change the signed-in member's password. */
+export async function setPassword(password: string): Promise<{ ok: boolean; error?: string }> {
+  const email = getSessionEmail();
+  if (!email) return { ok: false, error: "Please sign in first." };
+  const pw = String(password || "");
+  if (pw.length < 8) return { ok: false, error: "Use at least 8 characters." };
+  try {
+    await setMemberPassword(email, hashPassword(pw));
+    return { ok: true };
+  } catch {
+    return { ok: false, error: "Couldn't save that, try again." };
+  }
 }
