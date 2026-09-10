@@ -64,7 +64,7 @@ export default async function AccountPage({ searchParams }: { searchParams: { e?
   //    (no email-case issues), then fall back to an email lookup. ──
   const cached = await getMember(email);
   let live = cached?.stripe_customer_id
-    ? await findMembershipByCustomer(cached.stripe_customer_id, cached.name)
+    ? await findMembershipByCustomer(cached.stripe_customer_id)
     : null;
   if (!live) live = await findMembership(email);
   if (live) {

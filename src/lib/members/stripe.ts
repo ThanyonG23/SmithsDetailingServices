@@ -113,12 +113,14 @@ export async function findMembership(email: string): Promise<Membership | null> 
   return null;
 }
 
-/** Re-check a known customer's live subscription (used on the dashboard). */
-export async function findMembershipByCustomer(customerId: string, name = ""): Promise<Membership | null> {
+/** Re-check a known customer's live subscription (used on the dashboard).
+    Re-reads the customer's current name from Stripe so renames show up. */
+export async function findMembershipByCustomer(customerId: string): Promise<Membership | null> {
   if (!key() || !customerId) return null;
   const sub = await liveSubForCustomer(customerId);
   if (!sub) return null;
-  return { customerId, name, ...sub };
+  const cust = await stripeGet<StripeCustomer>(`/customers/${customerId}`);
+  return { customerId, name: cust?.name || "", ...sub };
 }
 
 /** Count matching customers for an email (diagnostics only). */
