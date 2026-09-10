@@ -70,8 +70,23 @@ export default function MemberThanksPage() {
             </p>
           </div>
 
+          {/* member account */}
+          <div className="mt-10 rounded-2xl border border-brand-purple/40 bg-gradient-to-b from-brand-purple/[0.14] to-white/[0.02] p-6 text-center shadow-[0_0_60px_-24px_rgba(124,47,245,0.6)]">
+            <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-purple-soft">Your account</div>
+            <h2 className="mt-1.5 font-display text-xl font-extrabold text-white">Access your member account</h2>
+            <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-white/60">
+              Sign in with the email you just used to see the draws you&apos;re in, your membership, and your perks. No password, we email you a one-tap link.
+            </p>
+            <Link
+              href="/account"
+              className="mt-4 inline-flex items-center justify-center rounded-full bg-brand-purple px-7 py-3 font-display text-sm font-black text-white transition hover:brightness-110 active:scale-95"
+            >
+              Go to your account →
+            </Link>
+          </div>
+
           {/* perks / how to use */}
-          <div className="mt-10 flex flex-col gap-3">
+          <div className="mt-8 flex flex-col gap-3">
             {PERKS.map((p) => (
               <div
                 key={p.n}
