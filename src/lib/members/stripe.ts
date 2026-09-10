@@ -83,17 +83,29 @@ async function liveSubForCustomer(customerId: string): Promise<SubInfo | null> {
   };
 }
 
-/** Find a live subscription by email, trying case variants. */
+/** Find a live subscription by email. Stripe's email filter is case-sensitive,
+    so we try the fast filtered path first, then fall back to a case-insensitive
+    scan of recent customers (fine at our scale; a webhook-fed table later). */
 export async function findMembership(email: string): Promise<Membership | null> {
   if (!key()) return null;
-  const trimmed = email.trim();
-  const variants = Array.from(new Set([trimmed, trimmed.toLowerCase()]));
+  const target = email.trim().toLowerCase();
+
+  // Fast path: exact email filter (raw + lower-cased forms).
+  const variants = Array.from(new Set([email.trim(), target]));
   for (const v of variants) {
     const custs = await stripeGet<StripeList<StripeCustomer>>(
       `/customers?email=${encodeURIComponent(v)}&limit=10`,
     );
-    if (!custs?.data?.length) continue;
-    for (const c of custs.data) {
+    for (const c of custs?.data ?? []) {
+      const sub = await liveSubForCustomer(c.id);
+      if (sub) return { customerId: c.id, name: c.name || "", ...sub };
+    }
+  }
+
+  // Fallback: case-insensitive scan (handles capitals stored at checkout).
+  const all = await stripeGet<StripeList<StripeCustomer>>(`/customers?limit=100`);
+  for (const c of all?.data ?? []) {
+    if ((c.email || "").trim().toLowerCase() === target) {
       const sub = await liveSubForCustomer(c.id);
       if (sub) return { customerId: c.id, name: c.name || "", ...sub };
     }
