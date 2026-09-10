@@ -3,7 +3,7 @@ import Link from "next/link";
 import { BUSINESS } from "@/lib/config";
 import { getSessionEmail } from "@/lib/members/session";
 import { getMember, upsertMember } from "@/lib/members/db";
-import { findMembership } from "@/lib/members/stripe";
+import { findMembership, findMembershipByCustomer } from "@/lib/members/stripe";
 import { openDraws, PARTNERS } from "@/lib/members/portal";
 import LoginForm from "@/components/account/LoginForm";
 
@@ -59,8 +59,13 @@ export default async function AccountPage({ searchParams }: { searchParams: { e?
     );
   }
 
-  // ── Signed in: resolve membership (live from Stripe, fall back to cache) ──
-  const live = await findMembership(email);
+  // ── Signed in: resolve membership. Prefer the cached Stripe customer id
+  //    (no email-case issues), then fall back to an email lookup. ──
+  const cached = await getMember(email);
+  let live = cached?.stripe_customer_id
+    ? await findMembershipByCustomer(cached.stripe_customer_id, cached.name)
+    : null;
+  if (!live) live = await findMembership(email);
   if (live) {
     await upsertMember({
       email,
@@ -72,7 +77,6 @@ export default async function AccountPage({ searchParams }: { searchParams: { e?
       current_period_end: live.currentPeriodEnd,
     });
   }
-  const cached = live ? null : await getMember(email);
 
   const name = (live?.name || cached?.name || "").split(" ")[0];
   const status = live?.status || cached?.status || "";

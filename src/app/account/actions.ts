@@ -34,11 +34,12 @@ Smiths`;
 /* Always returns the same message so we never reveal who is or isn't a member.
    Only actually sends a link if the email has a live Stripe subscription. */
 export async function requestMagicLink(email: string): Promise<{ ok: boolean; error?: string }> {
-  const clean = String(email || "").trim().toLowerCase();
+  const raw = String(email || "").trim();
+  const clean = raw.toLowerCase();
   if (!EMAIL_RE.test(clean)) return { ok: false, error: "That email doesn't look right." };
 
   try {
-    const membership = await findMembership(clean);
+    const membership = await findMembership(raw);
     if (membership) {
       await upsertMember({
         email: clean,

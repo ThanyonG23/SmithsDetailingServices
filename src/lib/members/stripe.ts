@@ -1,6 +1,9 @@
 /* Thin Stripe REST client (no SDK dependency). Needs STRIPE_SECRET_KEY set in
-   Vercel. Used to verify a member's subscription by email and to open Stripe's
-   hosted billing portal. Returns null gracefully when the key is missing. */
+   Vercel. Used to verify a member's subscription and to open Stripe's hosted
+   billing portal. Returns null gracefully when the key is missing.
+
+   Stripe's customer email filter is case-sensitive and emails are stored as
+   entered at checkout, so we try the raw and lower-cased forms. */
 
 const API = "https://api.stripe.com/v1";
 
@@ -49,49 +52,72 @@ export type Membership = {
   name: string;
 };
 
-/** Whether Stripe is configured for the portal at all. */
 export function stripeReady(): boolean {
   return key() !== null;
 }
 
 const LIVE = new Set(["active", "trialing", "past_due"]);
 
-/** Find a live subscription for the given email, or null. */
+type SubInfo = { subscriptionId: string; plan: string; status: string; currentPeriodEnd: string | null };
+
+async function liveSubForCustomer(customerId: string): Promise<SubInfo | null> {
+  const subs = await stripeGet<StripeList<StripeSubscription>>(
+    `/subscriptions?customer=${customerId}&status=all&limit=10`,
+  );
+  const live = subs?.data?.find((s) => LIVE.has(s.status));
+  if (!live) return null;
+  const price = live.items?.data?.[0]?.price;
+  return {
+    subscriptionId: live.id,
+    plan: price?.nickname || price?.id || "Membership",
+    status: live.status,
+    currentPeriodEnd: live.current_period_end
+      ? new Date(live.current_period_end * 1000).toISOString()
+      : null,
+  };
+}
+
+/** Find a live subscription by email, trying case variants. */
 export async function findMembership(email: string): Promise<Membership | null> {
   if (!key()) return null;
-  const custs = await stripeGet<StripeList<StripeCustomer>>(
-    `/customers?email=${encodeURIComponent(email.toLowerCase().trim())}&limit=10`,
-  );
-  if (!custs?.data?.length) return null;
-
-  for (const c of custs.data) {
-    const subs = await stripeGet<StripeList<StripeSubscription>>(
-      `/subscriptions?customer=${c.id}&status=all&limit=10`,
+  const trimmed = email.trim();
+  const variants = Array.from(new Set([trimmed, trimmed.toLowerCase()]));
+  for (const v of variants) {
+    const custs = await stripeGet<StripeList<StripeCustomer>>(
+      `/customers?email=${encodeURIComponent(v)}&limit=10`,
     );
-    const live = subs?.data?.find((s) => LIVE.has(s.status));
-    if (live) {
-      const price = live.items?.data?.[0]?.price;
-      return {
-        customerId: c.id,
-        subscriptionId: live.id,
-        plan: price?.nickname || price?.id || "Membership",
-        status: live.status,
-        currentPeriodEnd: live.current_period_end
-          ? new Date(live.current_period_end * 1000).toISOString()
-          : null,
-        name: c.name || "",
-      };
+    if (!custs?.data?.length) continue;
+    for (const c of custs.data) {
+      const sub = await liveSubForCustomer(c.id);
+      if (sub) return { customerId: c.id, name: c.name || "", ...sub };
     }
   }
   return null;
 }
 
-/** Whether any customer exists for this email (used to decide if we email a link). */
-export async function emailHasMembership(email: string): Promise<boolean> {
-  return (await findMembership(email)) !== null;
+/** Re-check a known customer's live subscription (used on the dashboard). */
+export async function findMembershipByCustomer(customerId: string, name = ""): Promise<Membership | null> {
+  if (!key() || !customerId) return null;
+  const sub = await liveSubForCustomer(customerId);
+  if (!sub) return null;
+  return { customerId, name, ...sub };
 }
 
-/** Create a Stripe billing-portal session, returns the URL to redirect to. */
+/** Count matching customers for an email (diagnostics only). */
+export async function countCustomers(email: string): Promise<number> {
+  if (!key()) return 0;
+  const trimmed = email.trim();
+  const variants = Array.from(new Set([trimmed, trimmed.toLowerCase()]));
+  let n = 0;
+  for (const v of variants) {
+    const custs = await stripeGet<StripeList<StripeCustomer>>(
+      `/customers?email=${encodeURIComponent(v)}&limit=10`,
+    );
+    n += custs?.data?.length ?? 0;
+  }
+  return n;
+}
+
 export async function createBillingPortal(customerId: string, returnUrl: string): Promise<string | null> {
   const k = key();
   if (!k) return null;
