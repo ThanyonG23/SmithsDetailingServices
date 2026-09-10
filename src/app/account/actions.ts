@@ -1,8 +1,10 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 import {
   createLoginToken,
+  consumeLoginToken,
   upsertMember,
   getMember,
   verifyPassword,
@@ -97,6 +99,15 @@ export async function loginWithPassword(email: string, password: string): Promis
   } catch {
     return { ok: false, error: "Something went wrong, try again." };
   }
+}
+
+/** Consume a magic-link token (only on this human POST) and start the session. */
+export async function confirmLogin(formData: FormData): Promise<void> {
+  const token = String(formData.get("token") || "");
+  const email = token ? await consumeLoginToken(token) : null;
+  if (!email) redirect("/account?e=link");
+  cookies().set(MEMBER_COOKIE, memberCookieValue(email), SESSION_COOKIE);
+  redirect("/account");
 }
 
 /** Set or change the signed-in member's password. */
