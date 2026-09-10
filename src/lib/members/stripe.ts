@@ -58,6 +58,11 @@ export function stripeReady(): boolean {
 
 const LIVE = new Set(["active", "trialing", "past_due"]);
 
+// Friendly names for our known price IDs, so the portal never shows a raw price id.
+const PLAN_NAMES: Record<string, string> = {
+  price_1U7uBeDKvWtA0gmHV4y9V2zg: "Smiths Member",
+};
+
 type SubInfo = { subscriptionId: string; plan: string; status: string; currentPeriodEnd: string | null };
 
 async function liveSubForCustomer(customerId: string): Promise<SubInfo | null> {
@@ -67,9 +72,10 @@ async function liveSubForCustomer(customerId: string): Promise<SubInfo | null> {
   const live = subs?.data?.find((s) => LIVE.has(s.status));
   if (!live) return null;
   const price = live.items?.data?.[0]?.price;
+  const priceId = price?.id || "";
   return {
     subscriptionId: live.id,
-    plan: price?.nickname || price?.id || "Membership",
+    plan: price?.nickname || PLAN_NAMES[priceId] || "Smiths Membership",
     status: live.status,
     currentPeriodEnd: live.current_period_end
       ? new Date(live.current_period_end * 1000).toISOString()
