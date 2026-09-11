@@ -42,8 +42,8 @@ const OPTIONS: { icon: string; title: string; tag: string; summary: string; give
 
 const STEPS: { n: string; t: string; d: string; img?: string }[] = [
   { n: "1", t: "Reach out", d: "Fill in the form below or give Thanyon a call. Quick chat, no obligation.", img: "/media/photos/step-reach-out.webp" },
-  { n: "2", t: "We feature you", d: "Either as a giveaway experience, a member discount, or both. We handle the promo." },
-  { n: "3", t: "You get seen", d: "Exposure to our whole audience, fresh content, and new local customers through the door." },
+  { n: "2", t: "We feature you", d: "Either as a giveaway experience, a member discount, or both. We handle the promo.", img: "/media/photos/step-featured.webp" },
+  { n: "3", t: "You get seen", d: "Exposure to our whole audience, fresh content, and new local customers through the door.", img: "/media/photos/step-audience.webp" },
 ];
 
 export default function PartnersPage() {
@@ -103,10 +103,10 @@ export default function PartnersPage() {
           <div className="mt-8 grid gap-5 sm:grid-cols-2">
             {OPTIONS.map((o, i) => (
               <Reveal key={o.title} delay={i * 90}>
-                <div className="flex h-full flex-col rounded-3xl border border-brand-purple/30 bg-gradient-to-b from-brand-purple/[0.10] to-white/[0.02] p-6 shadow-[0_0_60px_-24px_rgba(124,47,245,0.6)]">
+                <div className="flex h-full flex-col rounded-3xl border border-brand-yellow/35 bg-gradient-to-b from-brand-yellow/[0.08] to-white/[0.02] p-6 shadow-glowY">
                   <div className="flex items-center gap-3">
                     <span className="text-3xl leading-none">{o.icon}</span>
-                    <span className="rounded-full bg-brand-purple/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-brand-purple-soft">
+                    <span className="rounded-full bg-brand-yellow/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-brand-yellow">
                       {o.tag}
                     </span>
                   </div>
@@ -118,11 +118,11 @@ export default function PartnersPage() {
                       <div className="mt-1 text-sm leading-relaxed text-white/80">{o.give}</div>
                     </div>
                     <div>
-                      <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-purple-soft">You get</div>
+                      <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-yellow">You get</div>
                       <ul className="mt-2 flex flex-col gap-1.5">
                         {o.get.map((g) => (
                           <li key={g} className="flex items-start gap-2 text-sm leading-relaxed text-white/80">
-                            <span className="mt-0.5 shrink-0 text-brand-purple-soft">✓</span>
+                            <span className="mt-0.5 shrink-0 text-brand-yellow">✓</span>
                             <span>{g}</span>
                           </li>
                         ))}
@@ -136,10 +136,10 @@ export default function PartnersPage() {
 
           {/* Platinum, the paid tier */}
           <Reveal delay={180}>
-            <div className="mt-5 overflow-hidden rounded-3xl border border-brand-yellow/45 bg-gradient-to-b from-brand-yellow/[0.09] to-white/[0.02] p-6 shadow-glowY sm:p-8">
+            <div className="mt-5 overflow-hidden rounded-3xl border border-brand-purple/45 bg-gradient-to-b from-brand-purple/[0.12] to-white/[0.02] p-6 shadow-[0_0_60px_-24px_rgba(124,47,245,0.6)] sm:p-8">
               <div className="flex flex-wrap items-center gap-3">
                 <span className="text-3xl leading-none">💎</span>
-                <span className="rounded-full bg-brand-yellow/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-brand-yellow">
+                <span className="rounded-full bg-brand-purple/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-brand-purple-soft">
                   Our biggest push
                 </span>
               </div>
@@ -156,7 +156,7 @@ export default function PartnersPage() {
                   </div>
                 </div>
                 <div>
-                  <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-yellow">You get everything, plus</div>
+                  <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-purple-soft">You get everything, plus</div>
                   <ul className="mt-2 flex flex-col gap-1.5">
                     {[
                       "Weekly content shoots at your business, every single week",
@@ -165,7 +165,7 @@ export default function PartnersPage() {
                       "Everything from the two options above, included",
                     ].map((g) => (
                       <li key={g} className="flex items-start gap-2 text-sm leading-relaxed text-white/80">
-                        <span className="mt-0.5 shrink-0 text-brand-yellow">✓</span>
+                        <span className="mt-0.5 shrink-0 text-brand-purple-soft">✓</span>
                         <span>{g}</span>
                       </li>
                     ))}
@@ -174,7 +174,7 @@ export default function PartnersPage() {
               </div>
               <a
                 href="#contact"
-                className="mt-6 inline-flex items-center gap-2 rounded-full bg-brand-yellow px-8 py-3.5 font-display text-sm font-black uppercase tracking-[0.14em] text-brand-ink transition hover:brightness-110 active:scale-95"
+                className="mt-6 inline-flex items-center gap-2 rounded-full bg-brand-purple px-8 py-3.5 font-display text-sm font-black uppercase tracking-[0.14em] text-white transition hover:brightness-110 active:scale-95"
               >
                 Book a call to discuss →
               </a>
