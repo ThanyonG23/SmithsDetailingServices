@@ -32,8 +32,15 @@ export default function UpgradePage() {
         />
         <div className="relative mx-auto max-w-3xl px-5 pb-20 pt-12 sm:pt-16">
           <div className="text-center">
-            <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">One quick choice</div>
-            <h1 className="mt-2 font-display text-3xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-5xl">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/media/photos/spend-1000.webp"
+              alt="What would you spend $1,000 on this week?"
+              width={1600}
+              height={800}
+              className="mx-auto w-full max-w-2xl rounded-2xl"
+            />
+            <h1 className="mt-6 font-display text-2xl font-extrabold leading-[1.12] tracking-tight text-white sm:text-4xl">
               This week&apos;s prize is big. <span className="text-brand-purple-soft">What&apos;s coming next is bigger.</span>
             </h1>
             <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-white/65">
