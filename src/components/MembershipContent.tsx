@@ -283,12 +283,12 @@ export default function MembershipContent() {
 
       {/* ═══ THE PLAN ═══ */}
       <section id="join" className="scroll-mt-16 pt-10 pb-6 sm:pt-12">
-        <div className="mx-auto max-w-3xl px-4">
+        <div className="mx-auto max-w-5xl px-4">
           <div className="mb-6 text-center">
             <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-brand-purple-soft">Choose your plan</span>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-3">
             {/* Card 1: Smiths Member $1 first month — purple — Most popular */}
             <Reveal>
               <div className="relative flex h-full flex-col rounded-3xl border border-brand-purple/50 bg-gradient-to-b from-brand-purple/[0.16] to-white/[0.02] p-6 shadow-[0_14px_60px_-18px_rgba(124,47,245,0.5)]">
@@ -312,9 +312,9 @@ export default function MembershipContent() {
                   <div className="mt-1.5 text-xs text-white/45">then $9.99/month · cancel anytime</div>
                 </div>
                 <ul className="mt-5 flex flex-1 flex-col gap-2.5 text-sm text-white/80">
-                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-purple-soft">✓</span>10% off all our services</li>
+                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-purple-soft">✓</span>10% off all our detailing</li>
                   <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-purple-soft">✓</span>Priority booking</li>
-                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">Entry to every draw</span></li>
+                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">1 free entry into every draw</span></li>
                 </ul>
                 <a href="https://buy.stripe.com/8x27sL07CaTX8eI35F6kg0z" className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-purple px-6 py-3.5 font-display text-sm font-black text-white transition hover:brightness-110 active:scale-95">
                   Join for $1 →
@@ -323,36 +323,71 @@ export default function MembershipContent() {
               </div>
             </Reveal>
 
-            {/* Card 2: 30-Day Pass $24.99 one-off — black/neutral */}
+            {/* Card 2: Annual $99/year — yellow — Best value */}
             <Reveal delay={80}>
+              <div className="relative flex h-full flex-col rounded-3xl border border-brand-yellow/45 bg-gradient-to-b from-brand-yellow/[0.08] to-white/[0.02] p-6 shadow-glowY">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand-yellow px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-brand-ink">Best value</span>
+                <div>
+                  <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-yellow">Yearly</div>
+                  <h3 className="mt-1.5 font-display text-xl font-extrabold tracking-tight text-white">Annual Member</h3>
+                  <div className="mt-3 flex items-end gap-2">
+                    <span className="font-display text-4xl font-black text-white">$99</span>
+                    <span className="mb-1.5 text-xs font-bold text-white/50">/year</span>
+                  </div>
+                  <div className="mt-1.5 inline-flex items-center rounded-full bg-brand-yellow/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-brand-yellow">
+                    Save $20.88
+                  </div>
+                  <div className="mt-1.5 text-xs text-white/45">a year of membership, paid once</div>
+                </div>
+                <ul className="mt-5 flex flex-1 flex-col gap-2.5 text-sm text-white/80">
+                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">✓</span>10% off all our detailing</li>
+                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">✓</span>Priority booking</li>
+                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">5 free entries into every draw</span></li>
+                </ul>
+                <a href="https://buy.stripe.com/4gM3cv6w02nr52w49J6kg0D" className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-yellow px-6 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95">
+                  Get the year · $99 →
+                </a>
+                <p className="mt-2.5 flex min-h-[2.5rem] items-start justify-center text-center text-xs text-white/40">One payment a year. 5x the draw entries.</p>
+              </div>
+            </Reveal>
+
+            {/* Card 3: 30-Day Pass one-off — black/neutral */}
+            <Reveal delay={160}>
               <div className="flex h-full flex-col rounded-3xl border border-white/25 bg-gradient-to-b from-white/[0.07] to-white/[0.01] p-6 shadow-[0_14px_50px_-22px_rgba(255,255,255,0.28)]">
                 <div>
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-green">No subscription</div>
-                    <span className="inline-flex items-center gap-1 rounded-full bg-brand-purple/20 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.14em] text-brand-purple-soft">
-                      <span className="h-1 w-1 animate-pulse rounded-full bg-brand-purple-soft" />Limited time
-                    </span>
-                  </div>
+                  <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-green">No subscription</div>
                   <h3 className="mt-1.5 font-display text-xl font-extrabold tracking-tight text-white">30-Day Pass</h3>
                   <div className="mt-3 flex items-end gap-2">
                     <span className="mb-1.5 font-display text-xl font-bold text-red-400 line-through">$24.99</span>
                     <span className="font-display text-4xl font-black text-white">$9.99</span>
                     <span className="mb-1.5 text-xs font-bold text-white/50">once</span>
                   </div>
+                  <div className="mt-1.5 text-xs text-white/45">30 days of membership, nothing renews</div>
                 </div>
                 <ul className="mt-5 flex flex-1 flex-col gap-2.5 text-sm text-white/80">
-                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-white/70">✓</span>10% off all our services</li>
+                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-white/70">✓</span>10% off all our detailing</li>
                   <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-white/70">✓</span>Priority booking</li>
-                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">Entry to every draw</span></li>
+                  <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">1 free entry into every draw</span></li>
                   <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-white/70">✓</span>Valid 30 days, no renewal</li>
                 </ul>
-                <a href="https://buy.stripe.com/5kQaEX6w0bY19iM9u36kg0A" className="mt-6 flex w-full items-center justify-center rounded-full bg-white px-6 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-95 active:scale-95">
+                <a href="https://buy.stripe.com/fZueVdbQkbY166A8pZ6kg0H" className="mt-6 flex w-full items-center justify-center rounded-full bg-white px-6 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-95 active:scale-95">
                   Get the pass · $9.99 →
                 </a>
                 <p className="mt-2.5 flex min-h-[2.5rem] items-start justify-center text-center text-xs text-white/40">One-off. Nothing renews.</p>
               </div>
             </Reveal>
           </div>
+
+          <Reveal>
+            <p className="mx-auto mt-6 max-w-xl text-center text-xs leading-relaxed text-white/40">
+              Every plan is a membership with real perks, entries into the draws come free with it. No purchase is
+              necessary to enter:{" "}
+              <Link href="/free-entry" className="font-semibold text-brand-purple-soft underline underline-offset-4 hover:text-white">
+                enter for free here
+              </Link>
+              .
+            </p>
+          </Reveal>
         </div>
       </section>
 
