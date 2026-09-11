@@ -40,8 +40,8 @@ const OPTIONS: { icon: string; title: string; tag: string; summary: string; give
   },
 ];
 
-const STEPS: { n: string; t: string; d: string }[] = [
-  { n: "1", t: "Reach out", d: "Fill in the form below or give Thanyon a call. Quick chat, no obligation." },
+const STEPS: { n: string; t: string; d: string; img?: string }[] = [
+  { n: "1", t: "Reach out", d: "Fill in the form below or give Thanyon a call. Quick chat, no obligation.", img: "/media/photos/step-reach-out.webp" },
   { n: "2", t: "We feature you", d: "Either as a giveaway experience, a member discount, or both. We handle the promo." },
   { n: "3", t: "You get seen", d: "Exposure to our whole audience, fresh content, and new local customers through the door." },
 ];
@@ -194,10 +194,15 @@ export default function PartnersPage() {
           <div className="mt-8 flex flex-col gap-4">
             {STEPS.map((s, i) => (
               <Reveal key={s.n} delay={i * 90}>
-                <div className="flex items-start gap-4 rounded-2xl border border-white/8 bg-white/[0.02] p-5">
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-brand-purple/40 bg-brand-purple/[0.12] font-display text-sm font-black text-brand-purple-soft">
-                    {s.n}
-                  </span>
+                <div className="flex items-center gap-4 rounded-2xl border border-white/8 bg-white/[0.02] p-5">
+                  {s.img ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={s.img} alt="" className="h-16 w-16 shrink-0 rounded-xl object-cover" />
+                  ) : (
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-brand-purple/40 bg-brand-purple/[0.12] font-display text-sm font-black text-brand-purple-soft">
+                      {s.n}
+                    </span>
+                  )}
                   <div>
                     <div className="font-display text-base font-extrabold text-white">{s.t}</div>
                     <div className="mt-0.5 text-sm leading-relaxed text-white/60">{s.d}</div>
