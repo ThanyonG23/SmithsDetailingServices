@@ -12,6 +12,7 @@ import {
   setMemberPassword,
 } from "@/lib/members/db";
 import { findMembership } from "@/lib/members/stripe";
+import { getOrCreateReferralCode, countActiveReferrals } from "@/lib/members/referrals";
 import { MEMBER_COOKIE, memberCookieValue, getSessionEmail } from "@/lib/members/session";
 
 const EMAIL_RE = /^[\w.+-]+@[\w-]+\.[a-z]{2,}(?:\.[a-z]{2,})?$/i;
@@ -108,6 +109,30 @@ export async function confirmLogin(formData: FormData): Promise<void> {
   if (!email) redirect("/account?e=link");
   cookies().set(MEMBER_COOKIE, memberCookieValue(email), SESSION_COOKIE);
   redirect("/account");
+}
+
+/** Get (creating on first use) the signed-in member's referral code, the join
+    link to share, and how many active mates they've brought in so far. */
+export async function ensureReferral(): Promise<{
+  ok: boolean;
+  code?: string;
+  link?: string;
+  mates?: number;
+  error?: string;
+}> {
+  const email = getSessionEmail();
+  if (!email) return { ok: false, error: "Please sign in first." };
+  try {
+    const member = await getMember(email);
+    const cid = member?.stripe_customer_id;
+    if (!cid) return { ok: false, error: "We couldn't find your membership yet, try again in a moment." };
+    const code = await getOrCreateReferralCode(cid, member?.name || "");
+    if (!code) return { ok: false, error: "Couldn't set up your code, try again." };
+    const mates = await countActiveReferrals(cid);
+    return { ok: true, code, link: `${siteUrl()}/membership`, mates };
+  } catch {
+    return { ok: false, error: "Something went wrong, try again." };
+  }
 }
 
 /** Set or change the signed-in member's password. */

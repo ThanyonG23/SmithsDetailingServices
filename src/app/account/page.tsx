@@ -7,6 +7,7 @@ import { findMembership, findMembershipByCustomer } from "@/lib/members/stripe";
 import { openDraws, PARTNERS } from "@/lib/members/portal";
 import LoginForm from "@/components/account/LoginForm";
 import SetPasswordCard from "@/components/account/SetPasswordCard";
+import ReferralCard from "@/components/account/ReferralCard";
 
 export const dynamic = "force-dynamic";
 
@@ -189,6 +190,9 @@ export default async function AccountPage({ searchParams }: { searchParams: { e?
           </p>
         </section>
       )}
+
+      {/* Bring a Mate referral */}
+      {badge.live && <ReferralCard />}
         </div>
 
         {/* right column */}

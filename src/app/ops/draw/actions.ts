@@ -2,6 +2,7 @@
 
 import { isOwner } from "@/lib/ops/auth";
 import { sql } from "@/lib/ops/db";
+import { referralBonusByCustomer } from "@/lib/members/referrals";
 
 /* Assembles the current draw entrant list, weighted by tier, from three
    sources so nothing is missed: active subscriptions (all tiers), 30-day
@@ -15,6 +16,7 @@ const LIVE = new Set(["active", "trialing", "past_due"]);
 const PASS_AMOUNT = 999; // $9.99 one-off 30-day pass, in cents
 
 interface SCustomer {
+  id?: string;
   name?: string | null;
   email?: string | null;
 }
@@ -78,10 +80,12 @@ export async function pullEntrants(): Promise<{ ok: boolean; names?: string[]; s
   if (!key()) return { ok: false, error: "Stripe key isn't set in Vercel." };
 
   const names: string[] = [];
+  const nameByCustomer: Record<string, string> = {}; // to credit referral bonuses
   let memberCount = 0;
   let memberEntries = 0;
   let passCount = 0;
   let freeCount = 0;
+  let bonusEntries = 0;
 
   try {
     // 1. Active subscriptions (all tiers), weighted by tier.
@@ -92,6 +96,7 @@ export async function pullEntrants(): Promise<{ ok: boolean; names?: string[]; s
       const nm = (cust?.name || cust?.email || "Member").trim();
       const e = entriesForAmount(s.items?.data?.[0]?.price?.unit_amount);
       for (let i = 0; i < e; i++) names.push(nm);
+      if (cust?.id) nameByCustomer[cust.id] = nm;
       memberCount++;
       memberEntries += e;
     }
@@ -117,6 +122,20 @@ export async function pullEntrants(): Promise<{ ok: boolean; names?: string[]; s
     } catch {
       /* free_entries table may not exist yet; ignore */
     }
+
+    // 4. Referral bonus entries: one extra entry per active mate a member brought
+    //    in, credited to the referrer (must themselves be an active member).
+    try {
+      const bonus = await referralBonusByCustomer();
+      for (const [cid, count] of Object.entries(bonus)) {
+        const nm = nameByCustomer[cid];
+        if (!nm) continue; // referrer isn't an active member right now, no bonus
+        for (let i = 0; i < count; i++) names.push(nm);
+        bonusEntries += count;
+      }
+    } catch {
+      /* referral read is best-effort, base draw still stands */
+    }
   } catch {
     return { ok: false, error: "Couldn't pull from Stripe, try again." };
   }
@@ -126,8 +145,9 @@ export async function pullEntrants(): Promise<{ ok: boolean; names?: string[]; s
 
   const summary =
     `Pulled ${memberCount} member${memberCount === 1 ? "" : "s"} (${memberEntries} entries), ` +
-    `${passCount} pass${passCount === 1 ? "" : "es"}, ${freeCount} free entr${freeCount === 1 ? "y" : "ies"} — ` +
-    `${total} total entries in the draw.`;
+    `${passCount} pass${passCount === 1 ? "" : "es"}, ${freeCount} free entr${freeCount === 1 ? "y" : "ies"}` +
+    (bonusEntries > 0 ? `, ${bonusEntries} referral bonus` : "") +
+    ` — ${total} total entries in the draw.`;
 
   return { ok: true, names: shuffle(names), summary };
 }
