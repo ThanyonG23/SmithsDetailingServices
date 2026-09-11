@@ -15,7 +15,7 @@ type Data = Awaited<ReturnType<typeof loadSmsData>>;
 
 const BATCH = 15; // sends per request, keeps each call well under the timeout
 const FOOTER_LEN = 24; // "\n\nReply STOP to opt out."
-const SINGLE_LIMIT = 160 - FOOTER_LEN; // chars before it splits / truncates
+const MAX_LEN = 600; // backend ceiling, matches telstra-sms MAX_LEN
 
 export default function SmsBlaster({ initial }: { initial: Data }) {
   const [body, setBody] = useState("");
@@ -42,9 +42,14 @@ export default function SmsBlaster({ initial }: { initial: Data }) {
   const stopConnected = !!cfg?.ok && cfg.numbers.length > 0 && cfg.numbers.every((n) => n.connected);
 
   const { recipients, stats } = initial;
-  const overLimit = body.length > SINGLE_LIMIT;
   const hasSender = /smith/i.test(body);
-  const remaining = SINGLE_LIMIT - body.length;
+  const overMax = body.length > MAX_LEN;
+  // Rough segment estimate. Emoji / non-GSM characters force UCS-2, which has
+  // much shorter segments (70 / 67 vs 160 / 153), so they cost more to send.
+  const fullLen = body.length + FOOTER_LEN;
+  const unicode = [...body].some((c) => c.charCodeAt(0) > 127);
+  const perSeg = unicode ? (fullLen > 70 ? 67 : 70) : fullLen > 160 ? 153 : 160;
+  const segments = Math.max(1, Math.ceil(fullLen / perSeg));
 
   const preview = useMemo(() => (body.trim() ? `${body.trim()}\n\nReply STOP to opt out.` : ""), [body]);
 
@@ -163,8 +168,10 @@ export default function SmsBlaster({ initial }: { initial: Data }) {
           className="mt-2 w-full resize-y rounded-xl border border-white/12 bg-black/40 px-3.5 py-3 text-sm text-white outline-none placeholder:text-white/25 focus:border-brand-green"
         />
         <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs">
-          <span className={overLimit ? "font-bold text-brand-yellow" : "text-white/40"}>
-            {remaining} left in one SMS {overLimit && "· longer messages cost/split"}
+          <span className={overMax ? "font-bold text-brand-yellow" : "text-white/40"}>
+            {overMax
+              ? `Too long, trim to ${MAX_LEN} characters`
+              : `≈ ${segments} SMS${segments > 1 ? " each (costs more)" : ""}${unicode ? " · emoji uses more" : ""}`}
           </span>
           <span className="text-white/35">&ldquo;Reply STOP to opt out.&rdquo; is added automatically</span>
         </div>

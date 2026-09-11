@@ -125,9 +125,12 @@ export async function sendSMS(to: string, body: string): Promise<SendResult> {
     const token = await getAccessToken();
     const fromNumber = await getVirtualNumber(token);
 
-    // Keep body + footer within a single 160-char segment.
-    const maxBodyLen = 160 - STOP_FOOTER.length;
-    const fullBody = `${body.slice(0, maxBodyLen)}${STOP_FOOTER}`;
+    // Allow multi-part (concatenated) SMS so the full hook and the link survive.
+    // Telstra segments long messages automatically; we only keep a sane ceiling
+    // so a paste accident can't fire a giant multi-part blast to the whole list.
+    const MAX_LEN = 600;
+    const trimmed = body.length > MAX_LEN ? body.slice(0, MAX_LEN) : body;
+    const fullBody = `${trimmed}${STOP_FOOTER}`;
 
     const res = await fetch(SEND_URL, {
       method: "POST",
