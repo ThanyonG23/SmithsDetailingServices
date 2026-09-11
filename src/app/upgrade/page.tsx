@@ -85,7 +85,32 @@ export default function UpgradePage() {
             </div>
           </div>
 
-          <p className="mx-auto mt-6 max-w-md text-center text-[11px] leading-relaxed text-white/40">
+          {/* Posters: what the extra entries are for */}
+          <div className="mt-12">
+            <h2 className="text-center font-display text-xl font-extrabold leading-tight tracking-tight text-white sm:text-2xl">
+              Get <span className="text-brand-yellow">5 entries instead of 1</span> into these draws
+            </h2>
+            <div className="mt-6 grid gap-5 sm:grid-cols-2">
+              {[
+                { poster: "/media/photos/giveaway.jpg", label: "Big draw · 14 Sept", prize: "Win $1,000 cash or a $2,200 detail", alt: "Smiths big draw, win $1,000 cash or a $2,200 detail" },
+                { poster: "/media/photos/mini-giveaway.jpg", label: "Mini draw · 21 Sept", prize: "Win $300 cash or a $400+ detail", alt: "Smiths mini draw, win $300 cash or a $400+ detail" },
+              ].map((d) => (
+                <div
+                  key={d.label}
+                  className="overflow-hidden rounded-2xl border border-brand-purple/40 shadow-[0_0_0_1px_rgba(124,47,245,0.2),0_0_45px_rgba(124,47,245,0.28)]"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={d.poster} alt={d.alt} className="aspect-[16/9] w-full object-cover" />
+                  <div className="bg-gradient-to-br from-brand-purple/[0.16] to-brand-purple/[0.02] p-4">
+                    <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-purple-soft">{d.label}</div>
+                    <div className="mt-1 font-display text-base font-extrabold text-white">{d.prize}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <p className="mx-auto mt-8 max-w-md text-center text-[11px] leading-relaxed text-white/40">
             Cancel anytime, no lock-in. Both plans put you straight into this week&apos;s draw.
           </p>
         </div>
