@@ -8,6 +8,9 @@ import { BUSINESS } from "@/lib/config";
 
 // The member draw: drawn 14 Sep 2026, 12:00pm AEST (UTC+10).
 const DRAW_TIME = "2026-09-14T12:00:00+10:00";
+// The current headline prize, shown in the "what could you do with…" CTA above
+// the packages. Update this one line each draw (e.g. "$2,000", "a new car").
+const HEADLINE_PRIZE = "$1,000";
 // The weekly mini draw: drawn Sun 21 Sep 2026, 12:00pm AEST (UTC+10).
 const DRAW_MINI_TIME = "2026-09-21T12:00:00+10:00";
 
@@ -260,6 +263,16 @@ export default function MembershipContent() {
       {/* ═══ THE PLAN ═══ */}
       <section id="join" className="scroll-mt-16 pt-10 pb-6 sm:pt-12">
         <div className="mx-auto max-w-5xl px-4">
+          <Reveal>
+            <div className="mx-auto mb-7 max-w-2xl text-center">
+              <h2 className="font-display text-2xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl">
+                What could you do with an extra <span className="text-brand-green">{HEADLINE_PRIZE}</span> this week?
+              </h2>
+              <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-white/60">
+                Join for $1 and you&apos;re in the draw. Every member&apos;s in it, automatically.
+              </p>
+            </div>
+          </Reveal>
           <Reveal>
             <div className="mx-auto mb-8 max-w-2xl rounded-2xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-5 py-4 text-center shadow-glowY">
               <p className="font-display text-base font-black leading-snug tracking-tight text-brand-yellow sm:text-lg">
