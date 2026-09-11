@@ -380,12 +380,7 @@ export default function MembershipContent() {
 
           <Reveal>
             <p className="mx-auto mt-6 max-w-xl text-center text-xs leading-relaxed text-white/40">
-              Every plan is a membership with real perks, entries into the draws come free with it. No purchase is
-              necessary to enter:{" "}
-              <Link href="/free-entry" className="font-semibold text-brand-purple-soft underline underline-offset-4 hover:text-white">
-                enter for free here
-              </Link>
-              .
+              Every plan is a membership with real perks, entries into the draws come free with it.
             </p>
           </Reveal>
         </div>
