@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import Reveal from "@/components/Reveal";
 import SiteNav from "@/components/SiteNav";
 import BusinessPartnerForm from "@/components/BusinessPartnerForm";
@@ -10,8 +9,6 @@ export const metadata: Metadata = {
   description: "Put your business in front of a growing local membership. Feature as a giveaway prize or offer a member discount.",
   alternates: { canonical: "/partners" },
 };
-
-const LOGO = BUSINESS.logo;
 
 const OPTIONS: { icon: string; title: string; tag: string; summary: string; give: string; get: string[] }[] = [
   {
@@ -216,7 +213,7 @@ export default function PartnersPage() {
 
       {/* ═══ CONTACT ═══ */}
       <section id="contact" className="scroll-mt-16 px-4 py-14 sm:py-16">
-        <div className="mx-auto max-w-md">
+        <div className="mx-auto max-w-3xl">
           <Reveal>
             <BusinessPartnerForm />
           </Reveal>
@@ -231,17 +228,6 @@ export default function PartnersPage() {
         </div>
       </section>
 
-      {/* ═══ FOOTER ═══ */}
-      <footer className="border-t border-white/10">
-        <div className="mx-auto max-w-5xl px-4 py-12 text-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={LOGO} alt="Smiths Detailing" className="mx-auto h-12 w-auto" />
-          <p className="mx-auto mt-4 max-w-xs text-sm leading-relaxed text-white/50">{BUSINESS.address}</p>
-          <Link href="/membership" className="mt-5 inline-block text-sm text-white/50 underline underline-offset-4 transition hover:text-white">
-            ← Back to membership
-          </Link>
-        </div>
-      </footer>
     </main>
   );
 }
