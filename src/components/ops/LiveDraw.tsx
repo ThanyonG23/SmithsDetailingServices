@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BUSINESS } from "@/lib/config";
+import { pullEntrants } from "@/app/ops/draw/actions";
 
 /* Live members' draw, slot-machine reveal. Owner pastes the active member
    list (one per line), hits DRAW, and the reel spins down to a random winner
@@ -111,6 +112,7 @@ export default function LiveDraw() {
   const [isFull, setIsFull] = useState(false);
   const [copied, setCopied] = useState(false);
   const [importMsg, setImportMsg] = useState("");
+  const [pulling, setPulling] = useState(false);
   const [poster, setPoster] = useState<string | null>("/media/photos/mini-giveaway.jpg");
 
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -168,6 +170,27 @@ export default function LiveDraw() {
     };
     reader.readAsText(file);
     e.target.value = ""; // let the same file be re-uploaded
+  };
+
+  // Pull everyone entitled to entries straight from Stripe + the free-entry table:
+  // active subs weighted by tier, 30-day passes from the last 30 days, and free
+  // entries. No CSV, no reliance on anyone creating a portal login.
+  const onPull = async () => {
+    setPulling(true);
+    setImportMsg("Pulling live entrants from Stripe…");
+    try {
+      const res = await pullEntrants();
+      if (!res.ok || !res.names) {
+        setImportMsg(res.error || "Couldn't pull entrants.");
+        return;
+      }
+      onRawChange(res.names.join("\n"));
+      setImportMsg(res.summary || `Pulled ${res.names.length} entries.`);
+    } catch {
+      setImportMsg("Couldn't reach Stripe, try again.");
+    } finally {
+      setPulling(false);
+    }
   };
 
   const onPoster = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -539,14 +562,21 @@ export default function LiveDraw() {
           Active members
         </label>
         <div className="mt-2 flex flex-wrap items-center gap-2">
+          <button
+            onClick={onPull}
+            disabled={pulling}
+            className="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-brand-green px-4 py-2.5 text-sm font-black text-brand-ink shadow-glowG transition hover:brightness-110 disabled:cursor-wait disabled:opacity-60"
+          >
+            {pulling ? "Pulling…" : "⚡ Pull current entrants"}
+          </button>
           <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-brand-green/40 bg-brand-green/[0.06] px-4 py-2.5 text-sm font-bold text-brand-green transition hover:bg-brand-green/[0.12]">
             ⬆ Upload Stripe export (CSV)
             <input type="file" accept=".csv,text/csv" className="hidden" onChange={onFile} />
           </label>
-          {importMsg && <span className="text-xs text-white/55">{importMsg}</span>}
         </div>
+        {importMsg && <p className="mt-1.5 text-xs text-white/55">{importMsg}</p>}
         <p className="mt-1.5 text-xs text-white/35">
-          Stripe → Subscriptions → Export. Only members with a live subscription get pulled in. Or type / paste names below, one per line.
+          <b className="text-white/55">Pull current entrants</b> grabs everyone live from Stripe automatically: active members weighted by tier, 30-day passes from the last 30 days, and free entries. No login needed on their end. CSV upload and manual paste still work below.
         </p>
         <textarea
           value={raw}
