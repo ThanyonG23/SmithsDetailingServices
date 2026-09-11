@@ -178,9 +178,12 @@ export default function PartnersPage() {
               <h3 className="mt-4 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Platinum partner</h3>
               <div className="mt-2 flex flex-wrap items-end gap-x-2 gap-y-1">
                 <span className="text-xs font-bold text-white/50">from</span>
-                <span className="font-display text-3xl font-black text-white">$1,500</span>
+                <span className="font-display text-3xl font-black text-brand-green">$1,500</span>
                 <span className="mb-1 text-xs font-bold text-white/50">/month</span>
                 <span className="mb-1 text-xs text-white/40">or $15,000/yr prepaid</span>
+                <span className="mb-1 rounded-full bg-brand-green/15 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-brand-green">
+                  Save $3,000
+                </span>
               </div>
               <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/65">
                 The full package. Once a month we come out for a full content day at your business, then post it across all
@@ -200,6 +203,7 @@ export default function PartnersPage() {
                       "A full content shoot day at your business every month",
                       "Posted across all our socials every week, all month",
                       "Featured in our giveaways and offered as a member discount",
+                      "Links directly to your site on our website and members portal",
                       "Everything from the two options above, included",
                     ].map((g) => (
                       <li key={g} className="flex items-start gap-2 text-sm leading-relaxed text-white/80">
