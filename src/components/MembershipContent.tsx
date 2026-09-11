@@ -220,12 +220,12 @@ export default function MembershipContent() {
             </div>
           </Reveal>
           <Reveal delay={100}>
-            <div className="mt-7 flex snap-x snap-mandatory gap-5 overflow-x-auto pb-2 sm:justify-center sm:overflow-visible">
+            <div className="mt-7 flex flex-col items-center gap-6 sm:flex-row sm:justify-center">
               {[
                 { src: "/media/videos/winner-mini-draw.mp4", poster: "/media/photos/winner-poster.jpg" },
                 { src: "/media/videos/winner-2.mp4", poster: "/media/photos/winner-2-poster.jpg" },
               ].map((v) => (
-                <div key={v.src} className="relative w-[72vw] max-w-[280px] shrink-0 snap-center sm:w-[280px]">
+                <div key={v.src} className="relative w-full max-w-[280px] sm:w-[280px]">
                   <div
                     className="pointer-events-none absolute -inset-4 rounded-[2rem] opacity-40 blur-2xl"
                     style={{ background: GREEN_GLOW }}
