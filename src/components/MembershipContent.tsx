@@ -160,7 +160,7 @@ export default function MembershipContent() {
                 Join now, you&apos;re in <span className="text-brand-purple-soft">every draw</span>
               </h1>
               <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-white/65 sm:text-lg">
-                We just launched, so your odds have never been better. Every member goes in every draw, automatically.
+                Every member goes in every draw, automatically.
               </p>
             </div>
           </Reveal>
