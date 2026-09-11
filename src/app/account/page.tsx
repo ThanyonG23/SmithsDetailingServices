@@ -85,6 +85,7 @@ export default async function AccountPage({ searchParams }: { searchParams: { e?
   const periodEnd = live?.currentPeriodEnd || cached?.current_period_end || null;
   const badge = statusLabel(status);
   const draws = openDraws();
+  const isPlatinum = /platinum/i.test(plan);
 
   return (
     <Shell>
@@ -136,6 +137,53 @@ export default async function AccountPage({ searchParams }: { searchParams: { e?
           )}
         </div>
       </section>
+
+      {/* Platinum upsell */}
+      {!isPlatinum && (
+        <section className="mt-6 rounded-2xl border border-brand-yellow/40 bg-gradient-to-b from-brand-yellow/[0.10] to-white/[0.02] p-5 shadow-glowY">
+          <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-yellow">Upgrade</div>
+          <h2 className="mt-1.5 font-display text-xl font-extrabold text-white">Go Platinum</h2>
+          <p className="mt-1.5 text-sm leading-relaxed text-white/60">
+            Better perks and more entries into every draw, 20% off all detailing, priority access, and up to 10 free
+            entries.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <div className="flex flex-col rounded-xl border border-brand-yellow/30 bg-white/[0.02] p-4">
+              <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-brand-yellow">Monthly</div>
+              <div className="mt-1 flex items-end gap-1">
+                <span className="font-display text-2xl font-black text-white">$24.99</span>
+                <span className="mb-1 text-xs text-white/50">/mo</span>
+              </div>
+              <ul className="mt-2 flex flex-1 flex-col gap-1 text-xs text-white/70">
+                <li>✓ 20% off all detailing</li>
+                <li>✓ Priority access</li>
+                <li className="text-brand-yellow">🎁 5 free entries every draw</li>
+              </ul>
+              <a href="https://buy.stripe.com/9B63cv07C3rv0Mg5dN6kg0F" className="mt-3 block rounded-full bg-brand-yellow px-4 py-2.5 text-center font-display text-xs font-black text-brand-ink transition hover:brightness-110 active:scale-95">
+                Go Platinum →
+              </a>
+            </div>
+            <div className="flex flex-col rounded-xl border border-brand-yellow/30 bg-white/[0.02] p-4">
+              <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-brand-yellow">Yearly · best value</div>
+              <div className="mt-1 flex items-end gap-1">
+                <span className="font-display text-2xl font-black text-white">$124.99</span>
+                <span className="mb-1 text-xs text-white/50">/yr</span>
+              </div>
+              <ul className="mt-2 flex flex-1 flex-col gap-1 text-xs text-white/70">
+                <li>✓ 20% off all detailing</li>
+                <li>✓ Priority access</li>
+                <li className="text-brand-yellow">🎁 10 free entries every draw</li>
+              </ul>
+              <a href="https://buy.stripe.com/6oU00j2fKaTXdz25dN6kg0G" className="mt-3 block rounded-full bg-brand-yellow px-4 py-2.5 text-center font-display text-xs font-black text-brand-ink transition hover:brightness-110 active:scale-95">
+                Go Platinum yearly →
+              </a>
+            </div>
+          </div>
+          <p className="mt-3 text-center text-[10px] text-white/35">
+            Already on another plan? Manage or cancel it under Manage billing above.
+          </p>
+        </section>
+      )}
 
       {/* Password */}
       <SetPasswordCard hasPassword={!!cached?.password_hash} />
