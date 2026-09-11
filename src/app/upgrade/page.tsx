@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 
 /* Pre-purchase choice / upsell page. A DRAFT, not yet wired into the funnel.
-   Flow (tomorrow): the "Join for $1" buttons point here first; here the member
-   picks $1 membership OR the discounted Platinum yearly, side by side.
-   TODO tomorrow: create the real 20%-off one-time Platinum-yearly Stripe link
-   and drop it into PLATINUM_OFFER_URL. Until then the Platinum button uses the
-   standard $199 link as a placeholder. Nothing points here yet; noindex. */
+   Flow: the "Join for $1" buttons point here first; the visitor picks the $1
+   membership OR Platinum monthly ($24.99, a much smaller jump than the yearly),
+   side by side. Both buttons use real Stripe links. To go live, point the site's
+   "Join for $1" buttons at /upgrade. Nothing points here yet; noindex. */
 
 export const metadata: Metadata = {
   title: "Pick your plan · Smiths",
@@ -13,8 +12,8 @@ export const metadata: Metadata = {
 };
 
 const JOIN_1_URL = "https://buy.stripe.com/8x27sL07CaTX8eI35F6kg0z";
-// TODO(tomorrow): swap for the real 20%-off ($159) one-time Platinum-yearly link.
-const PLATINUM_OFFER_URL = "https://buy.stripe.com/4gM14ndYsd258eI35F6kg0I";
+// Platinum monthly $24.99 (5 entries every draw) — small step up from the $1 plan.
+const PLATINUM_OFFER_URL = "https://buy.stripe.com/9B63cv07C3rv0Mg5dN6kg0F";
 
 export default function UpgradePage() {
   return (
@@ -32,8 +31,8 @@ export default function UpgradePage() {
               This week&apos;s prize is big. <span className="text-brand-yellow">What&apos;s coming next is bigger.</span>
             </h1>
             <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-white/65">
-              Pick your plan. Most members go Platinum for <b className="text-white">10x the entries</b> in every draw,
-              all year, so you never miss the big ones.
+              Pick your plan. Most members go Platinum for <b className="text-white">5x the entries</b> in every draw,
+              so you never miss the big ones.
             </p>
           </div>
 
@@ -60,37 +59,34 @@ export default function UpgradePage() {
               </a>
             </div>
 
-            {/* Option B: Platinum yearly (recommended) */}
+            {/* Option B: Platinum monthly (recommended, small step up from $1) */}
             <div className="relative flex h-full flex-col rounded-3xl border border-brand-yellow/50 bg-gradient-to-b from-brand-yellow/[0.12] to-white/[0.02] p-6 shadow-glowY">
               <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-brand-yellow px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-brand-ink">
-                Most entries · best value
+                Best odds · most popular
               </span>
-              <div className="text-[11px] font-black uppercase tracking-[0.2em] text-brand-yellow">Platinum · yearly</div>
+              <div className="text-[11px] font-black uppercase tracking-[0.2em] text-brand-yellow">Platinum · monthly</div>
               <div className="mt-3 flex items-end gap-2">
-                <span className="mb-1.5 font-display text-lg font-bold text-red-400 line-through">$199</span>
-                <span className="font-display text-4xl font-black text-white">$159</span>
-                <span className="mb-1.5 text-xs font-bold text-white/50">/year</span>
+                <span className="font-display text-4xl font-black text-white">$24.99</span>
+                <span className="mb-1.5 text-xs font-bold text-white/50">/month</span>
               </div>
-              <div className="mt-1.5 inline-flex items-center self-start rounded-full bg-brand-yellow/20 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-brand-yellow">
-                20% off · only here
-              </div>
+              <div className="mt-1 text-xs text-white/45">5x the entries · cancel anytime</div>
               <ul className="mt-5 flex flex-1 flex-col gap-2.5 text-sm text-white/85">
-                <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><b className="text-white">10 entries into every draw</b></li>
+                <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><b className="text-white">5 entries into every draw</b></li>
                 <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>20% off all detailing</li>
                 <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Priority access to everything</li>
-                <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Paid once, sorted for the year</li>
+                <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Cancel anytime, no lock-in</li>
               </ul>
               <a
                 href={PLATINUM_OFFER_URL}
                 className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-yellow px-6 py-3.5 font-display text-sm font-black text-brand-ink shadow-glowY transition hover:brightness-110 active:scale-95"
               >
-                Go Platinum · $159 →
+                Go Platinum · $24.99/mo →
               </a>
             </div>
           </div>
 
           <p className="mx-auto mt-6 max-w-md text-center text-[11px] leading-relaxed text-white/40">
-            The Platinum price shown here is a one-time offer. Cancel anytime. Both plans put you in this week&apos;s draw.
+            Cancel anytime, no lock-in. Both plans put you straight into this week&apos;s draw.
           </p>
         </div>
       </div>
