@@ -36,8 +36,8 @@ export default function DrawCard({
         </h3>
         <p className="mt-2 min-h-[2.5rem] text-sm leading-relaxed text-white/70">{blurb}</p>
         <div className="mt-auto pt-4">
-          <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-purple-soft">Draw closes in</div>
-          <Countdown target={target} accent="purple" />
+          <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-red-400">Draw closes in</div>
+          <Countdown target={target} accent="red" />
           <a
             href={JOIN_1_URL}
             className="mt-3 flex w-full items-center justify-center rounded-full bg-brand-purple px-6 py-3 font-display text-sm font-black text-white transition hover:brightness-110 active:scale-95"

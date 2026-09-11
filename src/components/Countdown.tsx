@@ -9,10 +9,12 @@ export default function Countdown({
   accent = "yellow",
 }: {
   target: string;
-  accent?: "yellow" | "purple";
+  accent?: "yellow" | "purple" | "red";
 }) {
-  const borderCls = accent === "purple" ? "border-brand-purple/30" : "border-brand-yellow/30";
-  const textCls = accent === "purple" ? "text-brand-purple-soft" : "text-brand-yellow";
+  const borderCls =
+    accent === "red" ? "border-red-500/40" : accent === "purple" ? "border-brand-purple/30" : "border-brand-yellow/30";
+  const textCls =
+    accent === "red" ? "text-red-400" : accent === "purple" ? "text-brand-purple-soft" : "text-brand-yellow";
   const targetMs = new Date(target).getTime();
   const [now, setNow] = useState<number | null>(null);
 
