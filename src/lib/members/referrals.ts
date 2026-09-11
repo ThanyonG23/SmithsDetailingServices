@@ -93,10 +93,19 @@ async function getOrCreateCoupon(): Promise<string | null> {
   return null;
 }
 
-function makeCode(name: string): string {
-  const base = (name || "MATE").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 8) || "MATE";
-  const suffix = Math.random().toString(36).slice(2, 6).toUpperCase();
-  return `${base}${suffix}`;
+/* Easy-to-read codes: just the member's first name (e.g. AIDAN), then the first
+   name plus a couple of digits only if that name is already taken. No ambiguous
+   characters, nothing to spell out. */
+function firstNameBase(name: string): string {
+  const first = (name || "MATE").trim().split(/\s+/)[0] || "MATE";
+  return first.toUpperCase().replace(/[^A-Z]/g, "").slice(0, 12) || "MATE";
+}
+
+function codeCandidates(name: string): string[] {
+  const base = firstNameBase(name);
+  const two = () => String(Math.floor(Math.random() * 90) + 10); // 10-99
+  const three = () => String(Math.floor(Math.random() * 900) + 100); // 100-999
+  return [base, `${base}${two()}`, `${base}${two()}`, `${base}${three()}`];
 }
 
 /* This member's referral code, created on first use and cached on the Stripe
@@ -111,8 +120,7 @@ export async function getOrCreateReferralCode(customerId: string, name: string):
   if (!couponId) return null;
 
   const who = name || cust?.name || "MATE";
-  for (let i = 0; i < 4; i++) {
-    const code = makeCode(who);
+  for (const code of codeCandidates(who)) {
     const promo = await sPost<SPromo>(`/promotion_codes`, {
       coupon: couponId,
       code,
