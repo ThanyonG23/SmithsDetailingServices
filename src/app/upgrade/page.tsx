@@ -32,18 +32,18 @@ export default function UpgradePage() {
         />
         <div className="relative mx-auto max-w-3xl px-5 pb-20 pt-12 sm:pt-16">
           <div className="text-center">
+            <h1 className="font-display text-2xl font-extrabold leading-[1.12] tracking-tight text-white sm:text-4xl">
+              This week&apos;s prize is big. <span className="text-brand-purple-soft">What&apos;s coming next is bigger.</span>
+            </h1>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src="/media/photos/spend-1000.webp"
               alt="What would you spend $1,000 on this week?"
               width={1600}
               height={800}
-              className="mx-auto w-full max-w-2xl rounded-2xl"
+              className="mx-auto mt-6 w-full max-w-2xl rounded-2xl"
             />
-            <h1 className="mt-6 font-display text-2xl font-extrabold leading-[1.12] tracking-tight text-white sm:text-4xl">
-              This week&apos;s prize is big. <span className="text-brand-purple-soft">What&apos;s coming next is bigger.</span>
-            </h1>
-            <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-white/65">
+            <p className="mx-auto mt-6 max-w-lg text-base leading-relaxed text-white/65">
               Want the best odds? <b className="text-brand-purple-soft">Go Platinum for 5x the entries</b> in every draw.
             </p>
           </div>
