@@ -24,7 +24,6 @@ const OPTIONS: { icon: string; title: string; tag: string; summary: string; give
       "New local customers you wouldn't have had",
       "Free promotion to our members and audience",
       "Members choosing you over the business next door",
-      "Our team comes out regularly to shoot content with your business, promoted across our socials",
     ],
   },
   {
@@ -36,7 +35,7 @@ const OPTIONS: { icon: string; title: string; tag: string; summary: string; give
     get: [
       "Featured across every piece of that giveaway's content and the winner reveal",
       "A batch of content you can reuse",
-      "Our team comes out regularly to shoot content with your business, promoted across our socials",
+      "Our team comes out to shoot a batch of content with your business, promoted across our socials for the giveaway",
     ],
   },
 ];
@@ -60,12 +59,8 @@ export default function PartnersPage() {
           aria-hidden
         />
         <div className="relative mx-auto max-w-3xl px-4 pb-8 pt-14 text-center sm:pt-20">
-          <Reveal>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={LOGO} alt="Smiths Detailing" className="mx-auto w-full max-w-[190px] sm:max-w-[220px]" />
-          </Reveal>
           <Reveal delay={100}>
-            <div className="mt-7 text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">
+            <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">
               For local businesses
             </div>
           </Reveal>
@@ -96,12 +91,12 @@ export default function PartnersPage() {
         <div className="mx-auto max-w-4xl">
           <Reveal>
             <div className="text-center">
-              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">Two ways to partner</div>
+              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">Ways to partner</div>
               <h2 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
                 What you give, what you get
               </h2>
               <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-white/60">
-                No fee, no lock-in, no risk. Pick one or do both.
+                Two free ways to start, or go all in with Platinum.
               </p>
             </div>
           </Reveal>
@@ -138,6 +133,53 @@ export default function PartnersPage() {
               </Reveal>
             ))}
           </div>
+
+          {/* Platinum, the paid tier */}
+          <Reveal delay={180}>
+            <div className="mt-5 overflow-hidden rounded-3xl border border-brand-yellow/45 bg-gradient-to-b from-brand-yellow/[0.09] to-white/[0.02] p-6 shadow-glowY sm:p-8">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="text-3xl leading-none">💎</span>
+                <span className="rounded-full bg-brand-yellow/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-brand-yellow">
+                  Our biggest push
+                </span>
+              </div>
+              <h3 className="mt-4 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Platinum partner</h3>
+              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/65">
+                The full package. Every week we come out and shoot fresh content for your business, then push it across all
+                our socials, all month, all year. Your business in front of our audience, constantly.
+              </p>
+              <div className="mt-5 grid gap-4 border-t border-white/10 pt-5 sm:grid-cols-2">
+                <div>
+                  <div className="text-[10px] font-black uppercase tracking-[0.16em] text-white/40">You give</div>
+                  <div className="mt-1 text-sm leading-relaxed text-white/80">
+                    A yearly partnership. We&apos;ll walk through exactly what it looks like for your business on a quick call.
+                  </div>
+                </div>
+                <div>
+                  <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-yellow">You get everything, plus</div>
+                  <ul className="mt-2 flex flex-col gap-1.5">
+                    {[
+                      "Weekly content shoots at your business, every single week",
+                      "Distributed across all our socials, all month, every month",
+                      "Featured in our giveaways and offered as a member discount",
+                      "Everything from the two options above, included",
+                    ].map((g) => (
+                      <li key={g} className="flex items-start gap-2 text-sm leading-relaxed text-white/80">
+                        <span className="mt-0.5 shrink-0 text-brand-yellow">✓</span>
+                        <span>{g}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <a
+                href="#contact"
+                className="mt-6 inline-flex items-center gap-2 rounded-full bg-brand-yellow px-8 py-3.5 font-display text-sm font-black uppercase tracking-[0.14em] text-brand-ink transition hover:brightness-110 active:scale-95"
+              >
+                Book a call to discuss →
+              </a>
+            </div>
+          </Reveal>
         </div>
       </section>
 
