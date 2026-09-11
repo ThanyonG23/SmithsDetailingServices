@@ -43,6 +43,9 @@ const STEPS: { n: string; t: string; d: string; img?: string }[] = [
   { n: "3", t: "You get seen", d: "Exposure to our whole audience, fresh content, and new local customers through the door.", img: "/media/photos/step-audience.webp" },
 ];
 
+const PLAT_MONTHLY_URL = "https://buy.stripe.com/cNifZh1bGaTXfHa7lV6kg0J";
+const PLAT_ANNUAL_URL = "https://buy.stripe.com/6oU00j9Ic0fjamQbCb6kg0K";
+
 export default function PartnersPage() {
   return (
     <main className="min-h-screen bg-[#050506]">
@@ -212,14 +215,34 @@ export default function PartnersPage() {
                       </li>
                     ))}
                   </ul>
+                  <div className="mt-2.5 rounded-lg border border-brand-green/30 bg-brand-green/[0.07] px-3 py-2 text-xs leading-relaxed text-brand-green">
+                    <b>BONUS:</b> everything we make goes on our socials AND gets sent to you, recorded, edited and ready to post on your own.
+                  </div>
                 </div>
+              </div>
+              <div className="mt-6 flex flex-col gap-2.5 sm:flex-row">
+                <a
+                  href={PLAT_MONTHLY_URL}
+                  className="flex flex-1 items-center justify-center rounded-full bg-brand-purple px-6 py-3.5 font-display text-sm font-black uppercase tracking-[0.12em] text-white transition hover:brightness-110 active:scale-95"
+                >
+                  Go Platinum · $1,500/mo →
+                </a>
+                <a
+                  href={PLAT_ANNUAL_URL}
+                  className="flex flex-1 items-center justify-center rounded-full border border-brand-purple/50 bg-brand-purple/[0.12] px-6 py-3.5 font-display text-sm font-black uppercase tracking-[0.12em] text-brand-purple-soft transition hover:bg-brand-purple/[0.2] active:scale-95"
+                >
+                  Pay yearly · $15,000 →
+                </a>
               </div>
               <a
                 href="#contact"
-                className="mt-6 inline-flex items-center gap-2 rounded-full bg-brand-purple px-8 py-3.5 font-display text-sm font-black uppercase tracking-[0.14em] text-white transition hover:brightness-110 active:scale-95"
+                className="mt-3 block text-center text-sm font-bold text-brand-purple-soft underline underline-offset-4 transition hover:text-white"
               >
-                Book a call to discuss →
+                Or book a call to discuss →
               </a>
+              <p className="mt-2.5 text-center text-[11px] leading-relaxed text-white/45">
+                No lock-in contracts. Hate it? Cancel any time, and we&apos;ll send all our work across to you.
+              </p>
             </div>
           </Reveal>
         </div>
