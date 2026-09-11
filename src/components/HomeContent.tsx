@@ -173,12 +173,12 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
               className="mx-auto mb-8 w-full max-w-lg rounded-2xl border border-white/10 shadow-[0_20px_60px_-25px_rgba(0,0,0,0.8)]"
             />
             <h2 className="font-display text-3xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-4xl">
-              Does your car need a regular{" "}
-              <span className="text-brand-green">service &amp; detail?</span>
+              Join the club. Go in the{" "}
+              <span className="text-brand-green">draw every month.</span>
             </h2>
             <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-white/60">
-              Keep it clean and serviced on a schedule, all handled for you, on one simple weekly plan.
-              Plus you go in the draw for the members&apos; prize.
+              Become a Smiths member from $1, unlock member perks, and get entries into every giveaway
+              we run. Big prizes, drawn live.
             </p>
             <Link
               href="/membership"

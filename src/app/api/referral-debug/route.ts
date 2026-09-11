@@ -42,7 +42,8 @@ export async function GET() {
     out.readCoupons = { error: String(e) };
   }
 
-  // 2. Can we create a coupon? (this is the step that's failing)
+  // 2. Create a coupon and keep its id for the promo-code test.
+  let couponId = "";
   try {
     const r = await fetch(`${API}/coupons`, {
       method: "POST",
@@ -57,9 +58,37 @@ export async function GET() {
     });
     out.createCoupon = { status: r.status };
     const body = await r.text();
-    out.createCouponBody = body.slice(0, 800);
+    out.createCouponBody = body.slice(0, 400);
+    try {
+      couponId = (JSON.parse(body) as { id?: string }).id || "";
+    } catch {
+      /* ignore */
+    }
   } catch (e) {
     out.createCoupon = { error: String(e) };
+  }
+
+  // 3. Create a promotion code under that coupon (the step that's failing live).
+  if (couponId) {
+    try {
+      const code = `DEBUG${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+      const r = await fetch(`${API}/promotion_codes`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${sk}`, "content-type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          coupon: couponId,
+          code,
+          "metadata[referrer_customer]": "cus_debug",
+          "metadata[referrer_name]": "Debug",
+        }),
+        cache: "no-store",
+      });
+      out.createPromo = { status: r.status, code };
+      const body = await r.text();
+      out.createPromoBody = body.slice(0, 800);
+    } catch (e) {
+      out.createPromo = { error: String(e) };
+    }
   }
 
   return NextResponse.json(out);
