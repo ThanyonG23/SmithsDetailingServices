@@ -165,21 +165,8 @@ export default function MembershipContent() {
           </Reveal>
 
           <div className="mt-9 grid gap-6 md:grid-cols-2">
-            {/* mini draw */}
-            <Reveal>
-              <DrawCard
-                poster="/media/photos/mini-giveaway.jpg"
-                alt="Smiths members' mini draw, win $300 cash or a $400+ detail"
-                label="Mini draw · drawn 21 Sept"
-                title={<>Win <span className="text-brand-purple-soft">$300 cash</span> or a <span className="text-brand-purple-soft">$400+</span> detail</>}
-                blurb="A small member pool right now means the best odds you will ever get. Join and you're in."
-                target={DRAW_MINI_TIME}
-                termsHref="/mini-draw-terms"
-              />
-            </Reveal>
-
             {/* big draw */}
-            <Reveal delay={100}>
+            <Reveal>
               <DrawCard
                 poster="/media/photos/giveaway.jpg"
                 alt="Smiths Detailing members' giveaway, win $1,000 cash or a $2,200 paint correction and ceramic coating"
@@ -188,6 +175,19 @@ export default function MembershipContent() {
                 blurb="Every active member is automatically entered. Join now and you are in."
                 target={DRAW_TIME}
                 termsHref="/draw-terms"
+              />
+            </Reveal>
+
+            {/* mini draw */}
+            <Reveal delay={100}>
+              <DrawCard
+                poster="/media/photos/mini-giveaway.jpg"
+                alt="Smiths members' mini draw, win $300 cash or a $400+ detail"
+                label="Mini draw · drawn 21 Sept"
+                title={<>Win <span className="text-brand-purple-soft">$300 cash</span> or a <span className="text-brand-purple-soft">$400+</span> detail</>}
+                blurb="A small member pool right now means the best odds you will ever get. Join and you're in."
+                target={DRAW_MINI_TIME}
+                termsHref="/mini-draw-terms"
               />
             </Reveal>
           </div>
@@ -232,12 +232,12 @@ export default function MembershipContent() {
             </div>
           </Reveal>
           <Reveal delay={100}>
-            <div className="mt-7 flex flex-col items-center gap-6 sm:flex-row sm:justify-center">
+            <div className="mt-7 flex touch-pan-x snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain pb-2 sm:justify-center sm:overflow-visible">
               {[
                 { src: "/media/videos/winner-mini-draw.mp4", poster: "/media/photos/winner-poster.jpg" },
                 { src: "/media/videos/winner-2.mp4", poster: "/media/photos/winner-2-poster.jpg" },
               ].map((v) => (
-                <div key={v.src} className="relative w-full max-w-[280px] sm:w-[280px]">
+                <div key={v.src} className="relative w-[72vw] max-w-[280px] shrink-0 snap-center sm:w-[280px]">
                   <div
                     className="pointer-events-none absolute -inset-4 rounded-[2rem] opacity-40 blur-2xl"
                     style={{ background: GREEN_GLOW }}
