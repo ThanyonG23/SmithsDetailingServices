@@ -262,17 +262,17 @@ export default function MembershipContent() {
       </section>
 
       {/* ═══ THE PLAN ═══ */}
-      <section id="join" className="scroll-mt-16 pt-10 pb-6 sm:pt-12">
+      <section id="join" className="scroll-mt-16 pt-3 pb-6 sm:pt-5">
         <div className="mx-auto max-w-5xl px-4">
           <Reveal>
-            <div className="mx-auto mb-7 max-w-2xl text-center">
+            <div className="mx-auto mb-7 max-w-3xl text-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/media/photos/spend-1000.webp"
                 alt="What would you spend $1,000 on this week?"
-                width={1200}
-                height={900}
-                className="mx-auto w-full max-w-lg rounded-2xl"
+                width={1600}
+                height={800}
+                className="mx-auto w-full max-w-3xl rounded-2xl"
               />
               <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-white/60">
                 Join for $1 and you&apos;re in the draw. Every member&apos;s in it, automatically.
