@@ -213,8 +213,9 @@ export default function MembershipContent() {
                 <span><b className="font-bold text-white">100+</b> 5-star reviews · cancel anytime</span>
               </div>
             </div>
-            <p className="mx-auto mt-4 max-w-md text-center text-sm font-semibold leading-relaxed text-white/75">
-              The big national clubs? You&apos;re <span className="text-white">1 in 300,000</span>. Smiths right now? You&apos;re <span className="text-brand-green">1 in a handful</span>.
+            <p className="mx-auto mt-6 max-w-2xl text-center font-display text-xl font-extrabold leading-snug tracking-tight text-white sm:text-3xl">
+              The big national clubs? You&apos;re <span className="text-white/45">1 in 300,000</span>.
+              <br className="hidden sm:block" /> Smiths right now? You&apos;re <span className="text-brand-green">1 in a handful</span>.
             </p>
           </Reveal>
         </div>
