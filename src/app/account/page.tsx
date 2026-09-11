@@ -90,7 +90,7 @@ export default async function AccountPage({ searchParams }: { searchParams: { e?
   const entryLabel = `${entries} ${entries === 1 ? "entry" : "entries"}`;
 
   return (
-    <Shell>
+    <Shell wide>
       <div className="flex items-center justify-between">
         <div>
           <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">Members</div>
@@ -103,8 +103,11 @@ export default async function AccountPage({ searchParams }: { searchParams: { e?
         </a>
       </div>
 
+      <div className="mt-6 grid items-start gap-6 lg:grid-cols-2">
+        {/* left column */}
+        <div className="flex flex-col gap-6">
       {/* Membership */}
-      <section className="mt-6 rounded-2xl border border-brand-purple/40 bg-gradient-to-b from-brand-purple/[0.12] to-white/[0.02] p-5 shadow-[0_0_60px_-24px_rgba(124,47,245,0.6)]">
+      <section className="rounded-2xl border border-brand-purple/40 bg-gradient-to-b from-brand-purple/[0.12] to-white/[0.02] p-5 shadow-[0_0_60px_-24px_rgba(124,47,245,0.6)]">
         <div className="flex items-center justify-between gap-3">
           <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-purple-soft">Your membership</div>
           <span
@@ -142,7 +145,7 @@ export default async function AccountPage({ searchParams }: { searchParams: { e?
 
       {/* Platinum upsell */}
       {!isPlatinum && (
-        <section className="mt-6 rounded-2xl border border-brand-yellow/40 bg-gradient-to-b from-brand-yellow/[0.10] to-white/[0.02] p-5 shadow-glowY">
+        <section className="rounded-2xl border border-brand-yellow/40 bg-gradient-to-b from-brand-yellow/[0.10] to-white/[0.02] p-5 shadow-glowY">
           <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-brand-yellow">Upgrade</div>
           <h2 className="mt-1.5 font-display text-xl font-extrabold text-white">Go Platinum</h2>
           <p className="mt-1.5 text-sm leading-relaxed text-white/60">
@@ -186,12 +189,12 @@ export default async function AccountPage({ searchParams }: { searchParams: { e?
           </p>
         </section>
       )}
+        </div>
 
-      {/* Password */}
-      <SetPasswordCard hasPassword={!!cached?.password_hash} />
-
+        {/* right column */}
+        <div className="flex flex-col gap-6">
       {/* My draws */}
-      <section className="mt-6">
+      <section>
         <h2 className="font-display text-lg font-extrabold tracking-tight text-white">Draws you&apos;re in</h2>
         {draws.length > 0 && (
           <p className="mt-1 text-sm text-white/55">
@@ -225,7 +228,7 @@ export default async function AccountPage({ searchParams }: { searchParams: { e?
       </section>
 
       {/* Partner businesses */}
-      <section className="mt-7">
+      <section>
         <h2 className="font-display text-lg font-extrabold tracking-tight text-white">Partner businesses</h2>
         {PARTNERS.length === 0 ? (
           <div className="mt-3 rounded-2xl border border-dashed border-brand-purple/30 bg-brand-purple/[0.05] p-5 text-center">
@@ -246,11 +249,16 @@ export default async function AccountPage({ searchParams }: { searchParams: { e?
           </div>
         )}
       </section>
+        </div>
+      </div>
+
+      {/* Password — very bottom */}
+      <SetPasswordCard hasPassword={!!cached?.password_hash} />
     </Shell>
   );
 }
 
-function Shell({ children }: { children: React.ReactNode }) {
+function Shell({ children, wide = false }: { children: React.ReactNode; wide?: boolean }) {
   return (
     <main className="min-h-screen bg-[#050506]">
       <div className="relative">
@@ -259,7 +267,7 @@ function Shell({ children }: { children: React.ReactNode }) {
           style={{ background: "radial-gradient(closest-side, #7c2ff5, transparent 70%)" }}
           aria-hidden
         />
-        <div className="relative mx-auto max-w-lg px-5 pb-20 pt-12 sm:pt-16">
+        <div className={`relative mx-auto ${wide ? "max-w-5xl" : "max-w-lg"} px-5 pb-20 pt-12 sm:pt-16`}>
           <div className="mb-8 text-center">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <Link href="/">
