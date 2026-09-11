@@ -16,6 +16,8 @@ interface StripeCustomer {
 interface StripePrice {
   id: string;
   nickname?: string | null;
+  unit_amount?: number | null;
+  recurring?: { interval?: string } | null;
 }
 interface StripeSubscription {
   id: string;
@@ -49,8 +51,19 @@ export type Membership = {
   plan: string;
   status: string; // active | trialing | past_due | ...
   currentPeriodEnd: string | null;
+  entries: number; // free draw entries this tier gets
   name: string;
 };
+
+/* Free draw entries by tier, derived from the price so it can't drift:
+   $9.99 member / pass = 1, $99 annual = 5, $24.99 Platinum = 5, $124.99 Platinum yearly = 10. */
+function entriesForAmount(amount: number | null | undefined): number {
+  const a = amount ?? 0;
+  if (a >= 12000) return 10;
+  if (a >= 9000) return 5;
+  if (a >= 2000) return 5;
+  return 1;
+}
 
 export function stripeReady(): boolean {
   return key() !== null;
@@ -63,7 +76,7 @@ const PLAN_NAMES: Record<string, string> = {
   price_1U7uBeDKvWtA0gmHV4y9V2zg: "Smiths Member",
 };
 
-type SubInfo = { subscriptionId: string; plan: string; status: string; currentPeriodEnd: string | null };
+type SubInfo = { subscriptionId: string; plan: string; status: string; currentPeriodEnd: string | null; entries: number };
 
 async function liveSubForCustomer(customerId: string): Promise<SubInfo | null> {
   const subs = await stripeGet<StripeList<StripeSubscription>>(
@@ -80,6 +93,7 @@ async function liveSubForCustomer(customerId: string): Promise<SubInfo | null> {
     currentPeriodEnd: live.current_period_end
       ? new Date(live.current_period_end * 1000).toISOString()
       : null,
+    entries: entriesForAmount(price?.unit_amount),
   };
 }
 

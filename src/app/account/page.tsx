@@ -86,6 +86,8 @@ export default async function AccountPage({ searchParams }: { searchParams: { e?
   const badge = statusLabel(status);
   const draws = openDraws();
   const isPlatinum = /platinum/i.test(plan);
+  const entries = live?.entries ?? 1;
+  const entryLabel = `${entries} ${entries === 1 ? "entry" : "entries"}`;
 
   return (
     <Shell>
@@ -191,6 +193,11 @@ export default async function AccountPage({ searchParams }: { searchParams: { e?
       {/* My draws */}
       <section className="mt-6">
         <h2 className="font-display text-lg font-extrabold tracking-tight text-white">Draws you&apos;re in</h2>
+        {draws.length > 0 && (
+          <p className="mt-1 text-sm text-white/55">
+            You get <b className="text-brand-purple-soft">{entryLabel}</b> into every draw below.
+          </p>
+        )}
         {draws.length === 0 ? (
           <p className="mt-2 text-sm text-white/55">No draws are open right now. We&apos;ll let you know when the next one drops.</p>
         ) : (
@@ -202,7 +209,7 @@ export default async function AccountPage({ searchParams }: { searchParams: { e?
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="rounded-full bg-brand-green/15 px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.12em] text-brand-green">
-                      You&apos;re in
+                      🎁 You have {entryLabel}
                     </span>
                   </div>
                   <div className="mt-1 font-display text-sm font-extrabold text-white">{d.prize}</div>
