@@ -46,6 +46,10 @@ export default function UpgradePage() {
             <p className="mx-auto mt-6 max-w-lg text-base leading-relaxed text-white/65">
               Want the best odds? <a href={PLATINUM_OFFER_URL} className="font-bold text-brand-purple-soft">Go Platinum for 5x the entries</a> in every draw.
             </p>
+            <p className="mx-auto mt-5 max-w-xl text-center font-display text-lg font-extrabold leading-snug tracking-tight text-white sm:text-2xl">
+              The big national clubs? You&apos;re <span className="text-white/45">1 in 300,000</span>.
+              <br className="hidden sm:block" /> Smiths right now? You&apos;re <span className="text-brand-green">1 in a handful</span>.
+            </p>
           </div>
 
           <div className="mt-9 grid items-stretch gap-5 sm:grid-cols-2">
