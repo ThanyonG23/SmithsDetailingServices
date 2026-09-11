@@ -66,8 +66,8 @@ export default function ReferralCard() {
       </div>
       <h2 className="mt-1.5 font-display text-xl font-extrabold text-white">Send a mate 10% off</h2>
       <p className="mt-1.5 text-sm leading-relaxed text-white/60">
-        Share your code. Your mate gets 10% off their first payment, and for as long as they stay a member you get a
-        bonus entry in every eligible draw.
+        Share your code. Your mate gets 10% off their first payment, and for as long as they stay a member you get a{" "}
+        <span className="font-bold text-brand-green">🎁 bonus entry</span> in every eligible draw.
       </p>
 
       {loading ? (
@@ -93,6 +93,23 @@ export default function ReferralCard() {
           >
             {copied === "msg" ? "Message copied" : "Copy invite message"}
           </button>
+          <div className="mt-3 rounded-xl border border-white/10 bg-black/30 p-4">
+            <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/40">Steps</div>
+            <ol className="mt-2 flex flex-col gap-1.5 text-sm text-white/70">
+              <li className="flex gap-2">
+                <span className="font-black text-brand-green">1</span> Tap Copy invite message
+              </li>
+              <li className="flex gap-2">
+                <span className="font-black text-brand-green">2</span> Go to your messages
+              </li>
+              <li className="flex gap-2">
+                <span className="font-black text-brand-green">3</span> Paste
+              </li>
+              <li className="flex gap-2">
+                <span className="font-black text-brand-green">4</span> Send
+              </li>
+            </ol>
+          </div>
           <p className="mt-2.5 text-[11px] leading-relaxed text-white/40">
             Your mate enters <span className="font-bold text-white/60">{code}</span> at checkout. Their 10% off applies
             automatically.
