@@ -156,10 +156,10 @@ export default function MembershipContent() {
             <div className="mt-6 text-center">
               <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">Members&apos; draws</div>
               <h1 className="mt-2 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-6xl">
-                Join now, you&apos;re in <span className="text-brand-purple-soft">every draw</span>
+                The best <span className="text-brand-green">$1</span> you will ever spend
               </h1>
               <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-white/65 sm:text-lg">
-                Every member goes in every draw, automatically.
+                Join now, you&apos;re in <span className="text-brand-purple-soft">every draw</span>.
               </p>
             </div>
           </Reveal>
