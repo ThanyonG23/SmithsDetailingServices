@@ -172,7 +172,7 @@ export default async function AccountPage({ searchParams }: { searchParams: { e?
             <div className="flex flex-col rounded-xl border border-brand-yellow/30 bg-white/[0.02] p-4">
               <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-brand-yellow">Yearly · best value</div>
               <div className="mt-1 flex items-end gap-1">
-                <span className="font-display text-2xl font-black text-white">$124.99</span>
+                <span className="font-display text-2xl font-black text-white">$199</span>
                 <span className="mb-1 text-xs text-white/50">/yr</span>
               </div>
               <ul className="mt-2 flex flex-1 flex-col gap-1 text-xs text-white/70">
@@ -180,7 +180,7 @@ export default async function AccountPage({ searchParams }: { searchParams: { e?
                 <li>✓ Priority access</li>
                 <li className="text-brand-yellow">🎁 10 free entries every draw</li>
               </ul>
-              <a href="https://buy.stripe.com/6oU00j2fKaTXdz25dN6kg0G" className="mt-3 block rounded-full bg-brand-yellow px-4 py-2.5 text-center font-display text-xs font-black text-brand-ink transition hover:brightness-110 active:scale-95">
+              <a href="https://buy.stripe.com/4gM14ndYsd258eI35F6kg0I" className="mt-3 block rounded-full bg-brand-yellow px-4 py-2.5 text-center font-display text-xs font-black text-brand-ink transition hover:brightness-110 active:scale-95">
                 Go Platinum yearly →
               </a>
             </div>

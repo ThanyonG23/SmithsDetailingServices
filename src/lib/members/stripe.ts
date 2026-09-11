@@ -56,7 +56,7 @@ export type Membership = {
 };
 
 /* Free draw entries by tier, derived from the price so it can't drift:
-   $9.99 member / pass = 1, $99 annual = 5, $24.99 Platinum = 5, $124.99 Platinum yearly = 10. */
+   $9.99 member / pass = 1, $99 annual = 5, $24.99 Platinum = 5, $199 Platinum yearly = 10. */
 function entriesForAmount(amount: number | null | undefined): number {
   const a = amount ?? 0;
   if (a >= 12000) return 10;
