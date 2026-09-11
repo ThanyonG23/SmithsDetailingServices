@@ -10,8 +10,6 @@ import { BUSINESS } from "@/lib/config";
 const DRAW_TIME = "2026-09-14T12:00:00+10:00";
 // The weekly mini draw: drawn Sun 21 Sep 2026, 12:00pm AEST (UTC+10).
 const DRAW_MINI_TIME = "2026-09-21T12:00:00+10:00";
-// Tonight's surprise standard-detail draw: 9 Sep 2026, 7:30pm AEST (UTC+10).
-const DRAW_TONIGHT_TIME = "2026-09-09T19:30:00+10:00";
 
 /* Shared body for the membership pages. `bonus` toggles the free
    cut & polish banner, on for /membership (new/cold ad traffic), off for
@@ -167,37 +165,6 @@ export default function MembershipContent() {
             </div>
           </Reveal>
 
-          {/* tonight's surprise draw — urgency for ad traffic */}
-          <Reveal>
-            <div className="mt-8 overflow-hidden rounded-2xl border border-brand-yellow/50 shadow-[0_0_0_1px_rgba(255,230,0,0.18),0_0_60px_rgba(255,230,0,0.28)]">
-              <div className="relative w-full overflow-hidden bg-black">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/media/photos/tonight-draw.jpg"
-                  alt="Mini draw, win a standard detail, drawn tonight at 7:30pm"
-                  className="aspect-[16/9] w-full object-contain"
-                />
-                <span className="absolute right-3 top-3 inline-flex items-center gap-1.5 rounded-full bg-brand-purple px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] text-white">
-                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />Drawn tonight
-                </span>
-              </div>
-              <div className="flex flex-col items-center gap-4 bg-gradient-to-br from-brand-yellow/[0.12] to-brand-yellow/[0.02] p-5 sm:flex-row sm:justify-between">
-                <div className="text-center sm:text-left">
-                  <div className="font-display text-lg font-extrabold text-white">Tonight&apos;s draw closes 7:30pm</div>
-                  <div className="text-sm text-white/70">A member wins a free standard detail. Join for $1 and you&apos;re in it.</div>
-                </div>
-                <div className="flex shrink-0 flex-col items-center gap-2.5">
-                  <Countdown target={DRAW_TONIGHT_TIME} accent="yellow" />
-                  <a href="https://buy.stripe.com/8x27sL07CaTX8eI35F6kg0z" className="rounded-full bg-brand-yellow px-7 py-2.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95">
-                    Join for $1 →
-                  </a>
-                  <Link href="/detail-draw-terms" className="text-[11px] font-semibold text-white/50 underline underline-offset-4 transition hover:text-white">
-                    What&apos;s a standard detail &amp; draw terms
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </Reveal>
 
           <div className="mt-9 grid gap-6 md:grid-cols-2">
             {/* mini draw */}
