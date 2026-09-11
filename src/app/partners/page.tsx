@@ -176,23 +176,29 @@ export default function PartnersPage() {
                 </span>
               </div>
               <h3 className="mt-4 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Platinum partner</h3>
-              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/65">
-                The full package. Every week we come out and shoot fresh content for your business, then push it across all
-                our socials, all month, all year. Your business in front of our audience, constantly.
+              <div className="mt-2 flex flex-wrap items-end gap-x-2 gap-y-1">
+                <span className="text-xs font-bold text-white/50">from</span>
+                <span className="font-display text-3xl font-black text-white">$1,500</span>
+                <span className="mb-1 text-xs font-bold text-white/50">/month</span>
+                <span className="mb-1 text-xs text-white/40">or $15,000/yr prepaid</span>
+              </div>
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/65">
+                The full package. Once a month we come out for a full content day at your business, then post it across all
+                our socials every week, all month, all year. Your business in front of the town, constantly.
               </p>
               <div className="mt-5 grid gap-4 border-t border-white/10 pt-5 sm:grid-cols-2">
                 <div>
                   <div className="text-[10px] font-black uppercase tracking-[0.16em] text-white/40">You give</div>
                   <div className="mt-1 text-sm leading-relaxed text-white/80">
-                    A yearly partnership. We&apos;ll walk through exactly what it looks like for your business on a quick call.
+                    From $1,500/month, or $15,000 for the year prepaid. Book a quick call and we&apos;ll tailor it to your business.
                   </div>
                 </div>
                 <div>
                   <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-purple-soft">You get everything, plus</div>
                   <ul className="mt-2 flex flex-col gap-1.5">
                     {[
-                      "Weekly content shoots at your business, every single week",
-                      "Distributed across all our socials, all month, every month",
+                      "A full content shoot day at your business every month",
+                      "Posted across all our socials every week, all month",
                       "Featured in our giveaways and offered as a member discount",
                       "Everything from the two options above, included",
                     ].map((g) => (
