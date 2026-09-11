@@ -118,6 +118,12 @@ export default function UpgradePage() {
                     <div className="mt-1 font-display text-base font-extrabold text-white">{d.prize}</div>
                     <div className="mb-1.5 mt-3 text-[9px] font-bold uppercase tracking-[0.18em] text-red-400">Draw closes in</div>
                     <Countdown target={d.target} accent="red" />
+                    <a
+                      href={PLATINUM_OFFER_URL}
+                      className="mt-4 flex w-full items-center justify-center rounded-full bg-brand-purple px-6 py-3 font-display text-sm font-black text-white transition hover:brightness-110 active:scale-95"
+                    >
+                      Go Platinum →
+                    </a>
                   </div>
                 </div>
               ))}
