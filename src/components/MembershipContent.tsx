@@ -376,7 +376,7 @@ export default function MembershipContent() {
 
           <Reveal>
             <p className="mx-auto mt-7 max-w-xl text-center font-display text-base font-black leading-snug tracking-tight text-brand-green sm:text-lg">
-              10% off detailing can save you up to $230 on a single detail.
+              10% off detailing saves you up to $230 on one detail. That&apos;s $230 back, for $1. Worth it?
             </p>
           </Reveal>
 
