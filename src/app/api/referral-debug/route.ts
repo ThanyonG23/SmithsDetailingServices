@@ -85,9 +85,29 @@ export async function GET() {
       });
       out.createPromo = { status: r.status, code };
       const body = await r.text();
-      out.createPromoBody = body.slice(0, 800);
+      out.createPromoBody = body.slice(0, 400);
     } catch (e) {
       out.createPromo = { error: String(e) };
+    }
+
+    // 3b. Retry the promo code WITH a pinned Stripe-Version (the actual fix).
+    try {
+      const code = `DEBUGV${Math.random().toString(36).slice(2, 6).toUpperCase()}`;
+      const r = await fetch(`${API}/promotion_codes`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${sk}`,
+          "content-type": "application/x-www-form-urlencoded",
+          "Stripe-Version": "2023-10-16",
+        },
+        body: new URLSearchParams({ coupon: couponId, code }),
+        cache: "no-store",
+      });
+      out.createPromoPinned = { status: r.status, code };
+      const body = await r.text();
+      out.createPromoPinnedBody = body.slice(0, 400);
+    } catch (e) {
+      out.createPromoPinned = { error: String(e) };
     }
   }
 

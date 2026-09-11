@@ -9,6 +9,9 @@
 
 const API = "https://api.stripe.com/v1";
 const LIVE = new Set(["active", "trialing", "past_due"]);
+// Pin to a stable API version so coupon/promotion-code create shapes stay
+// predictable regardless of the account's (newer) default version.
+const STRIPE_VERSION = "2023-10-16";
 
 function key(): string | null {
   return process.env.STRIPE_SECRET_KEY || null;
@@ -18,7 +21,10 @@ async function sGet<T>(path: string): Promise<T | null> {
   const k = key();
   if (!k) return null;
   try {
-    const res = await fetch(`${API}${path}`, { headers: { Authorization: `Bearer ${k}` }, cache: "no-store" });
+    const res = await fetch(`${API}${path}`, {
+      headers: { Authorization: `Bearer ${k}`, "Stripe-Version": STRIPE_VERSION },
+      cache: "no-store",
+    });
     if (!res.ok) return null;
     return (await res.json()) as T;
   } catch {
@@ -32,7 +38,11 @@ async function sPost<T>(path: string, body: Record<string, string>): Promise<T |
   try {
     const res = await fetch(`${API}${path}`, {
       method: "POST",
-      headers: { Authorization: `Bearer ${k}`, "content-type": "application/x-www-form-urlencoded" },
+      headers: {
+        Authorization: `Bearer ${k}`,
+        "content-type": "application/x-www-form-urlencoded",
+        "Stripe-Version": STRIPE_VERSION,
+      },
       body: new URLSearchParams(body),
       cache: "no-store",
     });
