@@ -1,10 +1,8 @@
 import Link from "next/link";
 import Countdown from "@/components/Countdown";
 
-/* Shared members' draw card: poster, countdown, Join for $1 and a terms link.
+/* Shared members' draw card: poster, countdown and a terms link.
    Used on the membership page and the clubhouse page so they stay identical. */
-
-const JOIN_1_URL = "https://buy.stripe.com/8x27sL07CaTX8eI35F6kg0z";
 
 export default function DrawCard({
   poster,
@@ -38,15 +36,9 @@ export default function DrawCard({
         <div className="mt-auto pt-4">
           <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-purple-soft">Draw closes in</div>
           <Countdown target={target} accent="purple" />
-          <a
-            href={JOIN_1_URL}
-            className="mt-3 flex w-full items-center justify-center rounded-full bg-brand-purple px-6 py-3 font-display text-sm font-black text-white transition hover:brightness-110 active:scale-95"
-          >
-            Join for $1 →
-          </a>
           <Link
             href={termsHref}
-            className="mt-2.5 block text-center text-xs font-semibold text-brand-purple-soft underline underline-offset-4 transition hover:text-white"
+            className="mt-3 block text-center text-xs font-semibold text-brand-purple-soft underline underline-offset-4 transition hover:text-white"
           >
             See draw terms
           </Link>

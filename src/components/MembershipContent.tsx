@@ -149,10 +149,6 @@ export default function MembershipContent() {
         />
 
         <div className="relative mx-auto max-w-5xl px-4 pb-8 pt-12 sm:pt-16">
-          <Reveal delay={100}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={LOGO} alt="Smiths Detailing" className="mx-auto mt-6 w-full max-w-[210px] sm:max-w-xs" />
-          </Reveal>
           <Reveal delay={200}>
             <div className="mt-6 text-center">
               <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">Members&apos; draws</div>
@@ -162,20 +158,6 @@ export default function MembershipContent() {
               <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-white/65 sm:text-lg">
                 Every member goes in every draw, automatically.
               </p>
-            </div>
-          </Reveal>
-
-          {/* Scrolling announcement ticker */}
-          <Reveal delay={250}>
-            <div className="mt-6 overflow-hidden rounded-full border border-brand-purple/50 bg-gradient-to-r from-brand-purple to-brand-purple-soft py-2.5 shadow-[0_0_44px_-12px_rgba(124,47,245,0.8)]">
-              <div className="flex w-max animate-marquee items-center whitespace-nowrap">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <span key={i} className="flex items-center text-[12.5px] font-black uppercase tracking-[0.14em] text-white sm:text-[13px]">
-                    <span>This week only · all new members get 30% off all detailing services</span>
-                    <span className="px-6 text-white/55">✦</span>
-                  </span>
-                ))}
-              </div>
             </div>
           </Reveal>
 
@@ -206,6 +188,20 @@ export default function MembershipContent() {
               />
             </Reveal>
           </div>
+
+          {/* Scrolling announcement ticker, under the posters */}
+          <Reveal delay={150}>
+            <div className="mt-8 overflow-hidden rounded-full border border-brand-purple/50 bg-gradient-to-r from-brand-purple to-brand-purple-soft py-2.5 shadow-[0_0_44px_-12px_rgba(124,47,245,0.8)]">
+              <div className="flex w-max animate-marquee items-center whitespace-nowrap">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <span key={i} className="flex items-center text-[12.5px] font-black uppercase tracking-[0.14em] text-white sm:text-[13px]">
+                    <span>This week only · all new members get 30% off all detailing services</span>
+                    <span className="px-6 text-white/55">✦</span>
+                  </span>
+                ))}
+              </div>
+            </div>
+          </Reveal>
 
           <Reveal>
             <div className="mt-9 flex justify-center">
@@ -470,22 +466,6 @@ export default function MembershipContent() {
         </div>
       </section>
 
-      {/* ═══ FOOTER ═══ */}
-      <footer className="border-t border-white/10">
-        <div className="mx-auto max-w-5xl px-4 py-12 text-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={LOGO} alt="Smiths Detailing" className="mx-auto h-12 w-auto" />
-          <p className="mx-auto mt-4 max-w-xs text-sm leading-relaxed text-white/50">{BUSINESS.address}</p>
-          <p className="mt-3 text-sm">
-            <a href={`tel:${BUSINESS.phoneE164}`} className="font-bold text-white transition hover:text-brand-purple-soft">
-              {BUSINESS.phone}
-            </a>
-          </p>
-          <Link href="/" className="mt-5 inline-block text-sm text-white/50 underline underline-offset-4 transition hover:text-white">
-            ← Back to Smiths
-          </Link>
-        </div>
-      </footer>
     </main>
   );
 }
