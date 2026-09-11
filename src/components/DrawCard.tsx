@@ -50,6 +50,7 @@ export default function DrawCard({
           >
             See draw terms
           </Link>
+          <p className="mt-2 text-center text-[11px] text-white/45">Join for $1. Hate it? Cancel in 10 seconds.</p>
         </div>
       </div>
     </div>
