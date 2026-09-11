@@ -15,7 +15,7 @@ const OPTIONS: { icon: string; title: string; tag: string; summary: string; give
     icon: "🏷️",
     title: "Give members a discount",
     tag: "Costs you nothing to join",
-    summary: "Offer Smiths members something like 10% off. This is the easy one, and how most partners start.",
+    summary: "Offer Smiths members something like 10% off. This is the easy one.",
     give: "A member discount, that you only ever pay when one of our members actually buys from you. A customer you wouldn't have had otherwise.",
     get: [
       "New local customers you wouldn't have had",
@@ -143,7 +143,7 @@ export default function PartnersPage() {
                   <p className="mt-2 text-sm leading-relaxed text-white/60">{o.summary}</p>
                   <div className="mt-5 flex flex-col gap-4 border-t border-white/10 pt-5">
                     <div>
-                      <div className="text-[10px] font-black uppercase tracking-[0.16em] text-white/40">You give</div>
+                      <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-green">You give</div>
                       <div className="mt-1 text-sm leading-relaxed text-white/80">{o.give}</div>
                     </div>
                     <div>
@@ -188,7 +188,7 @@ export default function PartnersPage() {
               </p>
               <div className="mt-5 grid gap-4 border-t border-white/10 pt-5 sm:grid-cols-2">
                 <div>
-                  <div className="text-[10px] font-black uppercase tracking-[0.16em] text-white/40">You give</div>
+                  <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-green">You give</div>
                   <div className="mt-1 text-sm leading-relaxed text-white/80">
                     From $1,500/month, or $15,000 for the year prepaid. Book a quick call and we&apos;ll tailor it to your business.
                   </div>
