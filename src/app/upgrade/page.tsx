@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Countdown from "@/components/Countdown";
 
 /* Pre-purchase choice / upsell page. A DRAFT, not yet wired into the funnel.
    Flow: the "Join for $1" buttons point here first; the visitor picks the $1
@@ -14,6 +15,9 @@ export const metadata: Metadata = {
 const JOIN_1_URL = "https://buy.stripe.com/8x27sL07CaTX8eI35F6kg0z";
 // Platinum monthly $24.99 (5 entries every draw) — small step up from the $1 plan.
 const PLATINUM_OFFER_URL = "https://buy.stripe.com/9B63cv07C3rv0Mg5dN6kg0F";
+// Draw entry cut-offs (keep in sync with the membership page).
+const DRAW_TIME = "2026-09-14T12:00:00+10:00";
+const DRAW_MINI_TIME = "2026-09-21T12:00:00+10:00";
 
 export default function UpgradePage() {
   return (
@@ -31,8 +35,7 @@ export default function UpgradePage() {
               This week&apos;s prize is big. <span className="text-brand-yellow">What&apos;s coming next is bigger.</span>
             </h1>
             <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-white/65">
-              Pick your plan. Most members go Platinum for <b className="text-white">5x the entries</b> in every draw,
-              so you never miss the big ones.
+              With only a handful of members, get the best odds. Go <b className="text-white">Platinum for 5x the entries</b> in every draw.
             </p>
           </div>
 
@@ -92,8 +95,8 @@ export default function UpgradePage() {
             </h2>
             <div className="mt-6 grid gap-5 sm:grid-cols-2">
               {[
-                { poster: "/media/photos/giveaway.jpg", label: "Big draw · 14 Sept", prize: "Win $1,000 cash or a $2,200 detail", alt: "Smiths big draw, win $1,000 cash or a $2,200 detail" },
-                { poster: "/media/photos/mini-giveaway.jpg", label: "Mini draw · 21 Sept", prize: "Win $300 cash or a $400+ detail", alt: "Smiths mini draw, win $300 cash or a $400+ detail" },
+                { poster: "/media/photos/giveaway.jpg", label: "Big draw · 14 Sept", prize: "Win $1,000 cash or a $2,200 detail", target: DRAW_TIME, alt: "Smiths big draw, win $1,000 cash or a $2,200 detail" },
+                { poster: "/media/photos/mini-giveaway.jpg", label: "Mini draw · 21 Sept", prize: "Win $300 cash or a $400+ detail", target: DRAW_MINI_TIME, alt: "Smiths mini draw, win $300 cash or a $400+ detail" },
               ].map((d) => (
                 <div
                   key={d.label}
@@ -104,6 +107,8 @@ export default function UpgradePage() {
                   <div className="bg-gradient-to-br from-brand-purple/[0.16] to-brand-purple/[0.02] p-4">
                     <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-brand-purple-soft">{d.label}</div>
                     <div className="mt-1 font-display text-base font-extrabold text-white">{d.prize}</div>
+                    <div className="mb-1.5 mt-3 text-[9px] font-bold uppercase tracking-[0.18em] text-red-400">Draw closes in</div>
+                    <Countdown target={d.target} accent="red" />
                   </div>
                 </div>
               ))}
