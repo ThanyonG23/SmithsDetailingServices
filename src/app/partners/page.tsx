@@ -95,7 +95,7 @@ export default function PartnersPage() {
           <Reveal delay={100}>
             <div className="mx-auto mt-7 grid max-w-xl grid-cols-3 gap-3">
               {[
-                { k: "$100k+", t: "spent on ads" },
+                { k: "$132k+", t: "spent on ads" },
                 { k: "3 years", t: "perfecting it" },
                 { k: "100+", t: "5-star reviews" },
               ].map((s) => (
@@ -108,8 +108,8 @@ export default function PartnersPage() {
           </Reveal>
           <Reveal delay={150}>
             <p className="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-white/60 sm:text-base">
-              We&apos;ve spent three years and over $100k learning exactly what gets local attention. Business owners tell us
-              all the time they wish they had someone to do it for them. Now you can.
+              We&apos;ve spent three years and $132,854 of our own money learning exactly what gets local attention. Business
+              owners tell us all the time they wish they had someone to do it for them. Now you can.
             </p>
           </Reveal>
         </div>
