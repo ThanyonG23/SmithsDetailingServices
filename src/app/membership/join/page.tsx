@@ -66,7 +66,7 @@ export default function JoinPage() {
                 Win <b className="text-white">$1,000 cash</b> or a <b className="text-white">$2,200 detail</b>, drawn 14 Sept. Every member is automatically entered.
               </p>
               <div className="mt-1.5">
-                <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-yellow/80">Drawn in</div>
+                <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-yellow/80">Draw closes in</div>
                 <Countdown target={DRAW_TIME} />
               </div>
             </div>

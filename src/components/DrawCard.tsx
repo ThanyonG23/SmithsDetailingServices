@@ -36,7 +36,7 @@ export default function DrawCard({
         </h3>
         <p className="mt-2 min-h-[2.5rem] text-sm leading-relaxed text-white/70">{blurb}</p>
         <div className="mt-auto pt-4">
-          <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-purple-soft">Drawn in</div>
+          <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-brand-purple-soft">Draw closes in</div>
           <Countdown target={target} accent="purple" />
           <a
             href={JOIN_1_URL}
