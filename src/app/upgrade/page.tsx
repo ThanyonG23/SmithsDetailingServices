@@ -44,7 +44,7 @@ export default function UpgradePage() {
               className="mx-auto mt-6 w-full max-w-2xl rounded-2xl"
             />
             <p className="mx-auto mt-6 max-w-lg text-base leading-relaxed text-white/65">
-              Want the best odds? <b className="text-brand-purple-soft">Go Platinum for 5x the entries</b> in every draw.
+              Want the best odds? <a href={PLATINUM_OFFER_URL} className="font-bold text-brand-purple-soft">Go Platinum for 5x the entries</a> in every draw.
             </p>
           </div>
 
