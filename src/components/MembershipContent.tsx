@@ -260,6 +260,13 @@ export default function MembershipContent() {
       {/* ═══ THE PLAN ═══ */}
       <section id="join" className="scroll-mt-16 pt-10 pb-6 sm:pt-12">
         <div className="mx-auto max-w-5xl px-4">
+          <Reveal>
+            <div className="mx-auto mb-8 max-w-2xl rounded-2xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-5 py-4 text-center shadow-glowY">
+              <p className="font-display text-base font-black leading-snug tracking-tight text-brand-yellow sm:text-lg">
+                We only have a handful of members right now, the best odds you&apos;ll ever get.
+              </p>
+            </div>
+          </Reveal>
           <div className="mb-6 text-center">
             <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-brand-purple-soft">Choose your plan</span>
           </div>
@@ -355,7 +362,13 @@ export default function MembershipContent() {
           </div>
 
           <Reveal>
-            <p className="mx-auto mt-6 max-w-xl text-center text-xs leading-relaxed text-white/40">
+            <p className="mx-auto mt-7 max-w-xl text-center font-display text-base font-black leading-snug tracking-tight text-brand-green sm:text-lg">
+              10% off detailing can save you up to $230 on a single detail.
+            </p>
+          </Reveal>
+
+          <Reveal>
+            <p className="mx-auto mt-4 max-w-xl text-center text-xs leading-relaxed text-white/40">
               Every plan is a membership with real perks, entries into the draws come free with it.
             </p>
           </Reveal>
