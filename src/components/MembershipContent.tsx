@@ -8,9 +8,6 @@ import { BUSINESS } from "@/lib/config";
 
 // The member draw: drawn 14 Sep 2026, 12:00pm AEST (UTC+10).
 const DRAW_TIME = "2026-09-14T12:00:00+10:00";
-// The current headline prize, shown in the "what could you do with…" CTA above
-// the packages. Update this one line each draw (e.g. "$2,000", "a new car").
-const HEADLINE_PRIZE = "$1,000";
 // The weekly mini draw: drawn Sun 21 Sep 2026, 12:00pm AEST (UTC+10).
 const DRAW_MINI_TIME = "2026-09-21T12:00:00+10:00";
 
@@ -269,10 +266,15 @@ export default function MembershipContent() {
         <div className="mx-auto max-w-5xl px-4">
           <Reveal>
             <div className="mx-auto mb-7 max-w-2xl text-center">
-              <h2 className="font-display text-2xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl">
-                What could you do with an extra <span className="text-brand-green">{HEADLINE_PRIZE}</span> this week?
-              </h2>
-              <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-white/60">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/media/photos/spend-1000.webp"
+                alt="What would you spend $1,000 on this week?"
+                width={1200}
+                height={900}
+                className="mx-auto w-full max-w-lg rounded-2xl"
+              />
+              <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-white/60">
                 Join for $1 and you&apos;re in the draw. Every member&apos;s in it, automatically.
               </p>
             </div>
