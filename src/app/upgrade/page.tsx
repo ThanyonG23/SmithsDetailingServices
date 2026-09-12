@@ -28,7 +28,10 @@ export default function UpgradePage() {
   // If the visitor arrived via an affiliate link, their code rides in a cookie.
   // Pre-apply it as a Stripe promo code so the signup is attributed to them.
   const aff = cookies().get("smiths_aff")?.value || "";
-  const withPromo = (url: string) => (aff ? `${url}?prefilled_promo_code=${encodeURIComponent(aff)}` : url);
+  // prefilled_promo_code gives the member their 10% perk; client_reference_id is
+  // the permanent attribution the affiliate program reads (survives the discount).
+  const withPromo = (url: string) =>
+    aff ? `${url}?prefilled_promo_code=${encodeURIComponent(aff)}&client_reference_id=${encodeURIComponent(aff)}` : url;
   const join1 = withPromo(JOIN_1_URL);
   const platinum = withPromo(PLATINUM_OFFER_URL);
   return (

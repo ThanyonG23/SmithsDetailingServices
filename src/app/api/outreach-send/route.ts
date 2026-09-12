@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { sql } from "@/lib/ops/db";
 import { ensureOutreach } from "@/app/ops/outreach/actions";
 import { sendMail, hasReplied, mailerConfigured } from "@/lib/ops/mailer";
+import { affiliateEarnings } from "@/lib/members/affiliates";
 
 /* Hourly outreach sender. Hit by an external cron (cron-job.org) once an hour
    with ?token=OUTREACH_CRON_TOKEN. Each run sends at most ONE email so the pace
@@ -78,6 +79,9 @@ export async function GET(req: Request) {
   if (!process.env.OUTREACH_CRON_TOKEN || token !== process.env.OUTREACH_CRON_TOKEN) {
     return j({ ok: false, error: "unauthorised" }, 401);
   }
+  // Hourly capture of affiliate signups into the durable table (belt-and-braces,
+  // so attribution is caught even if no one opens the dashboards).
+  await affiliateEarnings().catch(() => {});
   if (!mailerConfigured()) {
     return j({ ok: false, error: "GMAIL_USER / GMAIL_APP_PASSWORD not set in Vercel" }, 503);
   }
