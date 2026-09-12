@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Reveal from "@/components/Reveal";
 import SiteNav from "@/components/SiteNav";
 import BusinessPartnerForm from "@/components/BusinessPartnerForm";
+import InstagramReels from "@/components/InstagramReels";
 import { BUSINESS } from "@/lib/config";
 
 export const metadata: Metadata = {
@@ -49,15 +50,6 @@ const STEPS: { n: string; t: string; d: string; platforms?: string[] }[] = [
 
 const PLAT_MONTHLY_URL = "https://buy.stripe.com/cNifZh1bGaTXfHa7lV6kg0J";
 const PLAT_ANNUAL_URL = "https://buy.stripe.com/6oU00j9Ic0fjamQbCb6kg0K";
-
-const REEL_STYLES: { style: string; url: string }[] = [
-  { style: "Educational", url: "https://www.instagram.com/reel/Dc-edEDBr0K/" },
-  { style: "Community", url: "https://www.instagram.com/reel/DZhYFJJB-bq/" },
-  { style: "Skit", url: "https://www.instagram.com/reel/DM63YEQBFYC/" },
-  { style: "Comedy", url: "https://www.instagram.com/reel/DLIdw5nB_np/" },
-  { style: "Giveaway", url: "https://www.instagram.com/reel/DKbDeeYBaxl/" },
-  { style: "Trend", url: "https://www.instagram.com/reel/DHU45AkqI2u/" },
-];
 
 export default function PartnersPage() {
   return (
@@ -141,29 +133,12 @@ export default function PartnersPage() {
                 Every style of content, for your brand
               </h2>
               <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-white/60">
-                Educational, community, skits, comedy, giveaways, trends. Whatever suits your business, we make it. Tap one to watch.
+                Educational, community, skits, comedy, giveaways, trends. Whatever suits your business, we make it. Watch them right here.
               </p>
             </div>
           </Reveal>
-          <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {REEL_STYLES.map((r, i) => (
-              <Reveal key={r.style} delay={i * 60}>
-                <a
-                  href={r.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group flex aspect-[4/5] flex-col justify-between overflow-hidden rounded-2xl border border-brand-purple/30 bg-gradient-to-b from-brand-purple/[0.14] to-white/[0.02] p-4 transition hover:border-brand-purple/60"
-                >
-                  <div className="text-[10px] font-bold uppercase tracking-[0.16em] text-brand-purple-soft">Reel</div>
-                  <div>
-                    <div className="font-display text-lg font-extrabold leading-tight text-white sm:text-xl">{r.style}</div>
-                    <div className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-bold text-brand-purple-soft transition group-hover:text-white">
-                      <span>▶</span> Watch on Instagram
-                    </div>
-                  </div>
-                </a>
-              </Reveal>
-            ))}
+          <div className="mt-8">
+            <InstagramReels />
           </div>
         </div>
       </section>
