@@ -93,7 +93,14 @@ export default function FullSuiteChoice({ platMonthly, platAnnual, suiteMonthly,
             <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-purple-soft">★</span><b className="text-white">Everything in Platinum</b></li>
             <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-purple-soft">★</span>We run your socials too, done for you</li>
             <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-purple-soft">★</span>Paid ads run against your best content, actual customers</li>
-            <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-green">🎁</span><span className="text-brand-green">Bonus: a free website (limited time)</span></li>
+            <li className="flex items-start gap-2.5">
+              <span className="mt-0.5 shrink-0 text-brand-purple-soft">★</span>
+              <span>
+                We build out your offer with you
+                <span className="mt-0.5 block text-xs font-semibold text-white/55">Attraction, upsell, downsell and cross-sell offers</span>
+              </span>
+            </li>
+            <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-green">🎁</span><span className="text-brand-green">Bonus: a free website (valued at $2,500)</span></li>
           </ul>
           <div className="mt-4 rounded-xl border border-brand-green/40 bg-brand-green/[0.08] px-4 py-3">
             <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-green">Our guarantee</div>

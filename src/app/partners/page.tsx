@@ -180,7 +180,7 @@ export default function PartnersPage() {
                   Only 10 spots
                 </span>
                 <span className="rounded-full bg-brand-green/15 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-brand-green">
-                  First content live in 7 days
+                  First content live in 3 days
                 </span>
               </div>
               <h3 className="mt-4 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Platinum partner</h3>
@@ -208,8 +208,8 @@ export default function PartnersPage() {
                   <b>🎁 BONUS:</b> Everything we make goes on our socials. We&apos;ll send you a personalised batch of content to post on your own socials too.
                 </div>
               </div>
-              <div className="mt-4 rounded-xl border border-brand-green/40 bg-brand-green/[0.08] px-4 py-3">
-                <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-green">Our guarantee</div>
+              <div className="mt-4 rounded-xl border border-brand-purple/45 bg-brand-purple/[0.12] px-4 py-3">
+                <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-purple-soft">Our guarantee</div>
                 <div className="mt-1 text-sm font-bold leading-relaxed text-white">
                   Don&apos;t make back $1,500 in your first 60 days and we&apos;ll work with you for free until you do.
                 </div>
@@ -237,6 +237,18 @@ export default function PartnersPage() {
               <p className="mt-2.5 text-center text-[11px] font-semibold leading-relaxed text-brand-green">
                 No lock-in contracts. Hate it? Cancel any time, and we&apos;ll send all our work across to you.
               </p>
+            </div>
+          </Reveal>
+
+          {/* Platinum value anchor vs hiring */}
+          <Reveal delay={40}>
+            <div className="mt-6 rounded-2xl border border-brand-green/30 bg-brand-green/[0.06] px-5 py-4 text-center">
+              <div className="font-display text-base font-extrabold text-white sm:text-lg">
+                A full-time content creator costs $1,000+ per week.
+              </div>
+              <div className="mt-1 text-sm font-black uppercase tracking-[0.06em] text-brand-green">
+                Save $800+ per week by using us.
+              </div>
             </div>
           </Reveal>
 
