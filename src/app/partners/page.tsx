@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Reveal from "@/components/Reveal";
 import SiteNav from "@/components/SiteNav";
 import BusinessPartnerForm from "@/components/BusinessPartnerForm";
+import PlatinumPricing from "@/components/PlatinumPricing";
 import Reels from "@/components/Reels";
 import { BUSINESS } from "@/lib/config";
 
@@ -107,9 +108,10 @@ export default function PartnersPage() {
             </h2>
           </Reveal>
           <Reveal delay={100}>
-            <div className="mx-auto mt-7 grid max-w-xl grid-cols-3 gap-3">
+            <div className="mx-auto mt-7 grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
               {[
                 { k: "$132k+", t: "spent on ads" },
+                { k: "9x", t: "return on ad spend" },
                 { k: "3 years", t: "perfecting it" },
                 { k: "100+", t: "5-star reviews" },
               ].map((s) => (
@@ -177,7 +179,7 @@ export default function PartnersPage() {
                   </div>
                   <h3 className="mt-4 font-display text-xl font-extrabold tracking-tight text-white sm:text-2xl">{o.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-white/60">{o.summary}</p>
-                  <div className="mt-5 flex flex-col gap-4 border-t border-white/10 pt-5">
+                  <div className="mt-5 flex flex-1 flex-col gap-4 border-t border-white/10 pt-5">
                     <div>
                       <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-green">You give</div>
                       <div className="mt-1 text-sm leading-relaxed text-white/80">{o.give}</div>
@@ -187,13 +189,19 @@ export default function PartnersPage() {
                       <ul className="mt-2 flex flex-col gap-1.5">
                         {o.get.map((g) => (
                           <li key={g} className="flex items-start gap-2 text-sm leading-relaxed text-white/80">
-                            <span className="mt-0.5 shrink-0 text-brand-yellow">✓</span>
+                            <span className="mt-0.5 shrink-0 text-brand-green">✓</span>
                             <span>{g}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
                   </div>
+                  <a
+                    href="#contact"
+                    className="mt-5 flex w-full items-center justify-center rounded-full bg-brand-yellow px-6 py-3 font-display text-sm font-black uppercase tracking-[0.12em] text-[#141400] transition hover:brightness-110 active:scale-95"
+                  >
+                    Start free →
+                  </a>
                 </div>
               </Reveal>
             ))}
@@ -210,51 +218,39 @@ export default function PartnersPage() {
                 <span className="rounded-full bg-red-500/15 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-red-300">
                   Only 10 spots
                 </span>
-              </div>
-              <h3 className="mt-4 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Platinum partner</h3>
-              <div className="mt-2 flex flex-wrap items-end gap-x-2 gap-y-1">
-                <span className="text-xs font-bold text-white/50">from</span>
-                <span className="font-display text-3xl font-black text-brand-green">$1,500</span>
-                <span className="mb-1 text-xs font-bold text-white/50">/month</span>
-                <span className="mb-1 text-xs text-white/40">or $15,000/yr prepaid</span>
-                <span className="mb-1 rounded-full bg-brand-green/15 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-brand-green">
-                  Save $3,000
+                <span className="rounded-full bg-brand-green/15 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-brand-green">
+                  First content live in 7 days
                 </span>
               </div>
-              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/65">
-                The full package. Once a month we come out for a full content day at your business, then post it across all
-                our socials every week, all month, all year. Your business in front of the town, constantly.
-              </p>
-              <div className="mt-5 grid gap-4 border-t border-white/10 pt-5 sm:grid-cols-2">
-                <div>
-                  <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-green">You give</div>
-                  <div className="mt-1 text-sm leading-relaxed text-white/80">
-                    From $1,500/month, or $15,000 for the year prepaid. Book a quick call and we&apos;ll tailor it to your business.
-                  </div>
+              <h3 className="mt-4 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Platinum partner</h3>
+              <PlatinumPricing />
+              <div className="mt-5 border-t border-white/10 pt-5">
+                <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-purple-soft">You get</div>
+                <ul className="mt-2 flex flex-col gap-2">
+                  {[
+                    "Never think about creating content for your business again",
+                    "Get seen across multiple channels",
+                    "Build brand awareness through partnerships",
+                    "Build momentum to help you stay busy",
+                    "Have content ready for paid advertisement",
+                  ].map((g) => (
+                    <li key={g} className="flex items-start gap-2.5 text-sm font-semibold leading-relaxed text-white">
+                      <span className="mt-0.5 shrink-0 text-brand-green">✓</span>
+                      <span>{g}</span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-3 text-xs leading-relaxed text-white/55">
+                  <span className="font-bold text-white/75">Includes:</span> a full shoot day at your business every month, posted across all our socials every week, a giveaway feature and member discount, direct links from our site and members portal, plus everything in the two options above.
+                </p>
+                <div className="mt-2.5 rounded-lg border border-brand-green/30 bg-brand-green/[0.07] px-3 py-2 text-xs leading-relaxed text-brand-green">
+                  <b>🎁 BONUS:</b> Everything we make goes on our socials. We&apos;ll send you a personalised batch of content to post on your own socials too.
                 </div>
-                <div>
-                  <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-purple-soft">Join now to</div>
-                  <ul className="mt-2 flex flex-col gap-2">
-                    {[
-                      "Never think about creating content for your business again",
-                      "Get seen across multiple channels",
-                      "Build brand awareness through partnerships",
-                      "Build momentum to help you stay busy",
-                      "Have content ready for paid advertisement",
-                    ].map((g) => (
-                      <li key={g} className="flex items-start gap-2.5 text-sm font-semibold leading-relaxed text-white">
-                        <span className="mt-0.5 shrink-0 text-brand-yellow">✓</span>
-                        <span>{g}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <p className="mt-3 text-xs leading-relaxed text-white/55">
-                    <span className="font-bold text-white/75">Includes:</span> a full shoot day at your business every month, posted across all our socials every week, a giveaway feature and member discount, direct links from our site and members portal, plus everything in the two options above.
-                  </p>
-                  <div className="mt-2.5 rounded-lg border border-brand-green/30 bg-brand-green/[0.07] px-3 py-2 text-xs leading-relaxed text-brand-green">
-                    <b>BONUS:</b> Everything we make goes on our socials. We&apos;ll send you a personalised batch of content to post on your own socials too.
-                  </div>
-                </div>
+              </div>
+              <div className="mt-4 rounded-xl border border-brand-yellow/45 bg-brand-yellow/[0.1] px-4 py-3 text-center">
+                <span className="font-display text-sm font-black uppercase tracking-[0.1em] text-brand-yellow">
+                  🎁 Buy now and get your 2nd month FREE
+                </span>
               </div>
               <a
                 href="/full-suite"
