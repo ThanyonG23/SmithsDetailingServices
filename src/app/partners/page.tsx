@@ -78,7 +78,7 @@ export default function PartnersPage() {
           </Reveal>
           <Reveal delay={150}>
             <h1 className="mt-2 font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-5xl">
-              Put your business in front of our <span className="text-brand-purple-soft">members</span>
+              Put your business across multiple platforms to reach more <span className="text-brand-purple-soft">eyeballs</span>
             </h1>
           </Reveal>
           <Reveal delay={250}>
@@ -163,10 +163,83 @@ export default function PartnersPage() {
                 What you give, what you get
               </h2>
               <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-white/60">
-                Two free ways to start, or go all in with Platinum.
+                Go all in with Platinum, or try us out with a free partnership.
               </p>
             </div>
           </Reveal>
+          {/* Platinum, the paid tier (shown first) */}
+          <Reveal delay={80}>
+            <div className="mt-8 overflow-hidden rounded-3xl border border-brand-purple/45 bg-gradient-to-b from-brand-purple/[0.12] to-white/[0.02] p-6 shadow-[0_0_60px_-24px_rgba(124,47,245,0.6)] sm:p-8">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="text-3xl leading-none">💎</span>
+                <span className="rounded-full bg-brand-purple/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-brand-purple-soft">
+                  Our biggest push
+                </span>
+                <span className="rounded-full bg-red-500/15 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-red-300">
+                  Only 10 spots
+                </span>
+                <span className="rounded-full bg-brand-green/15 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-brand-green">
+                  First content live in 7 days
+                </span>
+              </div>
+              <h3 className="mt-4 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Platinum partner</h3>
+              <PlatinumPricing />
+              <div className="mt-5 border-t border-white/10 pt-5">
+                <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-purple-soft">You get</div>
+                <ul className="mt-2 flex flex-col gap-2">
+                  {[
+                    "Never think about creating content for your business again",
+                    "Get seen across multiple channels",
+                    "Build brand awareness through partnerships",
+                    "Build momentum to help you stay busy",
+                    "Have content ready for paid advertisement",
+                  ].map((g) => (
+                    <li key={g} className="flex items-start gap-2.5 text-sm font-semibold leading-relaxed text-white">
+                      <span className="mt-0.5 shrink-0 text-brand-green">✓</span>
+                      <span>{g}</span>
+                    </li>
+                  ))}
+                </ul>
+                <p className="mt-3 text-xs leading-relaxed text-white/55">
+                  <span className="font-bold text-white/75">Includes:</span> a full shoot day at your business every month, posted across all our socials every week, a giveaway feature and member discount, direct links from our site and members portal, plus everything in the free options below.
+                </p>
+                <div className="mt-2.5 rounded-lg border border-brand-green/30 bg-brand-green/[0.07] px-3 py-2 text-xs leading-relaxed text-brand-green">
+                  <b>🎁 BONUS:</b> Everything we make goes on our socials. We&apos;ll send you a personalised batch of content to post on your own socials too.
+                </div>
+              </div>
+              <div className="mt-4 rounded-xl border border-brand-yellow/45 bg-brand-yellow/[0.1] px-4 py-3 text-center">
+                <span className="font-display text-sm font-black uppercase tracking-[0.1em] text-brand-yellow">
+                  🎁 Buy now and get your 2nd month FREE
+                </span>
+              </div>
+              <a
+                href="/full-suite"
+                className="mt-4 flex w-full items-center justify-center rounded-full bg-brand-purple px-8 py-3.5 font-display text-sm font-black uppercase tracking-[0.12em] text-white transition hover:brightness-110 active:scale-95"
+              >
+                Get started →
+              </a>
+              <a
+                href="#contact"
+                className="mt-3 block text-center text-sm font-bold text-brand-purple-soft underline underline-offset-4 transition hover:text-white"
+              >
+                Or book a call to discuss →
+              </a>
+              <p className="mt-2.5 text-center text-[11px] font-semibold leading-relaxed text-brand-green">
+                No lock-in contracts. Hate it? Cancel any time, and we&apos;ll send all our work across to you.
+              </p>
+            </div>
+          </Reveal>
+
+          {/* Free partnerships */}
+          <Reveal>
+            <div className="mt-14 text-center">
+              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-yellow">Not ready to spend money?</div>
+              <h3 className="mt-2 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+                Try us out through a free partnership
+              </h3>
+            </div>
+          </Reveal>
+
           <div className="mt-8 grid gap-5 sm:grid-cols-2">
             {OPTIONS.map((o, i) => (
               <Reveal key={o.title} delay={i * 90}>
@@ -206,69 +279,6 @@ export default function PartnersPage() {
               </Reveal>
             ))}
           </div>
-
-          {/* Platinum, the paid tier */}
-          <Reveal delay={180}>
-            <div className="mt-5 overflow-hidden rounded-3xl border border-brand-purple/45 bg-gradient-to-b from-brand-purple/[0.12] to-white/[0.02] p-6 shadow-[0_0_60px_-24px_rgba(124,47,245,0.6)] sm:p-8">
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="text-3xl leading-none">💎</span>
-                <span className="rounded-full bg-brand-purple/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-brand-purple-soft">
-                  Our biggest push
-                </span>
-                <span className="rounded-full bg-red-500/15 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-red-300">
-                  Only 10 spots
-                </span>
-                <span className="rounded-full bg-brand-green/15 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-brand-green">
-                  First content live in 7 days
-                </span>
-              </div>
-              <h3 className="mt-4 font-display text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Platinum partner</h3>
-              <PlatinumPricing />
-              <div className="mt-5 border-t border-white/10 pt-5">
-                <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-purple-soft">You get</div>
-                <ul className="mt-2 flex flex-col gap-2">
-                  {[
-                    "Never think about creating content for your business again",
-                    "Get seen across multiple channels",
-                    "Build brand awareness through partnerships",
-                    "Build momentum to help you stay busy",
-                    "Have content ready for paid advertisement",
-                  ].map((g) => (
-                    <li key={g} className="flex items-start gap-2.5 text-sm font-semibold leading-relaxed text-white">
-                      <span className="mt-0.5 shrink-0 text-brand-green">✓</span>
-                      <span>{g}</span>
-                    </li>
-                  ))}
-                </ul>
-                <p className="mt-3 text-xs leading-relaxed text-white/55">
-                  <span className="font-bold text-white/75">Includes:</span> a full shoot day at your business every month, posted across all our socials every week, a giveaway feature and member discount, direct links from our site and members portal, plus everything in the two options above.
-                </p>
-                <div className="mt-2.5 rounded-lg border border-brand-green/30 bg-brand-green/[0.07] px-3 py-2 text-xs leading-relaxed text-brand-green">
-                  <b>🎁 BONUS:</b> Everything we make goes on our socials. We&apos;ll send you a personalised batch of content to post on your own socials too.
-                </div>
-              </div>
-              <div className="mt-4 rounded-xl border border-brand-yellow/45 bg-brand-yellow/[0.1] px-4 py-3 text-center">
-                <span className="font-display text-sm font-black uppercase tracking-[0.1em] text-brand-yellow">
-                  🎁 Buy now and get your 2nd month FREE
-                </span>
-              </div>
-              <a
-                href="/full-suite"
-                className="mt-4 flex w-full items-center justify-center rounded-full bg-brand-purple px-8 py-3.5 font-display text-sm font-black uppercase tracking-[0.12em] text-white transition hover:brightness-110 active:scale-95"
-              >
-                Get started →
-              </a>
-              <a
-                href="#contact"
-                className="mt-3 block text-center text-sm font-bold text-brand-purple-soft underline underline-offset-4 transition hover:text-white"
-              >
-                Or book a call to discuss →
-              </a>
-              <p className="mt-2.5 text-center text-[11px] font-semibold leading-relaxed text-brand-green">
-                No lock-in contracts. Hate it? Cancel any time, and we&apos;ll send all our work across to you.
-              </p>
-            </div>
-          </Reveal>
         </div>
       </section>
 
