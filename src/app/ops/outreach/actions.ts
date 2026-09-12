@@ -171,7 +171,7 @@ export async function addListings(text: string): Promise<Lead[]> {
   return getOutreach();
 }
 
-async function fetchSiteText(url: string): Promise<string> {
+async function getHtml(url: string): Promise<string> {
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), 15000);
   try {
@@ -180,19 +180,62 @@ async function fetchSiteText(url: string): Promise<string> {
       headers: { "user-agent": "Mozilla/5.0 (compatible; SmithsOutreach/1.0)" },
       redirect: "follow",
     });
-    const html = await r.text();
-    return html
-      .replace(/<script[\s\S]*?<\/script>/gi, " ")
-      .replace(/<style[\s\S]*?<\/style>/gi, " ")
-      .replace(/<[^>]+>/g, " ")
-      .replace(/&nbsp;/gi, " ")
-      .replace(/&amp;/gi, "&")
-      .replace(/\s+/g, " ")
-      .trim()
-      .slice(0, 6000);
+    return await r.text();
   } finally {
     clearTimeout(t);
   }
+}
+
+function htmlToText(html: string): string {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 6000);
+}
+
+// Pull real email addresses out of page HTML (mailto links and plain text),
+// dropping image filenames and template junk, preferring the site's own domain.
+function extractEmails(html: string, domain: string): string[] {
+  const found = new Set<string>();
+  const re = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
+  for (const m of html.matchAll(re)) {
+    const e = m[0].toLowerCase();
+    if (/\.(png|jpe?g|gif|webp|svg|ico|css|js)$/i.test(e)) continue;
+    if (/(wix\.com|sentry|example\.|yourdomain|domain\.com|email\.com|@2x|\.wixpress)/i.test(e)) continue;
+    found.add(e);
+  }
+  return [...found].sort((a, b) => (Number(b.endsWith(domain)) - Number(a.endsWith(domain)))).slice(0, 5);
+}
+
+// Fetch a site's text + any emails. If the homepage has no email, try the
+// common contact pages (bounded, so it stays fast).
+async function fetchSite(url: string): Promise<{ text: string; emails: string[] }> {
+  let domain = "";
+  try {
+    domain = new URL(url).hostname.replace(/^www\./, "");
+  } catch {
+    /* ignore */
+  }
+  const homeHtml = await getHtml(url);
+  const text = htmlToText(homeHtml);
+  let emails = extractEmails(homeHtml, domain);
+  if (emails.length === 0) {
+    for (const path of ["/contact", "/contact-us", "/contact.html"]) {
+      try {
+        const html = await getHtml(new URL(path, url).toString());
+        emails = extractEmails(html, domain);
+        if (emails.length) break;
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+  return { text, emails };
 }
 
 const SYSTEM_PROMPT = `You write cold outreach for Thanyon from Smiths Detailing Services in Cairns, Australia.
@@ -294,9 +337,12 @@ export async function scanLead(id: number): Promise<Lead[]> {
   }
 
   let siteText = "";
+  let foundEmails: string[] = [];
   if (lead.url) {
     try {
-      siteText = await fetchSiteText(lead.url);
+      const site = await fetchSite(lead.url);
+      siteText = site.text;
+      foundEmails = site.emails;
     } catch {
       siteText = "";
     }
@@ -314,6 +360,7 @@ export async function scanLead(id: number): Promise<Lead[]> {
     lead.rating ? `Google rating: ${lead.rating}` : "",
     lead.phone ? `Phone: ${lead.phone}` : "",
     lead.url ? `Website: ${lead.url}` : "",
+    foundEmails.length ? `Emails found on the website: ${foundEmails.join(", ")}` : "",
     siteText ? `Website text:\n${siteText}` : "(No website text available, personalise from the listing details above.)",
   ]
     .filter(Boolean)
@@ -329,10 +376,12 @@ export async function scanLead(id: number): Promise<Lead[]> {
 
   // Keep the phone we parsed from the listing if the model did not return one.
   const phone = (parsed.phone || "").trim() || lead.phone || "";
+  // Prefer the model's email, else the best one we scraped from the site.
+  const email = (parsed.email || "").trim() || foundEmails[0] || "";
 
   await sql`UPDATE outreach_leads SET
     business = ${noDash(parsed.business || lead.business || "")},
-    email = ${(parsed.email || "").trim()},
+    email = ${email},
     phone = ${phone},
     channel = ${(parsed.channel || "").trim()},
     personalisation = ${noDash(parsed.personalisation || "")},

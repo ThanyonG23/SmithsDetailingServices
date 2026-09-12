@@ -113,8 +113,9 @@ export default function OutreachTool() {
         Outreach <span className="text-brand-purple-soft">machine</span>
       </h1>
       <p className="mt-1 text-sm text-white/45">
-        Paste a Google Maps results dump (names, ratings, phones) or website links. Claude writes a personalised giveaway
-        email and a text for each. You review and send from your own Gmail, or text the phone we parsed.
+        Paste website links (best, it scrapes their email) or a Google Maps results dump. Claude writes a personalised
+        giveaway email for each. You review and send from your own Gmail. No email found? Call them instead (cold email and
+        cold calling are the legal channels in AU, not cold texts).
       </p>
 
       {/* paste box */}
@@ -212,10 +213,6 @@ function LeadCard({
     if (lead.status !== "sent") onPatch({ status: "sent" });
   }
 
-  function copySms() {
-    navigator.clipboard?.writeText(lead.sms || body).catch(() => {});
-  }
-
   return (
     <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -299,19 +296,11 @@ function LeadCard({
             </button>
             {lead.phone && (
               <a
-                href={`sms:${lead.phone.replace(/\s+/g, "")}?&body=${encodeURIComponent(lead.sms || body)}`}
+                href={`tel:${lead.phone.replace(/\s+/g, "")}`}
                 className="rounded-xl border border-white/15 px-4 py-2.5 text-sm font-bold text-white/70 transition hover:border-white/35 hover:text-white"
               >
-                Text →
+                Call {lead.phone}
               </a>
-            )}
-            {lead.sms && (
-              <button
-                onClick={copySms}
-                className="rounded-xl border border-white/15 px-4 py-2.5 text-sm font-bold text-white/70 transition hover:border-white/35 hover:text-white"
-              >
-                Copy SMS text
-              </button>
             )}
             {lead.status === "sent" ? (
               <button onClick={() => onPatch({ status: "written" })} className="text-xs text-white/40 underline underline-offset-2 hover:text-white/70">
@@ -323,7 +312,7 @@ function LeadCard({
               </button>
             )}
             {!canGmail && written && (
-              <span className="text-[11px] text-white/40">No email, add one above or use the SMS text.</span>
+              <span className="text-[11px] text-white/40">No email found, add one above, or call them (cold calling is legal in AU).</span>
             )}
           </div>
         </div>
