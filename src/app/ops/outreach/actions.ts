@@ -265,7 +265,7 @@ function extractOutboundLinks(html: string): string[] {
 
 // Fetch a site's text + any emails. Follows a Linktree to a linked website, and
 // if the homepage has no email, tries the common contact pages (bounded).
-async function fetchSite(url: string): Promise<{ text: string; emails: string[] }> {
+async function fetchSite(url: string, follow: boolean = true): Promise<{ text: string; emails: string[] }> {
   let domain = "";
   try {
     domain = new URL(url).hostname.replace(/^www\./, "");
@@ -276,9 +276,10 @@ async function fetchSite(url: string): Promise<{ text: string; emails: string[] 
   let text = htmlToText(homeHtml);
   let emails = extractEmails(homeHtml, domain);
 
-  // Linktree / link-in-bio: no email on the page itself, so follow the first
-  // couple of real (non-social) website links and scrape those instead.
-  if (emails.length === 0 && /linktr\.ee|link-in-bio|beacons\.ai|linkin\.bio/i.test(url)) {
+  // `follow` is off for affiliate/influencer targets: a Linktree's links are the
+  // BRANDS they promote, so following them grabs the wrong email. Those are a DM
+  // channel anyway. We still read the page text for personalisation.
+  if (follow && emails.length === 0 && /linktr\.ee|link-in-bio|beacons\.ai|linkin\.bio/i.test(url)) {
     for (const l of extractOutboundLinks(homeHtml).slice(0, 3)) {
       try {
         const h = await getHtml(l);
@@ -294,7 +295,7 @@ async function fetchSite(url: string): Promise<{ text: string; emails: string[] 
     }
   }
 
-  if (emails.length === 0) {
+  if (follow && emails.length === 0) {
     for (const path of ["/contact", "/contact-us", "/contact-us/", "/contact/", "/contact.html", "/get-a-quote", "/about", "/about-us"]) {
       try {
         const html = await getHtml(new URL(path, url).toString());
@@ -450,7 +451,7 @@ export async function scanLead(id: number): Promise<Lead[]> {
   let foundEmails: string[] = [];
   if (lead.url) {
     try {
-      const site = await fetchSite(lead.url);
+      const site = await fetchSite(lead.url, lead.campaign !== "affiliate");
       siteText = site.text;
       foundEmails = site.emails;
     } catch {
