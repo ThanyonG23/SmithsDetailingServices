@@ -62,16 +62,16 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 function OfferCard({ o }: { o: Offer }) {
   const accentText =
     o.accent === "yellow" ? "text-brand-yellow" : o.accent === "purple" ? "text-brand-purple-soft" : "text-brand-green";
-  const accentBorder =
+  const accentGlow =
     o.accent === "yellow"
-      ? "hover:border-brand-yellow/45"
+      ? "border-brand-yellow/50 shadow-[0_0_0_1px_rgba(255,230,0,0.35),0_0_50px_-6px_rgba(255,230,0,0.65)] hover:shadow-[0_0_0_1px_rgba(255,230,0,0.5),0_0_64px_-6px_rgba(255,230,0,0.85)]"
       : o.accent === "purple"
-        ? "hover:border-brand-purple/45"
-        : "hover:border-brand-green/45";
+        ? "border-brand-purple/55 shadow-[0_0_0_1px_rgba(124,47,245,0.4),0_0_50px_-6px_rgba(124,47,245,0.8)] hover:shadow-[0_0_0_1px_rgba(124,47,245,0.55),0_0_64px_-6px_rgba(124,47,245,1)]"
+        : "border-brand-green/50 shadow-[0_0_0_1px_rgba(43,255,122,0.35),0_0_50px_-6px_rgba(43,255,122,0.65)] hover:shadow-[0_0_0_1px_rgba(43,255,122,0.5),0_0_64px_-6px_rgba(43,255,122,0.9)]";
   return (
     <Link
       href={o.href}
-      className={`group flex h-full flex-col overflow-hidden rounded-3xl border border-white/12 bg-white/[0.02] transition hover:bg-white/[0.035] ${accentBorder}`}
+      className={`group flex h-full flex-col overflow-hidden rounded-3xl border bg-white/[0.02] transition hover:bg-white/[0.035] ${accentGlow}`}
     >
       {/* photo */}
       <div className="relative h-44 overflow-hidden">
