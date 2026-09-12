@@ -1,3 +1,4 @@
+import { cookies } from "next/headers";
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
 import ReviewsSection from "@/components/ReviewsSection";
@@ -130,6 +131,10 @@ function GroupCard({ g }: { g: Group }) {
 }
 
 export default function MembershipContent() {
+  // Affiliate attribution: if the visitor arrived via /g/[code], stamp their code
+  // onto the direct Stripe links so signups on any package are credited.
+  const aff = cookies().get("smiths_aff")?.value || "";
+  const withAff = (u: string) => (aff ? `${u}?client_reference_id=${encodeURIComponent(aff)}` : u);
   return (
     <main className="min-h-screen bg-[#050506]">
       {/* ═══ NAV ═══ */}
@@ -346,7 +351,7 @@ export default function MembershipContent() {
                   <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">✓</span>Priority booking</li>
                   <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">5 free entries into every draw</span></li>
                 </ul>
-                <a href="https://buy.stripe.com/4gM3cv6w02nr52w49J6kg0D" className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-yellow px-6 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95">
+                <a href={withAff("https://buy.stripe.com/4gM3cv6w02nr52w49J6kg0D")} className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-yellow px-6 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-110 active:scale-95">
                   Get the year · $99 →
                 </a>
                 <p className="mt-2.5 flex min-h-[2.5rem] items-start justify-center text-center text-xs text-white/40">One payment a year. 5x the draw entries.</p>
@@ -372,7 +377,7 @@ export default function MembershipContent() {
                   <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">1 free entry into every draw</span></li>
                   <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-white/70">✓</span>Valid 30 days, no renewal</li>
                 </ul>
-                <a href="https://buy.stripe.com/fZueVdbQkbY166A8pZ6kg0H" className="mt-6 flex w-full items-center justify-center rounded-full bg-white px-6 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-95 active:scale-95">
+                <a href={withAff("https://buy.stripe.com/fZueVdbQkbY166A8pZ6kg0H")} className="mt-6 flex w-full items-center justify-center rounded-full bg-white px-6 py-3.5 font-display text-sm font-black text-brand-ink transition hover:brightness-95 active:scale-95">
                   Get the pass · $9.99 →
                 </a>
                 <p className="mt-2.5 flex min-h-[2.5rem] items-start justify-center text-center text-xs text-white/40">One-off. Nothing renews.</p>

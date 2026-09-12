@@ -2,7 +2,7 @@
 
 import { requireOwner } from "@/lib/ops/auth";
 import { sql } from "@/lib/ops/db";
-import { createAffiliatePromo, affiliateEarnings, REVSHARE } from "@/lib/members/affiliates";
+import { affiliateEarnings, REVSHARE } from "@/lib/members/affiliates";
 
 /* Affiliate program admin. Each affiliate is a row here + a Stripe promotion code
    (their share link uses the code). Earnings are read live from Stripe every load,
@@ -36,6 +36,24 @@ export async function revsharePct(): Promise<number> {
   return Math.round(REVSHARE * 100);
 }
 
+// Generate a short, unique affiliate code (first name based). No Stripe object,
+// the code just identifies the affiliate for tracking; the audience perk is
+// double entries in the draw, not a discount.
+function codeBase(name: string): string {
+  const first = (name || "SMITHS").trim().split(/\s+/)[0] || "SMITHS";
+  return first.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12) || "SMITHS";
+}
+async function generateCode(name: string): Promise<string> {
+  const b = codeBase(name);
+  const two = () => String(Math.floor(Math.random() * 90) + 10);
+  const three = () => String(Math.floor(Math.random() * 900) + 100);
+  for (const c of [b, `${b}${two()}`, `${b}${two()}`, `${b}${three()}`]) {
+    const ex = (await sql`SELECT 1 FROM affiliates WHERE code = ${c} LIMIT 1`) as unknown as unknown[];
+    if (ex.length === 0) return c;
+  }
+  return `${b}${Date.now().toString().slice(-4)}`;
+}
+
 export async function listAffiliates(): Promise<Affiliate[]> {
   requireOwner();
   await ensure();
@@ -59,8 +77,7 @@ export async function createAffiliate(name: string, email: string): Promise<{ ok
   await ensure();
   const nm = name.trim();
   if (!nm) return { ok: false, error: "Name is required." };
-  const code = await createAffiliatePromo(nm);
-  if (!code) return { ok: false, error: "Could not create a Stripe code, check STRIPE_SECRET_KEY is set." };
+  const code = await generateCode(nm);
   await sql`INSERT INTO affiliates (code, name, email) VALUES (${code}, ${nm}, ${email.trim()})`;
   return { ok: true, list: await listAffiliates() };
 }
@@ -91,8 +108,7 @@ export async function signupAffiliate(
   const em = email.trim();
   if (nm.length < 2) return { ok: false, error: "Please enter your name." };
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) return { ok: false, error: "Please enter a valid email." };
-  const code = await createAffiliatePromo(nm);
-  if (!code) return { ok: false, error: "Something went wrong creating your code, please try again." };
+  const code = await generateCode(nm);
   await sql`INSERT INTO affiliates (code, name, email, social) VALUES (${code}, ${nm}, ${em}, ${social.trim()})`;
   return { ok: true, code };
 }
