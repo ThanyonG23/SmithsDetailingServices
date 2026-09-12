@@ -3,11 +3,16 @@
 import { useRef, useState } from "react";
 
 /* Self-hosted reels: click-to-play (no autoplay), clean video, no IG chrome. */
-export default function Reels({ reels }: { reels: string[] }) {
+export default function Reels({ reels, labels }: { reels: string[]; labels?: string[] }) {
   return (
     <div className="-mx-4 flex snap-x gap-4 overflow-x-auto px-4 pb-3">
-      {reels.map((src) => (
-        <Reel key={src} src={src} />
+      {reels.map((src, i) => (
+        <div key={src} className="flex-none snap-start">
+          {labels?.[i] && (
+            <div className="mb-2 text-center font-display text-sm font-extrabold text-brand-purple-soft">{labels[i]}</div>
+          )}
+          <Reel src={src} />
+        </div>
       ))}
     </div>
   );

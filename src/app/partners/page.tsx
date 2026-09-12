@@ -148,7 +148,7 @@ export default function PartnersPage() {
           </Reveal>
           <Reveal delay={100}>
             <div className="mt-8">
-              <Reels reels={PARTNER_REELS} />
+              <Reels reels={PARTNER_REELS} labels={["Educational", "Trend", "Comedy", "Giveaway", "Community Event", "Skit"]} />
             </div>
           </Reveal>
         </div>
@@ -251,10 +251,8 @@ export default function PartnersPage() {
                       </li>
                     ))}
                   </ul>
-                  <div className="mt-2.5 flex items-center gap-3 rounded-lg border border-brand-green/30 bg-brand-green/[0.07] px-3 py-2.5 text-xs leading-relaxed text-brand-green">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src="/media/photos/bonus.webp" alt="" className="h-12 w-12 shrink-0 rounded-md object-cover" />
-                    <span><b>BONUS:</b> Everything we make goes on our socials. We&apos;ll send you a personalised batch of content to post on your own socials too.</span>
+                  <div className="mt-2.5 rounded-lg border border-brand-green/30 bg-brand-green/[0.07] px-3 py-2 text-xs leading-relaxed text-brand-green">
+                    <b>BONUS:</b> Everything we make goes on our socials. We&apos;ll send you a personalised batch of content to post on your own socials too.
                   </div>
                 </div>
               </div>
@@ -288,29 +286,33 @@ export default function PartnersPage() {
 
       {/* ═══ HOW IT WORKS ═══ */}
       <section className="border-y border-white/5 bg-white/[0.015] px-4 py-14 sm:py-16">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-4xl">
           <Reveal>
             <h2 className="text-center font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
               How our Platinum partnership works
             </h2>
           </Reveal>
-          <div className="mt-8 flex flex-col gap-4">
+          <div className="mt-10 flex flex-col gap-10 sm:gap-14">
             {STEPS.map((s, i) => (
-              <Reveal key={s.n} delay={i * 90}>
-                <div className="flex items-center gap-5 rounded-2xl border border-white/8 bg-white/[0.02] p-5">
-                  {s.img ? (
+              <Reveal key={s.n} delay={i * 60}>
+                <div
+                  className={`flex flex-col items-center gap-5 text-center sm:gap-10 sm:text-left ${
+                    i % 2 === 0 ? "sm:flex-row" : "sm:flex-row-reverse sm:text-right"
+                  }`}
+                >
+                  {s.img && (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={s.img} alt="" className="h-24 w-24 shrink-0 rounded-xl object-cover sm:h-32 sm:w-32" />
-                  ) : (
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-brand-purple/40 bg-brand-purple/[0.12] font-display text-sm font-black text-brand-purple-soft">
-                      {s.n}
-                    </span>
+                    <img src={s.img} alt="" className="h-44 w-44 shrink-0 rounded-2xl object-cover sm:h-60 sm:w-60" />
                   )}
-                  <div>
-                    <div className="font-display text-base font-extrabold text-white">{s.t}</div>
-                    <div className="mt-0.5 text-sm leading-relaxed text-white/60">{s.d}</div>
+                  <div className="flex-1">
+                    <div className="font-display text-xl font-extrabold text-white sm:text-2xl">{s.t}</div>
+                    <div className="mt-1.5 text-sm leading-relaxed text-white/60 sm:text-base">{s.d}</div>
                     {s.platforms && (
-                      <div className="mt-2.5 flex flex-wrap gap-2">
+                      <div
+                        className={`mt-3 flex flex-wrap gap-2 justify-center ${
+                          i % 2 === 0 ? "sm:justify-start" : "sm:justify-end"
+                        }`}
+                      >
                         {s.platforms.map((p) => (
                           <span key={p} className="rounded-full border border-brand-purple/30 bg-brand-purple/[0.1] px-3 py-1 text-[11px] font-bold text-brand-purple-soft">
                             {p}
