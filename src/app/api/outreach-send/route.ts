@@ -50,6 +50,29 @@ Thanyon
 Smiths Detailing Services`;
 }
 
+function affFollowup1(name: string): string {
+  return `Hey ${name}, just floating this back up.
+
+It's genuinely free and takes a minute, 25% recurring on every member you send, for as long as they stay. A few shares could be a tidy passive earner.
+
+Your link: smithsdetailingservices.com.au/earn
+
+Worth a look?
+
+Thanyon`;
+}
+
+function affFollowup2(name: string): string {
+  return `Hey ${name}, last one from me.
+
+If it's not for you, no stress at all. But if you want a passive 25% cut for sharing a $1 giveaway your audience will actually love, the door's open: smithsdetailingservices.com.au/earn
+
+Either way, keep doing your thing.
+
+Thanyon
+Smiths Detailing Services`;
+}
+
 export async function GET(req: Request) {
   const token = new URL(req.url).searchParams.get("token") || req.headers.get("x-cron-token") || "";
   if (!process.env.OUTREACH_CRON_TOKEN || token !== process.env.OUTREACH_CRON_TOKEN) {
@@ -81,11 +104,11 @@ export async function GET(req: Request) {
 
   // 1) Follow-ups that are due. Reply-check each before sending.
   const followups = (await sql`
-    SELECT id, email, business, subject, body, sent_at, stage FROM outreach_leads
+    SELECT id, email, business, subject, body, sent_at, stage, campaign FROM outreach_leads
     WHERE approved AND NOT replied AND NOT stopped AND NOT bounced AND email <> ''
       AND stage IN (1, 2) AND next_action_at IS NOT NULL AND next_action_at <= now()
     ORDER BY next_action_at ASC LIMIT 5
-  `) as unknown as { id: number; email: string; business: string; subject: string; body: string; sent_at: string; stage: number }[];
+  `) as unknown as { id: number; email: string; business: string; subject: string; body: string; sent_at: string; stage: number; campaign: string }[];
 
   for (const l of followups) {
     if (l.sent_at && (await hasReplied(l.email, new Date(l.sent_at)))) {
@@ -93,8 +116,12 @@ export async function GET(req: Request) {
       continue; // they answered, try the next candidate instead
     }
     const name = greetName(l.body);
-    const text = (l.stage === 1 ? followup1(name, l.business) : followup2(name, l.business)) + OPT_OUT;
-    const subject = "Re: " + (l.subject || "Cairns, you have seen our marketing");
+    const aff = l.campaign === "affiliate";
+    const bodyText = aff
+      ? (l.stage === 1 ? affFollowup1(name) : affFollowup2(name))
+      : (l.stage === 1 ? followup1(name, l.business) : followup2(name, l.business));
+    const text = bodyText + OPT_OUT;
+    const subject = "Re: " + (l.subject || (aff ? "Are you good at being an affiliate?" : "Cairns, you have seen our marketing"));
     const res = await sendMail(l.email, subject, text);
     if (res.ok) {
       if (l.stage === 1) {

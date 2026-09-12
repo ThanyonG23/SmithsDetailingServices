@@ -34,6 +34,7 @@ const STATUS_STYLE: Record<string, string> = {
 export default function OutreachTool() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [paste, setPaste] = useState("");
+  const [campaign, setCampaign] = useState<"partner" | "affiliate">("partner");
   const [busy, setBusy] = useState(false);
   const [scanning, setScanning] = useState<number | null>(null);
   const [scanAll, setScanAll] = useState(false);
@@ -66,7 +67,7 @@ export default function OutreachTool() {
     if (!paste.trim()) return;
     setBusy(true);
     try {
-      setLeads(await addListings(paste));
+      setLeads(await addListings(paste, campaign));
       setPaste("");
     } catch {
       /* ignore */
@@ -135,7 +136,28 @@ export default function OutreachTool() {
 
       {/* paste box */}
       <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-        <div className="text-[10px] font-bold uppercase tracking-wider text-white/40">Paste a Google Maps list, or website links</div>
+        <div className="mb-3 flex items-center gap-2">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-white/40">Campaign</span>
+          <div className="inline-flex rounded-full border border-white/15 bg-black/30 p-1 text-[11px] font-black uppercase tracking-[0.08em]">
+            <button
+              type="button"
+              onClick={() => setCampaign("partner")}
+              className={`rounded-full px-4 py-1.5 transition ${campaign === "partner" ? "bg-brand-purple text-white" : "text-white/50 hover:text-white"}`}
+            >
+              Giveaway partners
+            </button>
+            <button
+              type="button"
+              onClick={() => setCampaign("affiliate")}
+              className={`rounded-full px-4 py-1.5 transition ${campaign === "affiliate" ? "bg-brand-green text-[#04130a]" : "text-white/50 hover:text-white"}`}
+            >
+              Affiliates
+            </button>
+          </div>
+        </div>
+        <div className="text-[10px] font-bold uppercase tracking-wider text-white/40">
+          {campaign === "affiliate" ? "Paste links/handles of people with an audience" : "Paste a Google Maps list, or website links"}
+        </div>
         <textarea
           value={paste}
           onChange={(e) => setPaste(e.target.value)}
@@ -273,6 +295,7 @@ function LeadCard({
             </a>
           )}
           <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-white/45">
+            {lead.campaign === "affiliate" && <span className="font-bold text-brand-green">affiliate recruit</span>}
             {lead.category && <span>{lead.category}</span>}
             {lead.rating && <span>★ {lead.rating}</span>}
             {lead.phone && <span>{lead.phone}</span>}

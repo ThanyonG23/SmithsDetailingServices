@@ -26,6 +26,7 @@ export type Lead = {
   sms: string;
   status: string; // new | written | sent | skipped
   error: string;
+  campaign: string; // partner | affiliate
   // Auto-send pipeline
   approved: boolean;
   stage: number; // 0 not sent, 1 initial sent, 2 follow-up 1 sent, 3 final sent (done)
@@ -70,6 +71,7 @@ async function ensure() {
   await sql`ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS stopped boolean NOT NULL DEFAULT false`;
   await sql`ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS bounced boolean NOT NULL DEFAULT false`;
   await sql`ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS send_error text NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS campaign text NOT NULL DEFAULT 'partner'`;
   ready = true;
 }
 
@@ -83,7 +85,7 @@ export async function getOutreach(): Promise<Lead[]> {
   await ensure();
   const rows = (await sql`
     SELECT id, url, business, category, address, rating, email, phone, channel,
-           personalisation, prize, subject, body, sms, status, error,
+           personalisation, prize, subject, body, sms, status, error, campaign,
            approved, stage, replied, stopped, bounced, send_error, next_action_at
     FROM outreach_leads ORDER BY id DESC
   `) as unknown as Lead[];
@@ -172,9 +174,10 @@ function parseListings(text: string): Parsed[] {
   return out;
 }
 
-export async function addListings(text: string): Promise<Lead[]> {
+export async function addListings(text: string, campaign: string = "partner"): Promise<Lead[]> {
   requireOwner();
   await ensure();
+  const camp = campaign === "affiliate" ? "affiliate" : "partner";
   const parsed = parseListings(text);
 
   // Dedupe against existing rows and within this paste, by business name (Maps)
@@ -189,8 +192,8 @@ export async function addListings(text: string): Promise<Lead[]> {
     if (p.url && seenUrl.has(p.url)) continue;
     if (p.business) seenBiz.add(bizKey);
     if (p.url) seenUrl.add(p.url);
-    await sql`INSERT INTO outreach_leads (url, business, category, address, phone, rating, status)
-      VALUES (${p.url}, ${p.business}, ${p.category}, ${p.address}, ${p.phone}, ${p.rating}, 'new')`;
+    await sql`INSERT INTO outreach_leads (url, business, category, address, phone, rating, status, campaign)
+      VALUES (${p.url}, ${p.business}, ${p.category}, ${p.address}, ${p.phone}, ${p.rating}, 'new', ${camp})`;
   }
   return getOutreach();
 }
@@ -311,7 +314,45 @@ RULES:
 
 Output STRICT JSON only, no markdown fences, with exactly these keys: business, email, phone, channel, personalisation, prize, subject, body, sms.`;
 
-async function callClaude(model: string, key: string, context: string): Promise<string | null> {
+const AFFILIATE_SYSTEM_PROMPT = `You write cold outreach for Thanyon from Smiths Detailing Services in Cairns, Australia, recruiting AFFILIATES for the Smiths partner program.
+
+The offer: Smiths runs a giveaway (win $1,000 for a $1 entry). Affiliates earn 25% of everything their referred members pay, recurring, for as long as the member stays. Free to join, they just share a link. Their audience gets double entries for using their link. They sign up and get their link at smithsdetailingservices.com.au/earn.
+
+The target is a person with an audience (an influencer, content creator, community page, or someone who promotes things). You are given details about them (name/handle, category, area, and if available the text of their website or profile). Use whatever is provided.
+
+Do two things:
+1. Extract, using ONLY what is provided (never invent): their name or handle; contact email (or "" if none); phone (or ""); the best channel to reach them (email, phone, socials, form, none); and ONE genuine personalisation detail about their audience or content.
+2. Write the recruitment email (subject + body) and a short SMS version.
+
+Use this template closely, swapping in a genuine personalised line one:
+
+Subject: Are you good at being an affiliate?
+
+Hey [First name], Thanyon here from Smiths.
+
+[ONE personalised line about their audience or content, then tie it in, e.g. "You clearly know how to work an audience, so this is right up your alley."]
+
+We run a giveaway here in Cairns, win $1,000 for a $1 entry, and we pay 25% of every member you send us, every month, for as long as they stay. Free to join, you just drop a link in your bio or posts.
+
+"Win $1k for $1" sells itself, and your audience gets double entries through your link, so it actually converts.
+
+Grab your link here, takes 60 seconds: smithsdetailingservices.com.au/earn
+
+Need more information?
+
+Thanyon
+Smiths Detailing Services
+
+RULES:
+- If you find their first name, use it; otherwise write "Hey Mate,". Never output the literal text [First name].
+- NEVER use em dashes or en dashes. Use commas.
+- Australian spelling, warm, direct, human tone. Keep it short.
+- Only reference details actually provided. Never invent facts, follower counts or results.
+- SMS version: one short paragraph, no subject line, same offer, end with the link and "want your link?".
+
+Output STRICT JSON only, no markdown fences, with exactly these keys: business, email, phone, channel, personalisation, prize, subject, body, sms. Set prize to "".`;
+
+async function callClaude(model: string, key: string, context: string, system: string): Promise<string | null> {
   try {
     const r = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -319,7 +360,7 @@ async function callClaude(model: string, key: string, context: string): Promise<
       body: JSON.stringify({
         model,
         max_tokens: 1600,
-        system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
+        system: [{ type: "text", text: system, cache_control: { type: "ephemeral" } }],
         messages: [{ role: "user", content: context }],
       }),
     });
@@ -352,8 +393,8 @@ export async function scanLead(id: number): Promise<Lead[]> {
   await ensure();
   const key = process.env.ANTHROPIC_API_KEY;
   const rows = (await sql`
-    SELECT url, business, category, address, rating, phone FROM outreach_leads WHERE id = ${id}
-  `) as unknown as { url: string; business: string; category: string; address: string; rating: string; phone: string }[];
+    SELECT url, business, category, address, rating, phone, campaign FROM outreach_leads WHERE id = ${id}
+  `) as unknown as { url: string; business: string; category: string; address: string; rating: string; phone: string; campaign: string }[];
   const lead = rows[0];
   if (!lead) return getOutreach();
 
@@ -392,8 +433,9 @@ export async function scanLead(id: number): Promise<Lead[]> {
     .filter(Boolean)
     .join("\n");
 
-  let raw = await callClaude("claude-sonnet-5", key, context);
-  if (!raw) raw = await callClaude("claude-haiku-4-5-20251001", key, context);
+  const systemPrompt = lead.campaign === "affiliate" ? AFFILIATE_SYSTEM_PROMPT : SYSTEM_PROMPT;
+  let raw = await callClaude("claude-sonnet-5", key, context, systemPrompt);
+  if (!raw) raw = await callClaude("claude-haiku-4-5-20251001", key, context, systemPrompt);
   const parsed = raw ? parseJson(raw) : null;
   if (!parsed) {
     await sql`UPDATE outreach_leads SET status = 'new', error = 'AI could not draft this one, try rescan', updated_at = now() WHERE id = ${id}`;
