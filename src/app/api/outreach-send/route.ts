@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
 const START_HOUR = 7; // 7am
-const END_HOUR = 21; // stop sending at 9pm (send while hour < 21)
+const END_HOUR = 22; // send through the 9pm hour (skip once hour >= 22)
 const MIN_GAP_MIN = 50; // keep roughly one per hour even if the cron double-fires
 const DAILY_CAP = 16;
 const OPT_OUT = "\n\nNot interested? Just reply and I will take you off my list.";
@@ -69,11 +69,15 @@ export async function GET(req: Request) {
   `) as unknown as { h: number; sent_today: number; mins_since_last: number | null }[];
   const { h, sent_today, mins_since_last } = clock[0];
 
-  if (h < START_HOUR || h >= END_HOUR) return j({ ok: true, sent: 0, skipped: `outside send window (Cairns hour ${h})` });
-  if (mins_since_last !== null && mins_since_last < MIN_GAP_MIN) {
-    return j({ ok: true, sent: 0, skipped: `rate limit, last send ${Math.round(mins_since_last)}m ago` });
+  // ?force=1 bypasses the window/rate/cap guards, for a manual self-test.
+  const force = new URL(req.url).searchParams.get("force") === "1";
+  if (!force) {
+    if (h < START_HOUR || h >= END_HOUR) return j({ ok: true, sent: 0, skipped: `outside send window (Cairns hour ${h})` });
+    if (mins_since_last !== null && mins_since_last < MIN_GAP_MIN) {
+      return j({ ok: true, sent: 0, skipped: `rate limit, last send ${Math.round(mins_since_last)}m ago` });
+    }
+    if (sent_today >= DAILY_CAP) return j({ ok: true, sent: 0, skipped: `daily cap ${DAILY_CAP} reached` });
   }
-  if (sent_today >= DAILY_CAP) return j({ ok: true, sent: 0, skipped: `daily cap ${DAILY_CAP} reached` });
 
   // 1) Follow-ups that are due. Reply-check each before sending.
   const followups = (await sql`
