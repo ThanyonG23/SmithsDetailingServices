@@ -2,8 +2,17 @@ import type { Metadata } from "next";
 import Reveal from "@/components/Reveal";
 import SiteNav from "@/components/SiteNav";
 import BusinessPartnerForm from "@/components/BusinessPartnerForm";
-import InstagramReels from "@/components/InstagramReels";
+import Reels from "@/components/Reels";
 import { BUSINESS } from "@/lib/config";
+
+const PARTNER_REELS = [
+  "/media/videos/reel1.mp4",
+  "/media/videos/reel2.mp4",
+  "/media/videos/reel3.mp4",
+  "/media/videos/reel4.mp4",
+  "/media/videos/reel5.mp4",
+  "/media/videos/reel6.mp4",
+];
 
 export const metadata: Metadata = {
   title: "Partner with Smiths",
@@ -133,13 +142,15 @@ export default function PartnersPage() {
                 Every style of content, for your brand
               </h2>
               <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-white/60">
-                Educational, community, skits, comedy, giveaways, trends. Whatever suits your business, we make it. Watch them right here.
+                Educational, community, skits, comedy, giveaways, trends. Whatever suits your business, we make it. Swipe to watch.
               </p>
             </div>
           </Reveal>
-          <div className="mt-8">
-            <InstagramReels />
-          </div>
+          <Reveal delay={100}>
+            <div className="mt-8">
+              <Reels reels={PARTNER_REELS} />
+            </div>
+          </Reveal>
         </div>
       </section>
 
@@ -240,8 +251,10 @@ export default function PartnersPage() {
                       </li>
                     ))}
                   </ul>
-                  <div className="mt-2.5 rounded-lg border border-brand-green/30 bg-brand-green/[0.07] px-3 py-2 text-xs leading-relaxed text-brand-green">
-                    <b>BONUS:</b> Everything we make goes on our socials. We&apos;ll send you a personalised batch of content to post on your own socials too.
+                  <div className="mt-2.5 flex items-center gap-3 rounded-lg border border-brand-green/30 bg-brand-green/[0.07] px-3 py-2.5 text-xs leading-relaxed text-brand-green">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src="/media/photos/bonus.webp" alt="" className="h-12 w-12 shrink-0 rounded-md object-cover" />
+                    <span><b>BONUS:</b> Everything we make goes on our socials. We&apos;ll send you a personalised batch of content to post on your own socials too.</span>
                   </div>
                 </div>
               </div>
