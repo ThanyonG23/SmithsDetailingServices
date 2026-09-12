@@ -278,7 +278,7 @@ Thanyon
 Smiths Detailing Services
 
 RULES:
-- If you find an owner or contact first name, use it in the greeting; otherwise keep [First name].
+- If you find an owner or contact first name, use it in the greeting; otherwise write "Hey Mate,". Never output the literal text [First name].
 - NEVER use em dashes or en dashes anywhere. Use commas.
 - Australian spelling, warm, direct, human tone.
 - Only reference details that are actually provided. Never invent results, awards, reviews or facts.
@@ -320,6 +320,8 @@ function parseJson(raw: string): Record<string, string> | null {
 }
 
 const noDash = (s: string) => String(s || "").replace(/\s*[—–]\s*/g, ", ").replace(/,\s*,/g, ",");
+// No name found? Any leftover "[First name]" slot becomes "Mate".
+const fixName = (s: string) => noDash(s).replace(/\[\s*first\s*name\s*\]/gi, "Mate");
 
 export async function scanLead(id: number): Promise<Lead[]> {
   requireOwner();
@@ -387,8 +389,8 @@ export async function scanLead(id: number): Promise<Lead[]> {
     personalisation = ${noDash(parsed.personalisation || "")},
     prize = ${noDash(parsed.prize || "")},
     subject = ${noDash(parsed.subject || "Cairns, you have seen our marketing")},
-    body = ${noDash(parsed.body || "")},
-    sms = ${noDash(parsed.sms || "")},
+    body = ${fixName(parsed.body || "")},
+    sms = ${fixName(parsed.sms || "")},
     status = 'written',
     error = '',
     updated_at = now()
