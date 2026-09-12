@@ -16,7 +16,7 @@ type Offer = {
   tag: string;
   cta: string;
   live: boolean;
-  accent: "green" | "yellow";
+  accent: "green" | "yellow" | "purple";
 };
 
 const OFFERS: Offer[] = [
@@ -42,6 +42,17 @@ const OFFERS: Offer[] = [
     live: true,
     accent: "yellow",
   },
+  {
+    href: "/partners",
+    image: "/media/photos/partners-card.jpg",
+    icon: "🤝",
+    title: "Partners",
+    desc: "Own a business? We market it for you, done-for-you content posted everywhere, plus a spot in our giveaways. $132k spent learning what gets local attention.",
+    tag: "For business",
+    cta: "Partner with us",
+    live: true,
+    accent: "purple",
+  },
 ];
 
 function Eyebrow({ children }: { children: React.ReactNode }) {
@@ -49,8 +60,14 @@ function Eyebrow({ children }: { children: React.ReactNode }) {
 }
 
 function OfferCard({ o }: { o: Offer }) {
-  const accentText = o.accent === "yellow" ? "text-brand-yellow" : "text-brand-green";
-  const accentBorder = o.accent === "yellow" ? "hover:border-brand-yellow/45" : "hover:border-brand-green/45";
+  const accentText =
+    o.accent === "yellow" ? "text-brand-yellow" : o.accent === "purple" ? "text-brand-purple-soft" : "text-brand-green";
+  const accentBorder =
+    o.accent === "yellow"
+      ? "hover:border-brand-yellow/45"
+      : o.accent === "purple"
+        ? "hover:border-brand-purple/45"
+        : "hover:border-brand-green/45";
   return (
     <Link
       href={o.href}
@@ -127,7 +144,7 @@ export default function LandingHub() {
 
       {/* ═══ OFFERS ═══ */}
       <section className="relative z-10 -mt-10 px-4 pb-8">
-        <div className="mx-auto grid max-w-3xl gap-5 md:grid-cols-2">
+        <div className="mx-auto grid max-w-5xl gap-5 md:grid-cols-3">
           {OFFERS.map((o, i) => (
             <Reveal key={o.title} delay={i * 100}>
               <OfferCard o={o} />
@@ -169,6 +186,7 @@ export default function LandingHub() {
               <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-sm">
                 <Link href="/detailing" className="font-semibold text-white/70 transition hover:text-white">Detailing</Link>
                 <Link href="/membership" className="font-semibold text-white/70 transition hover:text-white">Membership</Link>
+                <Link href="/partners" className="font-semibold text-white/70 transition hover:text-white">Partners</Link>
               </div>
             </div>
             <div className="text-sm text-white/60">
