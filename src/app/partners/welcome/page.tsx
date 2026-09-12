@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 const GETS = [
   "A full content shoot day at your business every month",
   "Everything posted across our socials every week, all month",
-  "Content sent to you too, recorded, edited and ready to post on your own",
+  "A personalised batch of content sent to you, ready to post on your own socials",
   "Featured in our giveaways and offered as a member discount",
   "Links to your site on our website and members portal",
 ];
@@ -45,7 +45,7 @@ export default function PartnerWelcomePage() {
               {[
                 "We call you to book your first full content day.",
                 "Our team comes out and shoots a batch of content at your business.",
-                "It goes live across our socials, and we send you the lot to post on your own too.",
+                "It goes live across our socials, and we send you a personalised batch to post on yours too.",
               ].map((s, i) => (
                 <li key={s} className="flex items-start gap-3">
                   <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-purple font-display text-xs font-black text-white">

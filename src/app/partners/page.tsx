@@ -216,7 +216,7 @@ export default function PartnersPage() {
                     ))}
                   </ul>
                   <div className="mt-2.5 rounded-lg border border-brand-green/30 bg-brand-green/[0.07] px-3 py-2 text-xs leading-relaxed text-brand-green">
-                    <b>BONUS:</b> everything we make goes on our socials AND gets sent to you, recorded, edited and ready to post on your own.
+                    <b>BONUS:</b> Everything we make goes on our socials. We&apos;ll send you a personalised batch of content to post on your own socials too.
                   </div>
                 </div>
               </div>
@@ -240,7 +240,7 @@ export default function PartnersPage() {
               >
                 Or book a call to discuss →
               </a>
-              <p className="mt-2.5 text-center text-[11px] leading-relaxed text-white/45">
+              <p className="mt-2.5 text-center text-[11px] font-semibold leading-relaxed text-brand-green">
                 No lock-in contracts. Hate it? Cancel any time, and we&apos;ll send all our work across to you.
               </p>
             </div>
