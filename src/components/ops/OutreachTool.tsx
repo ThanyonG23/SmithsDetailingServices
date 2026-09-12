@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   getOutreach,
-  addUrls,
+  addListings,
   scanLead,
   updateLead,
   deleteLead,
@@ -51,7 +51,7 @@ export default function OutreachTool() {
     if (!paste.trim()) return;
     setBusy(true);
     try {
-      setLeads(await addUrls(paste));
+      setLeads(await addListings(paste));
       setPaste("");
     } catch {
       /* ignore */
@@ -113,18 +113,18 @@ export default function OutreachTool() {
         Outreach <span className="text-brand-purple-soft">machine</span>
       </h1>
       <p className="mt-1 text-sm text-white/45">
-        Paste Google listings or website links, Claude scans each site and writes a personalised giveaway email. You review
-        and send from your own Gmail in one click.
+        Paste a Google Maps results dump (names, ratings, phones) or website links. Claude writes a personalised giveaway
+        email and a text for each. You review and send from your own Gmail, or text the phone we parsed.
       </p>
 
       {/* paste box */}
       <div className="mt-6 rounded-2xl border border-white/10 bg-white/[0.02] p-4">
-        <div className="text-[10px] font-bold uppercase tracking-wider text-white/40">Paste listings or links, one per line</div>
+        <div className="text-[10px] font-bold uppercase tracking-wider text-white/40">Paste a Google Maps list, or website links</div>
         <textarea
           value={paste}
           onChange={(e) => setPaste(e.target.value)}
           rows={4}
-          placeholder={"https://www.example.com.au/\nhttps://www.anotherbusiness.com/"}
+          placeholder={"Paste the whole Google Maps results list here, or website links one per line."}
           className="mt-2 w-full resize-y rounded-xl border border-white/12 bg-black/40 px-3.5 py-2.5 text-sm text-white outline-none placeholder:text-white/25 focus:border-brand-purple-soft"
         />
         <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -226,12 +226,16 @@ function LeadCard({
               {lead.status}
             </span>
           </div>
-          <a href={lead.url} target="_blank" rel="noreferrer" className="mt-0.5 block truncate text-xs text-brand-purple-soft underline underline-offset-2 hover:text-white">
-            {host}
-          </a>
+          {lead.url && (
+            <a href={lead.url} target="_blank" rel="noreferrer" className="mt-0.5 block truncate text-xs text-brand-purple-soft underline underline-offset-2 hover:text-white">
+              {host}
+            </a>
+          )}
           <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-white/45">
-            {lead.channel && <span>channel: {lead.channel}</span>}
+            {lead.category && <span>{lead.category}</span>}
+            {lead.rating && <span>★ {lead.rating}</span>}
             {lead.phone && <span>{lead.phone}</span>}
+            {lead.channel && <span>via {lead.channel}</span>}
             {lead.prize && <span>prize: {lead.prize}</span>}
           </div>
           {lead.error && <div className="mt-1 text-[11px] font-semibold text-red-300">{lead.error}</div>}
@@ -293,6 +297,14 @@ function LeadCard({
             >
               Open in Gmail →
             </button>
+            {lead.phone && (
+              <a
+                href={`sms:${lead.phone.replace(/\s+/g, "")}?&body=${encodeURIComponent(lead.sms || body)}`}
+                className="rounded-xl border border-white/15 px-4 py-2.5 text-sm font-bold text-white/70 transition hover:border-white/35 hover:text-white"
+              >
+                Text →
+              </a>
+            )}
             {lead.sms && (
               <button
                 onClick={copySms}

@@ -3,16 +3,19 @@
 import { requireOwner } from "@/lib/ops/auth";
 import { sql } from "@/lib/ops/db";
 
-/* Outreach tool: paste business listings / URLs, Claude scans each website and
-   writes a personalised giveaway-partner cold email, then the owner sends each
-   one from their own Gmail via a compose link (no auto-blasting, keeps the
-   account safe and stays Spam-Act compliant). One lazily-created table. Reads
+/* Outreach tool: paste a Google Maps results dump (names, categories, ratings,
+   phones) OR website links. Claude writes a personalised giveaway-partner cold
+   email + SMS for each, and the owner sends from their own Gmail (compose link)
+   or texts the phone we parsed. No auto-blasting. One lazily-created table, reads
    run sequentially (the pooler deadlocks on parallel reads). */
 
 export type Lead = {
   id: number;
   url: string;
   business: string;
+  category: string;
+  address: string;
+  rating: string;
   email: string;
   phone: string;
   channel: string;
@@ -45,6 +48,10 @@ async function ensure() {
     created_at timestamptz NOT NULL DEFAULT now(),
     updated_at timestamptz NOT NULL DEFAULT now()
   )`;
+  // Migrate: fields that come from a Google Maps dump.
+  await sql`ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS category text NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS address text NOT NULL DEFAULT ''`;
+  await sql`ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS rating text NOT NULL DEFAULT ''`;
   ready = true;
 }
 
@@ -52,20 +59,18 @@ export async function getOutreach(): Promise<Lead[]> {
   requireOwner();
   await ensure();
   const rows = (await sql`
-    SELECT id, url, business, email, phone, channel, personalisation, prize, subject, body, sms, status, error
+    SELECT id, url, business, category, address, rating, email, phone, channel,
+           personalisation, prize, subject, body, sms, status, error
     FROM outreach_leads ORDER BY id DESC
   `) as unknown as Lead[];
   return rows;
 }
 
-// Pull a real https URL out of a pasted line, unwrapping Google redirect links.
+// Pull a real https URL out of a line, unwrapping Google redirect links.
 function extractUrl(line: string): string | null {
-  const raw = line.trim();
-  if (!raw) return null;
-  const m = raw.match(/https?:\/\/[^\s]+/i);
+  const m = line.match(/https?:\/\/[^\s]+/i);
   if (!m) return null;
   let u = m[0].replace(/[)>,.]+$/, "");
-  // Unwrap google.com/url?url=<real>&... redirect wrappers.
   if (/google\.[a-z.]+\/url/i.test(u)) {
     try {
       const inner = new URL(u).searchParams.get("url") || new URL(u).searchParams.get("q");
@@ -77,27 +82,95 @@ function extractUrl(line: string): string | null {
   return u;
 }
 
-export async function addUrls(text: string): Promise<Lead[]> {
+type Parsed = { url: string; business: string; category: string; address: string; phone: string; rating: string };
+
+const NOISE = new Set([
+  "website", "directions", "sponsored", "visit site", "share", "all filters", "results", "rating", "hours",
+  "update results when map moves", "back to top", "layers", "online estimates", "online appointments",
+  "in-store shopping", "delivery", "pest control",
+]);
+const PHONE_RE = /(\(07\)\s?\d{4}\s?\d{4}|\(0\d\)\s?\d{4}\s?\d{4}|1300\s?\d{3}\s?\d{3}|13\s?\d{2}\s?\d{2}|0\d{3}\s?\d{3}\s?\d{3}|0\d\s?\d{4}\s?\d{4})/;
+const RATING_RE = /^(\d(?:\.\d)?)\(([\d,]+)\)$/;
+const CATEGORY_HINT = /service|store|gardener|landscaper|inspector|cleaner|supermarket|contractor|centre|center|collection|market|nursery|shop/i;
+
+// Parse a Google Maps results dump into leads. Businesses appear as a duplicated
+// name line, then rating / category+address / hours+phone lines. Also accepts
+// standalone website URLs.
+function parseListings(text: string): Parsed[] {
+  const lines = String(text || "")
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0);
+
+  const out: Parsed[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    const name = lines[i];
+    const duplicated = lines[i + 1] === name && name.length >= 3 && !NOISE.has(name.toLowerCase());
+    if (duplicated) {
+      // Gather this business's block: the lines after the duplicated name, up to
+      // the next duplicated-name marker (or a small window).
+      const block: string[] = [];
+      let j = i + 2;
+      for (; j < lines.length && j < i + 10; j++) {
+        if (lines[j + 1] === lines[j] && lines[j].length >= 3 && !NOISE.has(lines[j].toLowerCase())) break;
+        block.push(lines[j]);
+      }
+      let rating = "", phone = "", category = "", address = "";
+      for (const bl of block) {
+        const rm = bl.match(RATING_RE);
+        if (rm && !rating) { rating = `${rm[1]} (${rm[2]})`; continue; }
+        if (/^no reviews$/i.test(bl) && !rating) { rating = "No reviews"; continue; }
+        const isHours = /\b(open|closed|opens|closes|temporarily)\b/i.test(bl);
+        if (!isHours && !category && bl.includes("·")) {
+          const parts = bl.split("·").map((s) => s.trim()).filter(Boolean);
+          category = parts[0] || "";
+          address = parts.slice(1).join(", ");
+          continue;
+        }
+        if (!isHours && !category && !PHONE_RE.test(bl) && CATEGORY_HINT.test(bl) && bl.length < 60) {
+          category = bl;
+          continue;
+        }
+      }
+      // Phone: prefer the hours line, else anywhere in the block.
+      for (const bl of block) {
+        const pm = bl.match(PHONE_RE);
+        if (pm) { phone = pm[0].replace(/\s+/g, " ").trim(); break; }
+      }
+      out.push({ url: "", business: name, category, address, phone, rating });
+      i = j - 1;
+      continue;
+    }
+    // Standalone URL line (when pasting website links instead of a Maps dump).
+    const u = extractUrl(name);
+    if (u) out.push({ url: u, business: "", category: "", address: "", phone: "", rating: "" });
+  }
+  return out;
+}
+
+export async function addListings(text: string): Promise<Lead[]> {
   requireOwner();
   await ensure();
-  const lines = String(text || "").split(/\r?\n/);
-  const urls: string[] = [];
-  for (const line of lines) {
-    const u = extractUrl(line);
-    if (u) urls.push(u);
-  }
-  // Dedupe against what's already in the table and within this paste.
-  const existing = (await sql`SELECT url FROM outreach_leads`) as unknown as { url: string }[];
-  const seen = new Set(existing.map((r) => r.url));
-  for (const u of urls) {
-    if (seen.has(u)) continue;
-    seen.add(u);
-    await sql`INSERT INTO outreach_leads (url, status) VALUES (${u}, 'new')`;
+  const parsed = parseListings(text);
+
+  // Dedupe against existing rows and within this paste, by business name (Maps)
+  // or by URL (link paste).
+  const existing = (await sql`SELECT business, url FROM outreach_leads`) as unknown as { business: string; url: string }[];
+  const seenBiz = new Set(existing.map((r) => r.business.toLowerCase()).filter(Boolean));
+  const seenUrl = new Set(existing.map((r) => r.url).filter(Boolean));
+
+  for (const p of parsed) {
+    const bizKey = p.business.toLowerCase();
+    if (p.business && seenBiz.has(bizKey)) continue;
+    if (p.url && seenUrl.has(p.url)) continue;
+    if (p.business) seenBiz.add(bizKey);
+    if (p.url) seenUrl.add(p.url);
+    await sql`INSERT INTO outreach_leads (url, business, category, address, phone, rating, status)
+      VALUES (${p.url}, ${p.business}, ${p.category}, ${p.address}, ${p.phone}, ${p.rating}, 'new')`;
   }
   return getOutreach();
 }
 
-// Fetch a website and return a trimmed plain-text version for the model.
 async function fetchSiteText(url: string): Promise<string> {
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), 15000);
@@ -108,15 +181,15 @@ async function fetchSiteText(url: string): Promise<string> {
       redirect: "follow",
     });
     const html = await r.text();
-    const text = html
+    return html
       .replace(/<script[\s\S]*?<\/script>/gi, " ")
       .replace(/<style[\s\S]*?<\/style>/gi, " ")
       .replace(/<[^>]+>/g, " ")
       .replace(/&nbsp;/gi, " ")
       .replace(/&amp;/gi, "&")
       .replace(/\s+/g, " ")
-      .trim();
-    return text.slice(0, 6000);
+      .trim()
+      .slice(0, 6000);
   } finally {
     clearTimeout(t);
   }
@@ -126,9 +199,13 @@ const SYSTEM_PROMPT = `You write cold outreach for Thanyon from Smiths Detailing
 
 Smiths runs local giveaways to a growing Cairns audience. The offer (an attraction offer) invites a local business to be the PRIZE in the next giveaway, for free: Smiths comes and shoots a batch of content, features the business through the whole giveaway and the winner reveal to the entire local audience, gives a direct link back, and the business keeps the content. Their only cost is one prize. Plus a guarantee: if they do not feel they got enough value, Thanyon refunds the cost of their prize.
 
-You are given the plain text of ONE business's website. Do two things:
-1. Extract, using ONLY what is actually on the site (never invent): business name; contact email (or ""); phone (or ""); the best channel to reach them (one of: email, phone, socials, form, none); ONE genuine specific personalisation detail; and a suggested giveaway prize that fits their business.
+You are given details about ONE business. This may include Google listing info (name, category, area/address, Google rating, phone) and, if available, the text of their website. Use whatever is provided.
+
+Do two things:
+1. Extract, using ONLY what is provided (never invent): business name; contact email (or "" if none is present); phone (or ""); the best channel to reach them (one of: email, phone, socials, form, none); ONE genuine specific personalisation detail; and a suggested giveaway prize that fits their business.
 2. Write the personalised email (subject + body) and a short SMS version.
+
+If no website text is provided, personalise from the listing, for example a strong review count ("a 5.0 from 316 reviews is seriously impressive"), their category, or their Cairns area/suburb. If no email is available, set email to "" and channel to "phone", and the SMS version is then the main way it will be sent.
 
 Follow this template closely, swapping in the personalisation, business name and prize:
 
@@ -158,16 +235,16 @@ Thanyon
 Smiths Detailing Services
 
 RULES:
-- If you find an owner or contact first name on the site, use it in the greeting; otherwise keep [First name].
+- If you find an owner or contact first name, use it in the greeting; otherwise keep [First name].
 - NEVER use em dashes or en dashes anywhere. Use commas.
 - Australian spelling, warm, direct, human tone.
-- Only reference details that are actually on the site. Never invent results, awards, reviews or facts.
+- Only reference details that are actually provided. Never invent results, awards, reviews or facts.
 - Keep the body close to the template length.
 - SMS version: one short paragraph, no subject line, same offer, end with the link and "keen for a quick chat?".
 
 Output STRICT JSON only, no markdown fences, with exactly these keys: business, email, phone, channel, personalisation, prize, subject, body, sms.`;
 
-async function callClaude(model: string, key: string, siteText: string, url: string): Promise<string | null> {
+async function callClaude(model: string, key: string, context: string): Promise<string | null> {
   try {
     const r = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -176,7 +253,7 @@ async function callClaude(model: string, key: string, siteText: string, url: str
         model,
         max_tokens: 1600,
         system: [{ type: "text", text: SYSTEM_PROMPT, cache_control: { type: "ephemeral" } }],
-        messages: [{ role: "user", content: `Website URL: ${url}\n\nWebsite text:\n${siteText}` }],
+        messages: [{ role: "user", content: context }],
       }),
     });
     if (!r.ok) return null;
@@ -205,9 +282,11 @@ export async function scanLead(id: number): Promise<Lead[]> {
   requireOwner();
   await ensure();
   const key = process.env.ANTHROPIC_API_KEY;
-  const rows = (await sql`SELECT url FROM outreach_leads WHERE id = ${id}`) as unknown as { url: string }[];
-  const url = rows[0]?.url;
-  if (!url) return getOutreach();
+  const rows = (await sql`
+    SELECT url, business, category, address, rating, phone FROM outreach_leads WHERE id = ${id}
+  `) as unknown as { url: string; business: string; category: string; address: string; rating: string; phone: string }[];
+  const lead = rows[0];
+  if (!lead) return getOutreach();
 
   if (!key) {
     await sql`UPDATE outreach_leads SET status = 'new', error = 'ANTHROPIC_API_KEY not set in Vercel', updated_at = now() WHERE id = ${id}`;
@@ -215,28 +294,46 @@ export async function scanLead(id: number): Promise<Lead[]> {
   }
 
   let siteText = "";
-  try {
-    siteText = await fetchSiteText(url);
-  } catch {
-    siteText = "";
+  if (lead.url) {
+    try {
+      siteText = await fetchSiteText(lead.url);
+    } catch {
+      siteText = "";
+    }
   }
-  if (!siteText) {
-    await sql`UPDATE outreach_leads SET status = 'new', error = 'Could not read that website, add details manually', updated_at = now() WHERE id = ${id}`;
+
+  if (!siteText && !lead.business) {
+    await sql`UPDATE outreach_leads SET status = 'new', error = 'No website text and no listing details to work from', updated_at = now() WHERE id = ${id}`;
     return getOutreach();
   }
 
-  let raw = await callClaude("claude-sonnet-5", key, siteText, url);
-  if (!raw) raw = await callClaude("claude-haiku-4-5-20251001", key, siteText, url);
+  const context = [
+    lead.business ? `Business name: ${lead.business}` : "",
+    lead.category ? `Category: ${lead.category}` : "",
+    lead.address ? `Address / area: ${lead.address}` : "",
+    lead.rating ? `Google rating: ${lead.rating}` : "",
+    lead.phone ? `Phone: ${lead.phone}` : "",
+    lead.url ? `Website: ${lead.url}` : "",
+    siteText ? `Website text:\n${siteText}` : "(No website text available, personalise from the listing details above.)",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  let raw = await callClaude("claude-sonnet-5", key, context);
+  if (!raw) raw = await callClaude("claude-haiku-4-5-20251001", key, context);
   const parsed = raw ? parseJson(raw) : null;
   if (!parsed) {
     await sql`UPDATE outreach_leads SET status = 'new', error = 'AI could not draft this one, try rescan', updated_at = now() WHERE id = ${id}`;
     return getOutreach();
   }
 
+  // Keep the phone we parsed from the listing if the model did not return one.
+  const phone = (parsed.phone || "").trim() || lead.phone || "";
+
   await sql`UPDATE outreach_leads SET
-    business = ${noDash(parsed.business || "")},
+    business = ${noDash(parsed.business || lead.business || "")},
     email = ${(parsed.email || "").trim()},
-    phone = ${(parsed.phone || "").trim()},
+    phone = ${phone},
     channel = ${(parsed.channel || "").trim()},
     personalisation = ${noDash(parsed.personalisation || "")},
     prize = ${noDash(parsed.prize || "")},
