@@ -84,7 +84,7 @@ export default function PartnersPage() {
           <Reveal delay={250}>
             <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-white/65 sm:text-lg">
               We&apos;re building a Cairns membership with regular giveaways and a growing local audience. Partner with us
-              to reach them, for free.
+              to reach them.
             </p>
           </Reveal>
           <Reveal delay={350}>
@@ -125,8 +125,10 @@ export default function PartnersPage() {
           <Reveal delay={150}>
             <p className="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-white/60 sm:text-base">
               We&apos;ve spent three years, created over 500 pieces of content for ourselves, and spent $132,854 of our own
-              money learning exactly what gets local attention. Business owners tell us all the time they wish they had
-              someone to do it for them. Now you can.
+              money learning exactly what gets local attention.{" "}
+              <span className="font-semibold text-brand-purple-soft">
+                Business owners tell us all the time they wish they had someone to do it for them. Now you can.
+              </span>
             </p>
           </Reveal>
         </div>
@@ -206,6 +208,12 @@ export default function PartnersPage() {
                 </p>
                 <div className="mt-2.5 rounded-lg border border-brand-green/30 bg-brand-green/[0.07] px-3 py-2 text-xs leading-relaxed text-brand-green">
                   <b>🎁 BONUS:</b> Everything we make goes on our socials. We&apos;ll send you a personalised batch of content to post on your own socials too.
+                </div>
+              </div>
+              <div className="mt-4 rounded-xl border border-brand-green/40 bg-brand-green/[0.08] px-4 py-3">
+                <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-green">Our guarantee</div>
+                <div className="mt-1 text-sm font-bold leading-relaxed text-white">
+                  Don&apos;t make back $1,500 in your first 60 days and we&apos;ll work with you for free until you do.
                 </div>
               </div>
               <div className="mt-4 rounded-xl border border-brand-yellow/45 bg-brand-yellow/[0.1] px-4 py-3 text-center">
