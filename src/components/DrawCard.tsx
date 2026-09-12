@@ -4,7 +4,8 @@ import Countdown from "@/components/Countdown";
 /* Shared members' draw card: poster, countdown, Join for $1 and a terms link.
    Used on the membership page and the clubhouse page so they stay identical. */
 
-const JOIN_1_URL = "https://buy.stripe.com/8x27sL07CaTX8eI35F6kg0z";
+// Routes to the pre-purchase choice page (/upgrade), where they pick $1 or Platinum.
+const JOIN_1_URL = "/upgrade";
 
 export default function DrawCard({
   poster,

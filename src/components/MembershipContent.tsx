@@ -318,7 +318,7 @@ export default function MembershipContent() {
                   <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-purple-soft">✓</span>Priority booking</li>
                   <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">1 free entry into every draw</span></li>
                 </ul>
-                <a href="https://buy.stripe.com/8x27sL07CaTX8eI35F6kg0z" className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-purple px-6 py-3.5 font-display text-sm font-black text-white transition hover:brightness-110 active:scale-95">
+                <a href="/upgrade" className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-purple px-6 py-3.5 font-display text-sm font-black text-white transition hover:brightness-110 active:scale-95">
                   Join for $1 →
                 </a>
                 <p className="mt-2.5 flex min-h-[2.5rem] items-start justify-center text-center text-xs text-white/40">First month $1, then $9.99/month. Cancel anytime.</p>
