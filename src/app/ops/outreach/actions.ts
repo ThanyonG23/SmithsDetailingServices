@@ -225,7 +225,7 @@ async function fetchSite(url: string): Promise<{ text: string; emails: string[] 
   const text = htmlToText(homeHtml);
   let emails = extractEmails(homeHtml, domain);
   if (emails.length === 0) {
-    for (const path of ["/contact", "/contact-us", "/contact.html"]) {
+    for (const path of ["/contact", "/contact-us", "/contact-us/", "/contact/", "/contact.html", "/get-a-quote", "/about", "/about-us"]) {
       try {
         const html = await getHtml(new URL(path, url).toString());
         emails = extractEmails(html, domain);
