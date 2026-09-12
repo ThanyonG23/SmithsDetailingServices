@@ -284,10 +284,10 @@ export default function PartnersPage() {
           <div className="mt-8 flex flex-col gap-4">
             {STEPS.map((s, i) => (
               <Reveal key={s.n} delay={i * 90}>
-                <div className="flex items-start gap-4 rounded-2xl border border-white/8 bg-white/[0.02] p-5">
+                <div className="flex items-center gap-5 rounded-2xl border border-white/8 bg-white/[0.02] p-5">
                   {s.img ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={s.img} alt="" className="h-16 w-16 shrink-0 rounded-xl object-cover" />
+                    <img src={s.img} alt="" className="h-24 w-24 shrink-0 rounded-xl object-cover sm:h-32 sm:w-32" />
                   ) : (
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-brand-purple/40 bg-brand-purple/[0.12] font-display text-sm font-black text-brand-purple-soft">
                       {s.n}
