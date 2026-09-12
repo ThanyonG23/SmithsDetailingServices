@@ -239,8 +239,31 @@ function extractEmails(html: string, domain: string): string[] {
   return [...found].sort((a, b) => (Number(b.endsWith(domain)) - Number(a.endsWith(domain)))).slice(0, 5);
 }
 
-// Fetch a site's text + any emails. If the homepage has no email, try the
-// common contact pages (bounded, so it stays fast).
+// Outbound website links from a page (e.g. a Linktree), excluding socials and
+// asset/CDN hosts, so we can follow an influencer through to their real site.
+const SOCIAL_HOSTS = /(linktr\.ee|instagram|tiktok|facebook|fb\.com|youtu|twitter|x\.com|threads|snapchat|spotify|apple|amazon|linkedin|pinterest|whatsapp|t\.me|telegram|cdn|cloudfront|googleapis|gstatic|fonts|sentry|licdn|shopify\.com\/cdn)/i;
+function extractOutboundLinks(html: string): string[] {
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const m of html.matchAll(/https?:\/\/[a-z0-9.-]+\.[a-z]{2,}[^\s"'\\<>]*/gi)) {
+    const u = m[0];
+    let host = "";
+    try {
+      host = new URL(u).hostname;
+    } catch {
+      continue;
+    }
+    if (SOCIAL_HOSTS.test(host)) continue;
+    const clean = u.split("?")[0].replace(/[)\].,]+$/, "");
+    if (seen.has(host)) continue;
+    seen.add(host);
+    out.push(clean);
+  }
+  return out;
+}
+
+// Fetch a site's text + any emails. Follows a Linktree to a linked website, and
+// if the homepage has no email, tries the common contact pages (bounded).
 async function fetchSite(url: string): Promise<{ text: string; emails: string[] }> {
   let domain = "";
   try {
@@ -249,8 +272,27 @@ async function fetchSite(url: string): Promise<{ text: string; emails: string[] 
     /* ignore */
   }
   const homeHtml = await getHtml(url);
-  const text = htmlToText(homeHtml);
+  let text = htmlToText(homeHtml);
   let emails = extractEmails(homeHtml, domain);
+
+  // Linktree / link-in-bio: no email on the page itself, so follow the first
+  // couple of real (non-social) website links and scrape those instead.
+  if (emails.length === 0 && /linktr\.ee|link-in-bio|beacons\.ai|linkin\.bio/i.test(url)) {
+    for (const l of extractOutboundLinks(homeHtml).slice(0, 3)) {
+      try {
+        const h = await getHtml(l);
+        const em = extractEmails(h, (() => { try { return new URL(l).hostname.replace(/^www\./, ""); } catch { return ""; } })());
+        if (em.length) {
+          emails = em;
+          if (!text) text = htmlToText(h);
+          break;
+        }
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
   if (emails.length === 0) {
     for (const path of ["/contact", "/contact-us", "/contact-us/", "/contact/", "/contact.html", "/get-a-quote", "/about", "/about-us"]) {
       try {

@@ -256,6 +256,7 @@ function LeadCard({
   const [subject, setSubject] = useState(lead.subject);
   const [body, setBody] = useState(lead.body);
   const [email, setEmail] = useState(lead.email);
+  const [dmCopied, setDmCopied] = useState(false);
 
   useEffect(() => {
     setSubject(lead.subject);
@@ -422,6 +423,19 @@ function LeadCard({
             >
               Open in Gmail →
             </button>
+            {lead.campaign === "affiliate" && lead.sms && (
+              <button
+                onClick={() => {
+                  navigator.clipboard?.writeText(lead.sms).then(() => {
+                    setDmCopied(true);
+                    setTimeout(() => setDmCopied(false), 1600);
+                  }).catch(() => {});
+                }}
+                className="rounded-xl border border-brand-green/40 bg-brand-green/[0.08] px-4 py-2.5 text-sm font-bold text-brand-green transition hover:brightness-110"
+              >
+                {dmCopied ? "Copied ✓" : "Copy DM"}
+              </button>
+            )}
             {lead.phone && (
               <a
                 href={`tel:${lead.phone.replace(/\s+/g, "")}`}
