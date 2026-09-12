@@ -44,7 +44,10 @@ export default function FullSuitePage() {
                 <span className="font-display text-4xl font-black text-white">$1,500</span>
                 <span className="mb-1.5 text-xs font-bold text-white/50">/month</span>
               </div>
-              <div className="mt-1 text-xs text-white/45">or $15,000/yr prepaid</div>
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-white/45">
+                or $15,000/yr prepaid
+                <span className="rounded-full bg-brand-green/15 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-brand-green">Save $3,000</span>
+              </div>
               <ul className="mt-5 flex flex-1 flex-col gap-2.5 text-sm text-white/80">
                 <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>A full content day at your business every month</li>
                 <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Posted across our socials every week</li>
@@ -71,7 +74,10 @@ export default function FullSuitePage() {
                 <span className="font-display text-4xl font-black text-white">$2,000</span>
                 <span className="mb-1.5 text-xs font-bold text-white/50">/month</span>
               </div>
-              <div className="mt-1 text-xs text-white/45">or $20,000/yr prepaid</div>
+              <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-white/45">
+                or $20,000/yr prepaid
+                <span className="rounded-full bg-brand-green/15 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider text-brand-green">Save $4,000</span>
+              </div>
               <ul className="mt-5 flex flex-1 flex-col gap-2.5 text-sm text-white/85">
                 <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-purple-soft">★</span><b className="text-white">Everything in Platinum</b></li>
                 <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-purple-soft">★</span>We run your socials too, done for you</li>
