@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import Countdown from "@/components/Countdown";
+
+export const dynamic = "force-dynamic";
 
 /* Pre-purchase choice / upsell page. A DRAFT, not yet wired into the funnel.
    Flow: the "Join for $1" buttons point here first; the visitor picks the $1
@@ -22,6 +25,12 @@ const DRAW_MINI_TIME = "2026-09-21T12:00:00+10:00";
 const PLAT_GLOW = "shadow-[0_0_44px_-12px_rgba(124,47,245,0.7)]";
 
 export default function UpgradePage() {
+  // If the visitor arrived via an affiliate link, their code rides in a cookie.
+  // Pre-apply it as a Stripe promo code so the signup is attributed to them.
+  const aff = cookies().get("smiths_aff")?.value || "";
+  const withPromo = (url: string) => (aff ? `${url}?prefilled_promo_code=${encodeURIComponent(aff)}` : url);
+  const join1 = withPromo(JOIN_1_URL);
+  const platinum = withPromo(PLATINUM_OFFER_URL);
   return (
     <main className="min-h-screen bg-[#050506]">
       <div className="relative">
@@ -68,7 +77,7 @@ export default function UpgradePage() {
                 <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-white/70">✓</span>Priority booking</li>
               </ul>
               <a
-                href={JOIN_1_URL}
+                href={join1}
                 className="mt-6 flex w-full items-center justify-center rounded-full border border-white/20 px-6 py-3.5 font-display text-sm font-black text-white transition hover:border-white/50 active:scale-95"
               >
                 Join for $1 →
@@ -93,7 +102,7 @@ export default function UpgradePage() {
                 <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-green">✓</span>Cancel anytime, no lock-in</li>
               </ul>
               <a
-                href={PLATINUM_OFFER_URL}
+                href={platinum}
                 className={`mt-6 flex w-full items-center justify-center rounded-full bg-brand-purple px-6 py-3.5 font-display text-sm font-black text-white ${PLAT_GLOW} transition hover:brightness-110 active:scale-95`}
               >
                 Go Platinum · $24.99/mo →
@@ -123,7 +132,7 @@ export default function UpgradePage() {
                     <div className="mb-1.5 mt-3 text-[9px] font-bold uppercase tracking-[0.18em] text-red-400">Draw closes in</div>
                     <Countdown target={d.target} accent="red" />
                     <a
-                      href={PLATINUM_OFFER_URL}
+                      href={platinum}
                       className="mt-4 flex w-full items-center justify-center rounded-full bg-brand-purple px-6 py-3 font-display text-sm font-black text-white transition hover:brightness-110 active:scale-95"
                     >
                       Go Platinum →
