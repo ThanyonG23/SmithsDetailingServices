@@ -392,7 +392,9 @@ RULES:
 - NEVER use em dashes or en dashes. Use commas.
 - Australian spelling, warm, direct, human tone. Keep it short.
 - Only reference details actually provided. Never invent facts, follower counts or results.
-- The "sms" field is an INSTAGRAM DM, not an email. Write it casual and short: 2 to 4 short sentences, no subject line, no formal signoff. Open with a quick personalised line, then the hook (get paid 25% every month for sharing our $1-to-win-$1,000 Cairns giveaway, free to join, their audience gets double entries through their link), then the link smithsdetailingservices.com.au/earn, then a casual "keen?". Use one or two emojis, Australian, friendly, human. Sign off casually like "- Thanyon, Smiths". No em dashes.
+- The "sms" field is an INSTAGRAM DM, not an email. Follow this structure and casual tone closely, swapping in their first name (or "mate" if unknown) and a genuine reference to their audience/niche:
+"Hey [First name], Thanyon from Smiths. We're setting up our affiliate program and wanted to see if it's something that'd interest you. We run a $1-to-win-$1,000 giveaway in Cairns, and I pay you 25% every month on everyone you refer, for as long as they stay. Free to join, you just drop your link, and your audience gets double entries through it so it actually converts. Reckon your [their audience] would love it: smithsdetailingservices.com.au/earn"
+No subject line, no formal signoff, Australian, friendly, human, no em dashes.
 
 Output STRICT JSON only, no markdown fences, with exactly these keys: business, email, phone, channel, personalisation, prize, subject, body, sms. Set prize to "".`;
 
