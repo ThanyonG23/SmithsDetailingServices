@@ -208,6 +208,28 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
         </Reveal>
       </section>
 
+      {/* ═══════════════════ PARTNERS ═══════════════════ */}
+      <section className="border-y border-white/10 bg-white/[0.02] py-16 sm:py-20">
+        <div className="mx-auto max-w-3xl px-4 text-center">
+          <Reveal>
+            <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">For local businesses</div>
+            <h2 className="mt-3 font-display text-3xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-4xl">
+              Own a business? Let us <span className="text-brand-purple-soft">market it for you.</span>
+            </h2>
+            <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-white/60">
+              We&apos;ve spent $132k learning what gets local attention. Done-for-you content, posted everywhere, plus a
+              spot in our giveaways and in front of our members.
+            </p>
+            <Link
+              href="/partners"
+              className="mt-7 inline-flex items-center justify-center rounded-full bg-brand-purple px-8 py-4 text-sm font-black text-white transition hover:brightness-110 active:scale-95"
+            >
+              Partner with Smiths →
+            </Link>
+          </Reveal>
+        </div>
+      </section>
+
       {/* ═══════════════════ GUARANTEE ═══════════════════ */}
       <section className="border-y border-white/10 py-24 sm:py-32">
         <div className="mx-auto max-w-3xl px-4 text-center">
