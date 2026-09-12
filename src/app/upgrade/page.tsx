@@ -44,6 +44,11 @@ export default function UpgradePage() {
           aria-hidden
         />
         <div className="relative mx-auto max-w-3xl px-5 pb-20 pt-12 sm:pt-16">
+          {aff && (
+            <div className="mb-6 rounded-xl border border-brand-green/45 bg-brand-green/[0.1] px-4 py-3 text-center text-sm font-black uppercase tracking-[0.06em] text-brand-green">
+              🎁 Double entries unlocked, you&apos;re joining through a partner link, so you get twice the entries in every draw.
+            </div>
+          )}
           <div className="text-center">
             <h1 className="font-display text-2xl font-extrabold leading-[1.12] tracking-tight text-white sm:text-4xl">
               This week&apos;s prize is big. <span className="text-brand-purple-soft">What&apos;s coming next is bigger.</span>

@@ -21,6 +21,9 @@ export default async function AffiliateLanding({ params }: { params: { code: str
   return (
     <>
       <AffTracker code={params.code} />
+      <div className="bg-brand-green/[0.12] px-4 py-2.5 text-center text-sm font-black uppercase tracking-[0.06em] text-brand-green">
+        🎁 You&apos;re in for double entries, twice the chance to win in every draw
+      </div>
       <MembershipContent />
     </>
   );
