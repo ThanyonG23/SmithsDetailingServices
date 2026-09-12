@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Reveal from "@/components/Reveal";
 import SiteNav from "@/components/SiteNav";
 import BusinessPartnerForm from "@/components/BusinessPartnerForm";
-import { BUSINESS } from "@/lib/config";
+import Reels from "@/components/Reels";
+import { BUSINESS, REELS } from "@/lib/config";
 
 export const metadata: Metadata = {
   title: "Partner with Smiths",
@@ -37,10 +38,14 @@ const OPTIONS: { icon: string; title: string; tag: string; summary: string; give
   },
 ];
 
-const STEPS: { n: string; t: string; d: string; img?: string }[] = [
-  { n: "1", t: "Reach out", d: "Fill in the form below or give Thanyon a call. Quick chat, no obligation.", img: "/media/photos/step-reach-out.webp" },
-  { n: "2", t: "We feature you", d: "Either as a giveaway experience, a member discount, or both. We handle the promo.", img: "/media/photos/step-featured.webp" },
-  { n: "3", t: "You get seen", d: "Exposure to our whole audience, fresh content, and new local customers through the door.", img: "/media/photos/step-audience.webp" },
+const STEPS: { n: string; t: string; d: string; platforms?: string[] }[] = [
+  { n: "1", t: "You sign up", d: "Pick monthly or yearly and you're in. That's the hard part done." },
+  { n: "2", t: "We book your content day", d: "We lock in a full day at your business and shoot a month of content." },
+  { n: "3", t: "We edit everything", d: "Our team cuts and polishes every video. You don't lift a finger." },
+  { n: "4", t: "You get your own videos", d: "We send you a personalised batch of finished videos to post yourself." },
+  { n: "5", t: "We publish across all four platforms", d: "Your business in front of our whole audience.", platforms: ["Instagram", "Facebook", "TikTok", "YouTube"] },
+  { n: "6", t: "We link straight to you", d: "Backlinks on our website and members portal send our members directly to your business." },
+  { n: "7", t: "We drive traffic every month", d: "Monthly email and text campaigns push our audience to our page with your links on it." },
 ];
 
 const PLAT_MONTHLY_URL = "https://buy.stripe.com/cNifZh1bGaTXfHa7lV6kg0J";
@@ -114,6 +119,28 @@ export default function PartnersPage() {
               We&apos;ve spent three years and $132,854 of our own money learning exactly what gets local attention. Business
               owners tell us all the time they wish they had someone to do it for them. Now you can.
             </p>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ═══ OUR WORK / REELS ═══ */}
+      <section className="px-4 py-14 sm:py-16">
+        <div className="mx-auto max-w-4xl">
+          <Reveal>
+            <div className="text-center">
+              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">Our work</div>
+              <h2 className="mt-2 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                The kind of content we make
+              </h2>
+              <p className="mx-auto mt-3 max-w-lg text-sm leading-relaxed text-white/60">
+                Real work, real businesses. This is the standard of content that goes out for you, every month.
+              </p>
+            </div>
+          </Reveal>
+          <Reveal delay={100}>
+            <div className="mt-8">
+              <Reels reels={REELS} />
+            </div>
           </Reveal>
         </div>
       </section>
@@ -253,24 +280,28 @@ export default function PartnersPage() {
         <div className="mx-auto max-w-3xl">
           <Reveal>
             <h2 className="text-center font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-              How it works
+              How our Platinum partnership works
             </h2>
           </Reveal>
           <div className="mt-8 flex flex-col gap-4">
             {STEPS.map((s, i) => (
               <Reveal key={s.n} delay={i * 90}>
-                <div className="flex items-center gap-4 rounded-2xl border border-white/8 bg-white/[0.02] p-5">
-                  {s.img ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={s.img} alt="" className="h-16 w-16 shrink-0 rounded-xl object-cover" />
-                  ) : (
-                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-brand-purple/40 bg-brand-purple/[0.12] font-display text-sm font-black text-brand-purple-soft">
-                      {s.n}
-                    </span>
-                  )}
+                <div className="flex items-start gap-4 rounded-2xl border border-white/8 bg-white/[0.02] p-5">
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-brand-purple/40 bg-brand-purple/[0.12] font-display text-sm font-black text-brand-purple-soft">
+                    {s.n}
+                  </span>
                   <div>
                     <div className="font-display text-base font-extrabold text-white">{s.t}</div>
                     <div className="mt-0.5 text-sm leading-relaxed text-white/60">{s.d}</div>
+                    {s.platforms && (
+                      <div className="mt-2.5 flex flex-wrap gap-2">
+                        {s.platforms.map((p) => (
+                          <span key={p} className="rounded-full border border-brand-purple/30 bg-brand-purple/[0.1] px-3 py-1 text-[11px] font-bold text-brand-purple-soft">
+                            {p}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               </Reveal>
