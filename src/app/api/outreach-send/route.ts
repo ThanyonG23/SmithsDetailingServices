@@ -15,7 +15,7 @@ export const maxDuration = 60;
 
 const START_HOUR = 7; // 7am
 const END_HOUR = 22; // send through the 9pm hour (skip once hour >= 22)
-const MIN_GAP_MIN = 50; // keep roughly one per hour even if the cron double-fires
+const MIN_GAP_MIN = 40; // < 60 so every hourly cron tick sends reliably, but blocks accidental rapid double-fires
 const DAILY_CAP = 16;
 const OPT_OUT = "\n\nNot interested? Just reply and I will take you off my list.";
 
