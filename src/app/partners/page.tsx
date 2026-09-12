@@ -233,44 +233,28 @@ export default function PartnersPage() {
                   </div>
                 </div>
                 <div>
-                  <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-purple-soft">You get everything, plus</div>
-                  <ul className="mt-2 flex flex-col gap-1.5">
+                  <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-purple-soft">Join now to</div>
+                  <ul className="mt-2 flex flex-col gap-2">
                     {[
-                      "A full content shoot day at your business every month",
-                      "Posted across all our socials every week, all month",
-                      "Featured in our giveaways and offered as a member discount",
-                      "Links directly to your site on our website and members portal",
-                      "Everything from the two options above, included",
+                      "Never think about creating content for your business again",
+                      "Get seen across multiple channels",
+                      "Build brand awareness through partnerships",
+                      "Build momentum to help you stay busy",
+                      "Have content ready for paid advertisement",
                     ].map((g) => (
-                      <li key={g} className="flex items-start gap-2 text-sm leading-relaxed text-white/80">
-                        <span className="mt-0.5 shrink-0 text-brand-purple-soft">✓</span>
+                      <li key={g} className="flex items-start gap-2.5 text-sm font-semibold leading-relaxed text-white">
+                        <span className="mt-0.5 shrink-0 text-brand-yellow">✓</span>
                         <span>{g}</span>
                       </li>
                     ))}
                   </ul>
+                  <p className="mt-3 text-xs leading-relaxed text-white/55">
+                    <span className="font-bold text-white/75">Includes:</span> a full shoot day at your business every month, posted across all our socials every week, a giveaway feature and member discount, direct links from our site and members portal, plus everything in the two options above.
+                  </p>
                   <div className="mt-2.5 rounded-lg border border-brand-green/30 bg-brand-green/[0.07] px-3 py-2 text-xs leading-relaxed text-brand-green">
                     <b>BONUS:</b> Everything we make goes on our socials. We&apos;ll send you a personalised batch of content to post on your own socials too.
                   </div>
                 </div>
-              </div>
-              <div className="mt-6 rounded-2xl border border-brand-purple/30 bg-brand-purple/[0.06] px-5 py-5">
-                <div className="text-center font-display text-lg font-black uppercase tracking-[0.14em] text-white">
-                  Join now to
-                </div>
-                <ul className="mt-3 flex flex-col gap-2">
-                  {[
-                    "Never think about creating content for your business again",
-                    "Get seen across multiple channels",
-                    "Build brand awareness through partnerships",
-                    "Build momentum to help you stay busy",
-                    "Have content ready for paid advertisement",
-                  ].map((g) => (
-                    <li key={g} className="flex items-start gap-2.5 text-sm font-semibold leading-relaxed text-white">
-                      <span className="mt-0.5 shrink-0 text-brand-yellow">✓</span>
-                      <span>{g}</span>
-                    </li>
-                  ))}
-                </ul>
               </div>
               <a
                 href="/full-suite"
