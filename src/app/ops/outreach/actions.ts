@@ -233,7 +233,8 @@ function extractEmails(html: string, domain: string): string[] {
   for (const m of html.matchAll(re)) {
     const e = m[0].toLowerCase();
     if (/\.(png|jpe?g|gif|webp|svg|ico|css|js)$/i.test(e)) continue;
-    if (/(wix\.com|sentry|example\.|yourdomain|domain\.com|email\.com|@2x|\.wixpress)/i.test(e)) continue;
+    // System / boilerplate / CDN addresses that are never a real contact.
+    if (/(w3\.org|schema\.org|schemaorg|sentry|wix|example\.|yourdomain|domain\.com|your-?email|email\.com|@2x|googleapis|gstatic|cloudflare|jsdelivr|cloudfront|\.wixpress|@sentry|latin@|core-js|@babel)/i.test(e)) continue;
     found.add(e);
   }
   return [...found].sort((a, b) => (Number(b.endsWith(domain)) - Number(a.endsWith(domain)))).slice(0, 5);
