@@ -146,6 +146,27 @@ function monthlyCents(s: SSub): number {
 
 export type AffEarn = { members: number; monthlyCents: number };
 
+/* Customer ids whose active subscription came through an affiliate link. Used by
+   the draw to give these members double entries (their promised perk). */
+export async function affiliateReferredCustomerIds(): Promise<Set<string>> {
+  const out = new Set<string>();
+  if (!key()) return out;
+  let list = await sGet<SList<SSub & { customer?: { id?: string } | string | null }>>(
+    `/subscriptions?status=all&limit=100&expand[]=data.customer&expand[]=data.discounts.promotion_code`,
+  );
+  if (!list) {
+    list = await sGet<SList<SSub & { customer?: { id?: string } | string | null }>>(
+      `/subscriptions?status=all&limit=100&expand[]=data.customer&expand[]=data.discount.promotion_code`,
+    );
+  }
+  for (const s of (list?.data ?? []).filter((x) => LIVE.has(x.status))) {
+    if (!affiliateCodeOf(s)) continue;
+    const cid = typeof s.customer === "string" ? s.customer : s.customer?.id;
+    if (cid) out.add(cid);
+  }
+  return out;
+}
+
 export async function affiliateEarnings(): Promise<Record<string, AffEarn>> {
   const out: Record<string, AffEarn> = {};
   if (!key()) return out;

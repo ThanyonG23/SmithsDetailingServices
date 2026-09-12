@@ -119,7 +119,7 @@ export default function AffiliatesTool() {
         )}
         {rows.map((a) => {
           const link = `${origin}/g/${a.code}`;
-          const invite = `Win $1,000 cash (or a $2,200 detail) with Smiths in Cairns. Enter for just $1 here: ${link}`;
+          const invite = `Win $1,000 cash (or a $2,200 detail) with Smiths in Cairns. Enter for just $1 and get double entries through my link: ${link}`;
           return (
             <div key={a.id} className="rounded-2xl border border-white/10 bg-white/[0.02] p-4">
               <div className="flex flex-wrap items-start justify-between gap-3">

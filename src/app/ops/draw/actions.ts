@@ -3,6 +3,7 @@
 import { isOwner } from "@/lib/ops/auth";
 import { sql } from "@/lib/ops/db";
 import { referralBonusByCustomer } from "@/lib/members/referrals";
+import { affiliateReferredCustomerIds } from "@/lib/members/affiliates";
 
 /* Assembles the current draw entrant list, weighted by tier, from three
    sources so nothing is missed: active subscriptions (all tiers), 30-day
@@ -81,11 +82,13 @@ export async function pullEntrants(): Promise<{ ok: boolean; names?: string[]; s
 
   const names: string[] = [];
   const nameByCustomer: Record<string, string> = {}; // to credit referral bonuses
+  const entriesByCustomer: Record<string, number> = {}; // base entries, to double for affiliate referrals
   let memberCount = 0;
   let memberEntries = 0;
   let passCount = 0;
   let freeCount = 0;
   let bonusEntries = 0;
+  let affBonusEntries = 0;
 
   try {
     // 1. Active subscriptions (all tiers), weighted by tier.
@@ -96,7 +99,10 @@ export async function pullEntrants(): Promise<{ ok: boolean; names?: string[]; s
       const nm = (cust?.name || cust?.email || "Member").trim();
       const e = entriesForAmount(s.items?.data?.[0]?.price?.unit_amount);
       for (let i = 0; i < e; i++) names.push(nm);
-      if (cust?.id) nameByCustomer[cust.id] = nm;
+      if (cust?.id) {
+        nameByCustomer[cust.id] = nm;
+        entriesByCustomer[cust.id] = e;
+      }
       memberCount++;
       memberEntries += e;
     }
@@ -136,6 +142,21 @@ export async function pullEntrants(): Promise<{ ok: boolean; names?: string[]; s
     } catch {
       /* referral read is best-effort, base draw still stands */
     }
+
+    // 5. Affiliate double entries: a member who joined through an affiliate link
+    //    gets their entries doubled (the perk we promise their audience).
+    try {
+      const affSet = await affiliateReferredCustomerIds();
+      for (const cid of affSet) {
+        const nm = nameByCustomer[cid];
+        if (!nm) continue; // only active members
+        const base = entriesByCustomer[cid] || 1;
+        for (let i = 0; i < base; i++) names.push(nm);
+        affBonusEntries += base;
+      }
+    } catch {
+      /* affiliate read is best-effort, base draw still stands */
+    }
   } catch {
     return { ok: false, error: "Couldn't pull from Stripe, try again." };
   }
@@ -147,6 +168,7 @@ export async function pullEntrants(): Promise<{ ok: boolean; names?: string[]; s
     `Pulled ${memberCount} member${memberCount === 1 ? "" : "s"} (${memberEntries} entries), ` +
     `${passCount} pass${passCount === 1 ? "" : "es"}, ${freeCount} free entr${freeCount === 1 ? "y" : "ies"}` +
     (bonusEntries > 0 ? `, ${bonusEntries} referral bonus` : "") +
+    (affBonusEntries > 0 ? `, ${affBonusEntries} affiliate bonus` : "") +
     ` — ${total} total entries in the draw.`;
 
   return { ok: true, names: shuffle(names), summary };

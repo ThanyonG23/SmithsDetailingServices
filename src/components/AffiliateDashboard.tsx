@@ -19,7 +19,7 @@ export default function AffiliateDashboard({ code }: { code: string }) {
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
   const link = `${origin}/g/${code}`;
-  const caption = `Win $1,000 cash (or a $2,200 detail) with Smiths in Cairns 🚗 enter for just $1 here: ${link}`;
+  const caption = `Win $1,000 cash (or a $2,200 detail) with Smiths in Cairns 🚗 enter for just $1 AND get double entries through my link: ${link}`;
 
   function copy(text: string, tag: string) {
     navigator.clipboard?.writeText(text).then(() => {

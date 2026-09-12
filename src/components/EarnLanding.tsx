@@ -19,7 +19,7 @@ export default function EarnLanding() {
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
   const link = code ? `${origin}/g/${code}` : "";
-  const caption = code ? `Win $1,000 cash (or a $2,200 detail) with Smiths in Cairns 🚗 enter for just $1 here: ${link}` : "";
+  const caption = code ? `Win $1,000 cash (or a $2,200 detail) with Smiths in Cairns 🚗 enter for just $1 AND get double entries through my link: ${link}` : "";
 
   async function join() {
     setBusy(true);
@@ -82,8 +82,17 @@ export default function EarnLanding() {
                 ))}
               </div>
 
+              {/* YOUR EXCLUSIVE */}
+              <div className="mt-6 rounded-2xl border border-brand-yellow/40 bg-brand-yellow/[0.08] p-6 text-center">
+                <div className="font-display text-xl font-extrabold text-white">🎁 Your exclusive: double entries</div>
+                <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-white/70">
+                  Everyone who joins through your link gets <b className="text-brand-yellow">double the entries</b> in every draw.
+                  That is a real reason for your audience to use your link and not just enter on their own. Only you can offer it.
+                </p>
+              </div>
+
               {/* WHY IT CONVERTS */}
-              <div className="mt-6 rounded-2xl border border-brand-green/30 bg-brand-green/[0.06] p-6 text-center">
+              <div className="mt-4 rounded-2xl border border-brand-green/30 bg-brand-green/[0.06] p-6 text-center">
                 <div className="font-display text-xl font-extrabold text-white">The easiest thing you&apos;ll ever get someone to click</div>
                 <p className="mx-auto mt-2 max-w-lg text-sm leading-relaxed text-white/70">
                   &ldquo;Enter to win $1,000 for $1&rdquo; sells itself. Send us 100 members and you earn around
