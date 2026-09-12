@@ -126,6 +126,14 @@ export default function PartnersPage() {
               <Reels reels={PARTNER_REELS} labels={["Educational", "Trend", "Comedy", "Giveaway", "Community Event", "Skit"]} />
             </div>
           </Reveal>
+          <Reveal delay={150}>
+            <p className="mx-auto mt-8 max-w-2xl text-center text-sm leading-relaxed text-white/60 sm:text-base">
+              We test everything. On 11 September we posted{" "}
+              <span className="font-bold text-brand-purple-soft">40 pieces of content</span> on our own socials in a single
+              day. Volume is the new game.{" "}
+              <span className="font-semibold text-white">How much volume can you do alone?</span>
+            </p>
+          </Reveal>
         </div>
       </section>
 
@@ -139,8 +147,8 @@ export default function PartnersPage() {
           </Reveal>
           <Reveal delay={100}>
             <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-white/65 sm:text-lg">
-              We&apos;re building a Cairns membership with regular giveaways and a growing local audience. Partner with us
-              to reach them.
+              We&apos;re building a Cairns membership with regular giveaways and a growing local raving audience. Partner
+              with us to reach them.
             </p>
           </Reveal>
         </div>
@@ -207,9 +215,12 @@ export default function PartnersPage() {
                 </div>
               </div>
               <div className="mt-4 rounded-xl border border-brand-yellow/45 bg-brand-yellow/[0.1] px-4 py-3 text-center">
-                <span className="font-display text-sm font-black uppercase tracking-[0.1em] text-brand-yellow">
-                  🎁 Buy now and get your 2nd month FREE
-                </span>
+                <div className="font-display text-sm font-black uppercase tracking-[0.1em] text-brand-yellow">
+                  🎁 Next 3 members: buy now and get your 2nd month FREE
+                </div>
+                <div className="mt-1.5 text-[11px] font-bold uppercase tracking-[0.08em] text-white/70">
+                  Less than $25/day | the cheapest employee you&apos;ll ever get
+                </div>
               </div>
               <a
                 href="/full-suite"
