@@ -26,6 +26,14 @@ export type Lead = {
   sms: string;
   status: string; // new | written | sent | skipped
   error: string;
+  // Auto-send pipeline
+  approved: boolean;
+  stage: number; // 0 not sent, 1 initial sent, 2 follow-up 1 sent, 3 final sent (done)
+  replied: boolean;
+  stopped: boolean;
+  bounced: boolean;
+  send_error: string;
+  next_action_at: string | null;
 };
 
 let ready = false;
@@ -52,7 +60,22 @@ async function ensure() {
   await sql`ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS category text NOT NULL DEFAULT ''`;
   await sql`ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS address text NOT NULL DEFAULT ''`;
   await sql`ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS rating text NOT NULL DEFAULT ''`;
+  // Migrate: auto-send pipeline.
+  await sql`ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS approved boolean NOT NULL DEFAULT false`;
+  await sql`ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS stage int NOT NULL DEFAULT 0`;
+  await sql`ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS sent_at timestamptz`;
+  await sql`ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS last_sent_at timestamptz`;
+  await sql`ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS next_action_at timestamptz`;
+  await sql`ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS replied boolean NOT NULL DEFAULT false`;
+  await sql`ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS stopped boolean NOT NULL DEFAULT false`;
+  await sql`ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS bounced boolean NOT NULL DEFAULT false`;
+  await sql`ALTER TABLE outreach_leads ADD COLUMN IF NOT EXISTS send_error text NOT NULL DEFAULT ''`;
   ready = true;
+}
+
+// Exported so the cron route can guarantee the columns exist before it runs.
+export async function ensureOutreach() {
+  await ensure();
 }
 
 export async function getOutreach(): Promise<Lead[]> {
@@ -60,7 +83,8 @@ export async function getOutreach(): Promise<Lead[]> {
   await ensure();
   const rows = (await sql`
     SELECT id, url, business, category, address, rating, email, phone, channel,
-           personalisation, prize, subject, body, sms, status, error
+           personalisation, prize, subject, body, sms, status, error,
+           approved, stage, replied, stopped, bounced, send_error, next_action_at
     FROM outreach_leads ORDER BY id DESC
   `) as unknown as Lead[];
   return rows;
@@ -415,5 +439,45 @@ export async function deleteLead(id: number): Promise<Lead[]> {
   requireOwner();
   await ensure();
   await sql`DELETE FROM outreach_leads WHERE id = ${id}`;
+  return getOutreach();
+}
+
+// Approve a written lead into the auto-send queue (or pull it back out).
+export async function approveLead(id: number, approved: boolean): Promise<Lead[]> {
+  requireOwner();
+  await ensure();
+  await sql`UPDATE outreach_leads SET approved = ${approved}, stopped = false, updated_at = now() WHERE id = ${id}`;
+  return getOutreach();
+}
+
+// Approve every written lead that has an email and hasn't been sent yet.
+export async function approveAllReady(): Promise<Lead[]> {
+  requireOwner();
+  await ensure();
+  await sql`UPDATE outreach_leads SET approved = true, stopped = false, updated_at = now()
+    WHERE status = 'written' AND email <> '' AND stage = 0 AND NOT approved`;
+  return getOutreach();
+}
+
+export async function stopLead(id: number): Promise<Lead[]> {
+  requireOwner();
+  await ensure();
+  await sql`UPDATE outreach_leads SET stopped = true, approved = false, updated_at = now() WHERE id = ${id}`;
+  return getOutreach();
+}
+
+export async function markReplied(id: number): Promise<Lead[]> {
+  requireOwner();
+  await ensure();
+  await sql`UPDATE outreach_leads SET replied = true, updated_at = now() WHERE id = ${id}`;
+  return getOutreach();
+}
+
+// Reset a lead's send pipeline back to the start (e.g. after fixing a bounce).
+export async function resetSend(id: number): Promise<Lead[]> {
+  requireOwner();
+  await ensure();
+  await sql`UPDATE outreach_leads SET stage = 0, sent_at = null, last_sent_at = null, next_action_at = null,
+    replied = false, stopped = false, bounced = false, send_error = '', updated_at = now() WHERE id = ${id}`;
   return getOutreach();
 }

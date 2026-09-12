@@ -10,7 +10,9 @@
   },
   "dependencies": {
     "adm-zip": "^0.5.16",
+    "imapflow": "^2.0.2",
     "next": "^14.2.35",
+    "nodemailer": "^10.0.9",
     "postgres": "^3.4.9",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
@@ -18,6 +20,7 @@
   "devDependencies": {
     "@types/adm-zip": "^0.5.7",
     "@types/node": "^20.16.10",
+    "@types/nodemailer": "^8.0.1",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
     "autoprefixer": "^10.4.20",

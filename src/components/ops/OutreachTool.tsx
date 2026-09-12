@@ -7,6 +7,11 @@ import {
   scanLead,
   updateLead,
   deleteLead,
+  approveLead,
+  approveAllReady,
+  stopLead,
+  markReplied,
+  resetSend,
   type Lead,
 } from "@/app/ops/outreach/actions";
 
@@ -38,14 +43,24 @@ export default function OutreachTool() {
   }, []);
 
   const counts = useMemo(() => {
-    const c = { total: leads.length, new: 0, written: 0, sent: 0 };
+    const c = { total: leads.length, new: 0, written: 0, queued: 0, sent: 0, replied: 0 };
     for (const l of leads) {
+      if (l.replied) c.replied++;
+      if (l.stage >= 1) c.sent++;
+      else if (l.approved && !l.stopped) c.queued++;
       if (l.status === "new") c.new++;
       else if (l.status === "written") c.written++;
-      else if (l.status === "sent") c.sent++;
     }
     return c;
   }, [leads]);
+
+  async function act(fn: () => Promise<Lead[]>) {
+    try {
+      setLeads(await fn());
+    } catch {
+      /* ignore */
+    }
+  }
 
   async function onAdd() {
     if (!paste.trim()) return;
@@ -113,9 +128,9 @@ export default function OutreachTool() {
         Outreach <span className="text-brand-purple-soft">machine</span>
       </h1>
       <p className="mt-1 text-sm text-white/45">
-        Paste website links (best, it scrapes their email) or a Google Maps results dump. Claude writes a personalised
-        giveaway email for each. You review and send from your own Gmail. No email found? Call them instead (cold email and
-        cold calling are the legal channels in AU, not cold texts).
+        Paste website links (best, it scrapes their email) or a Google Maps dump. Claude writes a personalised giveaway
+        email for each. Approve the ones you want, and the sender trickles them out from your Gmail, about one an hour,
+        7am to 9pm, with a day-2 and day-7 follow-up that stops the moment they reply. No email found? Call them instead.
       </p>
 
       {/* paste box */}
@@ -145,8 +160,16 @@ export default function OutreachTool() {
               {scanAll ? "Scanning…" : `Scan & write all new (${counts.new})`}
             </button>
           )}
+          {counts.written > 0 && (
+            <button
+              onClick={() => act(approveAllReady)}
+              className="rounded-xl bg-brand-green/20 px-5 py-2.5 text-sm font-black text-brand-green transition hover:bg-brand-green/30"
+            >
+              Approve all ready
+            </button>
+          )}
           <span className="ml-auto text-xs text-white/40">
-            {counts.total} total · {counts.written} written · {counts.sent} sent
+            {counts.total} total · {counts.queued} queued · {counts.sent} sent · {counts.replied} replied
           </span>
         </div>
       </div>
@@ -166,11 +189,24 @@ export default function OutreachTool() {
             onScan={() => onScan(l.id)}
             onPatch={(p) => patch(l.id, p)}
             onDelete={() => onDelete(l.id)}
+            onApprove={(a) => act(() => approveLead(l.id, a))}
+            onStop={() => act(() => stopLead(l.id))}
+            onReplied={() => act(() => markReplied(l.id))}
+            onReset={() => act(() => resetSend(l.id))}
           />
         ))}
       </div>
     </div>
   );
+}
+
+function fmtDate(iso: string | null): string {
+  if (!iso) return "";
+  try {
+    return new Date(iso).toLocaleDateString("en-AU", { day: "numeric", month: "short" });
+  } catch {
+    return "";
+  }
 }
 
 function LeadCard({
@@ -179,12 +215,20 @@ function LeadCard({
   onScan,
   onPatch,
   onDelete,
+  onApprove,
+  onStop,
+  onReplied,
+  onReset,
 }: {
   lead: Lead;
   scanning: boolean;
   onScan: () => void;
   onPatch: (p: { subject?: string; body?: string; email?: string; status?: string }) => void;
   onDelete: () => void;
+  onApprove: (approved: boolean) => void;
+  onStop: () => void;
+  onReplied: () => void;
+  onReset: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const [subject, setSubject] = useState(lead.subject);
@@ -253,6 +297,67 @@ function LeadCard({
 
       {written && (
         <div className="mt-3 border-t border-white/10 pt-3">
+          {/* auto-send pipeline status + controls */}
+          <div className="mb-3 flex flex-wrap items-center gap-2">
+            <span
+              className={`text-xs font-bold ${
+                lead.replied
+                  ? "text-brand-green"
+                  : lead.bounced
+                    ? "text-red-300"
+                    : lead.stopped
+                      ? "text-white/50"
+                      : lead.stage >= 1
+                        ? "text-brand-purple-soft"
+                        : lead.approved
+                          ? "text-brand-green"
+                          : "text-white/40"
+              }`}
+            >
+              {lead.replied
+                ? "Replied, sequence stopped ✓"
+                : lead.bounced
+                  ? `Bounced${lead.send_error ? ": " + lead.send_error : ""}`
+                  : lead.stopped
+                    ? "Paused"
+                    : lead.stage === 3
+                      ? "Done, 3 emails sent"
+                      : lead.stage === 2
+                        ? `Followed up, final due ${fmtDate(lead.next_action_at)}`
+                        : lead.stage === 1
+                          ? `Sent, follow-up due ${fmtDate(lead.next_action_at)}`
+                          : lead.approved
+                            ? "Queued for auto-send"
+                            : "Not queued"}
+            </span>
+            <div className="ml-auto flex flex-wrap gap-1.5">
+              {!lead.approved && lead.stage === 0 && !lead.stopped && (
+                <button
+                  onClick={() => onApprove(true)}
+                  disabled={!email.trim()}
+                  className="rounded-lg bg-brand-green px-3 py-1.5 text-xs font-black text-[#04130a] transition hover:brightness-110 disabled:opacity-40"
+                  title={email.trim() ? "" : "Needs an email address first"}
+                >
+                  Approve for auto-send
+                </button>
+              )}
+              {lead.approved && lead.stage < 3 && !lead.replied && !lead.stopped && (
+                <button onClick={onStop} className="rounded-lg border border-white/15 px-3 py-1.5 text-xs font-bold text-white/70 transition hover:border-white/35 hover:text-white">
+                  Pause
+                </button>
+              )}
+              {lead.stage >= 1 && !lead.replied && (
+                <button onClick={onReplied} className="rounded-lg border border-white/15 px-3 py-1.5 text-xs font-bold text-white/70 transition hover:border-white/35 hover:text-white">
+                  Mark replied
+                </button>
+              )}
+              {(lead.stopped || lead.bounced) && (
+                <button onClick={onReset} className="rounded-lg border border-white/15 px-3 py-1.5 text-xs font-bold text-white/70 transition hover:border-white/35 hover:text-white">
+                  Requeue
+                </button>
+              )}
+            </div>
+          </div>
           <button onClick={() => setOpen((o) => !o)} className="text-xs font-bold text-brand-purple-soft hover:text-white">
             {open ? "Hide email ▲" : "Show / edit email ▼"}
           </button>
