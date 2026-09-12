@@ -48,16 +48,6 @@ const OPTIONS: { icon: string; title: string; tag: string; summary: string; give
   },
 ];
 
-const STEPS: { n: string; t: string; d: string; platforms?: string[]; img?: string }[] = [
-  { n: "1", t: "You sign up", d: "That's the hard part done.", img: "/media/photos/step-1-signup.webp" },
-  { n: "2", t: "We book your content day", d: "We lock in a full day at your business and shoot a month of content. Educational, entertainment, skits, all scripted and ready to go.", img: "/media/photos/step-2-shoot.webp" },
-  { n: "3", t: "We edit everything", d: "Our team cuts and polishes every video. You don't lift a finger.", img: "/media/photos/step-3-edit.webp" },
-  { n: "4", t: "You get your own videos", d: "We send you a personalised batch of finished videos to post yourself.", img: "/media/photos/step-4-yours.webp" },
-  { n: "5", t: "We publish across all four of our platforms", d: "Your business in front of our whole audience.", platforms: ["Instagram", "Facebook", "TikTok", "YouTube"], img: "/media/photos/step-5-publish.webp" },
-  { n: "6", t: "We link straight to you", d: "Backlinks on our website and members portal send our members directly to your business.", img: "/media/photos/step-6-links.webp" },
-  { n: "7", t: "We drive traffic every day", d: "Every day we've got paid ads, email marketing, content or word of mouth driving traffic, pushing our audience to our pages with your links on them.", img: "/media/photos/step-7-traffic.webp" },
-];
-
 export default function PartnersPage() {
   return (
     <main className="min-h-screen bg-[#050506]">
@@ -89,7 +79,7 @@ export default function PartnersPage() {
           </Reveal>
           <Reveal delay={350}>
             <a
-              href="#contact"
+              href="#platinum"
               className="mt-7 inline-flex items-center gap-2 rounded-full bg-brand-purple px-8 py-3.5 font-display text-sm font-black uppercase tracking-[0.14em] text-white transition hover:brightness-110 active:scale-95"
             >
               Become a partner
@@ -172,7 +162,7 @@ export default function PartnersPage() {
           </Reveal>
           {/* Platinum, the paid tier (shown first) */}
           <Reveal delay={80}>
-            <div className="mt-8 overflow-hidden rounded-3xl border border-brand-purple/45 bg-gradient-to-b from-brand-purple/[0.12] to-white/[0.02] p-6 shadow-[0_0_60px_-24px_rgba(124,47,245,0.6)] sm:p-8">
+            <div id="platinum" className="mt-8 scroll-mt-24 overflow-hidden rounded-3xl border border-brand-purple/45 bg-gradient-to-b from-brand-purple/[0.12] to-white/[0.02] p-6 shadow-[0_0_60px_-24px_rgba(124,47,245,0.6)] sm:p-8">
               <div className="flex flex-wrap items-center gap-3">
                 <span className="text-3xl leading-none">💎</span>
                 <span className="rounded-full bg-brand-purple/20 px-2.5 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-brand-purple-soft">
@@ -288,50 +278,30 @@ export default function PartnersPage() {
               </Reveal>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* ═══ HOW IT WORKS ═══ */}
-      <section className="border-y border-white/5 bg-white/[0.015] px-4 py-14 sm:py-16">
-        <div className="mx-auto max-w-4xl">
-          <Reveal>
-            <h2 className="text-center font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-              How our Platinum partnership works
-            </h2>
-          </Reveal>
-          <div className="mt-10 flex flex-col gap-10 sm:gap-14">
-            {STEPS.map((s, i) => (
-              <Reveal key={s.n} delay={i * 60}>
-                <div
-                  className={`flex flex-col items-center gap-5 text-center sm:gap-10 sm:text-left ${
-                    i % 2 === 0 ? "sm:flex-row" : "sm:flex-row-reverse sm:text-right"
-                  }`}
-                >
-                  {s.img && (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={s.img} alt="" className="h-44 w-44 shrink-0 rounded-2xl object-cover sm:h-60 sm:w-60" />
-                  )}
-                  <div className="flex-1">
-                    <div className="font-display text-xl font-extrabold text-white sm:text-2xl">{s.t}</div>
-                    <div className="mt-1.5 text-sm leading-relaxed text-white/60 sm:text-base">{s.d}</div>
-                    {s.platforms && (
+          {/* Scrolling logos, like the membership page, so a business can picture their logo here */}
+          <Reveal delay={120}>
+            <div className="mt-12">
+              <div className="text-center text-[11px] font-bold uppercase tracking-[0.22em] text-brand-yellow">
+                Your business, in front of our members
+              </div>
+              <div className="relative mt-5 overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_12%,black_88%,transparent)]">
+                <div className="flex w-max animate-marquee items-center gap-5">
+                  {Array.from({ length: 2 }).flatMap((_, dup) =>
+                    Array.from({ length: 6 }).map((__, i) => (
                       <div
-                        className={`mt-3 flex flex-wrap gap-2 justify-center ${
-                          i % 2 === 0 ? "sm:justify-start" : "sm:justify-end"
-                        }`}
+                        key={`${dup}-${i}`}
+                        className="flex h-20 w-40 shrink-0 items-center justify-center rounded-2xl border border-brand-yellow/20 bg-white/[0.03] px-5"
                       >
-                        {s.platforms.map((p) => (
-                          <span key={p} className="rounded-full border border-brand-purple/30 bg-brand-purple/[0.1] px-3 py-1 text-[11px] font-bold text-brand-purple-soft">
-                            {p}
-                          </span>
-                        ))}
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={BUSINESS.logo} alt="Featured partner" className="max-h-9 w-auto opacity-85" />
                       </div>
-                    )}
-                  </div>
+                    ))
+                  )}
                 </div>
-              </Reveal>
-            ))}
-          </div>
+              </div>
+            </div>
+          </Reveal>
         </div>
       </section>
 
