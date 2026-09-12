@@ -48,13 +48,13 @@ const OPTIONS: { icon: string; title: string; tag: string; summary: string; give
 ];
 
 const STEPS: { n: string; t: string; d: string; platforms?: string[]; img?: string }[] = [
-  { n: "1", t: "You sign up", d: "Pick monthly or yearly and you're in. That's the hard part done.", img: "/media/photos/step-1-signup.webp" },
-  { n: "2", t: "We book your content day", d: "We lock in a full day at your business and shoot a month of content.", img: "/media/photos/step-2-shoot.webp" },
+  { n: "1", t: "You sign up", d: "That's the hard part done.", img: "/media/photos/step-1-signup.webp" },
+  { n: "2", t: "We book your content day", d: "We lock in a full day at your business and shoot a month of content. Educational, entertainment, skits, all scripted and ready to go.", img: "/media/photos/step-2-shoot.webp" },
   { n: "3", t: "We edit everything", d: "Our team cuts and polishes every video. You don't lift a finger.", img: "/media/photos/step-3-edit.webp" },
   { n: "4", t: "You get your own videos", d: "We send you a personalised batch of finished videos to post yourself.", img: "/media/photos/step-4-yours.webp" },
-  { n: "5", t: "We publish across all four platforms", d: "Your business in front of our whole audience.", platforms: ["Instagram", "Facebook", "TikTok", "YouTube"], img: "/media/photos/step-5-publish.webp" },
+  { n: "5", t: "We publish across all four of our platforms", d: "Your business in front of our whole audience.", platforms: ["Instagram", "Facebook", "TikTok", "YouTube"], img: "/media/photos/step-5-publish.webp" },
   { n: "6", t: "We link straight to you", d: "Backlinks on our website and members portal send our members directly to your business.", img: "/media/photos/step-6-links.webp" },
-  { n: "7", t: "We drive traffic every month", d: "Monthly email and text campaigns push our audience to our page with your links on it.", img: "/media/photos/step-7-traffic.webp" },
+  { n: "7", t: "We drive traffic every day", d: "Every day we've got paid ads, email marketing, content or word of mouth driving traffic, pushing our audience to our pages with your links on them.", img: "/media/photos/step-7-traffic.webp" },
 ];
 
 export default function PartnersPage() {
