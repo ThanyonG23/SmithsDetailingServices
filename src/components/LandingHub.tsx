@@ -109,7 +109,7 @@ export default function LandingHub() {
   return (
     <main className="min-h-screen bg-[#050506]">
       {/* ═══ NAV ═══ */}
-      <SiteNav />
+      <SiteNav accent="purple" />
 
       {/* ═══ HERO (full-bleed photo) ═══ */}
       <section className="relative flex min-h-[72vh] items-end overflow-hidden">
@@ -120,6 +120,11 @@ export default function LandingHub() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#050506] via-[#050506]/55 to-black/25" aria-hidden />
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#050506] to-transparent" aria-hidden />
+        <div
+          className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[620px] -translate-x-1/2 rounded-full opacity-[0.16] blur-[120px]"
+          style={{ background: "radial-gradient(closest-side, #7c2ff5, transparent 70%)" }}
+          aria-hidden
+        />
 
         <div className="relative mx-auto w-full max-w-6xl px-4 pb-14 pt-32">
           <Reveal>
@@ -130,7 +135,7 @@ export default function LandingHub() {
           <Reveal delay={100}>
             <h1 className="mt-6 max-w-4xl font-display text-5xl font-extrabold leading-[0.95] tracking-tight text-white sm:text-7xl lg:text-8xl">
               Everything your car needs,
-              <span className="text-brand-green"> in one place.</span>
+              <span className="text-brand-purple-soft"> in one place.</span>
             </h1>
           </Reveal>
           <Reveal delay={200}>
@@ -193,7 +198,7 @@ export default function LandingHub() {
               <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-white/35">Find us</div>
               <p className="mt-3 max-w-[16rem] leading-relaxed">{BUSINESS.address}</p>
               <p className="mt-3">
-                <a href={`tel:${BUSINESS.phoneE164}`} className="font-bold text-white transition hover:text-brand-green">
+                <a href={`tel:${BUSINESS.phoneE164}`} className="font-bold text-white transition hover:text-brand-purple-soft">
                   {BUSINESS.phone}
                 </a>
               </p>
