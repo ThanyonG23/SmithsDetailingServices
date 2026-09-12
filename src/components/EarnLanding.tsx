@@ -91,6 +91,36 @@ export default function EarnLanding() {
                 </p>
               </div>
 
+              {/* WHAT YOU EARN */}
+              <div className="mt-12">
+                <h2 className="text-center font-display text-2xl font-extrabold tracking-tight text-white">What you earn per referral</h2>
+                <p className="mx-auto mt-2 max-w-xl text-center text-sm leading-relaxed text-white/60">
+                  Our memberships go up to $24.99/month, so a single referral can pay you up to{" "}
+                  <b className="text-brand-green">$75 a year</b>, every year they stay. No cap on how many you refer.
+                </p>
+                <div className="mt-6 overflow-hidden rounded-2xl border border-white/10">
+                  <div className="grid grid-cols-3 bg-white/[0.04] px-4 py-3 text-[10px] font-black uppercase tracking-wider text-white/45">
+                    <div>Member joins</div><div>They pay</div><div className="text-right">You earn (25%)</div>
+                  </div>
+                  {[
+                    ["Smiths Member", "$9.99/mo", "$2.50/mo"],
+                    ["Platinum", "$24.99/mo", "$6.25/mo"],
+                    ["Annual", "$99/yr", "$24.75/yr"],
+                    ["Platinum Annual", "$199/yr", "$49.75/yr"],
+                  ].map(([plan, pay, earn], i) => (
+                    <div key={plan} className={`grid grid-cols-3 px-4 py-3.5 text-sm ${i % 2 ? "bg-white/[0.01]" : ""}`}>
+                      <div className="font-bold text-white">{plan}</div>
+                      <div className="text-white/60">{pay}</div>
+                      <div className="text-right font-black text-brand-green">{earn}</div>
+                    </div>
+                  ))}
+                </div>
+                <p className="mx-auto mt-4 max-w-xl text-center text-sm leading-relaxed text-white/60">
+                  Most people join on the $1 offer, then upgrade to Platinum for better odds, and your 25% grows with them,
+                  automatically. Refer 20 Platinum members and that&apos;s <b className="text-white">$125 a month</b>, on repeat.
+                </p>
+              </div>
+
               {/* HOW IT WORKS */}
               <div className="mt-12">
                 <h2 className="text-center font-display text-2xl font-extrabold tracking-tight text-white">How it works</h2>
