@@ -84,6 +84,12 @@ export default function FullSuitePage() {
                 <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-purple-soft">★</span>Paid ads run against your best content, actual customers</li>
                 <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-green">🎁</span><span className="text-brand-green">Bonus: a free website (limited time)</span></li>
               </ul>
+              <div className="mt-4 rounded-xl border border-brand-green/40 bg-brand-green/[0.08] px-4 py-3">
+                <div className="text-[10px] font-black uppercase tracking-[0.16em] text-brand-green">Our guarantee</div>
+                <div className="mt-1 text-sm font-bold leading-relaxed text-white">
+                  Don&apos;t make back your $2,000 and we&apos;ll work for free until you do.
+                </div>
+              </div>
               <div className="mt-4 rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-[11px] leading-relaxed text-white/50">
                 Requires a minimum <b className="text-white/70">$300/week ad budget</b>, that&apos;s your spend, you control it.
               </div>
