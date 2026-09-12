@@ -103,8 +103,8 @@ export default function PartnersPage() {
         <div className="mx-auto max-w-3xl text-center">
           <Reveal>
             <h2 className="font-display text-3xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-4xl">
-              You&apos;ve seen our ads around Cairns.
-              <br className="hidden sm:block" /> <span className="text-brand-purple-soft">Now let them work for your business.</span>
+              You&apos;ve seen our marketing around Cairns.
+              <br className="hidden sm:block" /> <span className="text-brand-purple-soft">Now let our marketing work for your business.</span>
             </h2>
           </Reveal>
           <Reveal delay={100}>
@@ -124,8 +124,9 @@ export default function PartnersPage() {
           </Reveal>
           <Reveal delay={150}>
             <p className="mx-auto mt-6 max-w-xl text-sm leading-relaxed text-white/60 sm:text-base">
-              We&apos;ve spent three years and $132,854 of our own money learning exactly what gets local attention. Business
-              owners tell us all the time they wish they had someone to do it for them. Now you can.
+              We&apos;ve spent three years, created over 500 pieces of content for ourselves, and spent $132,854 of our own
+              money learning exactly what gets local attention. Business owners tell us all the time they wish they had
+              someone to do it for them. Now you can.
             </p>
           </Reveal>
         </div>
