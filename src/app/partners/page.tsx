@@ -57,9 +57,6 @@ const STEPS: { n: string; t: string; d: string; platforms?: string[]; img?: stri
   { n: "7", t: "We drive traffic every month", d: "Monthly email and text campaigns push our audience to our page with your links on it.", img: "/media/photos/step-7-traffic.webp" },
 ];
 
-const PLAT_MONTHLY_URL = "https://buy.stripe.com/cNifZh1bGaTXfHa7lV6kg0J";
-const PLAT_ANNUAL_URL = "https://buy.stripe.com/6oU00j9Ic0fjamQbCb6kg0K";
-
 export default function PartnersPage() {
   return (
     <main className="min-h-screen bg-[#050506]">
@@ -256,20 +253,12 @@ export default function PartnersPage() {
                   </div>
                 </div>
               </div>
-              <div className="mt-6 flex flex-col gap-2.5 sm:flex-row">
-                <a
-                  href={PLAT_MONTHLY_URL}
-                  className="flex flex-1 items-center justify-center rounded-full bg-brand-purple px-6 py-3.5 font-display text-sm font-black uppercase tracking-[0.12em] text-white transition hover:brightness-110 active:scale-95"
-                >
-                  Go Platinum · $1,500/mo →
-                </a>
-                <a
-                  href={PLAT_ANNUAL_URL}
-                  className="flex flex-1 items-center justify-center rounded-full border border-brand-purple/50 bg-brand-purple/[0.12] px-6 py-3.5 font-display text-sm font-black uppercase tracking-[0.12em] text-brand-purple-soft transition hover:bg-brand-purple/[0.2] active:scale-95"
-                >
-                  Pay yearly · $15,000 →
-                </a>
-              </div>
+              <a
+                href="/full-suite"
+                className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-purple px-8 py-3.5 font-display text-sm font-black uppercase tracking-[0.12em] text-white transition hover:brightness-110 active:scale-95"
+              >
+                Get started →
+              </a>
               <a
                 href="#contact"
                 className="mt-3 block text-center text-sm font-bold text-brand-purple-soft underline underline-offset-4 transition hover:text-white"
