@@ -28,14 +28,14 @@ export default function PartnerWelcomePage() {
         />
         <div className="relative mx-auto max-w-xl px-5 pb-20 pt-16 text-center sm:pt-20">
           <span className="inline-flex items-center gap-2 rounded-full border border-brand-green/40 bg-brand-green/[0.1] px-4 py-1.5 text-[11px] font-black uppercase tracking-[0.16em] text-brand-green">
-            ✓ You&apos;re a Platinum partner
+            ✓ You&apos;re a Smiths partner
           </span>
           <h1 className="mt-5 font-display text-3xl font-extrabold leading-[1.08] tracking-tight text-white sm:text-4xl">
             Welcome to the team.
           </h1>
           <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-white/65">
             Thanks for partnering with Smiths. We&apos;ll be in touch <b className="text-white">within 24 hours</b> to lock in
-            your first content day. Nothing else to do right now.
+            your first content day and walk through your plan. Nothing else to do right now.
           </p>
 
           {/* What happens next */}
