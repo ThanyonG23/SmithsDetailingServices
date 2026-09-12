@@ -33,7 +33,7 @@ We have still got a giveaway slot open and I would love it to be ${business}. It
 
 See how it works: smithsdetailingservices.com.au/partners
 
-Worth a quick chat? Or just reply and I will take you off my list.
+Worth a quick chat?
 
 Thanyon
 Smiths Detailing Services`;
