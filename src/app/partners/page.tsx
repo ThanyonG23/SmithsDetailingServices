@@ -253,9 +253,28 @@ export default function PartnersPage() {
                   </div>
                 </div>
               </div>
+              <div className="mt-6 rounded-2xl border border-brand-purple/30 bg-brand-purple/[0.06] px-5 py-5">
+                <div className="text-center font-display text-lg font-black uppercase tracking-[0.14em] text-white">
+                  Join now to
+                </div>
+                <ul className="mt-3 flex flex-col gap-2">
+                  {[
+                    "Never think about creating content for your business again",
+                    "Get seen across multiple channels",
+                    "Build brand awareness through partnerships",
+                    "Build momentum to help you stay busy",
+                    "Have content ready for paid advertisement",
+                  ].map((g) => (
+                    <li key={g} className="flex items-start gap-2.5 text-sm font-semibold leading-relaxed text-white">
+                      <span className="mt-0.5 shrink-0 text-brand-yellow">✓</span>
+                      <span>{g}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
               <a
                 href="/full-suite"
-                className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-purple px-8 py-3.5 font-display text-sm font-black uppercase tracking-[0.12em] text-white transition hover:brightness-110 active:scale-95"
+                className="mt-4 flex w-full items-center justify-center rounded-full bg-brand-purple px-8 py-3.5 font-display text-sm font-black uppercase tracking-[0.12em] text-white transition hover:brightness-110 active:scale-95"
               >
                 Get started →
               </a>
