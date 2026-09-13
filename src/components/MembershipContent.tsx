@@ -196,12 +196,12 @@ export default function MembershipContent() {
 
           {/* Scrolling announcement ticker, under the posters */}
           <Reveal delay={150}>
-            <div className="mt-8 overflow-hidden rounded-full border border-brand-purple/50 bg-gradient-to-r from-brand-purple to-brand-purple-soft py-2.5 shadow-[0_0_44px_-12px_rgba(124,47,245,0.8)]">
-              <div className="flex w-max animate-marquee items-center whitespace-nowrap">
+            <div className="mt-8 overflow-hidden rounded-full border border-red-500/60 bg-gradient-to-r from-red-600 to-red-500 py-2.5 shadow-[0_0_44px_-12px_rgba(239,68,68,0.85)]">
+              <div className="flex w-max animate-marquee items-center whitespace-nowrap" style={{ animationDuration: "55s" }}>
                 {Array.from({ length: 8 }).map((_, i) => (
                   <span key={i} className="flex items-center text-[12.5px] font-black uppercase tracking-[0.14em] text-white sm:text-[13px]">
-                    <span>This week only · all new members get 30% off all detailing services</span>
-                    <span className="px-6 text-white/55">✦</span>
+                    <span>FINAL CALL · 2 HOURS LEFT</span>
+                    <span className="px-6 text-white/60">✦</span>
                   </span>
                 ))}
               </div>
