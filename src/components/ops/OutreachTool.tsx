@@ -31,6 +31,16 @@ const STATUS_STYLE: Record<string, string> = {
   skipped: "bg-white/5 text-white/35",
 };
 
+/* Which pipeline stage a lead is in. Order matters (checked top-down). */
+function bucketOf(l: Lead): "new" | "ready" | "queued" | "sequence" | "replied" | "done" {
+  if (l.replied) return "replied";
+  if (l.bounced || l.stopped || l.stage >= 3) return "done";
+  if (l.stage >= 1) return "sequence"; // sent, in follow-up (autopilot)
+  if (l.approved) return "queued"; // approved, waiting for the hourly sender
+  if (l.status === "written") return "ready"; // drafted, needs your approval
+  return "new"; // pasted, not scanned yet
+}
+
 export default function OutreachTool() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [paste, setPaste] = useState("");
@@ -38,22 +48,22 @@ export default function OutreachTool() {
   const [busy, setBusy] = useState(false);
   const [scanning, setScanning] = useState<number | null>(null);
   const [scanAll, setScanAll] = useState(false);
+  const [filter, setFilter] = useState<string>("all");
 
   useEffect(() => {
     getOutreach().then(setLeads).catch(() => {});
   }, []);
 
   const counts = useMemo(() => {
-    const c = { total: leads.length, new: 0, written: 0, queued: 0, sent: 0, replied: 0 };
-    for (const l of leads) {
-      if (l.replied) c.replied++;
-      if (l.stage >= 1) c.sent++;
-      else if (l.approved && !l.stopped) c.queued++;
-      if (l.status === "new") c.new++;
-      else if (l.status === "written") c.written++;
-    }
+    const c = { total: leads.length, new: 0, ready: 0, queued: 0, sequence: 0, replied: 0, done: 0 };
+    for (const l of leads) c[bucketOf(l)]++;
     return c;
   }, [leads]);
+
+  const shown = useMemo(
+    () => (filter === "all" ? leads : leads.filter((l) => bucketOf(l) === filter)),
+    [leads, filter],
+  );
 
   async function act(fn: () => Promise<Lead[]>) {
     try {
@@ -182,28 +192,74 @@ export default function OutreachTool() {
               {scanAll ? "Scanning…" : `Scan & write all new (${counts.new})`}
             </button>
           )}
-          {counts.written > 0 && (
+          {counts.ready > 0 && (
             <button
               onClick={() => act(approveAllReady)}
               className="rounded-xl bg-brand-green/20 px-5 py-2.5 text-sm font-black text-brand-green transition hover:bg-brand-green/30"
             >
-              Approve all ready
+              Approve all ready ({counts.ready})
             </button>
           )}
-          <span className="ml-auto text-xs text-white/40">
-            {counts.total} total · {counts.queued} queued · {counts.sent} sent · {counts.replied} replied
+          <span className="ml-auto text-xs text-white/45">
+            {counts.queued + counts.sequence} on autopilot
           </span>
         </div>
       </div>
 
+      {/* pipeline dashboard, tap a tile to filter */}
+      <div className="mt-6 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+        {([
+          { key: "ready", label: "Ready to approve", value: counts.ready, cls: "border-brand-purple/40 bg-brand-purple/[0.08] text-brand-purple-soft" },
+          { key: "queued", label: "Left to send", value: counts.queued, cls: "border-brand-green/40 bg-brand-green/[0.08] text-brand-green" },
+          { key: "sequence", label: "In follow-up", value: counts.sequence, cls: "border-white/15 bg-white/[0.03] text-white/80" },
+          { key: "replied", label: "Replied", value: counts.replied, cls: "border-brand-yellow/40 bg-brand-yellow/[0.08] text-brand-yellow" },
+        ] as const).map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setFilter((f) => (f === t.key ? "all" : t.key))}
+            className={`rounded-2xl border p-4 text-left transition ${t.cls} ${filter === t.key ? "ring-2 ring-white/40" : "hover:brightness-125"}`}
+          >
+            <div className="font-display text-3xl font-black tabular-nums">{t.value}</div>
+            <div className="mt-1 text-[11px] font-bold uppercase tracking-wider opacity-80">{t.label}</div>
+          </button>
+        ))}
+      </div>
+
+      {/* extra filters */}
+      <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold">
+        {([
+          { key: "all", label: `All (${counts.total})` },
+          { key: "new", label: `Not scanned (${counts.new})` },
+          { key: "done", label: `Done (${counts.done})` },
+        ] as const).map((t) => (
+          <button
+            key={t.key}
+            onClick={() => setFilter(t.key)}
+            className={`rounded-full px-3 py-1.5 transition ${filter === t.key ? "bg-white text-black" : "border border-white/15 text-white/60 hover:text-white"}`}
+          >
+            {t.label}
+          </button>
+        ))}
+        {filter !== "all" && (
+          <button onClick={() => setFilter("all")} className="rounded-full px-3 py-1.5 text-white/40 underline underline-offset-2 hover:text-white/70">
+            clear filter
+          </button>
+        )}
+      </div>
+
       {/* list */}
-      <div className="mt-6 flex flex-col gap-3">
+      <div className="mt-4 flex flex-col gap-3">
         {leads.length === 0 && (
           <div className="rounded-2xl border border-dashed border-white/12 p-8 text-center text-sm text-white/40">
             Nothing yet. Paste some business links above to get started.
           </div>
         )}
-        {leads.map((l) => (
+        {leads.length > 0 && shown.length === 0 && (
+          <div className="rounded-2xl border border-dashed border-white/12 p-6 text-center text-sm text-white/40">
+            Nothing in this bucket right now.
+          </div>
+        )}
+        {shown.map((l) => (
           <LeadCard
             key={l.id}
             lead={l}
