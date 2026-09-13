@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Reveal from "@/components/Reveal";
 import SiteNav from "@/components/SiteNav";
 import BusinessPartnerForm from "@/components/BusinessPartnerForm";
+import PartnerCallCTA from "@/components/PartnerCallCTA";
 import PlatinumPricing from "@/components/PlatinumPricing";
 import Reels from "@/components/Reels";
 import { BUSINESS } from "@/lib/config";
@@ -345,6 +346,7 @@ export default function PartnersPage() {
         </div>
       </section>
 
+      <PartnerCallCTA />
     </main>
   );
 }
