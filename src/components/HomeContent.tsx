@@ -3,6 +3,7 @@ import { BUSINESS, REELS, SERVICES, HERO_IMAGE, CTA_IMAGE } from "@/lib/config";
 import { refSmsHref } from "@/lib/referrals";
 import Reels from "@/components/Reels";
 import ReviewsSection from "@/components/ReviewsSection";
+import DetailOfferForm from "@/components/DetailOfferForm";
 import SiteNav from "@/components/SiteNav";
 import ServiceShowcase from "@/components/ServiceShowcase";
 import BringBlackBack from "@/components/BringBlackBack";
@@ -109,6 +110,69 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
               <Stars />
               <span className="font-bold text-white">100+ 5-Star Google reviews</span>
             </div>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ═══════════════════ ATTRACTION OFFER ═══════════════════ */}
+      <section className="relative overflow-hidden border-b border-white/10 bg-gradient-to-b from-brand-green/[0.06] to-transparent py-16 sm:py-20">
+        <div
+          className="pointer-events-none absolute left-1/2 top-0 h-[340px] w-[340px] -translate-x-1/2 rounded-full opacity-[0.12] blur-[120px]"
+          style={{ background: "radial-gradient(closest-side, #2bff7a, transparent 70%)" }}
+          aria-hidden
+        />
+        <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 lg:grid-cols-2">
+          {/* Left: the offer + value stack */}
+          <div>
+            <Reveal>
+              <div className="inline-flex items-center gap-2 rounded-full border border-brand-green/40 bg-brand-green/10 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-brand-green">
+                Limited booking offer
+              </div>
+            </Reveal>
+            <Reveal delay={100}>
+              <h2 className="mt-5 font-display text-4xl font-extrabold leading-[1.03] tracking-tight text-white sm:text-5xl">
+                Book an exterior detail with a full cut &amp; polish.
+                <br />
+                <span className="text-brand-green">We&apos;ll throw in the interior detail, free.</span>
+              </h2>
+            </Reveal>
+            <Reveal delay={200}>
+              <p className="mt-5 max-w-lg text-base leading-relaxed text-white/65">
+                A proper multi-stage paint correction that cuts out the swirls, scratches and oxidation
+                and brings back the deep, wet gloss, then a full interior detail on the house.
+              </p>
+            </Reveal>
+            <Reveal delay={250}>
+              <ul className="mt-7 flex flex-col gap-3">
+                {[
+                  { t: "Full exterior detail", d: "Wash, decontamination and protection, done properly." },
+                  { t: "Multi-stage cut & polish", d: "Real paint correction that removes swirls and scratches, not a quick buff." },
+                  { t: "Full interior detail, FREE", d: "Valued at $280+. Deep interior reset, thrown in at no cost.", free: true },
+                ].map((item) => (
+                  <li key={item.t} className="flex items-start gap-3">
+                    <span className={`mt-0.5 shrink-0 text-lg ${item.free ? "text-brand-yellow" : "text-brand-green"}`}>
+                      {item.free ? "🎁" : "✓"}
+                    </span>
+                    <span>
+                      <span className={`font-display text-base font-black ${item.free ? "text-brand-yellow" : "text-white"}`}>
+                        {item.t}
+                      </span>
+                      <span className="ml-2 text-sm text-white/55">{item.d}</span>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
+            <Reveal delay={300}>
+              <p className="mt-7 text-sm font-semibold text-white/50">
+                We only take a limited number of correction bookings each week, so we can give every car the time it needs.
+              </p>
+            </Reveal>
+          </div>
+
+          {/* Right: the form */}
+          <Reveal delay={150}>
+            <DetailOfferForm />
           </Reveal>
         </div>
       </section>
