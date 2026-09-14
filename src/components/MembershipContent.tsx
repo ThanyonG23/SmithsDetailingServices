@@ -200,7 +200,7 @@ export default function MembershipContent() {
               <div className="flex w-max animate-marquee items-center whitespace-nowrap" style={{ animationDuration: "55s" }}>
                 {Array.from({ length: 8 }).map((_, i) => (
                   <span key={i} className="flex items-center text-[12.5px] font-black uppercase tracking-[0.14em] text-white sm:text-[13px]">
-                    <span>FINAL CALL · 2 HOURS LEFT</span>
+                    <span>You missed the $1K Cash or $2.2K Detail draw · Don&apos;t miss the next one</span>
                     <span className="px-6 text-white/60">✦</span>
                   </span>
                 ))}
