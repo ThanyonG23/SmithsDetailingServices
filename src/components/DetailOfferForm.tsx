@@ -7,7 +7,15 @@ import { useState } from "react";
    the shop. Kept deliberately short (name, contact, vehicle) to maximise the
    conversion rate, everything else gets sorted on the quote call. */
 
-export default function DetailOfferForm({ source = "detailing-offer" }: { source?: string }) {
+export default function DetailOfferForm({
+  source = "detailing-offer",
+  offerLabel = "Exterior detail + multi-stage cut & polish, free interior detail",
+  ctaLabel = "Claim my free interior detail →",
+}: {
+  source?: string;
+  offerLabel?: string;
+  ctaLabel?: string;
+}) {
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
   const [vehicle, setVehicle] = useState("");
@@ -24,7 +32,7 @@ export default function DetailOfferForm({ source = "detailing-offer" }: { source
     setState("sending");
     try {
       const lines = [
-        "OFFER: Exterior detail + multi-stage cut & polish, free interior detail",
+        `OFFER: ${offerLabel}`,
         `Vehicle: ${vehicle.trim()}`,
         suburb.trim() && `Area: ${suburb.trim()}`,
       ].filter(Boolean);
@@ -60,7 +68,7 @@ export default function DetailOfferForm({ source = "detailing-offer" }: { source
         <div className="text-3xl">✅</div>
         <div className="mt-2 font-display text-lg font-extrabold text-white">You&apos;re in, thanks</div>
         <p className="mt-1 text-sm text-white/60">
-          Thanyon will call you shortly to talk through your vehicle and price. Your free interior detail is locked in.
+          Thanyon will call you shortly to talk through your vehicle and price. Your free extras are locked in.
         </p>
       </div>
     );
@@ -91,7 +99,7 @@ export default function DetailOfferForm({ source = "detailing-offer" }: { source
         disabled={state === "sending"}
         className="mt-3 w-full rounded-full bg-brand-purple px-6 py-3.5 font-display text-sm font-black text-white transition hover:brightness-110 active:scale-95 disabled:opacity-50"
       >
-        {state === "sending" ? "Sending…" : "Claim my free interior detail →"}
+        {state === "sending" ? "Sending…" : ctaLabel}
       </button>
       {error && <div className="mt-2 text-xs font-semibold text-red-300">{error}</div>}
       <p className="mt-2.5 text-center text-[11px] text-white/40">
