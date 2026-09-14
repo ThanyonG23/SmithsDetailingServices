@@ -38,6 +38,7 @@ const VALUE: { t: string; v: string }[] = [
   { t: "A high-converting landing page", v: "$2,000 setup" },
   { t: "AI automation", v: "$500/mo" },
   { t: "A full-time salesperson to close every lead", v: "$1,000/wk+" },
+  { t: "Advertising budget, funded by us", v: "$300/wk min" },
 ];
 
 const FAQ: { q: string; a: string }[] = [
@@ -56,6 +57,10 @@ const FAQ: { q: string; a: string }[] = [
   {
     q: "How much does it cost?",
     a: "Nothing upfront. No setup fee, no monthly fee, no lock-in. The only time you pay is when I've actually booked you a paying job. No jobs, no cost.",
+  },
+  {
+    q: "Who covers the ad spend?",
+    a: "We do. You don't put a cent toward ads. We fund the advertising budget ourselves and only make it back through our small cut of the jobs we book you. That's how sure we are it'll work.",
   },
   {
     q: "What's the percentage?",
@@ -216,12 +221,12 @@ export default function GrowLanding() {
               <span className="font-display text-sm font-black uppercase tracking-wide text-brand-purple-soft sm:text-base">
                 Total value
               </span>
-              <span className="shrink-0 font-display text-base font-black text-white sm:text-lg">$7,500+/month</span>
+              <span className="shrink-0 font-display text-base font-black text-white sm:text-lg">$8,800+/month</span>
             </div>
           </div>
           <Reveal delay={120}>
             <p className="mx-auto mt-6 max-w-md text-center text-base leading-relaxed text-white/70">
-              Over <span className="font-black text-white">$7,500 a month</span> of work, plus setup.{" "}
+              Over <span className="font-black text-white">$8,800 a month</span> of work, plus setup.{" "}
               <span className="font-semibold text-brand-purple-soft">You pay none of it upfront.</span>
             </p>
           </Reveal>
