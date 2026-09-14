@@ -146,7 +146,7 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
               <ul className="mt-7 flex flex-col gap-3">
                 {[
                   { t: "Full exterior detail", d: "Wash, decontamination and protection, done properly." },
-                  { t: "Multi-stage cut & polish", d: "Real paint correction that removes swirls and scratches, not a quick buff." },
+                  { t: "Upgraded to a multi-stage paint correction", d: "You book a cut & polish, we take it further with a full multi-stage correction that removes swirls, scratches and oxidation, not a quick buff." },
                   { t: "Full interior detail, FREE", d: "Valued at $280+. Deep interior reset, thrown in at no cost.", free: true },
                 ].map((item) => (
                   <li key={item.t} className="flex items-start gap-3">
