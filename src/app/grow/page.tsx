@@ -23,7 +23,7 @@ const SETUP = [
   { t: "Facebook ads", d: "Run and managed by us, targeted at local customers ready to book." },
   { t: "Google ads", d: "Catch the people already searching for what you do." },
   { t: "High-converting landing pages", d: "Built to turn clicks into booked jobs, not just visits." },
-  { t: "AI automation", d: "Every lead captured and followed up instantly, day or night." },
+  { t: "AI automation", d: "Only the boring work, not the important things." },
 ];
 
 export default function GrowLanding() {
@@ -114,8 +114,8 @@ export default function GrowLanding() {
             </h2>
             <p className="mx-auto mt-5 text-base leading-relaxed text-white/70">
               We built and run every bit of this for our own business, Smiths Detailing, the brand you&apos;ve probably
-              already seen around Cairns, with 100+ five-star reviews. And it&apos;s not just cars. I&apos;ve owned and run
-              lawn mowing and cleaning businesses myself, so I know exactly what it takes to keep a trade booked out.
+              already seen around Cairns, with 100+ five-star reviews. And it&apos;s not just cars. We&apos;ve done it for
+              lawn mowing and cleaning too, so we know exactly what it takes to keep a business booked out.
             </p>
           </Reveal>
         </div>
@@ -158,9 +158,21 @@ export default function GrowLanding() {
             <div className="mx-auto mt-6 max-w-xl rounded-2xl border border-brand-purple/45 bg-brand-purple/[0.1] p-6 text-center shadow-[0_0_44px_-16px_rgba(124,47,245,0.9)]">
               <div className="text-2xl">🛡️</div>
               <p className="mt-2 font-display text-xl font-black leading-snug text-white sm:text-2xl">
-                If we don&apos;t book you 10 jobs in your first 4 weeks, we work for free until we do.
+                If we don&apos;t book you at least 10 jobs in your first 4 weeks, we work for free until we do.
               </p>
               <p className="mt-2 text-sm text-white/60">No cut, no cost, nothing, until you&apos;re winning.</p>
+            </div>
+          </Reveal>
+          <Reveal delay={160}>
+            <div className="mx-auto mt-4 max-w-xl rounded-2xl border border-brand-yellow/45 bg-brand-yellow/[0.08] p-6 text-center shadow-glowY">
+              <div className="text-2xl">💰</div>
+              <p className="mt-2 font-display text-lg font-black leading-snug text-brand-yellow sm:text-xl">
+                It won&apos;t even cost you a cent out of pocket.
+              </p>
+              <p className="mt-2 text-sm text-white/70">
+                We&apos;ll most likely sell your service for more than you charge now, so our cut comes out of the extra,
+                not out of your pocket.
+              </p>
             </div>
           </Reveal>
         </div>
