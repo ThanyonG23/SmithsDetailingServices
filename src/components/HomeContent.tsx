@@ -148,6 +148,8 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
                   { t: "Full exterior detail", d: "Wash, decontamination and protection, done properly." },
                   { t: "Upgraded to a multi-stage paint correction", d: "You book a cut & polish, we take it further with a full multi-stage correction that removes swirls, scratches and oxidation, not a quick buff." },
                   { t: "Full interior detail, FREE", d: "Valued at $280+. Deep interior reset, thrown in at no cost.", free: true },
+                  { t: "Engine bay detail, FREE", d: "Valued at $85. Degreased, dressed and detailed.", free: true },
+                  { t: "Exterior plastics restored, FREE", d: "Valued at $150+. Faded trims and bumpers brought back to black.", free: true },
                 ].map((item) => (
                   <li key={item.t} className="flex items-start gap-3">
                     <span className={`mt-0.5 shrink-0 text-lg ${item.free ? "text-brand-yellow" : "text-brand-green"}`}>
@@ -163,8 +165,16 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
                 ))}
               </ul>
             </Reveal>
+            <Reveal delay={280}>
+              <div className="mt-6 inline-flex items-center gap-3 rounded-2xl border border-brand-yellow/45 bg-brand-yellow/[0.08] px-5 py-3.5 shadow-glowY">
+                <span className="text-xl">🎁</span>
+                <span className="font-display text-base font-black uppercase tracking-tight text-brand-yellow sm:text-lg">
+                  Total free value: $515+
+                </span>
+              </div>
+            </Reveal>
             <Reveal delay={300}>
-              <p className="mt-7 text-sm font-semibold text-white/50">
+              <p className="mt-6 text-sm font-semibold text-white/50">
                 We only take a limited number of correction bookings each week, so we can give every car the time it needs.
               </p>
             </Reveal>
