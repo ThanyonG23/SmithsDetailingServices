@@ -7,7 +7,7 @@ import { useState } from "react";
    the shop. Kept deliberately short (name, contact, vehicle) to maximise the
    conversion rate, everything else gets sorted on the quote call. */
 
-export default function DetailOfferForm() {
+export default function DetailOfferForm({ source = "detailing-offer" }: { source?: string }) {
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
   const [vehicle, setVehicle] = useState("");
@@ -37,7 +37,7 @@ export default function DetailOfferForm() {
           phone: isEmail ? "" : contact,
           vehicle: vehicle.trim(),
           membership: false,
-          source: "detailing-offer",
+          source,
           message: lines.join("\n"),
         }),
       });
