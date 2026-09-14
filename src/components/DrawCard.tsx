@@ -15,6 +15,7 @@ export default function DrawCard({
   blurb,
   target,
   termsHref,
+  posterAspectClass = "aspect-[16/9]",
 }: {
   poster: string;
   alt: string;
@@ -23,10 +24,11 @@ export default function DrawCard({
   blurb: React.ReactNode;
   target: string;
   termsHref: string;
+  posterAspectClass?: string;
 }) {
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-brand-purple/40 shadow-[0_0_0_1px_rgba(124,47,245,0.2),0_0_55px_rgba(124,47,245,0.32)]">
-      <div className="relative aspect-[16/9] w-full overflow-hidden bg-black">
+      <div className={`relative ${posterAspectClass} w-full overflow-hidden bg-black`}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={poster} alt={alt} className="h-full w-full object-cover" />
       </div>

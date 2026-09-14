@@ -8,7 +8,7 @@ import DrawCard from "@/components/DrawCard";
 import { BUSINESS } from "@/lib/config";
 
 // The member draw: drawn 14 Sep 2026, 12:00pm AEST (UTC+10).
-const DRAW_TIME = "2026-09-14T12:00:00+10:00";
+const DRAW_TIME = "2026-10-01T20:00:00+10:00";
 // The weekly mini draw: drawn Sun 21 Sep 2026, 12:00pm AEST (UTC+10).
 const DRAW_MINI_TIME = "2026-09-21T12:00:00+10:00";
 
@@ -170,13 +170,14 @@ export default function MembershipContent() {
             {/* big draw */}
             <Reveal>
               <DrawCard
-                poster="/media/photos/giveaway.jpg"
-                alt="Smiths Detailing members' giveaway, win $1,000 cash or a $2,200 paint correction and ceramic coating"
-                label="Big draw · drawn 14 Sept"
-                title={<>Win <span className="text-brand-purple-soft">$1,000 cash</span> or a <span className="text-brand-purple-soft">$2,200</span> paint correction &amp; coating</>}
+                poster="/media/photos/huge-giveaway.jpg"
+                alt="Win a $1,000+ premium interior and exterior detail plus cut and polish"
+                label="Big draw · closes 1 Oct, 8pm"
+                title={<>Premium detail <span className="text-brand-purple-soft">+ cut &amp; polish</span></>}
                 blurb="Every active member is automatically entered. Join now and you are in."
                 target={DRAW_TIME}
                 termsHref="/draw-terms"
+                posterAspectClass="aspect-[5/4]"
               />
             </Reveal>
 
@@ -240,6 +241,7 @@ export default function MembershipContent() {
           <Reveal delay={100}>
             <div className="mt-7 flex touch-pan-x snap-x snap-mandatory gap-5 overflow-x-auto overscroll-x-contain pb-2 sm:justify-center sm:overflow-visible">
               {[
+                { src: "/media/videos/winner-3.mp4", poster: "/media/photos/winner-3-poster.jpg" },
                 { src: "/media/videos/winner-mini-draw.mp4", poster: "/media/photos/winner-poster.jpg" },
                 { src: "/media/videos/winner-2.mp4", poster: "/media/photos/winner-2-poster.jpg" },
               ].map((v) => (

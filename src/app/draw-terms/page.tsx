@@ -23,48 +23,61 @@ const TERMS: Term[] = [
     body: "The winner is chosen at random. No skill is involved.",
   },
   {
-    heading: "3. Eligibility cut-off",
-    body: "Entry is based on your Smiths Detailing membership being active (payments up to date) as at 11:59pm AEST on 13 September 2026, the eligibility cut-off.",
+    heading: "3. Entries close",
+    body: "Entry is based on your Smiths membership being active (payments up to date) as at 8:00pm AEST on 1 October 2026, when entries close (the eligibility cut-off).",
   },
   {
     heading: "4. Who can enter",
-    body: "Entry is open to individuals who are 18 or older, are Australian residents, and hold an active Smiths Detailing membership in good standing (payments up to date) as at the eligibility cut-off in clause 3. Employees of Smiths and their immediate families are not eligible.",
+    body: "Entry is open to individuals who are 18 or older, are Australian residents, and hold an active Smiths membership in good standing (payments up to date) as at the eligibility cut-off in clause 3. Employees of Smiths and their immediate families are not eligible.",
   },
   {
     heading: "5. How to enter, it's free and automatic",
-    body: "Every eligible member is automatically entered. There is nothing extra to buy or do, and no additional cost beyond your normal membership. One (1) entry per member.",
+    body: "Every eligible member is automatically entered. There is nothing extra to buy or do, and no additional cost beyond your normal membership. The number of entries you receive depends on your membership tier, as set out in clause 6.",
   },
   {
-    heading: "6. The prize",
-    body: "There is one (1) winner, who chooses one of the following:",
+    heading: "6. Entries by membership tier",
+    body: "Higher membership tiers receive more entries in the draw, as follows:",
     choices: [
-      "$1,000 cash, paid by bank transfer; or",
-      "A Paint Correction & Ceramic Coating package, valued at up to $2,200, carried out at our Cairns workshop.",
+      "Standard monthly member or 30-day pass: 1 entry",
+      "Annual member or Platinum monthly member: 5 entries",
+      "Platinum annual member: 10 entries",
     ],
-    note: "Total prize value: up to $2,200. The prize is not transferable and cannot be split part-cash / part-service. If the winner chooses the detailing package, it must be booked and redeemed at our Cairns workshop within 6 months of the draw, subject to availability, on a vehicle in ordinary condition (excessive damage or rust will be quoted separately).",
+    note: "Your entry count is based on your membership tier as at the eligibility cut-off in clause 3.",
   },
   {
-    heading: "7. The draw",
-    body: "The winner will be drawn at random on 14 September 2026 at our Cairns workshop. The draw may be recorded.",
+    heading: "7. The prize",
+    body: "There is one (1) winner, who receives a premium interior and exterior detail plus cut and polish, carried out at our Cairns workshop, which includes:",
+    choices: [
+      "Paint correction (cut and polish)",
+      "Full interior detail",
+      "Exterior deep clean",
+      "Plastics rejuvenated",
+      "Engine bay detail",
+    ],
+    note: "Approximate retail value: $1,000. The prize is a service only. It has no cash alternative, is not transferable, and cannot be split or exchanged. It must be booked and redeemed at our Cairns workshop within 6 months of the draw, subject to availability, on a vehicle in ordinary condition (excessive damage, rust, or oversized vehicles may be quoted separately or incur an additional charge).",
   },
   {
-    heading: "8. Notifying the winner",
+    heading: "8. The draw",
+    body: "The winner will be drawn at random on or shortly after 8:00pm AEST on 1 October 2026 at our Cairns workshop. The draw may be recorded.",
+  },
+  {
+    heading: "9. Notifying the winner",
     body: "The winner will be contacted directly by phone or email within 2 business days of the draw, and announced on our social media (first name and initial only). If the winner cannot be contacted or does not claim the prize within 14 days, we may redraw.",
   },
   {
-    heading: "9. General",
-    body: "The prize is not exchangeable or redeemable for cash except as set out above. If the prize becomes unavailable for reasons beyond our control, we may substitute a prize of equal or greater value. We may verify a winner's eligibility and disqualify any entry that breaches these terms. Our decisions are final, subject to law.",
+    heading: "10. General",
+    body: "The prize is not exchangeable or redeemable for cash. If the prize becomes unavailable for reasons beyond our control, we may substitute a prize of equal or greater value. We may verify a winner's eligibility and disqualify any entry that breaches these terms. Our decisions are final, subject to law.",
   },
   {
-    heading: "10. Privacy",
+    heading: "11. Privacy",
     body: "We collect entrants' details only to run this promotion and contact the winner, in line with our Privacy Policy. The winner consents to us publishing their first name and initial as above.",
   },
   {
-    heading: "11. Your consumer rights",
+    heading: "12. Your consumer rights",
     body: "Nothing in these terms excludes, restricts or modifies any rights you have under the Australian Consumer Law.",
   },
   {
-    heading: "12. Governing law",
+    heading: "13. Governing law",
     body: "These terms are governed by the law of Queensland.",
   },
 ];
@@ -108,7 +121,7 @@ export default function DrawTermsPage() {
           ))}
 
           <section>
-            <h2 className="font-display text-lg font-extrabold tracking-tight text-white">13. Contact</h2>
+            <h2 className="font-display text-lg font-extrabold tracking-tight text-white">14. Contact</h2>
             <p className="mt-2 text-[15px] leading-relaxed text-white/70">
               Questions about the draw? Call us on{" "}
               <a href={`tel:${BUSINESS.phoneE164}`} className="font-semibold text-brand-green hover:text-white">
