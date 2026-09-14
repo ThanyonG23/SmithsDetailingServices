@@ -97,6 +97,19 @@ export default function PartnersPage() {
               </span>
             </p>
           </Reveal>
+          <Reveal delay={300}>
+            <div className="mx-auto mt-9 max-w-2xl overflow-hidden rounded-2xl border border-white/10 shadow-[0_24px_80px_-20px_rgba(124,47,245,0.5)]">
+              <video
+                controls
+                playsInline
+                preload="metadata"
+                poster="/media/videos/vsl-partners.jpg"
+                className="aspect-video w-full bg-black"
+              >
+                <source src="/media/videos/vsl-partners.mp4" type="video/mp4" />
+              </video>
+            </div>
+          </Reveal>
           <Reveal delay={350}>
             <a
               href="#platinum"
