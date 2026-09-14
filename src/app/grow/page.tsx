@@ -32,6 +32,14 @@ const SETUP = [
   { t: "AI automation", d: "Only the boring work, not the important things." },
 ];
 
+const VALUE: { t: string; v: string }[] = [
+  { t: "Facebook & Google ads, set up and managed", v: "$1,500/mo" },
+  { t: "Social media, run and posted for you", v: "$1,500/mo" },
+  { t: "A high-converting landing page", v: "$2,000 setup" },
+  { t: "AI automation", v: "$500/mo" },
+  { t: "A full-time salesperson to close every lead", v: "$1,000/wk+" },
+];
+
 const FAQ: { q: string; a: string }[] = [
   {
     q: "How are you actually making money?",
@@ -181,6 +189,43 @@ export default function GrowLanding() {
             </p>
           </div>
         </Reveal>
+      </section>
+
+      {/* ═══ VALUE STACK ═══ */}
+      <section className="px-4 py-14 sm:py-16">
+        <div className="mx-auto max-w-2xl">
+          <Reveal>
+            <div className="text-center">
+              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">What it&apos;s worth</div>
+              <h2 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                What this would normally cost you
+              </h2>
+            </div>
+          </Reveal>
+          <div className="mx-auto mt-8 max-w-xl overflow-hidden rounded-2xl border border-white/10 bg-white/[0.02]">
+            {VALUE.map((v, i) => (
+              <div
+                key={v.t}
+                className={`flex items-center justify-between gap-4 px-5 py-4 ${i > 0 ? "border-t border-white/10" : ""}`}
+              >
+                <span className="text-sm text-white/75 sm:text-base">{v.t}</span>
+                <span className="shrink-0 font-display text-sm font-black tabular-nums text-white sm:text-base">{v.v}</span>
+              </div>
+            ))}
+            <div className="flex items-center justify-between gap-4 border-t border-brand-purple/40 bg-brand-purple/10 px-5 py-4">
+              <span className="font-display text-sm font-black uppercase tracking-wide text-brand-purple-soft sm:text-base">
+                Total value
+              </span>
+              <span className="shrink-0 font-display text-base font-black text-white sm:text-lg">$7,500+/month</span>
+            </div>
+          </div>
+          <Reveal delay={120}>
+            <p className="mx-auto mt-6 max-w-md text-center text-base leading-relaxed text-white/70">
+              Over <span className="font-black text-white">$7,500 a month</span> of work, plus setup.{" "}
+              <span className="font-semibold text-brand-purple-soft">You pay none of it upfront.</span>
+            </p>
+          </Reveal>
+        </div>
       </section>
 
       {/* ═══ THE OFFER / RISK REVERSAL ═══ */}
