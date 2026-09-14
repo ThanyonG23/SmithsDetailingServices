@@ -15,8 +15,8 @@ export const maxDuration = 60;
 
 const START_HOUR = 7; // 7am
 const END_HOUR = 22; // send through the 9pm hour (skip once hour >= 22)
-const MIN_GAP_MIN = 40; // < 60 so every hourly cron tick sends reliably, but blocks accidental rapid double-fires
-const DAILY_CAP = 16;
+const MIN_GAP_MIN = 25; // < 30 so every half-hourly cron tick sends reliably, but blocks accidental rapid double-fires
+const DAILY_CAP = 30; // ~every 30 min across the 7am-9pm window
 const OPT_OUT = "\n\nNot interested? Just reply and I will take you off my list.";
 
 const j = (body: unknown, status = 200) => NextResponse.json(body, { status });
