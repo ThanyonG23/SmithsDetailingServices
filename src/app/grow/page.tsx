@@ -39,7 +39,7 @@ const FAQ: { q: string; a: string }[] = [
   },
   {
     q: "What's actually included?",
-    a: "Everything. I set up and run your social media, your Facebook and Google ads, your landing pages, and the AI automation that captures and follows up every lead. Then the leads come straight to me and I sell them for you. You don't build anything, run anything, or chase anyone. You just do the work.",
+    a: "Everything. I set up and run your social media, your Facebook and Google ads, your landing pages, and the AI automation. Then the leads come straight to me and I sell them for you. You don't build anything, run anything, or chase anyone. You just do the work.",
   },
   {
     q: "What if it's a no-show or a cancellation?",
