@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { BUSINESS } from "@/lib/config";
 import Reveal from "@/components/Reveal";
-import SiteNav from "@/components/SiteNav";
 import GrowthLeadForm from "@/components/GrowthLeadForm";
 
 /* Growth-partner service landing page. Cold traffic from DMs/emails lands here.
@@ -18,6 +15,15 @@ export const metadata: Metadata = {
   alternates: { canonical: "/grow" },
 };
 
+// A real recent week from our own detailing calendar, customer names removed.
+const WEEK: { day: string; jobs: { t: string; premium?: boolean }[] }[] = [
+  { day: "Mon", jobs: [{ t: "7am · Full Detail + Cut & Polish", premium: true }, { t: "9am · Full Detail + Cut & Polish", premium: true }] },
+  { day: "Tue", jobs: [{ t: "6am · Exterior + Cut & Polish", premium: true }, { t: "7am · Full Detail", premium: true }, { t: "7am · Full Detail" }, { t: "11am · Full Detail" }] },
+  { day: "Wed", jobs: [{ t: "6am · Full Detail", premium: true }, { t: "7am · Full Detail" }, { t: "9am · Full Detail" }, { t: "11am · Full Detail" }] },
+  { day: "Thu", jobs: [{ t: "6am · Full Detail", premium: true }, { t: "7am · Full Detail", premium: true }, { t: "8am · Full Detail + Cut & Polish", premium: true }, { t: "9am · Full Detail" }] },
+  { day: "Fri", jobs: [{ t: "6am · Full Detail" }, { t: "7am · Full Detail", premium: true }, { t: "9am · Full Detail" }] },
+];
+
 const SETUP = [
   { t: "Social media accounts", d: "Set up and posting, so you actually show up online." },
   { t: "Facebook ads", d: "Run and managed by us, targeted at local customers ready to book." },
@@ -29,8 +35,6 @@ const SETUP = [
 export default function GrowLanding() {
   return (
     <main className="min-h-screen bg-[#050506]">
-      <SiteNav cta={{ label: "Get started", href: "#contact" }} accent="purple" />
-
       {/* ═══ HERO ═══ */}
       <section className="relative overflow-hidden">
         <div
@@ -119,6 +123,41 @@ export default function GrowLanding() {
             </p>
           </Reveal>
         </div>
+
+        {/* A real booked-out week from our own calendar */}
+        <Reveal delay={120}>
+          <div className="mx-auto mt-10 max-w-4xl">
+            <div className="mb-3 text-center text-[11px] font-bold uppercase tracking-[0.2em] text-brand-purple-soft">
+              A recent week in our own calendar
+            </div>
+            <div className="overflow-x-auto rounded-2xl border border-white/10 bg-black/30 p-4">
+              <div className="grid min-w-[620px] grid-cols-5 gap-2">
+                {WEEK.map((d) => (
+                  <div key={d.day}>
+                    <div className="mb-2 text-center text-[11px] font-black uppercase tracking-wider text-white/50">{d.day}</div>
+                    <div className="flex flex-col gap-2">
+                      {d.jobs.map((j, i) => (
+                        <div
+                          key={i}
+                          className={`rounded-lg px-2.5 py-2 text-left text-[11px] font-bold leading-tight ${
+                            j.premium
+                              ? "bg-brand-purple text-white"
+                              : "border border-brand-purple/30 bg-brand-purple/20 text-white/90"
+                          }`}
+                        >
+                          {j.t}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <p className="mt-3 text-center text-xs text-white/40">
+              A real week from our own detailing calendar. Customer names removed for privacy.
+            </p>
+          </div>
+        </Reveal>
       </section>
 
       {/* ═══ THE OFFER / RISK REVERSAL ═══ */}
@@ -228,23 +267,14 @@ export default function GrowLanding() {
         </div>
       </section>
 
-      {/* ═══ FOOTER ═══ */}
+      {/* ═══ FOOTER (minimal, no navigation away) ═══ */}
       <footer className="border-t border-white/10">
-        <div className="mx-auto max-w-5xl px-4 py-10 text-center">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={BUSINESS.logo} alt={BUSINESS.name} className="mx-auto h-9 w-auto" />
-          <p className="mt-4 text-sm">
-            <a href={`tel:${BUSINESS.phoneE164}`} className="font-bold text-white transition hover:text-brand-purple-soft">
-              {BUSINESS.phone}
+        <div className="mx-auto max-w-5xl px-4 py-8 text-center">
+          <p className="text-xs text-white/30">
+            © {new Date().getFullYear()} Smiths Detailing Services ·{" "}
+            <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2 transition hover:text-white/60">
+              Privacy
             </a>
-          </p>
-          <p className="mt-4 flex justify-center gap-4 text-xs text-white/30">
-            <Link href="/terms" className="transition hover:text-white/70">
-              Terms &amp; Conditions
-            </Link>
-            <Link href="/privacy" className="transition hover:text-white/70">
-              Privacy Policy
-            </Link>
           </p>
         </div>
       </footer>
