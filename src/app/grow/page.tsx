@@ -32,6 +32,29 @@ const SETUP = [
   { t: "AI automation", d: "Only the boring work, not the important things." },
 ];
 
+const FAQ: { q: string; a: string }[] = [
+  {
+    q: "How are you actually making money?",
+    a: "I take a small cut of the jobs I book you. That's it. No upfront fee, no retainer. If I don't book you jobs, I don't earn a cent, which is exactly why I only take on businesses I know I can get results for. My money is tied to yours.",
+  },
+  {
+    q: "What's actually included?",
+    a: "Everything. I set up and run your social media, your Facebook and Google ads, your landing pages, and the AI automation that captures and follows up every lead. Then the leads come straight to me and I sell them for you. You don't build anything, run anything, or chase anyone. You just do the work.",
+  },
+  {
+    q: "What if it's a no-show or a cancellation?",
+    a: "You never pay for a job that doesn't happen. I only take my cut on jobs that actually go ahead. If a customer no-shows or cancels, that's my problem, not yours. I also handle the confirmations and reminders to keep no-shows low in the first place.",
+  },
+  {
+    q: "How much does it cost?",
+    a: "Nothing upfront. No setup fee, no monthly fee, no lock-in. The only time you pay is when I've actually booked you a paying job. No jobs, no cost.",
+  },
+  {
+    q: "What's the percentage?",
+    a: "It depends on your trade and what a job is worth, so we lock it in together on the call and you'll always know exactly where you stand. It's a small cut, and because we usually sell your service for a bit more than you charge now, it tends to come out of the extra, not out of your pocket.",
+  },
+];
+
 export default function GrowLanding() {
   return (
     <main className="min-h-screen bg-[#050506]">
@@ -242,6 +265,33 @@ export default function GrowLanding() {
                   <div className="mt-4 font-display text-lg font-black text-white">{s.t}</div>
                   <div className="mt-2 text-sm text-white/55">{s.d}</div>
                 </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ FAQ ═══ */}
+      <section className="border-y border-white/10 bg-white/[0.02] px-4 py-16 sm:py-20">
+        <div className="mx-auto max-w-2xl">
+          <Reveal>
+            <div className="mb-8 text-center">
+              <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">Questions</div>
+              <h2 className="mt-3 font-display text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                The stuff you&apos;re probably wondering
+              </h2>
+            </div>
+          </Reveal>
+          <div className="flex flex-col gap-3">
+            {FAQ.map((f, i) => (
+              <Reveal key={f.q} delay={i * 50}>
+                <details className="group rounded-2xl border border-white/10 bg-black/20 p-5 [&_summary::-webkit-details-marker]:hidden">
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-3 font-display text-base font-black text-white">
+                    {f.q}
+                    <span className="shrink-0 text-xl leading-none text-brand-purple-soft transition-transform group-open:rotate-45">+</span>
+                  </summary>
+                  <p className="mt-3 text-sm leading-relaxed text-white/60">{f.a}</p>
+                </details>
               </Reveal>
             ))}
           </div>
