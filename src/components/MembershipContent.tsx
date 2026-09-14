@@ -11,6 +11,8 @@ import { BUSINESS } from "@/lib/config";
 const DRAW_TIME = "2026-10-01T20:00:00+10:00";
 // The weekly mini draw: drawn Sun 21 Sep 2026, 12:00pm AEST (UTC+10).
 const DRAW_MINI_TIME = "2026-09-21T12:00:00+10:00";
+// $1 first-month membership, straight to Stripe (no upsell step).
+const JOIN_1_STRIPE = "https://buy.stripe.com/8x27sL07CaTX8eI35F6kg0z";
 
 /* Shared body for the membership pages. `bonus` toggles the free
    cut & polish banner, on for /membership (new/cold ad traffic), off for
@@ -178,6 +180,7 @@ export default function MembershipContent() {
                 target={DRAW_TIME}
                 termsHref="/draw-terms"
                 posterAspectClass="aspect-[5/4]"
+                joinHref={withAff(JOIN_1_STRIPE)}
               />
             </Reveal>
 
@@ -192,6 +195,7 @@ export default function MembershipContent() {
                 target={DRAW_MINI_TIME}
                 termsHref="/mini-draw-terms"
                 posterAspectClass="aspect-[5/4]"
+                joinHref={withAff(JOIN_1_STRIPE)}
               />
             </Reveal>
           </div>
@@ -318,7 +322,7 @@ export default function MembershipContent() {
                   <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-purple-soft">✓</span>Priority booking</li>
                   <li className="flex items-start gap-2.5"><span className="mt-0.5 shrink-0 text-brand-yellow">🎁</span><span className="text-brand-yellow">1 free entry into every draw</span></li>
                 </ul>
-                <a href="/upgrade" className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-purple px-6 py-3.5 font-display text-sm font-black text-white transition hover:brightness-110 active:scale-95">
+                <a href={withAff(JOIN_1_STRIPE)} className="mt-6 flex w-full items-center justify-center rounded-full bg-brand-purple px-6 py-3.5 font-display text-sm font-black text-white transition hover:brightness-110 active:scale-95">
                   Join for $1 →
                 </a>
                 <p className="mt-2.5 flex min-h-[2.5rem] items-start justify-center text-center text-xs text-white/40">First month $1, then $9.99/month. Cancel anytime.</p>

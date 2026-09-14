@@ -4,8 +4,9 @@ import Countdown from "@/components/Countdown";
 /* Shared members' draw card: poster, countdown, Join for $1 and a terms link.
    Used on the membership page and the clubhouse page so they stay identical. */
 
-// Routes to the pre-purchase choice page (/upgrade), where they pick $1 or Platinum.
-const JOIN_1_URL = "/upgrade";
+// Goes straight to the $1 first-month Stripe checkout. Callers can pass an
+// affiliate-tagged version via joinHref so attribution is preserved.
+const JOIN_1_URL = "https://buy.stripe.com/8x27sL07CaTX8eI35F6kg0z";
 
 export default function DrawCard({
   poster,
@@ -16,6 +17,7 @@ export default function DrawCard({
   target,
   termsHref,
   posterAspectClass = "aspect-[16/9]",
+  joinHref = JOIN_1_URL,
 }: {
   poster: string;
   alt: string;
@@ -25,6 +27,7 @@ export default function DrawCard({
   target: string;
   termsHref: string;
   posterAspectClass?: string;
+  joinHref?: string;
 }) {
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-2xl border border-brand-purple/40 shadow-[0_0_0_1px_rgba(124,47,245,0.2),0_0_55px_rgba(124,47,245,0.32)]">
@@ -42,7 +45,7 @@ export default function DrawCard({
           <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.18em] text-red-400">Draw closes in</div>
           <Countdown target={target} accent="red" />
           <a
-            href={JOIN_1_URL}
+            href={joinHref}
             className="mt-3 flex w-full items-center justify-center rounded-full bg-brand-purple px-6 py-3 font-display text-sm font-black text-white transition hover:brightness-110 active:scale-95"
           >
             Join for $1 →
