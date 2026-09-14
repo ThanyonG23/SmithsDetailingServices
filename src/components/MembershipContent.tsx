@@ -271,15 +271,7 @@ export default function MembershipContent() {
         <div className="mx-auto max-w-5xl px-4">
           <Reveal>
             <div className="mx-auto mb-7 max-w-3xl text-center">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/media/photos/spend-1000.webp"
-                alt="What would you spend $1,000 on this week?"
-                width={1600}
-                height={800}
-                className="mx-auto w-full max-w-3xl rounded-2xl"
-              />
-              <p className="mx-auto mt-4 max-w-md text-sm leading-relaxed text-white/60">
+              <p className="mx-auto max-w-md text-sm leading-relaxed text-white/60">
                 Join for $1 and you&apos;re in the draw. Every member&apos;s in it, automatically.
               </p>
             </div>
