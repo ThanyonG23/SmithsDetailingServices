@@ -60,7 +60,7 @@ export default function DetailOfferForm() {
         <div className="text-3xl">✅</div>
         <div className="mt-2 font-display text-lg font-extrabold text-white">You&apos;re in, thanks</div>
         <p className="mt-1 text-sm text-white/60">
-          Thanyon will text you back shortly with your price and a time. Your free interior detail is locked in.
+          Thanyon will call you shortly to talk through your vehicle and price. Your free interior detail is locked in.
         </p>
       </div>
     );
@@ -76,7 +76,7 @@ export default function DetailOfferForm() {
         Book your spot, get the interior free
       </h3>
       <p className="mt-1.5 text-sm text-white/55">
-        Drop your details and Thanyon will text you your price and a time. No obligation, takes 20 seconds.
+        Drop your details and Thanyon will call you to discuss your vehicle. No obligation, takes 20 seconds.
       </p>
 
       <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
