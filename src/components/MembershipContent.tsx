@@ -191,6 +191,7 @@ export default function MembershipContent() {
                 blurb="A small member pool right now means the best odds you will ever get. Join and you're in."
                 target={DRAW_MINI_TIME}
                 termsHref="/mini-draw-terms"
+                posterAspectClass="aspect-[5/4]"
               />
             </Reveal>
           </div>
