@@ -16,7 +16,7 @@ export default function BringBlackBack({ smsHref }: { smsHref: string }) {
             <h2 className="mt-3 font-display text-4xl font-extrabold leading-[1.02] tracking-tight text-white sm:text-6xl">
               Bring black
               <br />
-              <span className="text-brand-green">back.</span>
+              <span className="text-brand-purple-soft">back.</span>
             </h2>
             <p className="mt-5 max-w-md text-sm leading-relaxed text-white/65 sm:text-base">
               Sun-faded bumpers, mirrors and trim make even a clean car look tired. We strip back
@@ -27,8 +27,8 @@ export default function BringBlackBack({ smsHref }: { smsHref: string }) {
               href={smsHref}
               className="mt-7 inline-flex items-center gap-2 text-sm font-black transition hover:gap-3"
             >
-              <span className="text-brand-green">Text for a free quote</span>
-              <span className="text-brand-green">→</span>
+              <span className="text-brand-purple-soft">Text for a free quote</span>
+              <span className="text-brand-purple-soft">→</span>
             </a>
           </Reveal>
         </div>

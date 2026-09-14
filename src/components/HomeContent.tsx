@@ -14,7 +14,7 @@ function TextCta({ href, className = "" }: { href: string; className?: string })
   return (
     <a
       href={href}
-      className={`inline-flex items-center justify-center rounded-full bg-brand-green px-7 py-4 text-sm font-black text-[#04130a] transition hover:brightness-110 active:scale-95 ${className}`}
+      className={`inline-flex items-center justify-center rounded-full bg-brand-purple px-7 py-4 text-sm font-black text-white transition hover:brightness-110 active:scale-95 ${className}`}
     >
       Text for a Free Quote →
     </a>
@@ -50,7 +50,7 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
   return (
     <main className="min-h-screen bg-[#050506]">
       {/* ═══════════════════ NAV ═══════════════════ */}
-      <SiteNav cta={{ label: "Free Quote", href: smsHref }} />
+      <SiteNav cta={{ label: "Free Quote", href: smsHref }} accent="purple" />
 
       {/* ═══════════════════ HERO ═══════════════════ */}
       <section className="relative flex min-h-[86vh] items-end overflow-hidden">
@@ -115,17 +115,17 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
       </section>
 
       {/* ═══════════════════ ATTRACTION OFFER ═══════════════════ */}
-      <section className="relative overflow-hidden border-b border-white/10 bg-gradient-to-b from-brand-green/[0.06] to-transparent py-16 sm:py-20">
+      <section className="relative overflow-hidden border-b border-white/10 bg-gradient-to-b from-brand-purple/[0.06] to-transparent py-16 sm:py-20">
         <div
           className="pointer-events-none absolute left-1/2 top-0 h-[340px] w-[340px] -translate-x-1/2 rounded-full opacity-[0.12] blur-[120px]"
-          style={{ background: "radial-gradient(closest-side, #2bff7a, transparent 70%)" }}
+          style={{ background: "radial-gradient(closest-side, #7c2ff5, transparent 70%)" }}
           aria-hidden
         />
         <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-4 lg:grid-cols-2">
           {/* Left: the offer + value stack */}
           <div>
             <Reveal>
-              <div className="inline-flex items-center gap-2 rounded-full border border-brand-green/40 bg-brand-green/10 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-brand-green">
+              <div className="inline-flex items-center gap-2 rounded-full border border-brand-purple/40 bg-brand-purple/10 px-3 py-1.5 text-[11px] font-black uppercase tracking-[0.18em] text-brand-purple-soft">
                 Limited booking offer
               </div>
             </Reveal>
@@ -133,7 +133,7 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
               <h2 className="mt-5 font-display text-4xl font-extrabold leading-[1.03] tracking-tight text-white sm:text-5xl">
                 Book an exterior detail with a full cut &amp; polish.
                 <br />
-                <span className="text-brand-green">We&apos;ll throw in the interior detail, free.</span>
+                <span className="text-brand-purple-soft">We&apos;ll throw in the interior detail, free.</span>
               </h2>
             </Reveal>
             <Reveal delay={200}>
@@ -152,7 +152,7 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
                   { t: "Exterior plastics restored, FREE", d: "Valued at $150+. Faded trims and bumpers brought back to black.", free: true },
                 ].map((item) => (
                   <li key={item.t} className="flex items-start gap-3">
-                    <span className={`mt-0.5 shrink-0 text-lg ${item.free ? "text-brand-yellow" : "text-brand-green"}`}>
+                    <span className={`mt-0.5 shrink-0 text-lg ${item.free ? "text-brand-yellow" : "text-brand-purple-soft"}`}>
                       {item.free ? "🎁" : "✓"}
                     </span>
                     <span>
@@ -175,8 +175,17 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
             </Reveal>
             <Reveal delay={300}>
               <p className="mt-6 text-sm font-semibold text-white/50">
-                We only take a limited number of correction bookings each week, so we can give every car the time it needs.
+                We only take a limited number of correction bookings each week, so we can give every car the time it needs.{" "}
+                <span className="font-black text-brand-purple-soft">2 spots left this week!</span>
               </p>
+            </Reveal>
+            <Reveal delay={320}>
+              <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-brand-purple/30 bg-brand-purple/[0.06] px-4 py-3">
+                <span className="mt-0.5 shrink-0 text-brand-purple-soft">✅</span>
+                <span className="text-sm text-white/70">
+                  <span className="font-black text-white">100% Satisfaction Guarantee.</span> If you&apos;re not happy with the result, you don&apos;t pay.
+                </span>
+              </div>
             </Reveal>
           </div>
 
@@ -215,7 +224,7 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
             <Eyebrow>What we do</Eyebrow>
             <h2 className="mt-4 max-w-2xl font-display text-4xl font-extrabold leading-[1.05] tracking-tight text-white sm:text-6xl">
               Everything your car needs,
-              <span className="text-brand-green"> under one roof.</span>
+              <span className="text-brand-purple-soft"> under one roof.</span>
             </h2>
             <p className="mt-5 max-w-lg text-base leading-relaxed text-white/60">
               {SERVICES.length} services, from a full interior reset to multi-stage paint
@@ -248,7 +257,7 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
             />
             <h2 className="font-display text-3xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-4xl">
               Join the club. Go in the{" "}
-              <span className="text-brand-green">draw every month.</span>
+              <span className="text-brand-purple-soft">draw every month.</span>
             </h2>
             <p className="mx-auto mt-4 max-w-md text-base leading-relaxed text-white/60">
               Become a Smiths member from $1, unlock member perks, and get entries into every giveaway
@@ -256,7 +265,7 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
             </p>
             <Link
               href="/membership"
-              className="mt-7 inline-flex items-center justify-center rounded-full bg-brand-green px-8 py-4 text-sm font-black text-[#04130a] transition hover:brightness-110 active:scale-95"
+              className="mt-7 inline-flex items-center justify-center rounded-full bg-brand-purple px-8 py-4 text-sm font-black text-white transition hover:brightness-110 active:scale-95"
             >
               See our membership →
             </Link>
@@ -312,7 +321,7 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
             <p className="mt-6 font-display text-4xl font-extrabold leading-[1.1] tracking-tight text-white sm:text-6xl">
               If you&apos;re not happy,
               <br />
-              <span className="text-brand-green">you don&apos;t pay.</span>
+              <span className="text-brand-purple-soft">you don&apos;t pay.</span>
             </p>
             <p className="mx-auto mt-7 max-w-md text-base leading-relaxed text-white/60">
               We don&apos;t stop until your car looks its absolute best. No arguments, no fine
@@ -375,7 +384,7 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
               <p className="mt-3">
                 <a
                   href={`tel:${BUSINESS.phoneE164}`}
-                  className="font-bold text-white transition hover:text-brand-green"
+                  className="font-bold text-white transition hover:text-brand-purple-soft"
                 >
                   {BUSINESS.phone}
                 </a>
@@ -408,7 +417,7 @@ export default function HomeContent({ refCode }: { refCode?: string }) {
           scroll position. */}
       <a
         href={smsHref}
-        className="fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 rounded-full bg-brand-green px-5 py-3.5 font-display text-sm font-black text-brand-ink shadow-[0_10px_30px_rgba(43,255,122,0.35)] transition hover:brightness-110 active:scale-95"
+        className="fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 rounded-full bg-brand-purple px-5 py-3.5 font-display text-sm font-black text-white shadow-[0_10px_30px_rgba(124,47,245,0.45)] transition hover:brightness-110 active:scale-95"
       >
         <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />

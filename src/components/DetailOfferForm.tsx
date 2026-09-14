@@ -56,7 +56,7 @@ export default function DetailOfferForm() {
 
   if (state === "done") {
     return (
-      <div className="rounded-2xl border border-brand-green/40 bg-brand-green/[0.08] p-8 text-center">
+      <div className="rounded-2xl border border-brand-purple/40 bg-brand-purple/[0.08] p-8 text-center">
         <div className="text-3xl">✅</div>
         <div className="mt-2 font-display text-lg font-extrabold text-white">You&apos;re in, thanks</div>
         <p className="mt-1 text-sm text-white/60">
@@ -67,11 +67,11 @@ export default function DetailOfferForm() {
   }
 
   const field =
-    "w-full rounded-xl border border-white/12 bg-black/40 px-3.5 py-3 text-sm text-white outline-none placeholder:text-white/30 focus:border-brand-green";
+    "w-full rounded-xl border border-white/12 bg-black/40 px-3.5 py-3 text-sm text-white outline-none placeholder:text-white/30 focus:border-brand-purple";
 
   return (
-    <div className="rounded-2xl border border-brand-green/30 bg-white/[0.02] p-6 sm:p-7">
-      <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-brand-green">Claim the offer</div>
+    <div className="rounded-2xl border border-brand-purple/30 bg-white/[0.02] p-6 sm:p-7">
+      <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-brand-purple-soft">Claim the offer</div>
       <h3 className="mt-1.5 font-display text-xl font-extrabold text-white sm:text-2xl">
         Book your spot, get the interior free
       </h3>
@@ -89,7 +89,7 @@ export default function DetailOfferForm() {
       <button
         onClick={submit}
         disabled={state === "sending"}
-        className="mt-3 w-full rounded-full bg-brand-green px-6 py-3.5 font-display text-sm font-black text-[#04130a] transition hover:brightness-110 active:scale-95 disabled:opacity-50"
+        className="mt-3 w-full rounded-full bg-brand-purple px-6 py-3.5 font-display text-sm font-black text-white transition hover:brightness-110 active:scale-95 disabled:opacity-50"
       >
         {state === "sending" ? "Sending…" : "Claim my free interior detail →"}
       </button>

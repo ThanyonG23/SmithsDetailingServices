@@ -15,10 +15,10 @@ const ACCENT = {
     halo: "halo-yellow",
   },
   green: {
-    text: "text-brand-green",
-    pillBg: "bg-brand-green/10",
-    pillBorder: "border-brand-green/35",
-    cardBorder: "border-brand-green/25",
+    text: "text-brand-purple-soft",
+    pillBg: "bg-brand-purple/10",
+    pillBorder: "border-brand-purple/35",
+    cardBorder: "border-brand-purple/25",
     halo: "halo-green",
   },
 } as const;
