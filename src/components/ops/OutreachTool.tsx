@@ -50,20 +50,38 @@ export default function OutreachTool() {
   const [scanAll, setScanAll] = useState(false);
   const [filter, setFilter] = useState<string>("all");
   const [search, setSearch] = useState("");
+  const [campaignFilter, setCampaignFilter] = useState<"all" | "partner" | "affiliate" | "growth">("all");
 
   useEffect(() => {
     getOutreach().then(setLeads).catch(() => {});
   }, []);
 
-  const counts = useMemo(() => {
-    const c = { total: leads.length, new: 0, ready: 0, queued: 0, sequence: 0, replied: 0, done: 0 };
-    for (const l of leads) c[bucketOf(l)]++;
+  // How many leads sit in each campaign (for the filter pills).
+  const campCounts = useMemo(() => {
+    const c = { all: leads.length, partner: 0, affiliate: 0, growth: 0 };
+    for (const l of leads) {
+      if (l.campaign === "affiliate") c.affiliate++;
+      else if (l.campaign === "growth") c.growth++;
+      else c.partner++;
+    }
     return c;
   }, [leads]);
 
+  // Everything below (tiles, bucket filters, list) works off the selected campaign.
+  const campLeads = useMemo(
+    () => (campaignFilter === "all" ? leads : leads.filter((l) => l.campaign === campaignFilter)),
+    [leads, campaignFilter],
+  );
+
+  const counts = useMemo(() => {
+    const c = { total: campLeads.length, new: 0, ready: 0, queued: 0, sequence: 0, replied: 0, done: 0 };
+    for (const l of campLeads) c[bucketOf(l)]++;
+    return c;
+  }, [campLeads]);
+
   const shown = useMemo(() => {
     const q = search.trim().toLowerCase();
-    let list = filter === "all" ? leads : leads.filter((l) => bucketOf(l) === filter);
+    let list = filter === "all" ? campLeads : campLeads.filter((l) => bucketOf(l) === filter);
     if (q) {
       list = list.filter((l) =>
         [l.business, l.email, l.category, l.address, l.phone, l.url].some((f) =>
@@ -72,7 +90,7 @@ export default function OutreachTool() {
       );
     }
     return list;
-  }, [leads, filter, search]);
+  }, [campLeads, filter, search]);
 
   async function act(fn: () => Promise<Lead[]>) {
     try {
@@ -222,8 +240,30 @@ export default function OutreachTool() {
         </div>
       </div>
 
+      {/* campaign filter, everything below reflects the one you pick */}
+      <div className="mt-6 flex flex-wrap items-center gap-2">
+        <span className="mr-1 text-[10px] font-bold uppercase tracking-wider text-white/40">Showing</span>
+        {([
+          { key: "all", label: `All (${campCounts.all})` },
+          { key: "partner", label: `Giveaway (${campCounts.partner})` },
+          { key: "growth", label: `Growth (${campCounts.growth})` },
+          { key: "affiliate", label: `Affiliates (${campCounts.affiliate})` },
+        ] as const).map((t) => (
+          <button
+            key={t.key}
+            type="button"
+            onClick={() => setCampaignFilter(t.key)}
+            className={`rounded-full px-4 py-1.5 text-xs font-black uppercase tracking-wide transition ${
+              campaignFilter === t.key ? "bg-brand-purple text-white" : "border border-white/15 text-white/55 hover:text-white"
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
       {/* pipeline dashboard, tap a tile to filter */}
-      <div className="mt-6 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
+      <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-4">
         {([
           { key: "ready", label: "Ready to approve", value: counts.ready, cls: "border-brand-purple/40 bg-brand-purple/[0.08] text-brand-purple-soft" },
           { key: "queued", label: "Left to send", value: counts.queued, cls: "border-brand-green/40 bg-brand-green/[0.08] text-brand-green" },
