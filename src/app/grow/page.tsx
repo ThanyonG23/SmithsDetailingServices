@@ -81,7 +81,7 @@ export default function GrowLanding() {
         <div className="relative mx-auto max-w-3xl px-4 pb-12 pt-14 text-center sm:pt-20">
           <Reveal delay={100}>
             <div className="text-[11px] font-bold uppercase tracking-[0.22em] text-brand-purple-soft">
-              For local service businesses
+              For service businesses
             </div>
           </Reveal>
           <Reveal delay={150}>
@@ -153,9 +153,9 @@ export default function GrowLanding() {
               We&apos;ve actually done this ourselves
             </h2>
             <p className="mx-auto mt-5 text-base leading-relaxed text-white/70">
-              We built and run every bit of this for our own business, Smiths Detailing, the brand you&apos;ve probably
-              already seen around Cairns, with 100+ five-star reviews. And it&apos;s not just cars. We&apos;ve done it for
-              lawn mowing and cleaning too, so we know exactly what it takes to keep a business booked out.
+              We built and run every bit of this for our own business, Smiths Detailing, with 100+ five-star reviews. And
+              it&apos;s not just cars. We&apos;ve done it for lawn mowing and cleaning too, so we know exactly what it takes
+              to keep a business booked out.
             </p>
           </Reveal>
         </div>

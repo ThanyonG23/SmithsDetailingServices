@@ -74,6 +74,30 @@ Thanyon
 Smiths Detailing Services`;
 }
 
+function growthFollowup1(name: string, business: string): string {
+  return `Hey ${name}, just floating this back to the top of your inbox.
+
+Still keen to fill ${business} with booked jobs. I build and run all the marketing at my own cost, even the ad spend, and you only ever pay a small cut of the jobs I actually book you. If I book you nothing, you pay nothing.
+
+See how it works: smithsdetailingservices.com.au/grow
+
+Worth a quick chat?
+
+Thanyon
+Smiths Detailing Services`;
+}
+
+function growthFollowup2(name: string, business: string): string {
+  return `Hey ${name}, last one from me, I promise.
+
+If the timing is not right, no worries at all. But if you want your calendar filled with no upfront cost and no risk, just reply here or text me on 0456 186 696.
+
+smithsdetailingservices.com.au/grow
+
+Thanyon
+Smiths Detailing Services`;
+}
+
 export async function GET(req: Request) {
   const token = new URL(req.url).searchParams.get("token") || req.headers.get("x-cron-token") || "";
   if (!process.env.OUTREACH_CRON_TOKEN || token !== process.env.OUTREACH_CRON_TOKEN) {
@@ -120,12 +144,20 @@ export async function GET(req: Request) {
       continue; // they answered, try the next candidate instead
     }
     const name = greetName(l.body);
-    const aff = l.campaign === "affiliate";
-    const bodyText = aff
-      ? (l.stage === 1 ? affFollowup1(name) : affFollowup2(name))
-      : (l.stage === 1 ? followup1(name, l.business) : followup2(name, l.business));
+    let bodyText: string;
+    let subjFallback: string;
+    if (l.campaign === "affiliate") {
+      bodyText = l.stage === 1 ? affFollowup1(name) : affFollowup2(name);
+      subjFallback = "Are you good at being an affiliate?";
+    } else if (l.campaign === "growth") {
+      bodyText = l.stage === 1 ? growthFollowup1(name, l.business) : growthFollowup2(name, l.business);
+      subjFallback = "filling your calendar";
+    } else {
+      bodyText = l.stage === 1 ? followup1(name, l.business) : followup2(name, l.business);
+      subjFallback = "Cairns, you have seen our marketing";
+    }
     const text = bodyText + OPT_OUT;
-    const subject = "Re: " + (l.subject || (aff ? "Are you good at being an affiliate?" : "Cairns, you have seen our marketing"));
+    const subject = "Re: " + (l.subject || subjFallback);
     const res = await sendMail(l.email, subject, text);
     if (res.ok) {
       if (l.stage === 1) {

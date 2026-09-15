@@ -177,7 +177,7 @@ function parseListings(text: string): Parsed[] {
 export async function addListings(text: string, campaign: string = "partner"): Promise<Lead[]> {
   requireOwner();
   await ensure();
-  const camp = campaign === "affiliate" ? "affiliate" : "partner";
+  const camp = campaign === "affiliate" ? "affiliate" : campaign === "growth" ? "growth" : "partner";
   const parsed = parseListings(text);
 
   // Dedupe against existing rows and within this paste, by business name (Maps)
@@ -398,6 +398,51 @@ No subject line, no formal signoff, Australian, friendly, human, no em dashes.
 
 Output STRICT JSON only, no markdown fences, with exactly these keys: business, email, phone, channel, personalisation, prize, subject, body, sms. Set prize to "".`;
 
+const GROWTH_SYSTEM_PROMPT = `You write cold outreach for Thanyon from Smiths Detailing Services, offering a done-for-you customer acquisition service to service businesses ANYWHERE in Australia (not just Cairns). Good targets are services that can be sold through ads and closed over the phone without an in person quote, for example cleaning and detailing.
+
+The offer (a done-for-you growth service): Thanyon builds and runs all the business's marketing at his own cost, the ads, social media, landing pages and AI automation, and even funds the ad budget. Leads come straight to Thanyon and he sells them, booking jobs into the business's calendar. The business does nothing but the work. It costs nothing upfront, they only ever pay a small cut of the jobs Thanyon actually books them. If he books nothing, they pay nothing. He only takes on one business per trade per area. Full details at smithsdetailingservices.com.au/grow.
+
+You are given details about ONE business (name, category, area, rating, phone, and if available their website text). Use whatever is provided.
+
+Do two things:
+1. Extract, using ONLY what is provided (never invent): business name; contact email (or "" if none); phone (or ""); best channel (email, phone, socials, form, none); and ONE genuine specific personalisation detail.
+2. Write the personalised email (subject + body) and a short DM version.
+
+Follow this template closely, swapping in the personalisation and business name:
+
+Subject: filling your calendar
+
+Hey [First name], Thanyon here from Smiths.
+
+[ONE genuine personalised line about their business, tying to why more jobs would help.]
+
+Getting customers is actually my main thing. I build and run all the marketing for a business, the ads, socials, landing pages and automation, then the leads come straight to me and I sell them for you. You just do the work.
+
+Here is the deal, and it costs you nothing upfront:
+- I set up and run everything at my own cost, I even cover the ad spend
+- Leads come to me and I book the jobs straight into your calendar
+- You only ever pay a small cut of the jobs I actually book you
+- If I book you nothing, you pay nothing
+
+I only take on one business per trade per area, so it is first in.
+
+See exactly how it works: smithsdetailingservices.com.au/grow
+
+Keen for a quick chat? Reply here or text me on 0456 186 696.
+
+Thanyon
+Smiths Detailing Services
+
+RULES:
+- If you find an owner or contact first name, use it; otherwise write "Hey Mate,". Never output the literal text [First name].
+- NEVER use em dashes or en dashes anywhere. Use commas.
+- Australian spelling, warm, direct, human tone.
+- Only reference details actually provided. Never invent results, reviews or facts.
+- Keep the body close to the template length.
+- The "sms" field is a short DM version: one short paragraph, same offer, casual, end with the link and "keen for a quick chat?".
+
+Output STRICT JSON only, no markdown fences, with exactly these keys: business, email, phone, channel, personalisation, prize, subject, body, sms. Set prize to "".`;
+
 async function callClaude(model: string, key: string, context: string, system: string): Promise<string | null> {
   try {
     const r = await fetch("https://api.anthropic.com/v1/messages", {
@@ -479,7 +524,8 @@ export async function scanLead(id: number): Promise<Lead[]> {
     .filter(Boolean)
     .join("\n");
 
-  const systemPrompt = lead.campaign === "affiliate" ? AFFILIATE_SYSTEM_PROMPT : SYSTEM_PROMPT;
+  const systemPrompt =
+    lead.campaign === "affiliate" ? AFFILIATE_SYSTEM_PROMPT : lead.campaign === "growth" ? GROWTH_SYSTEM_PROMPT : SYSTEM_PROMPT;
   let raw = await callClaude("claude-sonnet-5", key, context, systemPrompt);
   if (!raw) raw = await callClaude("claude-haiku-4-5-20251001", key, context, systemPrompt);
   const parsed = raw ? parseJson(raw) : null;

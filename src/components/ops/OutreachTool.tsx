@@ -44,7 +44,7 @@ function bucketOf(l: Lead): "new" | "ready" | "queued" | "sequence" | "replied" 
 export default function OutreachTool() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [paste, setPaste] = useState("");
-  const [campaign, setCampaign] = useState<"partner" | "affiliate">("partner");
+  const [campaign, setCampaign] = useState<"partner" | "affiliate" | "growth">("partner");
   const [busy, setBusy] = useState(false);
   const [scanning, setScanning] = useState<number | null>(null);
   const [scanAll, setScanAll] = useState(false);
@@ -162,6 +162,13 @@ export default function OutreachTool() {
               className={`rounded-full px-4 py-1.5 transition ${campaign === "affiliate" ? "bg-brand-green text-[#04130a]" : "text-white/50 hover:text-white"}`}
             >
               Affiliates
+            </button>
+            <button
+              type="button"
+              onClick={() => setCampaign("growth")}
+              className={`rounded-full px-4 py-1.5 transition ${campaign === "growth" ? "bg-brand-yellow text-brand-ink" : "text-white/50 hover:text-white"}`}
+            >
+              Remote growth
             </button>
           </div>
         </div>
@@ -353,6 +360,7 @@ function LeadCard({
           )}
           <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-white/45">
             {lead.campaign === "affiliate" && <span className="font-bold text-brand-green">affiliate recruit</span>}
+            {lead.campaign === "growth" && <span className="font-bold text-brand-yellow">remote growth</span>}
             {lead.category && <span>{lead.category}</span>}
             {lead.rating && <span>★ {lead.rating}</span>}
             {lead.phone && <span>{lead.phone}</span>}
