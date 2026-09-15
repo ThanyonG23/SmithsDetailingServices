@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 
 const TABS = [
   { href: "/ops", label: "Dashboard" },
-  { href: "/ops/tracker", label: "Grind" },
   { href: "/ops/outreach", label: "Outreach" },
   { href: "/ops/affiliates", label: "Affiliates" },
   { href: "/ops/uploads", label: "Uploads" },
@@ -13,8 +12,6 @@ const TABS = [
   { href: "/ops/service", label: "Servicing" },
   { href: "/ops/analytics", label: "Analytics" },
   { href: "/ops/scoreboard", label: "Scoreboard" },
-  { href: "/ops/training", label: "Training" },
-  { href: "/ops/team", label: "Team" },
   { href: "/ops/ads", label: "Ads" },
   { href: "/ops/stock", label: "Stock" },
   { href: "/ops/crm", label: "CRM" },
@@ -33,9 +30,7 @@ export default function OpsTabs({ role }: { role?: "owner" | "crew" | null }) {
   // rest of ops (numbers, CRM, costs).
   const tabs =
     role === "crew"
-      ? TABS.filter((t) =>
-          ["/ops/inspect", "/ops/service", "/ops/team", "/ops/scoreboard", "/ops/training"].includes(t.href)
-        )
+      ? TABS.filter((t) => ["/ops/inspect", "/ops/service", "/ops/scoreboard"].includes(t.href))
       : TABS;
 
   return (

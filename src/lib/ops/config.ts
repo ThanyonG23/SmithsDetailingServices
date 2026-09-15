@@ -1,24 +1,22 @@
 import { ACTIVE_TEAM } from "@/lib/referrals";
 
 /* =====================================================================
-   DAILY OPS, targets & roster
+   DAILY OPS, targets
    ---------------------------------------------------------------------
-   Cost model: owner + 2 detailers + 1 videographer/social (3 wages @ $32/hr).
-   Lower payroll than the old 4-wage team → lower break-even; 2 detailers (vs 3)
-   → slightly lower delivery capacity, so slightly lower targets.
-     - breakEvenRevenue = daily break-even (business covered), ~$36k/mo
-     - aimRevenue       = the daily TARGET to beat break-even
-     - weeklyTarget     = the target to run the week toward
-     - monthlyTarget    = the target to run the month toward
-     - jobsTarget       = corrections/day we're aiming for
-   Update these here if the cost base changes and the whole dashboard
-   re-scores itself.
+   Solo model: Thanyon running it himself and drawing profit (no crew wages).
+     - breakEvenRevenue = daily fixed overhead to cover. ESTIMATE, set your real
+       number here (rent, insurance, products, subs / work days).
+     - aimRevenue       = the daily TARGET
+     - weeklyTarget     = the target to run the week toward (~6 days)
+     - monthlyTarget    = the target to run the month toward (~26 days)
+     - jobsTarget       = jobs/day we're aiming for
+   Update these here and the whole dashboard re-scores itself.
    ===================================================================== */
 export const OPS_TARGETS = {
-  breakEvenRevenue: 1650,
-  aimRevenue: 2000,
-  weeklyTarget: 10500,
-  monthlyTarget: 45000,
+  breakEvenRevenue: 350,
+  aimRevenue: 850,
+  weeklyTarget: 5100,
+  monthlyTarget: 22000,
   jobsTarget: 1,
 };
 
