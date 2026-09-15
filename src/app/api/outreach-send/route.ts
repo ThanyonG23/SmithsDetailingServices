@@ -15,8 +15,8 @@ export const maxDuration = 60;
 
 const START_HOUR = 7; // 7am
 const END_HOUR = 22; // send through the 9pm hour (skip once hour >= 22)
-const MIN_GAP_MIN = 25; // < 30 so every half-hourly cron tick sends reliably, but blocks accidental rapid double-fires
-const DAILY_CAP = 30; // ~every 30 min across the 7am-9pm window
+const MIN_GAP_MIN = 25; // < 30 so every half-hourly cron tick fires reliably, but blocks accidental rapid double-fires
+const DAILY_CAP = 90; // up to 3 per run (follow-up + partner + growth) across the 7am-9pm window
 const OPT_OUT = "\n\nNot interested? Just reply and I will take you off my list.";
 
 const j = (body: unknown, status = 200) => NextResponse.json(body, { status });
@@ -98,39 +98,8 @@ Thanyon
 Smiths Detailing Services`;
 }
 
-export async function GET(req: Request) {
-  const token = new URL(req.url).searchParams.get("token") || req.headers.get("x-cron-token") || "";
-  if (!process.env.OUTREACH_CRON_TOKEN || token !== process.env.OUTREACH_CRON_TOKEN) {
-    return j({ ok: false, error: "unauthorised" }, 401);
-  }
-  // Hourly capture of affiliate signups into the durable table (belt-and-braces,
-  // so attribution is caught even if no one opens the dashboards).
-  await affiliateEarnings().catch(() => {});
-  if (!mailerConfigured()) {
-    return j({ ok: false, error: "GMAIL_USER / GMAIL_APP_PASSWORD not set in Vercel" }, 503);
-  }
-  await ensureOutreach();
-
-  // Time window + rate + daily cap, all evaluated in Cairns time via Postgres.
-  const clock = (await sql`SELECT
-    extract(hour from (now() AT TIME ZONE 'Australia/Brisbane'))::int AS h,
-    (SELECT count(*)::int FROM outreach_leads WHERE last_sent_at IS NOT NULL
-       AND (last_sent_at AT TIME ZONE 'Australia/Brisbane')::date = (now() AT TIME ZONE 'Australia/Brisbane')::date) AS sent_today,
-    (SELECT extract(epoch from (now() - max(last_sent_at)))/60 FROM outreach_leads) AS mins_since_last
-  `) as unknown as { h: number; sent_today: number; mins_since_last: number | null }[];
-  const { h, sent_today, mins_since_last } = clock[0];
-
-  // ?force=1 bypasses the window/rate/cap guards, for a manual self-test.
-  const force = new URL(req.url).searchParams.get("force") === "1";
-  if (!force) {
-    if (h < START_HOUR || h >= END_HOUR) return j({ ok: true, sent: 0, skipped: `outside send window (Cairns hour ${h})` });
-    if (mins_since_last !== null && mins_since_last < MIN_GAP_MIN) {
-      return j({ ok: true, sent: 0, skipped: `rate limit, last send ${Math.round(mins_since_last)}m ago` });
-    }
-    if (sent_today >= DAILY_CAP) return j({ ok: true, sent: 0, skipped: `daily cap ${DAILY_CAP} reached` });
-  }
-
-  // 1) Follow-ups that are due. Reply-check each before sending.
+/* Sends one due follow-up (any campaign). Returns a result, or null if none due. */
+async function sendOneFollowup(): Promise<Record<string, unknown> | null> {
   const followups = (await sql`
     SELECT id, email, business, subject, body, sent_at, stage, campaign FROM outreach_leads
     WHERE approved AND NOT replied AND NOT stopped AND NOT bounced AND email <> ''
@@ -167,32 +136,92 @@ export async function GET(req: Request) {
         await sql`UPDATE outreach_leads SET stage = 3, last_sent_at = now(),
           next_action_at = null, send_error = '', updated_at = now() WHERE id = ${l.id}`;
       }
-      return j({ ok: true, sent: 1, type: `follow-up ${l.stage}`, to: l.email, business: l.business });
+      return { ok: true, sent: 1, type: `follow-up ${l.stage}`, to: l.email, business: l.business };
     }
-    // Send failed, park it a day so it doesn't block the queue, record the error.
     await sql`UPDATE outreach_leads SET send_error = ${res.error || "send failed"},
       next_action_at = now() + interval '1 day', updated_at = now() WHERE id = ${l.id}`;
-    return j({ ok: false, error: res.error, to: l.email });
+    return { ok: false, sent: 0, error: res.error, to: l.email };
   }
+  return null;
+}
 
-  // 2) Otherwise, the next fresh approved lead.
+/* Sends the next fresh approved lead for one campaign. Null if none waiting. */
+async function sendOneFresh(campaign: string): Promise<Record<string, unknown> | null> {
   const fresh = (await sql`
     SELECT id, email, business, subject, body FROM outreach_leads
     WHERE approved AND stage = 0 AND NOT stopped AND NOT bounced AND email <> '' AND body <> ''
+      AND campaign = ${campaign}
     ORDER BY id ASC LIMIT 1
   `) as unknown as { id: number; email: string; business: string; subject: string; body: string }[];
+  if (!fresh[0]) return null;
+  const l = fresh[0];
+  const fallback =
+    campaign === "growth"
+      ? "filling your calendar"
+      : campaign === "affiliate"
+        ? "Are you good at being an affiliate?"
+        : "Cairns, you have seen our marketing";
+  const res = await sendMail(l.email, l.subject || fallback, (l.body || "") + OPT_OUT);
+  if (res.ok) {
+    await sql`UPDATE outreach_leads SET stage = 1, status = 'sent', sent_at = now(), last_sent_at = now(),
+      next_action_at = now() + interval '2 days', send_error = '', updated_at = now() WHERE id = ${l.id}`;
+    return { ok: true, sent: 1, type: `initial ${campaign}`, to: l.email, business: l.business };
+  }
+  await sql`UPDATE outreach_leads SET send_error = ${res.error || "send failed"}, updated_at = now() WHERE id = ${l.id}`;
+  return { ok: false, sent: 0, error: res.error, to: l.email };
+}
 
-  if (fresh[0]) {
-    const l = fresh[0];
-    const res = await sendMail(l.email, l.subject || "Cairns, you have seen our marketing", (l.body || "") + OPT_OUT);
-    if (res.ok) {
-      await sql`UPDATE outreach_leads SET stage = 1, status = 'sent', sent_at = now(), last_sent_at = now(),
-        next_action_at = now() + interval '2 days', send_error = '', updated_at = now() WHERE id = ${l.id}`;
-      return j({ ok: true, sent: 1, type: "initial", to: l.email, business: l.business });
+export async function GET(req: Request) {
+  const token = new URL(req.url).searchParams.get("token") || req.headers.get("x-cron-token") || "";
+  if (!process.env.OUTREACH_CRON_TOKEN || token !== process.env.OUTREACH_CRON_TOKEN) {
+    return j({ ok: false, error: "unauthorised" }, 401);
+  }
+  // Hourly capture of affiliate signups into the durable table (belt-and-braces,
+  // so attribution is caught even if no one opens the dashboards).
+  await affiliateEarnings().catch(() => {});
+  if (!mailerConfigured()) {
+    return j({ ok: false, error: "GMAIL_USER / GMAIL_APP_PASSWORD not set in Vercel" }, 503);
+  }
+  await ensureOutreach();
+
+  // Time window + rate + daily cap, all evaluated in Cairns time via Postgres.
+  const clock = (await sql`SELECT
+    extract(hour from (now() AT TIME ZONE 'Australia/Brisbane'))::int AS h,
+    (SELECT count(*)::int FROM outreach_leads WHERE last_sent_at IS NOT NULL
+       AND (last_sent_at AT TIME ZONE 'Australia/Brisbane')::date = (now() AT TIME ZONE 'Australia/Brisbane')::date) AS sent_today,
+    (SELECT extract(epoch from (now() - max(last_sent_at)))/60 FROM outreach_leads) AS mins_since_last
+  `) as unknown as { h: number; sent_today: number; mins_since_last: number | null }[];
+  const { h, sent_today, mins_since_last } = clock[0];
+
+  // ?force=1 bypasses the window/rate/cap guards, for a manual self-test.
+  const force = new URL(req.url).searchParams.get("force") === "1";
+  if (!force) {
+    if (h < START_HOUR || h >= END_HOUR) return j({ ok: true, sent: 0, skipped: `outside send window (Cairns hour ${h})` });
+    if (mins_since_last !== null && mins_since_last < MIN_GAP_MIN) {
+      return j({ ok: true, sent: 0, skipped: `rate limit, last send ${Math.round(mins_since_last)}m ago` });
     }
-    await sql`UPDATE outreach_leads SET send_error = ${res.error || "send failed"}, updated_at = now() WHERE id = ${l.id}`;
-    return j({ ok: false, error: res.error, to: l.email });
+    if (sent_today >= DAILY_CAP) return j({ ok: true, sent: 0, skipped: `daily cap ${DAILY_CAP} reached` });
   }
 
-  return j({ ok: true, sent: 0, note: "nothing due to send" });
+  // Each run advances all three streams so none starves: one due follow-up,
+  // one fresh giveaway/partner, one fresh remote-growth. Capped by DAILY_CAP.
+  const budget = force ? 99 : Math.max(0, DAILY_CAP - sent_today);
+  const results: Record<string, unknown>[] = [];
+  const sentSoFar = () => results.filter((r) => (r as { sent?: number }).sent).length;
+
+  if (sentSoFar() < budget) {
+    const r = await sendOneFollowup();
+    if (r) results.push(r);
+  }
+  if (sentSoFar() < budget) {
+    const r = await sendOneFresh("partner");
+    if (r) results.push(r);
+  }
+  if (sentSoFar() < budget) {
+    const r = await sendOneFresh("growth");
+    if (r) results.push(r);
+  }
+
+  if (results.length === 0) return j({ ok: true, sent: 0, note: "nothing due to send" });
+  return j({ ok: true, sent: sentSoFar(), results });
 }
