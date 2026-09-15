@@ -7,6 +7,7 @@ import {
   type GrowthDay,
 } from "@/lib/ops/db";
 import { cairnsToday } from "@/lib/ops/config";
+import { getStripeRevenue, type StripeRevenue } from "@/lib/ops/stripe-revenue";
 
 export const metadata: Metadata = {
   title: "History | Smiths Detailing",
@@ -83,6 +84,14 @@ export default async function HistoryPage() {
     ({ recent, growth } = data);
   } catch {
     dbError = true;
+  }
+
+  // Live Stripe revenue, a second source alongside the daily logs (Xero later).
+  let stripeRev: StripeRevenue | null = null;
+  try {
+    stripeRev = await getStripeRevenue();
+  } catch {
+    stripeRev = null;
   }
 
   // ── weekly buckets ──
@@ -187,6 +196,50 @@ export default async function HistoryPage() {
         Hist<span className="text-brand-green">ory</span>
       </h1>
       <p className="mt-3 text-sm text-white/50">Look back, spot the pattern, what&apos;s working and what&apos;s not.</p>
+
+      {/* ── STRIPE PAYMENTS (live revenue source) ──────────────────── */}
+      <section className="mt-8">
+        <div className={EYEBROW}>Stripe payments</div>
+        {!stripeRev?.configured ? (
+          <p className="mt-3 text-sm text-white/45">
+            Stripe key not set, add STRIPE_SECRET_KEY in Vercel to track Stripe revenue here.
+          </p>
+        ) : (
+          <>
+            <div className="mt-3 grid grid-cols-3 gap-3">
+              {[
+                { label: "This week", v: money(stripeRev.week) },
+                { label: "This month", v: money(stripeRev.month) },
+                { label: "Last 45 days", v: money(stripeRev.window) },
+              ].map((m) => (
+                <div key={m.label} className={`${CARD} p-4`}>
+                  <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/40">{m.label}</div>
+                  <div className="mt-1.5 font-display text-2xl font-extrabold tabular-nums text-brand-green">{m.v}</div>
+                </div>
+              ))}
+            </div>
+            {stripeRev.recent.length > 0 && (
+              <div className={`${CARD} mt-3 divide-y divide-white/5`}>
+                {stripeRev.recent.slice(0, 15).map((p, i) => (
+                  <div key={i} className="flex items-center justify-between gap-3 px-4 py-2.5">
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-semibold text-white">{p.name}</div>
+                      {p.desc && <div className="truncate text-[11px] text-white/40">{p.desc}</div>}
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <div className="font-display text-sm font-black tabular-nums text-white">{money(p.amount)}</div>
+                      <div className="text-[10px] text-white/35">{brisFmt(p.dateMs)}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <p className="mt-2 text-[11px] text-white/30">
+              Live from Stripe. Xero can slot in here as a second source once it&apos;s connected.
+            </p>
+          </>
+        )}
+      </section>
 
       {dbError && (
         <div className="mt-5 rounded-xl border border-brand-yellow/40 bg-brand-yellow/[0.08] px-4 py-3 text-sm text-brand-yellow">
