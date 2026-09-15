@@ -49,6 +49,7 @@ export default function OutreachTool() {
   const [scanning, setScanning] = useState<number | null>(null);
   const [scanAll, setScanAll] = useState(false);
   const [filter, setFilter] = useState<string>("all");
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     getOutreach().then(setLeads).catch(() => {});
@@ -60,10 +61,18 @@ export default function OutreachTool() {
     return c;
   }, [leads]);
 
-  const shown = useMemo(
-    () => (filter === "all" ? leads : leads.filter((l) => bucketOf(l) === filter)),
-    [leads, filter],
-  );
+  const shown = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    let list = filter === "all" ? leads : leads.filter((l) => bucketOf(l) === filter);
+    if (q) {
+      list = list.filter((l) =>
+        [l.business, l.email, l.category, l.address, l.phone, l.url].some((f) =>
+          String(f || "").toLowerCase().includes(q),
+        ),
+      );
+    }
+    return list;
+  }, [leads, filter, search]);
 
   async function act(fn: () => Promise<Lead[]>) {
     try {
@@ -254,6 +263,31 @@ export default function OutreachTool() {
         )}
       </div>
 
+      {/* search */}
+      <div className="relative mt-3">
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search business, email, category, area or phone…"
+          className="w-full rounded-full border border-white/15 bg-black/30 px-4 py-2 pr-16 text-sm text-white outline-none placeholder:text-white/30 focus:border-brand-purple"
+        />
+        {search && (
+          <button
+            type="button"
+            onClick={() => setSearch("")}
+            className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full px-3 py-1 text-xs font-bold text-white/40 hover:text-white"
+          >
+            clear
+          </button>
+        )}
+      </div>
+      {search && (
+        <div className="mt-1.5 px-1 text-[11px] text-white/40">
+          {shown.length} match{shown.length === 1 ? "" : "es"} for &ldquo;{search}&rdquo;
+        </div>
+      )}
+
       {/* list */}
       <div className="mt-4 flex flex-col gap-3">
         {leads.length === 0 && (
@@ -263,7 +297,7 @@ export default function OutreachTool() {
         )}
         {leads.length > 0 && shown.length === 0 && (
           <div className="rounded-2xl border border-dashed border-white/12 p-6 text-center text-sm text-white/40">
-            Nothing in this bucket right now.
+            {search ? "No leads match your search." : "Nothing in this bucket right now."}
           </div>
         )}
         {shown.map((l) => (
