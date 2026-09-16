@@ -147,8 +147,18 @@ export default function DiamondTouchPage() {
             <div className="mx-auto mt-6 flex max-w-2xl items-start gap-3 rounded-2xl border border-brand-green/30 bg-brand-green/[0.06] px-5 py-4">
               <span className="mt-0.5 shrink-0 text-brand-green">🛡️</span>
               <span className="text-sm leading-relaxed text-white/75">
-                <span className="font-black text-white">Zero risk.</span> No upfront cost, no monthly fee, no lock-in. You
-                only ever pay when we actually bring you a paying job.
+                <span className="font-black text-white">Zero risk.</span> No upfront cost and no monthly fee. You only
+                ever pay when we actually bring you a paying job.
+              </span>
+            </div>
+          </Reveal>
+          <Reveal delay={200}>
+            <div className="mx-auto mt-4 flex max-w-2xl items-start gap-3 rounded-2xl border border-brand-purple/30 bg-brand-purple/[0.06] px-5 py-4">
+              <span className="mt-0.5 shrink-0 text-brand-purple-soft">📆</span>
+              <span className="text-sm leading-relaxed text-white/75">
+                <span className="font-black text-white">A 6 month partnership.</span> Marketing compounds. The first
+                stretch is setup and the results stack from there, so we run it as a 6 month agreement to give it the time
+                it needs to genuinely pay off for you.
               </span>
             </div>
           </Reveal>
