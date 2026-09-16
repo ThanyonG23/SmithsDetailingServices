@@ -77,7 +77,7 @@ async function runEnsure(): Promise<void> {
     const rows = await sql`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.tables
-        WHERE table_name = 'inspect_hidden'
+        WHERE table_name = 'sales_clients'
       ) AS ready;`;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
   } catch {
@@ -155,6 +155,19 @@ async function runEnsure(): Promise<void> {
   await sql`CREATE TABLE IF NOT EXISTS inspect_hidden (
     uid        text        PRIMARY KEY,
     hidden_at  timestamptz NOT NULL DEFAULT now()
+  );`;
+  // Sales clients: businesses we run marketing/sales for. Header fields as
+  // columns, all the discovery answers in the details JSONB.
+  await sql`CREATE TABLE IF NOT EXISTS sales_clients (
+    id          serial      PRIMARY KEY,
+    business    text        NOT NULL DEFAULT '',
+    contact     text        NOT NULL DEFAULT '',
+    phone       text        NOT NULL DEFAULT '',
+    email       text        NOT NULL DEFAULT '',
+    stage       text        NOT NULL DEFAULT 'onboarding',
+    details     jsonb       NOT NULL DEFAULT '{}'::jsonb,
+    created_at  timestamptz NOT NULL DEFAULT now(),
+    updated_at  timestamptz NOT NULL DEFAULT now()
   );`;
   // Real sales from Xero (SalesInvoices export), one row per invoice, the
   // source of truth for revenue (vs the calendar price estimate).
@@ -1530,6 +1543,69 @@ export async function hideInspectCar(uid: string): Promise<void> {
   await ensureTable();
   if (!uid) return;
   await sql`INSERT INTO inspect_hidden (uid) VALUES (${uid}) ON CONFLICT (uid) DO NOTHING;`;
+}
+
+// ── Sales clients (the businesses we run marketing/sales for) ──────────────
+export interface SalesClient {
+  id: number;
+  business: string;
+  contact: string;
+  phone: string;
+  email: string;
+  stage: string;
+  details: Record<string, string>;
+  created_at: string;
+  updated_at: string;
+}
+
+function mapSalesClient(r: Record<string, unknown>): SalesClient {
+  const d = r.details;
+  return {
+    id: Number(r.id),
+    business: String(r.business || ""),
+    contact: String(r.contact || ""),
+    phone: String(r.phone || ""),
+    email: String(r.email || ""),
+    stage: String(r.stage || "onboarding"),
+    details: d && typeof d === "object" ? (d as Record<string, string>) : {},
+    created_at: String(r.created_at || ""),
+    updated_at: String(r.updated_at || ""),
+  };
+}
+
+export async function getSalesClients(): Promise<SalesClient[]> {
+  await ensureTable();
+  const rows = (await sql`SELECT * FROM sales_clients ORDER BY updated_at DESC`) as unknown as Record<string, unknown>[];
+  return rows.map(mapSalesClient);
+}
+
+export async function getSalesClient(id: number): Promise<SalesClient | null> {
+  await ensureTable();
+  const rows = (await sql`SELECT * FROM sales_clients WHERE id = ${id} LIMIT 1`) as unknown as Record<string, unknown>[];
+  return rows[0] ? mapSalesClient(rows[0]) : null;
+}
+
+export async function createSalesClient(business: string): Promise<number> {
+  await ensureTable();
+  const rows = (await sql`INSERT INTO sales_clients (business) VALUES (${business}) RETURNING id`) as unknown as { id: number }[];
+  return rows[0].id;
+}
+
+export async function saveSalesClient(
+  id: number,
+  data: { business: string; contact: string; phone: string; email: string; stage: string; details: Record<string, string> },
+): Promise<void> {
+  await ensureTable();
+  await sql`UPDATE sales_clients SET
+    business = ${data.business}, contact = ${data.contact}, phone = ${data.phone},
+    email = ${data.email}, stage = ${data.stage}, details = ${sql.json(data.details)},
+    updated_at = now()
+    WHERE id = ${id}`;
+}
+
+export async function deleteSalesClient(id: number): Promise<void> {
+  await ensureTable();
+  await sql`DELETE FROM sales_clients WHERE id = ${id}`;
 }
 
 /** Diagnostic: does the save round-trip work, and what's actually stored? */

@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { passwordRole, sessionCookieValue, OPS_COOKIE } from "@/lib/ops/auth";
+import { CLIENT_DETAIL_KEYS } from "@/lib/ops/clients-fields";
 import {
   upsertDailyLog,
   replaceBookings,
@@ -38,6 +39,9 @@ import {
   createInspection,
   archiveInspection,
   hideInspectCar,
+  createSalesClient,
+  saveSalesClient,
+  deleteSalesClient,
   saveInspectionItems,
   recordInspectionResponse,
   getInspection,
@@ -367,6 +371,43 @@ export async function dismissInspectCar(formData: FormData): Promise<void> {
   if (!uid) return;
   await hideInspectCar(uid);
   revalidatePath("/ops/inspect");
+}
+
+/** Create a new sales client and open its onboarding sheet. */
+export async function newSalesClient(formData: FormData): Promise<void> {
+  const business = String(formData.get("business") || "").trim().slice(0, 120) || "New client";
+  const id = await createSalesClient(business);
+  revalidatePath("/ops/clients");
+  redirect(`/ops/clients/${id}`);
+}
+
+/** Save a sales client's onboarding sheet (header fields + all discovery answers). */
+export async function saveClient(formData: FormData): Promise<void> {
+  const id = Number(formData.get("id") || 0);
+  if (!id) return;
+  const details: Record<string, string> = {};
+  for (const key of CLIENT_DETAIL_KEYS) {
+    details[key] = String(formData.get(key) || "").trim().slice(0, 4000);
+  }
+  await saveSalesClient(id, {
+    business: String(formData.get("business") || "").trim().slice(0, 120),
+    contact: String(formData.get("contact") || "").trim().slice(0, 120),
+    phone: String(formData.get("phone") || "").trim().slice(0, 40),
+    email: String(formData.get("email") || "").trim().slice(0, 200),
+    stage: String(formData.get("stage") || "onboarding").trim().slice(0, 40),
+    details,
+  });
+  revalidatePath(`/ops/clients/${id}`);
+  revalidatePath("/ops/clients");
+}
+
+/** Delete a sales client. */
+export async function removeSalesClient(formData: FormData): Promise<void> {
+  const id = Number(formData.get("id") || 0);
+  if (!id) return;
+  await deleteSalesClient(id);
+  revalidatePath("/ops/clients");
+  redirect("/ops/clients");
 }
 
 /** Toggle the member discount on an inspection (from the builder). */
