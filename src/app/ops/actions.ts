@@ -36,6 +36,7 @@ import {
   setWaitlistStatus,
   deleteWaitlist,
   createInspection,
+  archiveInspection,
   saveInspectionItems,
   recordInspectionResponse,
   getInspection,
@@ -349,6 +350,14 @@ export async function startInspection(formData: FormData): Promise<void> {
   const slug = await createInspection({ bookingUid: uid, customerName: name, vehicle, member });
   revalidatePath("/ops/inspect");
   redirect(`/ops/inspect/${slug}`);
+}
+
+/** Close (archive) an inspection off the list, one you didn't need to do. */
+export async function closeInspection(formData: FormData): Promise<void> {
+  const slug = String(formData.get("slug") || "").slice(0, 60);
+  if (!slug) return;
+  await archiveInspection(slug);
+  revalidatePath("/ops/inspect");
 }
 
 /** Toggle the member discount on an inspection (from the builder). */

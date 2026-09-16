@@ -149,6 +149,8 @@ async function runEnsure(): Promise<void> {
     );`;
   // Member inspections give the customer a discount on every upsell.
   await sql`ALTER TABLE inspections ADD COLUMN IF NOT EXISTS member boolean NOT NULL DEFAULT false;`;
+  // Archived inspections are hidden from the list, ones that didn't need doing.
+  await sql`ALTER TABLE inspections ADD COLUMN IF NOT EXISTS archived boolean NOT NULL DEFAULT false;`;
   // Real sales from Xero (SalesInvoices export), one row per invoice, the
   // source of truth for revenue (vs the calendar price estimate).
   await sql`
@@ -1501,8 +1503,14 @@ export async function recordInspectionResponse(
 
 export async function listRecentInspections(limit = 40): Promise<Inspection[]> {
   await ensureTable();
-  const rows = await sql`SELECT * FROM inspections ORDER BY created_at DESC LIMIT ${limit};`;
+  const rows = await sql`SELECT * FROM inspections WHERE NOT archived ORDER BY created_at DESC LIMIT ${limit};`;
   return (rows as Record<string, unknown>[]).map(mapInspection);
+}
+
+/** Hide an inspection from the list (one that didn't need doing). Reversible. */
+export async function archiveInspection(slug: string): Promise<void> {
+  await ensureTable();
+  await sql`UPDATE inspections SET archived = true WHERE slug = ${slug};`;
 }
 
 /** Diagnostic: does the save round-trip work, and what's actually stored? */

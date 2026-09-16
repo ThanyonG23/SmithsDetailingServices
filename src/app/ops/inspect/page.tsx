@@ -9,7 +9,7 @@ import {
   type Inspection,
 } from "@/lib/ops/db";
 import { cairnsToday } from "@/lib/ops/config";
-import { startInspection } from "../actions";
+import { startInspection, closeInspection } from "../actions";
 
 export const metadata: Metadata = {
   title: "Inspect | Smiths Detailing",
@@ -142,8 +142,18 @@ export default async function InspectPage() {
                   ? "border-brand-green/40 bg-brand-green/[0.05]"
                   : "border-white/10 bg-white/[0.02]";
               return (
-                <Link key={insp.slug} href={`/ops/inspect/${insp.slug}`} className={`rounded-2xl border p-4 transition hover:border-white/25 ${tone}`}>
-                  <div className="flex items-start justify-between gap-2">
+                <div key={insp.slug} className={`relative rounded-2xl border p-4 transition ${tone}`}>
+                  <form action={closeInspection} className="absolute right-2 top-2 z-10">
+                    <input type="hidden" name="slug" value={insp.slug} />
+                    <button
+                      title="Remove from list (didn't need doing)"
+                      className="flex h-6 w-6 items-center justify-center rounded-full border border-white/15 bg-black/40 text-xs text-white/45 transition hover:border-red-400/50 hover:bg-red-500/15 hover:text-red-300"
+                    >
+                      ✕
+                    </button>
+                  </form>
+                  <Link href={`/ops/inspect/${insp.slug}`} className="block transition hover:opacity-90">
+                  <div className="flex items-start justify-between gap-2 pr-7">
                     <div className="min-w-0">
                       <div className="truncate font-display text-base font-extrabold tracking-tight text-white">
                         {insp.customer_name || "(no name)"}
@@ -177,7 +187,8 @@ export default async function InspectPage() {
                       {insp.items.length} extra{insp.items.length === 1 ? "" : "s"} · {money(offered)} offered
                     </div>
                   )}
-                </Link>
+                  </Link>
+                </div>
               );
             })}
           </div>
