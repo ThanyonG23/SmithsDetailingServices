@@ -6,7 +6,7 @@ import { useState } from "react";
    /api/waitlist tagged source="growth-partner" so leads land in the ops
    dashboard and email the shop. Short on purpose to maximise conversion. */
 
-export default function GrowthLeadForm() {
+export default function GrowthLeadForm({ source = "growth-partner" }: { source?: string }) {
   const [name, setName] = useState("");
   const [business, setBusiness] = useState("");
   const [trade, setTrade] = useState("");
@@ -37,7 +37,7 @@ export default function GrowthLeadForm() {
           phone: isEmail ? "" : contact,
           vehicle: "",
           membership: false,
-          source: "growth-partner",
+          source,
           message: lines.join("\n"),
         }),
       });

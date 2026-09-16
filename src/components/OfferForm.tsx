@@ -10,14 +10,17 @@ export default function OfferForm({
   source,
   offerLabel,
   ctaLabel = "Lock it in →",
+  chooser,
 }: {
   source: string;
   offerLabel: string;
   ctaLabel?: string;
+  chooser?: { label: string; options: string[] };
 }) {
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
   const [note, setNote] = useState("");
+  const [chosen, setChosen] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [error, setError] = useState("");
 
@@ -38,7 +41,7 @@ export default function OfferForm({
           vehicle: "",
           membership: false,
           source,
-          message: [`OFFER: ${offerLabel}`, note.trim()].filter(Boolean).join("\n"),
+          message: [`OFFER: ${offerLabel}`, chosen && `Chose: ${chosen}`, note.trim()].filter(Boolean).join("\n"),
         }),
       });
       if (!res.ok) {
@@ -75,7 +78,19 @@ export default function OfferForm({
       <h3 className="mt-1.5 font-display text-xl font-extrabold text-white sm:text-2xl">Ready to go?</h3>
       <p className="mt-1.5 text-sm text-white/55">Drop your details and we&apos;ll plan it out with you. No obligation.</p>
 
-      <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
+      {chooser && (
+        <select value={chosen} onChange={(e) => setChosen(e.target.value)} className={`${field} mt-5`}>
+          <option value="" className="bg-[#0a0a0a]">
+            {chooser.label}
+          </option>
+          {chooser.options.map((o) => (
+            <option key={o} value={o} className="bg-[#0a0a0a]">
+              {o}
+            </option>
+          ))}
+        </select>
+      )}
+      <div className={`grid gap-2.5 sm:grid-cols-2 ${chooser ? "mt-2.5" : "mt-5"}`}>
         <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your name" className={field} />
         <input value={contact} onChange={(e) => setContact(e.target.value)} placeholder="Email or mobile" className={field} />
       </div>
