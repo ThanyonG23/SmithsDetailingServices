@@ -243,10 +243,16 @@ export default function PartyBusPage() {
       <section id="accept" className="scroll-mt-6 px-4 py-12 sm:py-16">
         <div className="mx-auto max-w-2xl">
           <Reveal>
+            <p className="mb-5 text-center text-sm leading-relaxed text-white/60">
+              Once you click accept, the team gets to work planning everything and reaches out to organise everything we
+              need from you.
+            </p>
+          </Reveal>
+          <Reveal delay={100}>
             <OfferForm
               source="partybus"
               offerLabel="Ultimate Party Cairns, 6-week giveaway campaign (mini + major + Meta ads)"
-              ctaLabel="Lock in the campaign →"
+              ctaLabel="Accept the campaign →"
             />
           </Reveal>
         </div>

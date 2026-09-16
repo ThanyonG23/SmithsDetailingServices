@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Reveal from "@/components/Reveal";
-import GrowthLeadForm from "@/components/GrowthLeadForm";
+import OfferForm from "@/components/OfferForm";
 
 /* Personalised growth-partner service page for Ultimate Party Cairns, the paid
    done-for-you version of /grow: we fill the bus, you pay only on bookings.
@@ -34,7 +34,6 @@ const VALUE: { t: string; v: string }[] = [
 const OFFER = [
   { t: "Nothing upfront", d: "We build and run everything at our own cost, including the ad spend. You don't pay a cent to start." },
   { t: "We only take a small cut of the bookings we make you", d: "No bookings, no cost. We don't get paid unless you do." },
-  { t: "Live in just a few days", d: "Not weeks. We move fast and get your booking engine running quickly." },
   { t: "One party bus in Cairns", d: "Once we build yours, we won't build a competitor's. First in, locks it in." },
 ];
 
@@ -251,13 +250,20 @@ export default function PartyBusGrowPage() {
                 Let&apos;s get your bus <span className="text-brand-purple-soft">booked out.</span>
               </h2>
               <p className="mx-auto mt-3 max-w-md text-base leading-relaxed text-white/60">
-                Fill out your details and I&apos;ll give you a call to walk you through exactly how it works. No
-                obligation.
+                Once you accept, we&apos;ll sit down together and go through your whole business, your pricing, staff and
+                bookings, so we can put together a proper proposal and the exact commission we&apos;d ask for.
               </p>
             </div>
           </Reveal>
           <Reveal delay={100}>
-            <GrowthLeadForm source="partybus-grow" />
+            <OfferForm
+              source="partybus-grow"
+              offerLabel="Ultimate Party Cairns, growth service (done-for-you bookings)"
+              ctaLabel="Accept and book a sit-down →"
+              heading="Accept and let's plan it"
+              sub="Drop your details and we'll set a time to go through your business and put a proper proposal together."
+              footnote="No upfront cost. You only pay a small cut of the bookings we make you."
+            />
           </Reveal>
         </div>
       </section>

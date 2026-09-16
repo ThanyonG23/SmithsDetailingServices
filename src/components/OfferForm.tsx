@@ -11,11 +11,17 @@ export default function OfferForm({
   offerLabel,
   ctaLabel = "Lock it in →",
   chooser,
+  heading = "Ready to go?",
+  sub = "Drop your details and we'll plan it out with you. No obligation.",
+  footnote = "No cost to you. You just put up the prize.",
 }: {
   source: string;
   offerLabel: string;
   ctaLabel?: string;
   chooser?: { label: string; options: string[] };
+  heading?: string;
+  sub?: string;
+  footnote?: string;
 }) {
   const [name, setName] = useState("");
   const [contact, setContact] = useState("");
@@ -75,8 +81,8 @@ export default function OfferForm({
   return (
     <div className="rounded-2xl border border-brand-purple/30 bg-white/[0.02] p-6 sm:p-7">
       <div className="text-[11px] font-bold uppercase tracking-[0.18em] text-brand-purple-soft">Lock it in</div>
-      <h3 className="mt-1.5 font-display text-xl font-extrabold text-white sm:text-2xl">Ready to go?</h3>
-      <p className="mt-1.5 text-sm text-white/55">Drop your details and we&apos;ll plan it out with you. No obligation.</p>
+      <h3 className="mt-1.5 font-display text-xl font-extrabold text-white sm:text-2xl">{heading}</h3>
+      <p className="mt-1.5 text-sm text-white/55">{sub}</p>
 
       {chooser && (
         <select value={chosen} onChange={(e) => setChosen(e.target.value)} className={`${field} mt-5`}>
@@ -110,7 +116,7 @@ export default function OfferForm({
         {state === "sending" ? "Sending…" : ctaLabel}
       </button>
       {error && <div className="mt-2 text-xs font-semibold text-red-300">{error}</div>}
-      <p className="mt-2.5 text-center text-[11px] text-white/40">No cost to you. You just put up the prize.</p>
+      {footnote && <p className="mt-2.5 text-center text-[11px] text-white/40">{footnote}</p>}
     </div>
   );
 }
