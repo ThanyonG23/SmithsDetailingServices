@@ -77,7 +77,7 @@ async function runEnsure(): Promise<void> {
     const rows = await sql`
       SELECT EXISTS (
         SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'inspections' AND column_name = 'member'
+        WHERE table_name = 'inspections' AND column_name = 'archived'
       ) AS ready;`;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
   } catch {
