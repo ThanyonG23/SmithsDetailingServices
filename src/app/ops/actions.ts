@@ -37,6 +37,7 @@ import {
   deleteWaitlist,
   createInspection,
   archiveInspection,
+  hideInspectCar,
   saveInspectionItems,
   recordInspectionResponse,
   getInspection,
@@ -357,6 +358,14 @@ export async function closeInspection(formData: FormData): Promise<void> {
   const slug = String(formData.get("slug") || "").slice(0, 60);
   if (!slug) return;
   await archiveInspection(slug);
+  revalidatePath("/ops/inspect");
+}
+
+/** Dismiss a car from the "cars in today" inspect list (no inspection needed). */
+export async function dismissInspectCar(formData: FormData): Promise<void> {
+  const uid = String(formData.get("uid") || "").slice(0, 200);
+  if (!uid) return;
+  await hideInspectCar(uid);
   revalidatePath("/ops/inspect");
 }
 

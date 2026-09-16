@@ -76,8 +76,8 @@ async function runEnsure(): Promise<void> {
     // table whenever the schema grows so the one-time DDL runs exactly once.
     const rows = await sql`
       SELECT EXISTS (
-        SELECT 1 FROM information_schema.columns
-        WHERE table_name = 'inspections' AND column_name = 'archived'
+        SELECT 1 FROM information_schema.tables
+        WHERE table_name = 'inspect_hidden'
       ) AS ready;`;
     if ((rows[0] as { ready: boolean } | undefined)?.ready) return;
   } catch {
@@ -151,6 +151,11 @@ async function runEnsure(): Promise<void> {
   await sql`ALTER TABLE inspections ADD COLUMN IF NOT EXISTS member boolean NOT NULL DEFAULT false;`;
   // Archived inspections are hidden from the list, ones that didn't need doing.
   await sql`ALTER TABLE inspections ADD COLUMN IF NOT EXISTS archived boolean NOT NULL DEFAULT false;`;
+  // Cars dismissed from the "cars in today" inspect list, by booking uid.
+  await sql`CREATE TABLE IF NOT EXISTS inspect_hidden (
+    uid        text        PRIMARY KEY,
+    hidden_at  timestamptz NOT NULL DEFAULT now()
+  );`;
   // Real sales from Xero (SalesInvoices export), one row per invoice, the
   // source of truth for revenue (vs the calendar price estimate).
   await sql`
@@ -1511,6 +1516,20 @@ export async function listRecentInspections(limit = 40): Promise<Inspection[]> {
 export async function archiveInspection(slug: string): Promise<void> {
   await ensureTable();
   await sql`UPDATE inspections SET archived = true WHERE slug = ${slug};`;
+}
+
+/** Booking uids dismissed from the "cars in today" inspect list. */
+export async function getHiddenInspectUids(): Promise<Set<string>> {
+  await ensureTable();
+  const rows = (await sql`SELECT uid FROM inspect_hidden;`) as unknown as { uid: string }[];
+  return new Set(rows.map((r) => r.uid));
+}
+
+/** Dismiss a car from the "cars in today" inspect list (no inspection needed). */
+export async function hideInspectCar(uid: string): Promise<void> {
+  await ensureTable();
+  if (!uid) return;
+  await sql`INSERT INTO inspect_hidden (uid) VALUES (${uid}) ON CONFLICT (uid) DO NOTHING;`;
 }
 
 /** Diagnostic: does the save round-trip work, and what's actually stored? */

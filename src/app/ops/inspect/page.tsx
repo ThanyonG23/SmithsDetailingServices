@@ -5,11 +5,12 @@ import {
   getJobsForDate,
   getCarryoverJobs,
   listRecentInspections,
+  getHiddenInspectUids,
   type JobWithHours,
   type Inspection,
 } from "@/lib/ops/db";
 import { cairnsToday } from "@/lib/ops/config";
-import { startInspection, closeInspection } from "../actions";
+import { startInspection, closeInspection, dismissInspectCar } from "../actions";
 
 export const metadata: Metadata = {
   title: "Inspect | Smiths Detailing",
@@ -39,18 +40,21 @@ export default async function InspectPage() {
   let jobs: JobWithHours[] = [];
   let carryover: JobWithHours[] = [];
   let inspections: Inspection[] = [];
+  let hidden = new Set<string>();
   let dbError = false;
   try {
     jobs = await getJobsForDate(today);
     carryover = await getCarryoverJobs(today, shift(today, -13));
     inspections = await listRecentInspections(40);
+    hidden = await getHiddenInspectUids();
   } catch {
     dbError = true;
   }
 
   // cars physically on the floor = today's + carried-over, deduped, minus no-shows
+  // and minus any you've dismissed as not needing an inspection.
   const floor = [...jobs, ...carryover.filter((c) => !jobs.some((j) => j.uid === c.uid))].filter(
-    (j) => !j.cancelled
+    (j) => !j.cancelled && !hidden.has(j.uid)
   );
   const byUid = new Map(inspections.filter((i) => i.booking_uid).map((i) => [i.booking_uid, i]));
 
@@ -83,8 +87,19 @@ export default async function InspectPage() {
             {floor.map((j) => {
               const existing = byUid.get(j.uid);
               return (
-                <div key={j.uid} className={`${CARD} p-4`}>
-                  <div className="font-display text-base font-extrabold tracking-tight text-white">
+                <div key={j.uid} className={`relative ${CARD} p-4`}>
+                  {j.uid && (
+                    <form action={dismissInspectCar} className="absolute right-2 top-2 z-10">
+                      <input type="hidden" name="uid" value={j.uid} />
+                      <button
+                        title="Remove from list (no inspection needed)"
+                        className="flex h-6 w-6 items-center justify-center rounded-full border border-white/15 bg-black/40 text-xs text-white/45 transition hover:border-red-400/50 hover:bg-red-500/15 hover:text-red-300"
+                      >
+                        ✕
+                      </button>
+                    </form>
+                  )}
+                  <div className="pr-7 font-display text-base font-extrabold tracking-tight text-white">
                     {nameOf(j.summary) || "(no name)"}
                   </div>
                   <div className="mt-0.5 text-xs text-white/50">
