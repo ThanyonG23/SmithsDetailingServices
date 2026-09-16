@@ -13,14 +13,14 @@ const EMAIL_RE = /^[\w.+-]+@[\w-]+\.[a-z]{2,}(?:\.[a-z]{2,})?$/i;
    in Vercel; silently skipped (never blocks the customer) if unset or it fails. */
 async function notifyOwner(w: {
   name: string; email: string; phone: string; vehicle: string;
-  interests: string[]; membership: boolean; message: string;
+  interests: string[]; membership: boolean; message: string; source: string;
 }): Promise<void> {
   const key = process.env.RESEND_API_KEY;
   if (!key) return;
   const from = process.env.EMAIL_FROM || "Smiths Garage <onboarding@resend.dev>";
   const to = process.env.OWNER_EMAIL || BUSINESS.email;
 
-  const text = `New Smiths Garage waitlist sign-up.
+  const text = `New lead, source: ${w.source}.
 
 Name: ${w.name}
 Phone: ${w.phone || "-"}
@@ -29,8 +29,8 @@ Vehicle: ${w.vehicle || "-"}
 
 Interested in: ${w.interests.join(", ") || "-"}
 Wants the ${MEMBERSHIP_NAME}: ${w.membership ? "YES" : "no"}
-${w.message ? `\nMessage: ${w.message}\n` : ""}
-It's also waiting in /ops on the dashboard.`;
+${w.message ? `\nDetails:\n${w.message}\n` : ""}
+It's also waiting in /ops on the Waitlist tab.`;
 
   try {
     await fetch("https://api.resend.com/emails", {
@@ -39,7 +39,7 @@ It's also waiting in /ops on the dashboard.`;
       body: JSON.stringify({
         from,
         to,
-        subject: `Smiths Garage waitlist, ${w.name}${w.membership ? " (wants membership)" : ""}`,
+        subject: `New lead (${w.source}): ${w.name}`,
         text,
       }),
     });
@@ -62,9 +62,21 @@ export async function POST(req: Request) {
   const email = String(body.email || "").trim().slice(0, 200);
   const phone = String(body.phone || "").replace(/[^\d+ ]/g, "").trim().slice(0, 20);
   const vehicle = String(body.vehicle || "").trim().slice(0, 100);
-  const message = String(body.message || "").trim().slice(0, 500);
+  const message = String(body.message || "").trim().slice(0, 2000);
   const membership = body.membership === true || body.membership === "true";
-  const SOURCES = ["garage-waitlist", "membership-page", "membership-signup", "business-partner"];
+  const SOURCES = [
+    "garage-waitlist",
+    "membership-page",
+    "membership-signup",
+    "business-partner",
+    "detailing-offer",
+    "detail-offer-lp",
+    "interior-offer-lp",
+    "growth-partner",
+    "partybus",
+    "partybus-grow",
+    "diamond-touch",
+  ];
   const source = SOURCES.includes(String(body.source)) ? String(body.source) : "garage-waitlist";
   // Only keep interests we recognise, never trust arbitrary strings from the browser.
   const interests = Array.isArray(body.interests)
@@ -83,7 +95,7 @@ export async function POST(req: Request) {
 
   try {
     await insertWaitlist({ name, email, phone, vehicle, interests, membership, message, source });
-    await notifyOwner({ name, email, phone, vehicle, interests, membership, message });
+    await notifyOwner({ name, email, phone, vehicle, interests, membership, message, source });
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "Couldn't save that, try again in a moment." }, { status: 502 });

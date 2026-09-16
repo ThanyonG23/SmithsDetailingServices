@@ -23,6 +23,14 @@ const SOURCE_LABEL: Record<string, string> = {
   "garage-waitlist": "Garage waitlist",
   "membership-page": "Membership page",
   "membership-signup": "Signed up ✍️",
+  "business-partner": "Partner enquiry",
+  "detailing-offer": "Detailing offer",
+  "detail-offer-lp": "Detail offer (ad)",
+  "interior-offer-lp": "Interior offer (ad)",
+  "growth-partner": "Growth service",
+  partybus: "🚌 Party bus giveaway",
+  "partybus-grow": "🚌 Party bus, growth service",
+  "diamond-touch": "🧽 Diamond Touch",
 };
 
 const STAGE_META: Record<string, { label: string; cls: string }> = {
