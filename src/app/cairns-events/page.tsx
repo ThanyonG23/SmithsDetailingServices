@@ -57,8 +57,8 @@ const FAQS: { q: string; a: string }[] = [
     a: "Every trip is built to your group size, your days and what you want to do. You set the budget in the form and we design the best possible experience to it. Tell us what you're working with and we'll make it work.",
   },
   {
-    q: "Do I have to pay anything upfront?",
-    a: "No. You approve the full plan first. Only when you love it do we take a deposit to lock in your dates. No surprises.",
+    q: "How big can the group be?",
+    a: "From small VIP groups to large corporate teams and wedding parties. The double-decker bus alone carries up to 100. Tell us your numbers and we build the experience around them.",
   },
   {
     q: "What if it rains?",
@@ -247,11 +247,10 @@ export default function CairnsEventsPage() {
         >
           <span className="mt-0.5 shrink-0 text-3xl">🛡️</span>
           <div>
-            <div className="font-display text-lg font-black text-white">Zero risk to enquire</div>
+            <div className="font-display text-lg font-black text-white">No pressure, no lock-in</div>
             <p className="mt-1.5 text-sm leading-relaxed text-white/70">
-              Tell us what you want and we design it. You only go ahead if you genuinely love the plan, and you pay
-              nothing until you approve it. We plan and re-plan until it&apos;s the trip you actually want. No pressure,
-              no lock-in.
+              Tell us what you want and we design it around you. We plan and re-plan until it&apos;s the trip you
+              actually want, and you decide if you go ahead once you&apos;ve seen it. Enquiring costs you nothing.
             </p>
           </div>
         </div>
