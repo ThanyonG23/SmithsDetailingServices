@@ -33,7 +33,7 @@ const ROLES_ME = [
   "Build and pay for all the ads (national and local)",
   "Own the landing pages, funnels, socials and content",
   "Handle every lead, call and sale over the phone",
-  "Design the full custom itinerary and coordinate suppliers",
+  "Negotiate every supplier, build the itinerary and set the price",
   "Track everything and report back to you",
 ];
 const ROLES_PETE = [
@@ -211,8 +211,9 @@ export default function CairnsSystemPage() {
                 $10k <span className="text-white/35">to</span> $100k<span style={{ color: PURPLE_SOFT }}>+</span>
               </div>
               <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-white/60">
-                You keep your bus fee plus your margin on every trip, and <span className="font-bold text-white">you set
-                the price</span>. It is all new business, at zero marketing cost to you.
+                I negotiate the suppliers and price every trip at a premium, so you keep your bus fee{" "}
+                <span className="font-bold text-white">plus extra margin on top</span>, more than a standard hire. It is
+                all new business, at zero marketing cost to you.
               </p>
             </div>
 
@@ -226,8 +227,8 @@ export default function CairnsSystemPage() {
                 <div className="mt-1 text-[11px] leading-snug text-white/55">your cost. I fund the marketing</div>
               </div>
               <div className="rounded-2xl border border-white/10 bg-black/30 p-4 text-center">
-                <div className="font-display text-xl font-black" style={{ color: GREEN }}>Yours</div>
-                <div className="mt-1 text-[11px] leading-snug text-white/55">you set the price and keep your margin</div>
+                <div className="font-display text-xl font-black" style={{ color: GREEN }}>More</div>
+                <div className="mt-1 text-[11px] leading-snug text-white/55">you earn above your standard bus hire</div>
               </div>
             </div>
 
