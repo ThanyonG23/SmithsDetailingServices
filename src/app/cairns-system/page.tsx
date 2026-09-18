@@ -44,6 +44,13 @@ const ROLES_PETE = [
   "Honour the bookings we bring you",
 ];
 
+const TIERS: { price: string; suppliers: string; keep: string; cut: string }[] = [
+  { price: "$10,000", suppliers: "~$6,000", keep: "~$2,000", cut: "$2,000" },
+  { price: "$25,000", suppliers: "~$15,000", keep: "~$5,000", cut: "$5,000" },
+  { price: "$50,000", suppliers: "~$30,000", keep: "~$10,000", cut: "$10,000" },
+  { price: "$100,000", suppliers: "~$60,000", keep: "~$20,000", cut: "$20,000" },
+];
+
 const TERMS = [
   { t: "12 month agreement", d: "A full year to build this properly, then we renew or renegotiate." },
   { t: "You pay nothing for marketing", d: "I fund all the advertising. It costs you nothing to have this running." },
@@ -205,30 +212,43 @@ export default function CairnsSystemPage() {
           </div>
 
           <div className="mt-8 rounded-3xl border border-white/12 bg-white/[0.02] p-6 sm:p-8">
-            <div className="text-[11px] font-black uppercase tracking-[0.16em] text-white/40">
-              Illustrative example, a $25,000 trip
+            <div className="text-center">
+              <div className="text-[11px] font-black uppercase tracking-[0.16em] text-white/40">What a trip sells for</div>
+              <div className="mt-2 font-display text-4xl font-black text-white sm:text-5xl">
+                $10k <span className="text-white/35">to</span> $100k<span style={{ color: PURPLE_SOFT }}>+</span>
+              </div>
+              <p className="mx-auto mt-2 max-w-md text-sm text-white/55">
+                Every trip is custom. The bigger the group and the trip, the more you make.
+              </p>
             </div>
-            <div className="mt-4 flex flex-col gap-3">
-              <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3">
-                <span className="text-sm text-white/70">Suppliers (reef, heli, dining, stays)</span>
-                <span className="font-display text-sm font-black text-white">paid from the trip price</span>
-              </div>
-              <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3">
-                <span className="text-sm text-white/70">You keep, your bus revenue + margin</span>
-                <span className="font-display text-sm font-black" style={{ color: GREEN }}>your money</span>
-              </div>
-              <div className="flex items-center justify-between gap-3 rounded-xl border px-4 py-3" style={{ borderColor: `${PURPLE}55`, background: `${PURPLE}18` }}>
-                <span className="text-sm text-white/80">My commission (20% of the trip)</span>
-                <span className="font-display text-sm font-black" style={{ color: PURPLE_SOFT }}>$5,000</span>
-              </div>
-              <div className="flex items-center justify-between gap-3 rounded-xl border px-4 py-3" style={{ borderColor: `${PURPLE}55`, background: `${PURPLE}18` }}>
-                <span className="text-sm text-white/80">My planning fee (client pays me to plan)</span>
-                <span className="font-display text-sm font-black" style={{ color: PURPLE_SOFT }}>$0 to $1,000</span>
-              </div>
+
+            <div className="mt-6 overflow-x-auto">
+              <table className="w-full min-w-[440px] border-collapse text-sm">
+                <thead>
+                  <tr className="text-[11px] uppercase tracking-wider text-white/40">
+                    <th className="px-3 py-2 text-left font-black">Trip sells for</th>
+                    <th className="px-3 py-2 text-right font-black">Suppliers</th>
+                    <th className="px-3 py-2 text-right font-black">You keep</th>
+                    <th className="px-3 py-2 text-right font-black">My 20%</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {TIERS.map((t) => (
+                    <tr key={t.price} className="border-t border-white/10">
+                      <td className="px-3 py-3 font-display font-black tabular-nums text-white">{t.price}</td>
+                      <td className="px-3 py-3 text-right tabular-nums text-white/55">{t.suppliers}</td>
+                      <td className="px-3 py-3 text-right font-black tabular-nums" style={{ color: GREEN }}>{t.keep}</td>
+                      <td className="px-3 py-3 text-right font-black tabular-nums" style={{ color: PURPLE_SOFT }}>{t.cut}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+
             <p className="mt-4 text-xs leading-relaxed text-white/45">
-              Illustrative only, real numbers depend on the trip. The point stands: it is a booking you would not have
-              had, it costs you nothing in marketing, and you keep your bus revenue and margin.
+              Approximate and illustrative, the real split depends on the mix of activities in each trip. Your share is
+              your bus revenue plus your margin, and every one is a booking you would not have had, at zero marketing
+              cost to you. My planning fee ($0 to $1,000) is paid to me separately by the client, on top.
             </p>
           </div>
 
