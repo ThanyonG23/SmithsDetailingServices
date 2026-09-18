@@ -2,18 +2,49 @@
 
 import { useState } from "react";
 
-/* Progressive, one-question-at-a-time enquiry form for the Cairns Party Bus
+/* Progressive, one-question-at-a-time enquiry form for the Cairns Ultimate Party
    exclusive-events funnel. Each step is gated: the next question only appears
-   once the current one is answered. Choice steps auto-advance, text/contact
-   steps use a button. Posts to /api/waitlist tagged "partybus-events" so the
-   lead lands in the ops dashboard and emails the shop the moment it comes in. */
+   once the current one is answered. Q1 is a multi-select of Cairns experiences
+   plus a free-text "something else". Choice steps auto-advance, multi/text/contact
+   steps use a button. Posts to /api/waitlist tagged "partybus-events" so the lead
+   lands in the ops dashboard and emails the shop the moment it comes in.
+   Branding: Cairns Ultimate Party, fire-engine red #FF0000 on black. */
 
+type MultiStep = { key: "activities"; q: string; sub?: string; type: "multi"; options: { icon: string; label: string }[] };
 type ChoiceStep = { key: string; q: string; sub?: string; type: "choice"; options: string[] };
 type TextStep = { key: string; q: string; sub?: string; type: "text"; placeholder: string };
 type ContactStep = { key: "contact"; q: string; sub?: string; type: "contact" };
-type Step = ChoiceStep | TextStep | ContactStep;
+type Step = MultiStep | ChoiceStep | TextStep | ContactStep;
+
+const ACTIVITIES: { icon: string; label: string }[] = [
+  { icon: "🐠", label: "Great Barrier Reef" },
+  { icon: "🏝️", label: "Island day trip" },
+  { icon: "🚁", label: "Helicopter flight" },
+  { icon: "🛥️", label: "Private yacht charter" },
+  { icon: "🪂", label: "Skydive the reef" },
+  { icon: "🌴", label: "Daintree rainforest" },
+  { icon: "🚡", label: "Skyrail & Kuranda" },
+  { icon: "🎈", label: "Hot air balloon" },
+  { icon: "🌊", label: "White water rafting" },
+  { icon: "🎣", label: "Fishing charter" },
+  { icon: "🥂", label: "Sunset cruise" },
+  { icon: "🐊", label: "Wildlife & crocs" },
+  { icon: "🏎️", label: "Go-karting" },
+  { icon: "⛳", label: "Golf" },
+  { icon: "🥩", label: "Fine dining" },
+  { icon: "🍹", label: "Bars & nightlife" },
+  { icon: "🚌", label: "Party bus crawl" },
+  { icon: "💆", label: "Spa & relaxation" },
+];
 
 const STEPS: Step[] = [
+  {
+    key: "activities",
+    q: "What do you want to do while in Cairns?",
+    sub: "Pick anything that sounds good. We'll build the trip around it.",
+    type: "multi",
+    options: ACTIVITIES,
+  },
   {
     key: "people",
     q: "How many people?",
@@ -55,11 +86,14 @@ const STEPS: Step[] = [
   },
 ];
 
-const PINK = "#ff2d78";
-const CYAN = "#22d3ee";
+const RED = "#ff0000";
+const RED_DEEP = "#c20000";
+const RED_SOFT = "#ff5a5a";
 
 export default function CairnsEventsForm() {
   const [step, setStep] = useState(0);
+  const [activities, setActivities] = useState<string[]>([]);
+  const [activityOther, setActivityOther] = useState("");
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -71,6 +105,11 @@ export default function CairnsEventsForm() {
   const total = STEPS.length;
   const pct = state === "done" ? 100 : Math.round((step / total) * 100);
 
+  const toggleActivity = (label: string) => {
+    setError("");
+    setActivities((a) => (a.includes(label) ? a.filter((x) => x !== label) : [...a, label]));
+  };
+
   const answerAndNext = (key: string, value: string) => {
     setAnswers((a) => ({ ...a, [key]: value }));
     setError("");
@@ -78,6 +117,10 @@ export default function CairnsEventsForm() {
   };
 
   const next = () => {
+    if (current.type === "multi") {
+      if (activities.length === 0 && !activityOther.trim())
+        return setError("Pick at least one, or tell us what you're after.");
+    }
     if (current.type === "text") {
       if (!(answers[current.key] || "").trim()) return setError("Give us a rough idea so we can plan around it.");
     }
@@ -96,8 +139,10 @@ export default function CairnsEventsForm() {
     if (!phone.trim() && !email.trim()) return setError("Add a mobile or email so we can reach you.");
     setState("sending");
     try {
+      const wants = [...activities, activityOther.trim() && `Other: ${activityOther.trim()}`].filter(Boolean).join(", ");
       const message = [
-        "CAIRNS PARTY BUS EVENT ENQUIRY",
+        "CAIRNS ULTIMATE PARTY EVENT ENQUIRY",
+        `Wants to do: ${wants || "-"}`,
         `People: ${answers.people || "-"}`,
         `When: ${answers.dates || "-"}`,
         `Budget: ${answers.budget || "-"}`,
@@ -131,36 +176,36 @@ export default function CairnsEventsForm() {
   };
 
   const field =
-    "w-full rounded-xl border border-white/15 bg-black/50 px-4 py-3.5 text-base text-white outline-none placeholder:text-white/30 transition focus:border-[#22d3ee]";
+    "w-full rounded-xl border border-white/15 bg-black/50 px-4 py-3.5 text-base text-white outline-none placeholder:text-white/30 transition focus:border-[#ff0000]";
 
   if (state === "done") {
     return (
-      <div className="rounded-3xl border border-[#22d3ee]/40 bg-[#22d3ee]/[0.06] p-8 text-center sm:p-10">
+      <div className="rounded-3xl border border-[#ff0000]/40 bg-[#ff0000]/[0.06] p-8 text-center sm:p-10">
         <div className="text-4xl">🎉</div>
         <div className="mt-3 font-display text-2xl font-extrabold text-white">You&apos;re in.</div>
         <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-white/65">
           We&apos;ve got everything we need to start. Keep an eye on your phone, we&apos;ll call you shortly to plan the
-          ultimate Cairns getaway.
+          ultimate Cairns experience.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-3xl border border-white/12 bg-white/[0.03] p-6 shadow-[0_20px_80px_-30px_rgba(255,45,120,0.5)] sm:p-8">
+    <div className="rounded-3xl border border-white/12 bg-white/[0.03] p-6 shadow-[0_20px_80px_-30px_rgba(255,0,0,0.55)] sm:p-8">
       {/* progress */}
       <div className="flex items-center justify-between">
         <span className="text-[11px] font-black uppercase tracking-[0.18em] text-white/45">
           Step {step + 1} of {total}
         </span>
-        <span className="text-[11px] font-black uppercase tracking-[0.18em]" style={{ color: CYAN }}>
+        <span className="text-[11px] font-black uppercase tracking-[0.18em]" style={{ color: RED_SOFT }}>
           {pct}%
         </span>
       </div>
       <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
         <div
           className="h-full rounded-full transition-all duration-300"
-          style={{ width: `${Math.max(pct, 6)}%`, background: `linear-gradient(90deg, ${PINK}, ${CYAN})` }}
+          style={{ width: `${Math.max(pct, 6)}%`, background: `linear-gradient(90deg, ${RED_DEEP}, ${RED})` }}
         />
       </div>
 
@@ -168,6 +213,46 @@ export default function CairnsEventsForm() {
       <div className="mt-7">
         <h3 className="font-display text-2xl font-extrabold leading-tight text-white sm:text-3xl">{current.q}</h3>
         {current.sub && <p className="mt-2 text-sm text-white/55">{current.sub}</p>}
+
+        {current.type === "multi" && (
+          <div className="mt-6">
+            <div className="grid grid-cols-2 gap-2.5">
+              {current.options.map((o) => {
+                const selected = activities.includes(o.label);
+                return (
+                  <button
+                    key={o.label}
+                    onClick={() => toggleActivity(o.label)}
+                    className={`flex items-center gap-2.5 rounded-2xl border px-3.5 py-3 text-left text-sm font-bold transition active:scale-[0.98] ${
+                      selected
+                        ? "border-[#ff0000] bg-[#ff0000]/15 text-white"
+                        : "border-white/15 bg-black/30 text-white/80 hover:border-white/40"
+                    }`}
+                  >
+                    <span className="text-lg">{o.icon}</span>
+                    <span className="leading-tight">{o.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <input
+              value={activityOther}
+              onChange={(e) => {
+                setActivityOther(e.target.value);
+                setError("");
+              }}
+              placeholder="Something else? Tell us here"
+              className={`${field} mt-3`}
+            />
+            <button
+              onClick={next}
+              className="mt-4 w-full rounded-full px-6 py-3.5 font-display text-sm font-black uppercase tracking-wide text-white transition hover:brightness-110 active:scale-95"
+              style={{ background: RED }}
+            >
+              Continue →
+            </button>
+          </div>
+        )}
 
         {current.type === "choice" && (
           <div className="mt-6 grid gap-3">
@@ -179,14 +264,14 @@ export default function CairnsEventsForm() {
                   onClick={() => answerAndNext(current.key, o)}
                   className={`group flex items-center justify-between rounded-2xl border px-5 py-4 text-left text-base font-bold transition active:scale-[0.99] ${
                     selected
-                      ? "border-[#ff2d78] bg-[#ff2d78]/15 text-white"
+                      ? "border-[#ff0000] bg-[#ff0000]/15 text-white"
                       : "border-white/15 bg-black/30 text-white/80 hover:border-white/40 hover:bg-white/[0.04]"
                   }`}
                 >
                   <span>{o}</span>
                   <span
                     className="text-lg opacity-0 transition group-hover:opacity-100"
-                    style={{ color: CYAN }}
+                    style={{ color: RED_SOFT }}
                     aria-hidden
                   >
                     →
@@ -209,8 +294,8 @@ export default function CairnsEventsForm() {
             />
             <button
               onClick={next}
-              className="mt-4 w-full rounded-full px-6 py-3.5 font-display text-sm font-black text-white transition hover:brightness-110 active:scale-95"
-              style={{ background: PINK }}
+              className="mt-4 w-full rounded-full px-6 py-3.5 font-display text-sm font-black uppercase tracking-wide text-white transition hover:brightness-110 active:scale-95"
+              style={{ background: RED }}
             >
               Continue →
             </button>
@@ -243,8 +328,8 @@ export default function CairnsEventsForm() {
             <button
               onClick={submit}
               disabled={state === "sending"}
-              className="mt-2 w-full rounded-full px-6 py-4 font-display text-base font-black text-white transition hover:brightness-110 active:scale-95 disabled:opacity-50"
-              style={{ background: `linear-gradient(90deg, ${PINK}, ${CYAN})` }}
+              className="mt-2 w-full rounded-full px-6 py-4 font-display text-base font-black uppercase tracking-wide text-white transition hover:brightness-110 active:scale-95 disabled:opacity-50"
+              style={{ background: `linear-gradient(90deg, ${RED_DEEP}, ${RED})` }}
             >
               {state === "sending" ? "Sending…" : "Get my custom plan →"}
             </button>
