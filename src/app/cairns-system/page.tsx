@@ -44,13 +44,6 @@ const ROLES_PETE = [
   "Honour the bookings we bring you",
 ];
 
-const TIERS: { price: string; suppliers: string; keep: string; cut: string }[] = [
-  { price: "$10,000", suppliers: "~$6,000", keep: "~$2,000", cut: "$2,000" },
-  { price: "$25,000", suppliers: "~$15,000", keep: "~$5,000", cut: "$5,000" },
-  { price: "$50,000", suppliers: "~$30,000", keep: "~$10,000", cut: "$10,000" },
-  { price: "$100,000", suppliers: "~$60,000", keep: "~$20,000", cut: "$20,000" },
-];
-
 const TERMS = [
   { t: "12 month agreement", d: "A full year to build this properly, then we renew or renegotiate." },
   { t: "You pay nothing for marketing", d: "I fund all the advertising. It costs you nothing to have this running." },
@@ -217,38 +210,43 @@ export default function CairnsSystemPage() {
               <div className="mt-2 font-display text-4xl font-black text-white sm:text-5xl">
                 $10k <span className="text-white/35">to</span> $100k<span style={{ color: PURPLE_SOFT }}>+</span>
               </div>
-              <p className="mx-auto mt-2 max-w-md text-sm text-white/55">
-                Every trip is custom. The bigger the group and the trip, the more you make.
+              <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-white/60">
+                You keep your bus fee plus your margin on every trip, and <span className="font-bold text-white">you set
+                the price</span>. It is all new business, at zero marketing cost to you.
               </p>
             </div>
 
-            <div className="mt-6 overflow-x-auto">
-              <table className="w-full min-w-[440px] border-collapse text-sm">
-                <thead>
-                  <tr className="text-[11px] uppercase tracking-wider text-white/40">
-                    <th className="px-3 py-2 text-left font-black">Trip sells for</th>
-                    <th className="px-3 py-2 text-right font-black">Suppliers</th>
-                    <th className="px-3 py-2 text-right font-black">You keep</th>
-                    <th className="px-3 py-2 text-right font-black">My 20%</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {TIERS.map((t) => (
-                    <tr key={t.price} className="border-t border-white/10">
-                      <td className="px-3 py-3 font-display font-black tabular-nums text-white">{t.price}</td>
-                      <td className="px-3 py-3 text-right tabular-nums text-white/55">{t.suppliers}</td>
-                      <td className="px-3 py-3 text-right font-black tabular-nums" style={{ color: GREEN }}>{t.keep}</td>
-                      <td className="px-3 py-3 text-right font-black tabular-nums" style={{ color: PURPLE_SOFT }}>{t.cut}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="mt-6 grid grid-cols-3 gap-3">
+              <div className="rounded-2xl border border-white/10 bg-black/30 p-4 text-center">
+                <div className="font-display text-xl font-black" style={{ color: GREEN }}>100%</div>
+                <div className="mt-1 text-[11px] leading-snug text-white/55">new business you&apos;re not getting today</div>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-black/30 p-4 text-center">
+                <div className="font-display text-xl font-black" style={{ color: GREEN }}>$0</div>
+                <div className="mt-1 text-[11px] leading-snug text-white/55">your cost. I fund the marketing</div>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-black/30 p-4 text-center">
+                <div className="font-display text-xl font-black" style={{ color: GREEN }}>Yours</div>
+                <div className="mt-1 text-[11px] leading-snug text-white/55">you set the price and keep your margin</div>
+              </div>
+            </div>
+
+            <div className="mt-6 rounded-2xl border p-6 text-center" style={{ borderColor: `${PURPLE}55`, background: `${PURPLE}14` }}>
+              <div className="text-[11px] font-black uppercase tracking-[0.16em]" style={{ color: PURPLE_SOFT }}>
+                What a year could look like
+              </div>
+              <div className="mt-2 font-display text-4xl font-black text-white sm:text-5xl">~$120,000+</div>
+              <div className="mt-1 text-sm font-bold text-white/70">in new money you keep</div>
+              <p className="mx-auto mt-3 max-w-md text-sm leading-relaxed text-white/60">
+                Just two trips a month at a $25k average is around $120k a year in your pocket, on top of the pub crawls,
+                hens, bucks and private hires the same marketing brings in. All of it money you are not making today.
+              </p>
             </div>
 
             <p className="mt-4 text-xs leading-relaxed text-white/45">
-              Approximate and illustrative, the real split depends on the mix of activities in each trip. Your share is
-              your bus revenue plus your margin, and every one is a booking you would not have had, at zero marketing
-              cost to you. My planning fee ($0 to $1,000) is paid to me separately by the client, on top.
+              Illustrative, real numbers depend on the trips. The point stands: every booking is new business you would
+              not have had, it costs you nothing in marketing, and you keep your bus fee and your margin. My planning fee
+              ($0 to $1,000) is paid to me separately by the client, on top.
             </p>
           </div>
 
