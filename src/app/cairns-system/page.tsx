@@ -1,35 +1,36 @@
 import type { Metadata } from "next";
 
-/* Partner explainer page for Pete (Cairns Ultimate Party). Walks him through the
-   whole system Thanyon is building: the attraction offer / ads, the landing page,
-   the $100M offer, the money model (planning fee + 20%), who does what, and the
-   contract. Clean and skimmable, meant to be sent as a link. No nav, noindex.
-   Branding: Cairns Ultimate Party red/black. Numbers are illustrative and
-   labelled as such, nothing fabricated. */
+/* Partner explainer page for Pete (Cairns Ultimate Party), presented as Thanyon's
+   growth-partner pitch. Walks Pete through the whole system: the attraction offer
+   / ads, the landing page, the money model (planning fee + 20%), who does what,
+   and the contract. Clean and skimmable, meant to be sent as a link. No nav,
+   noindex. Branding: Thanyon (purple). Numbers are illustrative and labelled as
+   such, nothing fabricated. */
 
 export const metadata: Metadata = {
-  title: "The Growth System | Cairns Ultimate Party",
+  title: "The Growth System | Thanyon x Cairns Ultimate Party",
   description:
     "The complete marketing and sales system built for Cairns Ultimate Party: how leads come in, how trips get sold, and how we both make money.",
   robots: { index: false, follow: false },
   alternates: { canonical: "/cairns-system" },
 };
 
-const RED = "#ff0000";
-const RED_DEEP = "#c20000";
-const RED_SOFT = "#ff5a5a";
+const PURPLE = "#7c2ff5";
+const PURPLE_DEEP = "#5a1cc0";
+const PURPLE_SOFT = "#a970ff";
+const GREEN = "#2bff7a";
 
 const FUNNEL: { n: string; t: string; d: string }[] = [
   { n: "1", t: "The ad (attraction offer)", d: "Paid ads run across Australia to teams, wedding parties and groups thinking about Cairns." },
   { n: "2", t: "The landing page", d: "They watch a short video and answer a few quick questions about the trip they want." },
   { n: "3", t: "I call them", d: "One on one, I find out exactly what they want, need and can spend." },
-  { n: "4", t: "I build the plan ($1,000)", d: "A full custom Cairns itinerary, every piece tied together. They pay me to design it." },
+  { n: "4", t: "I build the plan", d: "A full custom Cairns itinerary, every piece tied together. They pay me to design it." },
   { n: "5", t: "I present the package", d: "One plan, one price, sold over the phone. Deposit taken to lock it in." },
   { n: "6", t: "You deliver it", d: "The bus, the day, the experience. You do what you do best and make the client's trip." },
 ];
 
 const ROLES_ME = [
-  "Build and pay for all the ads (across Australia)",
+  "Build and pay for all the ads (national and local)",
   "Own the landing pages, funnels, socials and content",
   "Handle every lead, call and sale over the phone",
   "Design the full custom itinerary and coordinate suppliers",
@@ -47,8 +48,8 @@ const TERMS = [
   { t: "12 month agreement", d: "A full year to build this properly, then we renew or renegotiate." },
   { t: "You pay nothing for marketing", d: "I fund all the advertising. It costs you nothing to have this running." },
   { t: "20% commission", d: "I take 20% of the revenue I generate. You keep the rest after your suppliers." },
-  { t: "The planning fee is mine", d: "The $1,000 I charge clients to build their plan is separate and stays with me." },
-  { t: "Exclusive to me", d: "While we work together, you use me for marketing and sales, not anyone else." },
+  { t: "The planning fee is mine", d: "The planning fee I charge clients ($0 to $1,000) to build their plan is separate and stays with me." },
+  { t: "Exclusive to me", d: "While we work together, you use me for marketing and sales, not anyone else. That covers local ad campaigns and offers too, not just the national trips." },
   { t: "I own what I build", d: "The ads, funnels, pages and systems stay mine. You get a licence to use them while we work together." },
 ];
 
@@ -59,12 +60,12 @@ export default function CairnsSystemPage() {
       <header className="border-b border-white/10 bg-black">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
           <div>
-            <div className="font-display text-lg font-black uppercase leading-none tracking-[0.08em]">
-              <span className="text-white">Cairns</span> <span style={{ color: RED }}>Ultimate Party</span>
+            <div className="font-display text-lg font-black uppercase leading-none tracking-[0.14em]" style={{ color: PURPLE_SOFT }}>
+              THANYON
             </div>
-            <div className="mt-1 text-[10px] font-black uppercase tracking-[0.28em] text-white/45">The Growth System</div>
+            <div className="mt-1 text-[10px] font-black uppercase tracking-[0.28em] text-white/45">Growth Partner</div>
           </div>
-          <span className="text-xs font-bold text-white/40">Prepared for Pete</span>
+          <span className="text-xs font-bold text-white/40">Prepared for Cairns Ultimate Party</span>
         </div>
       </header>
 
@@ -72,14 +73,14 @@ export default function CairnsSystemPage() {
       <section className="relative overflow-hidden px-4 pt-14 pb-8 sm:pt-20">
         <div
           className="pointer-events-none absolute left-1/2 top-0 h-[420px] w-[560px] -translate-x-1/2 rounded-full opacity-30 blur-[130px]"
-          style={{ background: `radial-gradient(closest-side, ${RED}, transparent 70%)` }}
+          style={{ background: `radial-gradient(closest-side, ${PURPLE}, transparent 70%)` }}
           aria-hidden
         />
         <div className="relative mx-auto max-w-3xl text-center">
           <h1 className="font-display text-4xl font-extrabold uppercase leading-[1.03] tracking-tight sm:text-6xl">
             A machine that
             <br />
-            <span style={{ color: RED }}>books out your bus</span>
+            <span style={{ color: PURPLE_SOFT }}>books out your bus</span>
           </h1>
           <p className="mx-auto mt-5 max-w-xl text-base leading-relaxed text-white/70 sm:text-lg">
             Here is exactly what I am building for Cairns Ultimate Party. A complete marketing and sales system that
@@ -91,7 +92,7 @@ export default function CairnsSystemPage() {
               href="/cairns-events"
               target="_blank"
               className="inline-flex items-center justify-center rounded-full px-7 py-3.5 font-display text-sm font-black uppercase tracking-wide text-white transition hover:brightness-110 active:scale-95"
-              style={{ background: `linear-gradient(90deg, ${RED_DEEP}, ${RED})` }}
+              style={{ background: `linear-gradient(90deg, ${PURPLE_DEEP}, ${PURPLE})` }}
             >
               See the live landing page →
             </a>
@@ -108,7 +109,7 @@ export default function CairnsSystemPage() {
       {/* ── THE ATTRACTION OFFER ── */}
       <section className="px-4 py-10">
         <div className="mx-auto max-w-3xl">
-          <div className="text-center text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: RED_SOFT }}>
+          <div className="text-center text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: PURPLE_SOFT }}>
             It starts with the ad
           </div>
           <h2 className="mt-3 text-center font-display text-3xl font-extrabold uppercase tracking-tight sm:text-4xl">
@@ -134,7 +135,7 @@ export default function CairnsSystemPage() {
       <section className="border-t border-white/10 px-4 py-14">
         <div className="mx-auto max-w-4xl">
           <div className="text-center">
-            <div className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: RED_SOFT }}>
+            <div className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: PURPLE_SOFT }}>
               The whole flow
             </div>
             <h2 className="mt-3 font-display text-3xl font-extrabold uppercase tracking-tight sm:text-4xl">
@@ -146,7 +147,7 @@ export default function CairnsSystemPage() {
               <div key={s.n} className="h-full rounded-2xl border border-white/10 bg-white/[0.02] p-5">
                 <div
                   className="flex h-9 w-9 items-center justify-center rounded-full font-display text-sm font-black text-white"
-                  style={{ background: RED }}
+                  style={{ background: PURPLE }}
                 >
                   {s.n}
                 </div>
@@ -160,12 +161,12 @@ export default function CairnsSystemPage() {
 
       {/* ── THE LANDING PAGE ── */}
       <section className="px-4 py-12">
-        <div className="mx-auto max-w-3xl rounded-3xl border p-6 sm:p-8" style={{ borderColor: `${RED}33`, background: `${RED}0a` }}>
-          <div className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: RED_SOFT }}>
-            Already built
+        <div className="mx-auto max-w-3xl rounded-3xl border p-6 sm:p-8" style={{ borderColor: `${PURPLE}44`, background: `${PURPLE}0f` }}>
+          <div className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: PURPLE_SOFT }}>
+            First draft built
           </div>
           <h2 className="mt-2 font-display text-2xl font-extrabold uppercase tracking-tight sm:text-3xl">
-            The landing page is live
+            The landing page
           </h2>
           <p className="mt-3 text-sm leading-relaxed text-white/70">
             Built in your branding. A video sells the dream, then a simple step-by-step form asks what they want to do,
@@ -173,11 +174,15 @@ export default function CairnsSystemPage() {
             enquiry that lands straight with me. It already lays out the full offer: everything handled, one package, one
             price, with a no-pressure guarantee.
           </p>
+          <p className="mt-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-xs leading-relaxed text-white/55">
+            Heads up: this is a rough first draft. It still needs the real images added and the video finished and
+            tweaked, but it shows you exactly how the whole thing works.
+          </p>
           <a
             href="/cairns-events"
             target="_blank"
             className="mt-5 inline-flex items-center justify-center rounded-full px-7 py-3.5 font-display text-sm font-black uppercase tracking-wide text-white transition hover:brightness-110 active:scale-95"
-            style={{ background: RED }}
+            style={{ background: PURPLE }}
           >
             Take a look →
           </a>
@@ -188,7 +193,7 @@ export default function CairnsSystemPage() {
       <section id="money" className="scroll-mt-4 border-t border-white/10 px-4 py-14">
         <div className="mx-auto max-w-3xl">
           <div className="text-center">
-            <div className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: RED_SOFT }}>
+            <div className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: PURPLE_SOFT }}>
               The important bit
             </div>
             <h2 className="mt-3 font-display text-3xl font-extrabold uppercase tracking-tight sm:text-4xl">
@@ -210,15 +215,15 @@ export default function CairnsSystemPage() {
               </div>
               <div className="flex items-center justify-between gap-3 rounded-xl border border-white/10 bg-black/30 px-4 py-3">
                 <span className="text-sm text-white/70">You keep, your bus revenue + margin</span>
-                <span className="font-display text-sm font-black" style={{ color: "#3ddc84" }}>your money</span>
+                <span className="font-display text-sm font-black" style={{ color: GREEN }}>your money</span>
               </div>
-              <div className="flex items-center justify-between gap-3 rounded-xl border px-4 py-3" style={{ borderColor: `${RED}44`, background: `${RED}12` }}>
+              <div className="flex items-center justify-between gap-3 rounded-xl border px-4 py-3" style={{ borderColor: `${PURPLE}55`, background: `${PURPLE}18` }}>
                 <span className="text-sm text-white/80">My commission (20% of the trip)</span>
-                <span className="font-display text-sm font-black" style={{ color: RED_SOFT }}>$5,000</span>
+                <span className="font-display text-sm font-black" style={{ color: PURPLE_SOFT }}>$5,000</span>
               </div>
-              <div className="flex items-center justify-between gap-3 rounded-xl border px-4 py-3" style={{ borderColor: `${RED}44`, background: `${RED}12` }}>
+              <div className="flex items-center justify-between gap-3 rounded-xl border px-4 py-3" style={{ borderColor: `${PURPLE}55`, background: `${PURPLE}18` }}>
                 <span className="text-sm text-white/80">My planning fee (client pays me to plan)</span>
-                <span className="font-display text-sm font-black" style={{ color: RED_SOFT }}>$1,000</span>
+                <span className="font-display text-sm font-black" style={{ color: PURPLE_SOFT }}>$0 to $1,000</span>
               </div>
             </div>
             <p className="mt-4 text-xs leading-relaxed text-white/45">
@@ -229,15 +234,15 @@ export default function CairnsSystemPage() {
 
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 text-center">
-              <div className="font-display text-2xl font-black" style={{ color: RED }}>$0</div>
+              <div className="font-display text-2xl font-black" style={{ color: PURPLE_SOFT }}>$0</div>
               <div className="mt-1 text-xs text-white/55">your marketing cost. I fund every ad.</div>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 text-center">
-              <div className="font-display text-2xl font-black" style={{ color: RED }}>20%</div>
+              <div className="font-display text-2xl font-black" style={{ color: PURPLE_SOFT }}>20%</div>
               <div className="mt-1 text-xs text-white/55">my cut of revenue I bring you. You keep the rest.</div>
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/[0.02] p-5 text-center">
-              <div className="font-display text-2xl font-black" style={{ color: RED }}>New</div>
+              <div className="font-display text-2xl font-black" style={{ color: PURPLE_SOFT }}>New</div>
               <div className="mt-1 text-xs text-white/55">high-value bookings you are not getting today.</div>
             </div>
           </div>
@@ -248,7 +253,7 @@ export default function CairnsSystemPage() {
       <section className="border-t border-white/10 px-4 py-14">
         <div className="mx-auto max-w-4xl">
           <div className="text-center">
-            <div className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: RED_SOFT }}>
+            <div className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: PURPLE_SOFT }}>
               Clear lanes
             </div>
             <h2 className="mt-3 font-display text-3xl font-extrabold uppercase tracking-tight sm:text-4xl">
@@ -257,13 +262,13 @@ export default function CairnsSystemPage() {
           </div>
           <div className="mt-8 grid gap-4 sm:grid-cols-2">
             <div className="rounded-3xl border border-white/12 bg-white/[0.02] p-6">
-              <div className="font-display text-lg font-black uppercase" style={{ color: RED_SOFT }}>
+              <div className="font-display text-lg font-black uppercase" style={{ color: PURPLE_SOFT }}>
                 I handle
               </div>
               <ul className="mt-4 flex flex-col gap-2.5">
                 {ROLES_ME.map((r) => (
                   <li key={r} className="flex items-start gap-2.5 text-sm leading-relaxed text-white/80">
-                    <span className="mt-0.5 shrink-0" style={{ color: RED }}>✓</span>
+                    <span className="mt-0.5 shrink-0" style={{ color: PURPLE_SOFT }}>✓</span>
                     <span>{r}</span>
                   </li>
                 ))}
@@ -274,7 +279,7 @@ export default function CairnsSystemPage() {
               <ul className="mt-4 flex flex-col gap-2.5">
                 {ROLES_PETE.map((r) => (
                   <li key={r} className="flex items-start gap-2.5 text-sm leading-relaxed text-white/80">
-                    <span className="mt-0.5 shrink-0 text-[#3ddc84]">✓</span>
+                    <span className="mt-0.5 shrink-0" style={{ color: GREEN }}>✓</span>
                     <span>{r}</span>
                   </li>
                 ))}
@@ -291,15 +296,15 @@ export default function CairnsSystemPage() {
       <section className="border-t border-white/10 px-4 py-14">
         <div className="mx-auto max-w-4xl">
           <div className="text-center">
-            <div className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: RED_SOFT }}>
+            <div className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: PURPLE_SOFT }}>
               Straight and fair
             </div>
             <h2 className="mt-3 font-display text-3xl font-extrabold uppercase tracking-tight sm:text-4xl">
               The agreement
             </h2>
             <p className="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-white/60">
-              A simple 12 month agreement so we can build this properly. Here is the shape of it. The full contract is
-              ready for you to read and sign.
+              A simple 12 month agreement so we can build this properly. Here is the shape of it. The full contract will
+              be printed and signed by both of us.
             </p>
           </div>
           <div className="mt-8 grid gap-3 sm:grid-cols-2">
@@ -316,7 +321,7 @@ export default function CairnsSystemPage() {
       {/* ── THE OPPORTUNITY ── */}
       <section className="border-t border-white/10 bg-black px-4 py-14">
         <div className="mx-auto max-w-3xl text-center">
-          <div className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: RED_SOFT }}>
+          <div className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: PURPLE_SOFT }}>
             Why now
           </div>
           <h2 className="mt-3 font-display text-3xl font-extrabold uppercase tracking-tight sm:text-4xl">
@@ -336,14 +341,14 @@ export default function CairnsSystemPage() {
         <div className="mx-auto max-w-xl">
           <h2 className="font-display text-3xl font-extrabold uppercase tracking-tight sm:text-4xl">Let&apos;s lock it in</h2>
           <p className="mx-auto mt-4 text-sm leading-relaxed text-white/65">
-            Everything is built and ready. Have a read of the full agreement, and let&apos;s go through it together. Once
-            we sign, I switch the ads on and we start filling that bus with the best trips Cairns has ever put together.
+            Everything is built and ready. Let&apos;s go through the agreement together and get it signed. Once we do, I
+            switch the ads on and we start filling that bus with the best trips Cairns has ever put together.
           </p>
           <a
             href="/cairns-events"
             target="_blank"
             className="mt-7 inline-flex items-center justify-center rounded-full px-8 py-4 font-display text-base font-black uppercase tracking-wide text-white transition hover:brightness-110 active:scale-95"
-            style={{ background: `linear-gradient(90deg, ${RED_DEEP}, ${RED})`, boxShadow: `0 14px 40px -14px ${RED}` }}
+            style={{ background: `linear-gradient(90deg, ${PURPLE_DEEP}, ${PURPLE})`, boxShadow: `0 14px 40px -14px ${PURPLE}` }}
           >
             See it in action →
           </a>
@@ -352,10 +357,10 @@ export default function CairnsSystemPage() {
 
       <footer className="border-t border-white/10 bg-black">
         <div className="mx-auto max-w-5xl px-4 py-8 text-center">
-          <div className="font-display text-sm font-black uppercase tracking-[0.1em]">
-            <span className="text-white">Cairns</span> <span style={{ color: RED }}>Ultimate Party</span>
+          <div className="font-display text-sm font-black uppercase tracking-[0.14em]" style={{ color: PURPLE_SOFT }}>
+            THANYON
           </div>
-          <p className="mt-2 text-xs text-white/30">The Growth System · Prepared for Pete · Confidential</p>
+          <p className="mt-2 text-xs text-white/30">Growth System · Prepared for Cairns Ultimate Party · Confidential</p>
         </div>
       </footer>
     </main>
