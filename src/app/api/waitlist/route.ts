@@ -75,6 +75,7 @@ export async function POST(req: Request) {
     "growth-partner",
     "partybus",
     "partybus-grow",
+    "partybus-events",
     "diamond-touch",
   ];
   const source = SOURCES.includes(String(body.source)) ? String(body.source) : "garage-waitlist";

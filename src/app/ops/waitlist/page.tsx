@@ -30,6 +30,7 @@ const SOURCE_LABEL: Record<string, string> = {
   "growth-partner": "Growth service",
   partybus: "🚌 Party bus giveaway",
   "partybus-grow": "🚌 Party bus, growth service",
+  "partybus-events": "🎉 Party bus event enquiry",
   "diamond-touch": "🧽 Diamond Touch",
 };
 
